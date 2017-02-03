@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ModifiedFilesDialog</class>
+ <widget class="QDialog" name="ModifiedFilesDialog">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>617</width>
+    <height>242</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Save modified files before exiting?</string>
+  </property>
+  <property name="modal">
+   <bool>true</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>The following files have been modified</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QTreeWidget" name="treeWidget">
+       <column>
+        <property name="text">
+         <string>Open Files</string>
+        </property>
+       </column>
+       <item>
+        <property name="text">
+         <string>not_part_of_project.rmp</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>&lt;Untitled script&gt;</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>&lt;Untitled map&gt;</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Project Name</string>
+        </property>
+        <item>
+         <property name="text">
+          <string>scripts/main.js</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>spritesets/player.rss</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>maps/field.rmp</string>
+         </property>
+        </item>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QPushButton" name="cancelButton">
+         <property name="text">
+          <string>Cancel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="discardAllButton">
+         <property name="text">
+          <string>Discard selected</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="discardAllButton_2">
+         <property name="text">
+          <string>Discard All</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="saveButton">
+         <property name="text">
+          <string>Save selected</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="saveAllButton">
+         <property name="text">
+          <string>Save All</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
