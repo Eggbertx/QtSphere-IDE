@@ -33,11 +33,6 @@ QString getWidgetType(QObject* widget) {
 	return QString(widget->metaObject()->className());
 }
 
-void highlightSyntax(QTextEdit* textBox) {
-
-}
-
-
 
 void setTheme(QString theme) {
 	//QFile styleFile("stylesheet.qss");
@@ -49,5 +44,5 @@ void setTheme(QString theme) {
 	if(MainWindow::instance() == NULL)
         qDebug() << "MainWindow::instance() is NULL. wtf??";
 	else
-        qDebug().noquote() << "something something load theme or whatever"
+        qDebug().noquote() << "something something load theme or whatever";
 }

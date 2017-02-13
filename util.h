@@ -11,8 +11,6 @@ int question(QString title, QString message);
 
 QString getWidgetType(QObject* widget);
 
-void highlightSyntax(QTextEdit* textBox);
-
 void setTheme(QString theme);
 
 #endif // UTIL_H
