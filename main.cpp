@@ -6,11 +6,11 @@
 
 int main(int argc, char *argv[]) {
 	QApplication a(argc, argv);
+
 	Config ideConfig;
-	ideConfig.loadConfig();
+    MainWindow w;
 
-	MainWindow w;
-
-	w.showMaximized();
+    ideConfig.loadConfig();
+    w.showMaximized();
 	return a.exec();
 }

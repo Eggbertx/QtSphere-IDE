@@ -1,13 +1,9 @@
-#include <iostream>
 #include <QProcess>
 #include <QFileDialog>
-#include <QTreeWidget>
 #include <QMenu>
-#include <QSplitter>
 #include <QCloseEvent>
-#include <QMessageBox>
 #include <QTime>
-
+#include <assert.h>
 #include "mainwindow.h"
 #include "util.h"
 #include "ui_mainwindow.h"
@@ -15,12 +11,18 @@
 #include "settingswindow.h"
 #include "highlighter.h"
 
+MainWindow* MainWindow::_instance = NULL;
+
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
-	ui->setupUi(this);
+    Q_ASSERT(!_instance);
+    _instance = this;
 
-	this->console("こんばんは！");
-
+    ui->setupUi(this);
 	ui->statusBar->showMessage("Ready");
+
+	ui->toolbarNewButton->setIcon(this->style()->standardIcon(QStyle::SP_FileIcon));
+	ui->toolbarOpenButton->setIcon(this->style()->standardIcon(QStyle::SP_DialogOpenButton));
+	ui->toolbarSaveButton->setIcon(this->style()->standardIcon(QStyle::SP_DriveFDIcon));
 
 	ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
 
@@ -28,7 +30,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	h->setCheckState(Qt::Unchecked);
 
 	ui->tableWidget->setItem(0, 1, h);
-
 
 	ui->centralWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->centralWidget, SIGNAL(customContextMenuRequested(const QPoint&)),
@@ -52,6 +53,13 @@ MainWindow::~MainWindow() {
 	delete ui;
 }
 
+MainWindow* MainWindow::instance() {
+    if(!_instance)
+        _instance = new MainWindow;
+
+    return _instance;
+}
+
 void MainWindow::closeEvent(QCloseEvent* event) {
 	return;
 	event->ignore();
@@ -60,30 +68,31 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 }
 
 void MainWindow::console(QVariant s, int which) {
+    // thank you SO much to the folks at the Qt forums
+    // for helping me get this nonsense to work
 
 	QString prefix = "[" + QTime::currentTime().toString("h:mm:s ap") + "] ";
+    QString line = prefix + s.toString();
 	switch (which) {
 		case 0:
-            ui->buildLogText->insertPlainText(prefix + s.toString() + "\n");
+            ui->buildLogText->insertPlainText(line);
 		break;
 		case 1:
-            ui->consoleText->insertPlainText(prefix + s.toString() + "\n");
+            ui->consoleText->appendPlainText(line);
 		break;
 		case 2:
-			//
+            // exceptions, probably make a QTableView
 		break;
 		default:
-            ui->consoleText->insertPlainText(prefix + s.toString() + "\n");
+            ui->consoleText->insertPlainText(line);
 		break;
 	}
 }
-
 
 void MainWindow::on_actionAbout_triggered() {
 	AboutDialog aboutDialog;
 	aboutDialog.setModal(true);
 	aboutDialog.exec();
-
 }
 
 void MainWindow::on_actionSphere_2_0_API_triggered() {
@@ -95,27 +104,32 @@ void MainWindow::on_actionMiniRT_API_triggered() {
 	QProcess process;
 }
 
+void MainWindow::saveCurrentTab() {
+	QObjectList tabChildren = ui->openFileTabs->currentWidget()->children();
+    
+    foreach (QObject* tab, tabChildren) {
+        qDebug().noquote() << "Object: " << getWidgetType(tab);
+    }
+}
+
 void MainWindow::setupEditor() {
 	QFont font;
 	font.setFamily("Courier");
 	font.setFixedPitch(true);
-	font.setPointSize(12);
+	font.setPointSize(10);
+	font.setStyleStrategy(QFont::PreferAntialias);
+	int num_tabs = ui->openFileTabs->count();
 
-	ui->toolbarNewButton->setIcon(this->style()->standardIcon(QStyle::SP_FileIcon));
-	ui->toolbarOpenButton->setIcon(this->style()->standardIcon(QStyle::SP_DialogOpenButton));
-    ui->toolbarSaveButton->setIcon(this->style()->standardIcon(QStyle::SP_DriveFDIcon));
-
-	QObjectList widgets =  ui->openFileTabs->findChildren<QObject *>();
-
-	foreach(QObject* obj, widgets) {
-		if(obj->objectName().indexOf("textEdit") == 0 && obj->isWidgetType()) {
-			QTextEdit* editor = qobject_cast<QTextEdit*>(obj);
-			editor->setFont(font);
-			Highlighter* highlighter = new Highlighter(editor->document());
-
-			QFile file("main.js");
-			if(file.open(QFile::ReadOnly | QFile::Text)) {
-				editor->setPlainText("file.readAll()");
+	for(int i = 0; i < num_tabs; i++) {
+		QObjectList children;
+		for(int ch = 0; ch < ui->openFileTabs->widget(i)->children().count(); ch++) {
+			if(getWidgetType(ui->openFileTabs->widget(i)->children()[ch]) == "QTextEdit") {
+				QTextEdit* editor;
+				editor = qobject_cast<QTextEdit*>(ui->openFileTabs->widget(i)->children()[ch]);
+				editor->setFont(font);
+				Highlighter* highlighter = new Highlighter(editor->document());
+				children.append(ui->openFileTabs->widget(i)->children()[ch]);
+				ui->openFileTabs->setCurrentIndex(0);
 			}
 		}
 	}
@@ -140,24 +154,18 @@ void MainWindow::showContextMenu(const QPoint &pos) {
 
 	QAction* selectedItem = rMenu.exec(globalPos);
 
-
-
 	if (selectedItem) {
 		ui->consoleText->insertPlainText("selectedItem");
 	} else {
 		ui->consoleText->insertPlainText("not selectedItem");
 	}
-
 }
 
 void MainWindow::prepareForText() {
-    QList<int> paneSizes; // size of horizontal pane and main area
-    paneSizes << 200 << 300;
-    ui->splitter->setSizes(paneSizes);
+
 }
 
 void MainWindow::openProject(QString fileName) {
-    qDebug().noquote() << "Loading " << fileName << "...";
     this->console("Loading " + QVariant(fileName).toString());
 }
 
@@ -185,4 +193,17 @@ void MainWindow::on_actionConfigure_QtSphere_IDE_triggered() {
     SettingsWindow settingsWindow;
     settingsWindow.setModal(true);
     settingsWindow.exec();
+}
+
+void MainWindow::on_toolbarNewButton_triggered() {
+	setTheme("ayy lmao");
+	QTextEdit* newTextEdit = new QTextEdit("bleh.readAll()", ui->openFileTabs);
+	newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()) );
+	Highlighter* highlighter = new Highlighter(newTextEdit->document());
+	ui->openFileTabs->insertTab(0, newTextEdit, "<Untitled>");
+	this->setupEditor();
+}
+
+void MainWindow::on_toolbarSaveButton_triggered() {
+	this->saveCurrentTab();
 }

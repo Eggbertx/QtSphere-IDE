@@ -22,7 +22,7 @@ HEADERS  += mainwindow.h \
     modifiedfilesdialog.h \
     config.h \
     highlighter.h \
-    settingswindow.h
+    settingswindow.h \
 
 FORMS    += mainwindow.ui \
     aboutdialog.ui \

@@ -15,22 +15,24 @@ class MainWindow : public QMainWindow {
 	Q_OBJECT
 
 	public:
-		explicit MainWindow(QWidget *parent = 0);
+        explicit MainWindow(QWidget *parent = Q_NULLPTR);
 		~MainWindow();
 		QFileSystemModel *fileTree;
 
 		void openFile(QString fileName);
 		void openProject(QString fileName);
+		void saveCurrentTab();
 
-        // triggered whenever a file tab is clicked
         void prepareForText();
         void prepareForImage();
         void prepareForMap();
         void prepareForTileSet();
         void prepareForSpriteset();
+
 		void console(QVariant s, int which = 1);
 		void closeEvent(QCloseEvent* event);
 
+		static MainWindow* instance();
 	private slots:
 		void on_actionMiniRT_API_triggered();
 
@@ -46,12 +48,15 @@ class MainWindow : public QMainWindow {
 
         void on_actionConfigure_QtSphere_IDE_triggered();
 
-private:
+        void on_toolbarNewButton_triggered();
+
+		void on_toolbarSaveButton_triggered();
+
+	private:
+        static MainWindow* _instance;
+
 		Ui::MainWindow *ui;
 		void setupEditor();
-		QTextEdit *editor;
-
 };
-
 
 #endif // MAINWINDOW_H
