@@ -4,10 +4,9 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include "config.h"
+#include "mainwindow.h"
 
 Config::Config() {
-
-	qDebug() << "Initiated config object";
 	this->configPath = QDir::homePath() + "/.QtSphereIDE/QtSphereIDE.json";
 	this->jsonFile = new QFile(this->configPath);
 }

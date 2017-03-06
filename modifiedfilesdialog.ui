@@ -36,41 +36,6 @@
          <string>Open Files</string>
         </property>
        </column>
-       <item>
-        <property name="text">
-         <string>not_part_of_project.rmp</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>&lt;Untitled script&gt;</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>&lt;Untitled map&gt;</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Project Name</string>
-        </property>
-        <item>
-         <property name="text">
-          <string>scripts/main.js</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>spritesets/player.rss</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>maps/field.rmp</string>
-         </property>
-        </item>
-       </item>
       </widget>
      </item>
      <item>

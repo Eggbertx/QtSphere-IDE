@@ -2,9 +2,11 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QApplication>
-#include "mainwindow.h"
+
 #include "util.h"
+#include "mainwindow.h"
 #include "modifiedfilesdialog.h"
+#include "objects/qsifile.h"
 
 
 int handleModifiedFiles() {
@@ -33,16 +35,26 @@ QString getWidgetType(QObject* widget) {
 	return QString(widget->metaObject()->className());
 }
 
+void syntaxHighlighting(QWidget widget, bool yn) {
+	// if true, applies. If falls, clears
+	if(yn) {
+		// just temporary so the compiler doesn't bitch about yn being unreferenced
+	}
+
+}
 
 void setTheme(QString theme) {
-	//QFile styleFile("stylesheet.qss");
-	//styleFile.open(QFile::ReadOnly);
-	//QString stylesheet = QLatin1String(styleFile.readAll());
-	//styleFile.close();
-	//qApp->setStyleSheet(stylesheet);
+	QFile styleFile("stylesheet.qss");
+	if(!styleFile.open(QFile::ReadOnly)) {
+		MainWindow::instance()->console("Failed to open stylesheet: " + styleFile.errorString(), 1);
+		return;
+	}
+	QString stylesheet = QLatin1String(styleFile.readAll());
+	styleFile.close();
+	qApp->setStyleSheet(stylesheet);
+}
 
-	if(MainWindow::instance() == NULL)
-        qDebug() << "MainWindow::instance() is NULL. wtf??";
-	else
-        qDebug().noquote() << "something something load theme or whatever";
+bool handleEvents(QEvent e) {
+
+	return true;
 }
