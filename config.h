@@ -10,7 +10,9 @@ class Config {
 	public:
 		Config();
 		void loadConfig();
-		QString configPath;
+        void setTheme(QString theme);
+        QString configDirectory;
+        QString configPath;
 		QStringList projectPaths;
 		QString lastOpenedProject;
 		QString theme;

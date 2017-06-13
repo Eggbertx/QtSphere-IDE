@@ -43,18 +43,15 @@ void syntaxHighlighting(QWidget widget, bool yn) {
 
 }
 
-void setTheme(QString theme) {
-	QFile styleFile("stylesheet.qss");
-	if(!styleFile.open(QFile::ReadOnly)) {
-		MainWindow::instance()->console("Failed to open stylesheet: " + styleFile.errorString(), 1);
-		return;
-	}
-	QString stylesheet = QLatin1String(styleFile.readAll());
-	styleFile.close();
-	qApp->setStyleSheet(stylesheet);
-}
-
 bool handleEvents(QEvent e) {
 
 	return true;
+}
+
+void errorBox(QString message) {
+    QMessageBox::critical(MainWindow::instance(), "Error!", message, QMessageBox::Ok);
+}
+
+void infoBox(QString info) {
+    QMessageBox::information(MainWindow::instance(), "Info", info, QMessageBox::Ok);
 }

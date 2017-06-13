@@ -5,7 +5,13 @@
 #include <QTime>
 #include <QTextStream>
 #include <QComboBox>
+#include <QListWidget>
+#include <QListWidgetItem>
 #include <assert.h>
+
+#include <Qsci/qsciscintilla.h>
+#include <Qsci/qscilexerjavascript.h>
+
 
 #include "mainwindow.h"
 #include "util.h"
@@ -15,6 +21,7 @@
 #include "objects/qsifile.h"
 #include "texteffects.h"
 #include "modifiedfilesdialog.h"
+#include "objects/textfile.h"
 
 MainWindow* MainWindow::_instance = NULL;
 
@@ -23,15 +30,14 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
     _instance = this;
     ui->setupUi(this);
 
-    QComboBox *syntaxes = new QComboBox();
+	this->syntaxMode = new QComboBox(ui->statusBar);
     QStringList syntaxes_str;
     syntaxes_str << "Plaintext" << "Javascript" << "TypeScript" << "SGM Project File" << "JSON";
-    syntaxes->addItems(syntaxes_str);
-    syntaxes->setStyleSheet("margin-right: 8px;");
+	this->syntaxMode->addItems(syntaxes_str);
+	this->syntaxMode->setStyleSheet("margin-right: 8px;");
 
-
-    ui->statusBar->addWidget(new QLabel("Ready."));
-    ui->statusBar->addPermanentWidget(syntaxes);
+	ui->statusBar->addWidget(new QLabel("Ready."));
+	ui->statusBar->addPermanentWidget(this->syntaxMode);
 
 	ui->toolbarNewButton->setIcon(this->style()->standardIcon(QStyle::SP_FileIcon));
 	ui->toolbarOpenButton->setIcon(this->style()->standardIcon(QStyle::SP_DialogOpenButton));
@@ -50,7 +56,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 	ui->openFileTabs->setTabsClosable(true);
 	prepareForText();
-    setupEditor();
 	openProject("");
 
 
@@ -73,12 +78,11 @@ QString MainWindow::getStatus() {
 }
 
 void MainWindow::setStatus(QString status) {
-    foreach(QObject* child, ui->statusBar->children()) {
-        if(getWidgetType(child) == "QLabel") {
-            QLabel* lbl = qobject_cast<QLabel *>(child);
-            lbl->setText(status);
-        }
-    }
+	QLabel* msg = ui->statusBar->findChild<QLabel *>();
+	if(msg == nullptr) {
+		return;
+	}
+	msg->setText(status);
 }
 
 MainWindow::~MainWindow() {
@@ -135,6 +139,7 @@ void MainWindow::on_actionMiniRT_API_triggered() {
 }
 
 void MainWindow::saveCurrentTab() {
+	if(ui->openFileTabs->count() == 0) return;
 	QObjectList tabChildren = ui->openFileTabs->currentWidget()->children();
     //ui->openFileTabs->current
     foreach(QObject* tab, tabChildren) {
@@ -156,28 +161,26 @@ void MainWindow::saveCurrentTab() {
     }
 }
 
-void MainWindow::setupEditor() {
-	QFont font;
-	font.setFamily("Courier");
-	font.setFixedPitch(true);
-	font.setPointSize(10);
-	font.setStyleStrategy(QFont::PreferAntialias);
-	int num_tabs = ui->openFileTabs->count();
+//void MainWindow::setupEditor(QTextEdit *editor) {
+void MainWindow::setupEditor(QsciScintilla *editor) {
+	QsciLexerCPP *lexer = new QsciLexerJavaScript();
+	lexer->setDefaultFont(editor->font());
+	lexer->setFoldComments(true);
+	editor->setLexer(lexer);
+	QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!editor->folding()) * 5);
+	if (!state) editor->foldAll(false);
+	editor->setFolding(state);
+}
 
-	for(int i = 0; i < num_tabs; i++) {
-		QObjectList children;
-		for(int ch = 0; ch < ui->openFileTabs->widget(i)->children().count(); ch++) {
-			if(getWidgetType(ui->openFileTabs->widget(i)->children()[ch]) == "QTextEdit") {
-				QTextEdit* editor;
-				editor = qobject_cast<QTextEdit*>(ui->openFileTabs->widget(i)->children()[ch]);
-				editor->setFont(font);
-				editor->setTabStopWidth(40);
-				highlighter = new TextEffects(editor->document());
-				children.append(ui->openFileTabs->widget(i)->children()[ch]);
-				ui->openFileTabs->setCurrentIndex(0);
-			}
-		}
-	}
+void MainWindow::setupEditors() {
+	/*QObjectList sometab = ui->openFileTabs->children();
+	foreach (QObject *edit, sometab) {
+		qDebug().noquote() << "Object: " << edit->objectName();
+	}*/
+
+	/*foreach(QsciScintilla *edit, ui->openFileTabs->findChildren<QsciScintilla *>()) {
+
+	}*/
 }
 
 void MainWindow::showContextMenu(const QPoint &pos) {
@@ -206,7 +209,7 @@ void MainWindow::showContextMenu(const QPoint &pos) {
 
 void MainWindow::openFile(QString fileName) {
 	QString fn;
-	if(fileName == "") {
+    if(fileName == "") {
 		fn = QFileDialog::getOpenFileName(this, "Open file", QDir::currentPath(),
 												"All supported files (*.sgm *.txt *.js *.ts *.rmp *.rss *.rws);;"
 												"Sphere projects (*.sgm);;"
@@ -217,21 +220,15 @@ void MainWindow::openFile(QString fileName) {
 		fn = fileName;
 	}
 
-    QTextEdit *qte = new QTextEdit(ui->openFileTabs);
-    QSIFile *qsifile = new QSIFile(fn, qte);
-    QTextOption options = qsifile->textEditor()->document()->defaultTextOption();
-    options.setTabStop(24);
-    qsifile->textEditor()->document()->setDefaultTextOption(options);
+	if(fn == "") return;
 
-    qsifile->textEditor()->setPlainText(qsifile->text);
+    TextFile* newTextEdit = new TextFile(ui->openFileTabs);
+    newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()) );
+    newTextEdit->readFile(fn);
+    this->openFiles.append(newTextEdit);
+    ui->openFileTabs->insertTab(0, newTextEdit, newTextEdit->fileName());
+    ui->openFileTabs->setCurrentIndex(0);
 
-    if(qsifile->fileType == QSIFile::JavaScript || qsifile->fileType == QSIFile::TypeScript) {
-        highlighter = new TextEffects(qsifile->textEditor()->document());
-        this->setupEditor();
-    }
-
-    ui->openFileTabs->insertTab(0,qte,qsifile->baseName());
-    openFiles.insert(0,qsifile);
 	ui->openFileTabs->setCurrentIndex(0);
 
 }
@@ -249,17 +246,16 @@ void MainWindow::openProject(QString fileName) {
 }
 
 void MainWindow::handleModifiedFiles() {
+    if(this->openFiles.count() == 0) return;
     ModifiedFilesDialog mfd(this);
-    int num_modified;
-    for(int t = 0; t < ui->openFileTabs->count(); t++) {
-        QWidget *tab = ui->openFileTabs->widget(t);
-        if(getWidgetType(tab) == "QTextEdit") {
-            QTextEdit *qte = dynamic_cast<QTextEdit *>(tab);
-            if(qte->document()->toPlainText() != this->openFiles.at(t)->text) {
-                mfd.addModifiedItem(this->openFiles.at(t));
-                num_modified++;
-            }
-        }
+    int num_modified = 0;
+    QList<QTextEdit *> openEditors = ui->openFileTabs->findChildren<QTextEdit *>();
+
+    for(int t = 0; t < openEditors.count(); t++) {
+       /* if(openEditors.at(t)->document()->toPlainText() != this->openFiles.at(t)->text) {
+            mfd.addModifiedItem(this->openFiles.at(t));
+            num_modified++;
+        }*/
     }
     if(num_modified > 0)
         mfd.exec();
@@ -283,12 +279,12 @@ void MainWindow::on_actionConfigure_QtSphere_IDE_triggered() {
 }
 
 void MainWindow::on_toolbarNewButton_triggered() {
-    QTextEdit* newTextEdit = new QTextEdit("", ui->openFileTabs);
-    this->openFiles.append(new QSIFile("",newTextEdit));
-	newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()) );
-	highlighter = new TextEffects(newTextEdit->document());
+    TextFile* newTextEdit = new TextFile(ui->openFileTabs);
+    newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()) );
+
+    this->openFiles.append(newTextEdit);
 	ui->openFileTabs->insertTab(0, newTextEdit, "<Untitled>");
-	this->setupEditor();
+	ui->openFileTabs->setCurrentIndex(0);
 }
 
 void MainWindow::on_toolbarSaveButton_triggered() {
@@ -300,6 +296,24 @@ void MainWindow::on_toolbarOpenButton_triggered() {
 }
 
 void MainWindow::on_openFileTabs_tabCloseRequested(int index) {
-    this->openFiles.remove(index);
+	this->openFiles.removeAt(index);
     ui->openFileTabs->removeTab(index);
+}
+
+void MainWindow::on_actionUndo_triggered() {
+    // incredibly hacky? Yes, but it works.
+    ui->openFileTabs->children().at(ui->openFileTabs->currentIndex())->findChildren<QTextEdit *>().at(0)->undo();
+}
+
+void MainWindow::on_openFileTabs_currentChanged(int index) {
+	if(this->openFiles.count() > 0) {
+        /*switch(this->openFiles.at(index)->fileType) {
+			case QSIFile::JavaScript:
+				this->syntaxMode->setCurrentIndex(1);
+			break;
+			default:
+				this->syntaxMode->setCurrentIndex(0);
+			break;
+        }*/
+	}
 }

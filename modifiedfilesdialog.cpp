@@ -23,7 +23,7 @@ void ModifiedFilesDialog::on_discardAllButton_2_clicked() {
 
 void ModifiedFilesDialog::addModifiedItem(QSIFile *item) {
     QTreeWidgetItem *twi = new QTreeWidgetItem(ui->treeWidget);
-    twi->setText(0,item->fileName());
+    //twi->setText(0,item->fileName());
     ui->treeWidget->insertTopLevelItem(0,twi);
 }
 

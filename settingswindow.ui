@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>531</width>
-    <height>388</height>
+    <height>249</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,9 +36,6 @@
           <string>Project directories</string>
          </property>
         </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="projectDirectories_txt"/>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="theme_lbl">
@@ -120,6 +117,20 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item row="0" column="1">
+        <widget class="QListWidget" name="listWidget">
+         <item>
+          <property name="text">
+           <string>/home/josh/Projects</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>/home/josh/Dropbox/Programming/Sphere/games</string>
+          </property>
+         </item>
+        </widget>
        </item>
       </layout>
      </item>

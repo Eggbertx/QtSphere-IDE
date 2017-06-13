@@ -1,11 +1,14 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QMetaObject>
 #include <QMainWindow>
 //#include <QSyntaxHighlighter>
 #include <QTextEdit>
 #include <QFileSystemModel>
 #include <QVariant>
+#include <QComboBox>
+#include <Qsci/qsciscintilla.h>
 
 #include "objects/qsifile.h"
 #include "texteffects.h"
@@ -52,14 +55,17 @@ class MainWindow : public QMainWindow {
         void on_toolbarOpenButton_triggered();
         void on_openFileTabs_tabCloseRequested(int index);
         void showContextMenu(const QPoint& pos);
-
-private:
+        void on_actionUndo_triggered();
+		void on_openFileTabs_currentChanged(int index);
+	private:
         static MainWindow* _instance;
 		Ui::MainWindow *ui;
         QString status;
 		TextEffects* highlighter;
-        QVector<QSIFile *> openFiles;
-		void setupEditor();
+		QList<QObject *> openFiles;
+        void setupEditors();
+		void setupEditor(QsciScintilla *editor);
+		QComboBox *syntaxMode;
 };
 
 #endif // MAINWINDOW_H
