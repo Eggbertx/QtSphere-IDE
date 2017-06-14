@@ -6,14 +6,13 @@ TARGET = QtSphereIDE
 TEMPLATE = app
 VERSION = 0.2.2
 DEFINES += QT_DEPRECATED_WARNINGS TARGET=\\\"$$TARGET\\\" VERSION=\\\"$$VERSION\\\"
+CONFIG += static
+INCLUDEPATH += $$PWD/include
 
-INCLUDEPATH += $$PWD/Qt4Qt5
-DEPENDPATH += $$PWD/Qt4Qt5
 
+win32:LIBS += -L$$PWD/lib -lqscintilla2
+unix:LIBS += -lqscintilla2_qt5
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/Qt4Qt5/win-release/ -lqscintilla2
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/Qt4Qt5/win-debug/ -lqscintilla2
-else:unix: LIBS += -lqscintilla2_qt5
 
 SOURCES += main.cpp\
     mainwindow.cpp \

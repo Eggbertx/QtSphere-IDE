@@ -11,6 +11,7 @@
 #include <Qsci/qsciscintilla.h>
 
 #include "objects/qsifile.h"
+#include "texteffects.h"
 
 #define MAINWINDOW_TITLE TARGET " (working title) " VERSION
 
@@ -60,6 +61,7 @@ class MainWindow : public QMainWindow {
         static MainWindow* _instance;
 		Ui::MainWindow *ui;
         QString status;
+		TextEffects* highlighter;
 		QList<QObject *> openFiles;
         void setupEditors();
 		void setupEditor(QsciScintilla *editor);

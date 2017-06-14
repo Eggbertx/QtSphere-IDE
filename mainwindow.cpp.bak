@@ -19,6 +19,7 @@
 #include "aboutdialog.h"
 #include "settingswindow.h"
 #include "objects/qsifile.h"
+#include "texteffects.h"
 #include "modifiedfilesdialog.h"
 #include "objects/textfile.h"
 
@@ -224,9 +225,8 @@ void MainWindow::openFile(QString fileName) {
     TextFile* newTextEdit = new TextFile(ui->openFileTabs);
     newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()) );
     newTextEdit->readFile(fn);
-	this->openFiles.append(newTextEdit->getTextWidget());
-
-	ui->openFileTabs->insertTab(0, newTextEdit->getTextWidget(), newTextEdit->fileName());
+    this->openFiles.append(newTextEdit);
+    ui->openFileTabs->insertTab(0, newTextEdit, newTextEdit->fileName());
     ui->openFileTabs->setCurrentIndex(0);
 
 	ui->openFileTabs->setCurrentIndex(0);
@@ -282,8 +282,8 @@ void MainWindow::on_toolbarNewButton_triggered() {
     TextFile* newTextEdit = new TextFile(ui->openFileTabs);
     newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()) );
 
-	this->openFiles.append(newTextEdit->getTextWidget());
-	ui->openFileTabs->insertTab(0, newTextEdit->getTextWidget(), "<Untitled>");
+    this->openFiles.append(newTextEdit);
+	ui->openFileTabs->insertTab(0, newTextEdit, "<Untitled>");
 	ui->openFileTabs->setCurrentIndex(0);
 }
 
