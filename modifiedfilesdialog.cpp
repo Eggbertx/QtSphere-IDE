@@ -21,7 +21,7 @@ void ModifiedFilesDialog::on_discardAllButton_2_clicked() {
 	this->close();
 }
 
-void ModifiedFilesDialog::addModifiedItem(QSIFile *item) {
+void ModifiedFilesDialog::addModifiedItem(SphereFile *item) {
     QTreeWidgetItem *twi = new QTreeWidgetItem(ui->treeWidget);
     //twi->setText(0,item->fileName());
     ui->treeWidget->insertTopLevelItem(0,twi);

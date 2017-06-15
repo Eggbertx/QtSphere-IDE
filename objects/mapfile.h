@@ -2,13 +2,13 @@
 #define MAPFILE_H
 
 #include <QObject>
-#include "objects/qsifile.h"
+#include "objects/spherefile.h"
 
-class MapFile : public QSIFile {
+class MapFile : public SphereFile {
     Q_OBJECT
 
     public:
-        MapFile(QSIFile *parent = 0);
+		MapFile(QWidget *parent = 0);
         bool running();
         QString getMapName();
         void setMapName(QString name);

@@ -2,7 +2,7 @@
 #define MODIFIEDFILESDIALOG_H
 
 #include <QDialog>
-#include <objects/qsifile.h>
+#include <objects/spherefile.h>
 namespace Ui {
 	class ModifiedFilesDialog;
 }
@@ -14,9 +14,9 @@ class ModifiedFilesDialog : public QDialog {
 		explicit ModifiedFilesDialog(QWidget *parent = 0);
 		~ModifiedFilesDialog();
 		int getResult();
-        void addModifiedItem(QSIFile *item);
-        void saveModifiedItem(QSIFile item);
-        void discardModifiedItem(QSIFile item);
+		void addModifiedItem(SphereFile *item);
+		void saveModifiedItem(SphereFile item);
+		void discardModifiedItem(SphereFile item);
 
 	private slots:
 		void on_cancelButton_clicked();

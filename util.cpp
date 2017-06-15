@@ -6,7 +6,7 @@
 #include "util.h"
 #include "mainwindow.h"
 #include "modifiedfilesdialog.h"
-#include "objects/qsifile.h"
+#include "objects/spherefile.h"
 
 
 int handleModifiedFiles() {

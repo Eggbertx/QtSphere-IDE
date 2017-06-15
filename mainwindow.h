@@ -1,16 +1,15 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMetaObject>
 #include <QMainWindow>
-//#include <QSyntaxHighlighter>
+#include <QSignalMapper>
 #include <QTextEdit>
 #include <QFileSystemModel>
 #include <QVariant>
 #include <QComboBox>
 #include <Qsci/qsciscintilla.h>
 
-#include "objects/qsifile.h"
+#include "objects/spherefile.h"
 
 #define MAINWINDOW_TITLE TARGET " (working title) " VERSION
 
@@ -31,8 +30,6 @@ class MainWindow : public QMainWindow {
 		void openProject(QString fileName);
 		void saveCurrentTab();
 
-		void prepareForText();
-		void prepareForCode();
         void prepareForImage();
         void prepareForMap();
         void prepareForTileSet();
@@ -40,6 +37,7 @@ class MainWindow : public QMainWindow {
         void handleModifiedFiles();
 		void console(QVariant s, int which = 1);
 		void closeEvent(QCloseEvent* event);
+		void setupTextBox(QsciScintilla *box, QString type);
 
 		static MainWindow* instance();
 	private slots:
@@ -56,14 +54,17 @@ class MainWindow : public QMainWindow {
         void showContextMenu(const QPoint& pos);
         void on_actionUndo_triggered();
 		void on_openFileTabs_currentChanged(int index);
+		void onTextWidgetChanged();
+
 	private:
         static MainWindow* _instance;
 		Ui::MainWindow *ui;
         QString status;
-		QList<QObject *> openFiles;
+		QList<QWidget *> openFiles;
         void setupEditors();
 		void setupEditor(QsciScintilla *editor);
 		QComboBox *syntaxMode;
+		QSignalMapper* signalMapper;
 };
 
 #endif // MAINWINDOW_H

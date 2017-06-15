@@ -18,9 +18,9 @@
 #include "ui_mainwindow.h"
 #include "aboutdialog.h"
 #include "settingswindow.h"
-#include "objects/qsifile.h"
+#include "objects/spherefile.h"
 #include "modifiedfilesdialog.h"
-#include "objects/textfile.h"
+//#include "objects/textfile.h"
 
 MainWindow* MainWindow::_instance = NULL;
 
@@ -54,7 +54,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 			this, SLOT(showContextMenu(const QPoint&)));
 
 	ui->openFileTabs->setTabsClosable(true);
-	prepareForText();
+	//prepareForText();
 	openProject("");
 
 
@@ -64,6 +64,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	consoleSplitterList << 350 << 1;
 	ui->splitter->setSizes(mainSplitterList);
 	ui->consoleSplitter->setSizes(consoleSplitterList);
+	this->signalMapper = new QSignalMapper(this) ;
 }
 
 QString MainWindow::getStatus() {
@@ -137,49 +138,32 @@ void MainWindow::on_actionMiniRT_API_triggered() {
 	QProcess process;
 }
 
+void MainWindow::onTextWidgetChanged() {
+	QObject* editorObject = QObject::sender();
+	//QsciScintilla* editor = static_cast<QsciScintilla*>(editorObject);
+	//editor->setMarginWidth(0, editor->fontMetrics().width(QString::number(editor->lines())) + 6);
+}
+
 void MainWindow::saveCurrentTab() {
 	if(ui->openFileTabs->count() == 0) return;
 	QObjectList tabChildren = ui->openFileTabs->currentWidget()->children();
-    //ui->openFileTabs->current
-    foreach(QObject* tab, tabChildren) {
-		if(getWidgetType(tab) == "QTextEdit") {
-			QTextEdit* textdata = qobject_cast<QTextEdit*>(tab);
-			QString saveFileName = QFileDialog::getSaveFileName(this, "Save script", "","Script (*.js);;Text file (*.txt);;All files (*)");
-			QFile saveFile(saveFileName);
-			if(!saveFile.open(QIODevice::Text|QIODevice::WriteOnly)) {
-				this->console("Failed saving file: " + saveFile.errorString());
-				return;
-			} else {
-				QTextStream out(&saveFile);
-				out.setCodec("UTF-8");
-                out << QString::fromUtf8(textdata->document()->toPlainText().toStdString().c_str());
-				saveFile.flush();
-				saveFile.close();
-			}
+	QWidget* currentWidget = ui->openFileTabs->currentWidget();
+	if(QString(currentWidget->metaObject()->className()) == "QsciScintilla") {
+		QsciScintilla* currentEditor = static_cast<QsciScintilla*>(ui->openFileTabs->currentWidget());
+		QString saveFileName = QFileDialog::getSaveFileName(this,
+								"Save script", "","Script (*.js);;Text file (*.txt);;All files (*)");
+		QFile saveFile(saveFileName);
+		if(!saveFile.open(QIODevice::WriteOnly)) {
+			this->console("Failed saving file: " + saveFile.errorString());
+			return;
+		} else {
+			QTextStream out(&saveFile);
+			out.setCodec("UTF-8");
+			out << currentEditor->text();
+			saveFile.flush();
+			saveFile.close();
 		}
-    }
-}
-
-//void MainWindow::setupEditor(QTextEdit *editor) {
-void MainWindow::setupEditor(QsciScintilla *editor) {
-	QsciLexerCPP *lexer = new QsciLexerJavaScript();
-	lexer->setDefaultFont(editor->font());
-	lexer->setFoldComments(true);
-	editor->setLexer(lexer);
-	QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!editor->folding()) * 5);
-	if (!state) editor->foldAll(false);
-	editor->setFolding(state);
-}
-
-void MainWindow::setupEditors() {
-	/*QObjectList sometab = ui->openFileTabs->children();
-	foreach (QObject *edit, sometab) {
-		qDebug().noquote() << "Object: " << edit->objectName();
-	}*/
-
-	/*foreach(QsciScintilla *edit, ui->openFileTabs->findChildren<QsciScintilla *>()) {
-
-	}*/
+	}
 }
 
 void MainWindow::showContextMenu(const QPoint &pos) {
@@ -221,24 +205,21 @@ void MainWindow::openFile(QString fileName) {
 
 	if(fn == "") return;
 
-    TextFile* newTextEdit = new TextFile(ui->openFileTabs);
-    newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()) );
-    newTextEdit->readFile(fn);
-	this->openFiles.append(newTextEdit->getTextWidget());
+	QFile* file = new QFile(fn);
+	QString fileExtension;
+	if (!file->open(QIODevice::ReadWrite | QIODevice::Text)) return;
+	QFileInfo fi = QFileInfo(fn);
+	QByteArray bytes = file->readAll();
 
-	ui->openFileTabs->insertTab(0, newTextEdit->getTextWidget(), newTextEdit->fileName());
-    ui->openFileTabs->setCurrentIndex(0);
 
+	QsciScintilla* newTextEdit = new QsciScintilla(this);
+	newTextEdit->setText(bytes);
+	this->setupTextBox(newTextEdit, "JavaScript");
+
+	newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()) );
+	this->openFiles.append(newTextEdit);
+	ui->openFileTabs->insertTab(0, newTextEdit, fi.fileName());
 	ui->openFileTabs->setCurrentIndex(0);
-
-}
-
-void MainWindow::prepareForText() {
-
-}
-
-void MainWindow::prepareForCode() {
-
 }
 
 void MainWindow::openProject(QString fileName) {
@@ -261,6 +242,30 @@ void MainWindow::handleModifiedFiles() {
         mfd.exec();
 }
 
+void MainWindow::setupTextBox(QsciScintilla* box, QString type) {
+	QFont boxfont("Courier", 10);
+	// type will eventually change the lexer
+	box->setFont(boxfont);
+	box->setMarginsFont(box->font());
+
+	box->setMarginWidth(0, QFontMetrics(box->font()).width(QString::number(box->lines()))+6);
+	box->setMarginLineNumbers(0, true);
+	box->setMarginsBackgroundColor(QColor("#cccccc"));
+
+	box->setCaretLineVisible(true);
+	box->setCaretLineBackgroundColor(QColor("#ffe4e4"));
+
+	QsciLexerJavaScript *lexer = new QsciLexerJavaScript();
+	lexer->setDefaultFont(boxfont);
+	lexer->setFoldComments(true);
+	box->setLexer(lexer);
+
+	QsciScintilla::FoldStyle state = static_cast<QsciScintilla::FoldStyle>((!box->folding())*5);
+	if(!state) box->foldAll(false);
+	box->setFolding(state);
+	connect(box, SIGNAL(textChanged()), this, SLOT(onTextWidgetChanged()));
+}
+
 void MainWindow::on_actionExit_triggered() {
     handleModifiedFiles();
     this->close(); // just temporary until I have a way to test if the currently open file has been modified
@@ -279,11 +284,13 @@ void MainWindow::on_actionConfigure_QtSphere_IDE_triggered() {
 }
 
 void MainWindow::on_toolbarNewButton_triggered() {
-    TextFile* newTextEdit = new TextFile(ui->openFileTabs);
-    newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()) );
+	QsciScintilla* newTextEdit = new QsciScintilla(this);
+	this->setupTextBox(newTextEdit, "JavaScript");
 
-	this->openFiles.append(newTextEdit->getTextWidget());
-	ui->openFileTabs->insertTab(0, newTextEdit->getTextWidget(), "<Untitled>");
+	newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()) );
+
+	this->openFiles.append(newTextEdit);
+	ui->openFileTabs->insertTab(0, newTextEdit, "<Untitled>");
 	ui->openFileTabs->setCurrentIndex(0);
 }
 

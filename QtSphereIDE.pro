@@ -4,9 +4,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = QtSphereIDE
 TEMPLATE = app
-VERSION = 0.2.2
+VERSION = 0.2.3
 DEFINES += QT_DEPRECATED_WARNINGS TARGET=\\\"$$TARGET\\\" VERSION=\\\"$$VERSION\\\"
-CONFIG += static
 INCLUDEPATH += $$PWD/include
 
 
@@ -21,9 +20,8 @@ SOURCES += main.cpp\
     modifiedfilesdialog.cpp \
     config.cpp \
     settingswindow.cpp \
-    objects/qsifile.cpp \
     objects/mapfile.cpp \
-    objects/textfile.cpp
+    objects/spherefile.cpp
 
 HEADERS  += mainwindow.h \
     aboutdialog.h \
@@ -31,9 +29,8 @@ HEADERS  += mainwindow.h \
     modifiedfilesdialog.h \
     config.h \
     settingswindow.h \
-    objects/qsifile.h \
     objects/mapfile.h \
-    objects/textfile.h
+    objects/spherefile.h
 
 FORMS    += mainwindow.ui \
     aboutdialog.ui \

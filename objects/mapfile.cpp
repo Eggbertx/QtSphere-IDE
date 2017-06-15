@@ -1,6 +1,6 @@
 #include "mapfile.h"
 
 
-MapFile::MapFile(QSIFile *parent) : QSIFile(parent) {
+MapFile::MapFile(QWidget *parent) : SphereFile(parent) {
 
 }
