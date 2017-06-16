@@ -248,7 +248,7 @@ void MainWindow::setupTextBox(QsciScintilla* box, QString type) {
 	box->setFont(boxfont);
 	box->setMarginsFont(box->font());
 
-	box->setMarginWidth(0, QFontMetrics(box->font()).width(QString::number(box->lines()))+6);
+	box->setMarginWidth(0, QFontMetrics(boxfont).width(QString::number(box->lines()))+6);
 	box->setMarginLineNumbers(0, true);
 	box->setMarginsBackgroundColor(QColor("#cccccc"));
 
@@ -257,6 +257,8 @@ void MainWindow::setupTextBox(QsciScintilla* box, QString type) {
 
 	QsciLexerJavaScript *lexer = new QsciLexerJavaScript();
 	lexer->setDefaultFont(boxfont);
+	lexer->setFont(boxfont);
+
 	lexer->setFoldComments(true);
 	box->setLexer(lexer);
 

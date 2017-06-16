@@ -8,10 +8,9 @@ VERSION = 0.2.3
 DEFINES += QT_DEPRECATED_WARNINGS TARGET=\\\"$$TARGET\\\" VERSION=\\\"$$VERSION\\\"
 INCLUDEPATH += $$PWD/include
 
+CONFIG += c++11 qscintilla2
 
-win32:LIBS += -L$$PWD/lib -lqscintilla2
-unix:LIBS += -lqscintilla2_qt5
-
+win32:LIBS += -L$$PWD/lib -lqscintilla2_qt5
 
 SOURCES += main.cpp\
     mainwindow.cpp \
