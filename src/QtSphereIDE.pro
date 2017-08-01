@@ -6,7 +6,13 @@ TARGET = QtSphereIDE
 TEMPLATE = app
 VERSION = 0.2.3
 DEFINES += QT_DEPRECATED_WARNINGS TARGET=\\\"$$TARGET\\\" VERSION=\\\"$$VERSION\\\"
-INCLUDEPATH += $$PWD/include
+QMAKE_CXXFLAGS_WARN_OFF -= -Wunused-parameter
+... = -Wno-unused-parameter
+
+
+DESTDIR=../../../ #Target file directory
+OBJECTS_DIR=../../../temp_files #Intermediate object files directory
+MOC_DIR=../../../temp_files #Intermediate moc files directory
 
 SOURCES += main.cpp\
     mainwindow.cpp \
