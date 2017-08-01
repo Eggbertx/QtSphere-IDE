@@ -1,0 +1,4 @@
+magnifying glass in debug.png comes from https://openclipart.org/detail/176296/magnifying-glass-with-transparent-glass
+1385573251-24px.png comes from https://openclipart.org/detail/189171/gear-icon
+LegacyFunctions.txt and Enums.txt are based on ScriptEditPlugin/Dictionary/SphereAPI.txt from https://github.com/Radnen/spherestudio
+MiniSphereObjects.txt is based on src/minisphere/pegasus.c from https://github.com/fatcerberus/minisphere

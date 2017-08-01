@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>sphere-icon.png</file>
+        <file>1385573251-24px.png</file>
+        <file>debug.png</file>
+        <file>icon.png</file>
+    </qresource>
+    <qresource prefix="/dictionaries">
+        <file>Enums.txt</file>
+        <file>LegacyFunctions.txt</file>
+    </qresource>
+</RCC>
