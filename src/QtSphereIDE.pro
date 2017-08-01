@@ -6,13 +6,11 @@ TARGET = QtSphereIDE
 TEMPLATE = app
 VERSION = 0.2.3
 DEFINES += QT_DEPRECATED_WARNINGS TARGET=\\\"$$TARGET\\\" VERSION=\\\"$$VERSION\\\"
-QMAKE_CXXFLAGS_WARN_OFF -= -Wunused-parameter
-... = -Wno-unused-parameter
 
-
-DESTDIR=../../../ #Target file directory
-OBJECTS_DIR=../../../temp_files #Intermediate object files directory
-MOC_DIR=../../../temp_files #Intermediate moc files directory
+UI_DIR=temp_files
+DESTDIR=build
+OBJECTS_DIR=temp_files
+MOC_DIR=temp_files
 
 SOURCES += main.cpp\
     mainwindow.cpp \
@@ -48,8 +46,5 @@ FORMS    += mainwindow.ui \
 
 RESOURCES += \
     res/qsires.qrc
-
-#QMAKE_CXXFLAGS += /utf-8
-
 
 RC_FILE = res/icon.rc
