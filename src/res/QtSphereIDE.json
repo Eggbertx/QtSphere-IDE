@@ -1,0 +1,17 @@
+{
+	"projectPaths": ["~/src/Sphere/games"],
+	"recentFiles": [
+		"field.rmp",
+		"player.rss"
+	],
+	"lastOpenedProject": "",
+	"theme": "Default",
+	"whichEngine": "minisphere",
+	"legacySphere": {
+		"useWine": true,
+		"_comment": "useWine is *NIX only, used for Sphere 1.x",
+		"dir": "~/src/Sphere/Sphere 1.5",
+		"configExe": "config.exe",
+		"enginePath": ""
+	}
+}

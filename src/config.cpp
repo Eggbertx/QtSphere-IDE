@@ -48,7 +48,7 @@ void Config::setTheme(QString theme = "stylesheet.qss") {
 
 void Config::createDefaultConfig() {
 	QDir().mkdir(QDir::homePath() + "/.QtSphereIDE");
-	QFile* defaultConfig = new QFile("QtSphereIDE.json");
+    QFile* defaultConfig = new QFile(":/text/QtSphereIDE.json");
 	defaultConfig->copy(this->configPath);
 	// open settings dialog
 	defaultConfig->close();

@@ -5,8 +5,7 @@
         <file>debug.png</file>
         <file>icon.png</file>
     </qresource>
-    <qresource prefix="/dictionaries">
-        <file>Enums.txt</file>
-        <file>LegacyFunctions.txt</file>
+    <qresource prefix="/text">
+        <file>QtSphereIDE.json</file>
     </qresource>
 </RCC>

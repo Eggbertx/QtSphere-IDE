@@ -1,5 +1,4 @@
 #include <QApplication>
-#include <Qsci/qsciscintilla.h>
 #include "util.h"
 #include "mainwindow.h"
 #include "config.h"
