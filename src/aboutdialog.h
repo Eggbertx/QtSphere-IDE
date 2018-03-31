@@ -7,9 +7,8 @@ namespace Ui {
 	class AboutDialog;
 }
 
-class AboutDialog : public QDialog
-{
-		Q_OBJECT
+class AboutDialog : public QDialog {
+	Q_OBJECT
 
 	public:
 		explicit AboutDialog(QWidget *parent = 0);
@@ -17,7 +16,6 @@ class AboutDialog : public QDialog
 
 	private slots:
 		void on_viewLicense_clicked();
-
 		void on_closeAboutDialog_clicked();
 
 	private:

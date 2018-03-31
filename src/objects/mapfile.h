@@ -5,31 +5,33 @@
 #include <QGraphicsView>
 
 class MapFile : public QGraphicsView {
-    Q_OBJECT
+	Q_OBJECT
 
-    public:
+	public:
 		MapFile(QWidget *parent = nullptr);
 		void newMap();
 		bool loadMap(QString filename);
 		bool saveMap(QString filename);
-        QString getMapName();
-        void setMapName(QString name);
-        bool mapOrigin();
-		void setParallax(bool is_parallax,
-						 float multiplier_x, float multiplier_y,
-						 float scrollspeed_x, float floatscrollspeed_);
+		QString getMapName();
+		void setMapName(QString name);
+		bool mapOrigin();
+		void setParallax(
+			bool is_parallax,
+			float multiplier_x, float multiplier_y,
+			float scrollspeed_x, float floatscrollspeed_
+		);
 		struct parallax_info getParallaxInfo();
 
-    signals:
+	signals:
 
-    public slots:
+	public slots:
 
-    private:
-        QString mapName;
+	private:
+		QString mapName;
 		QGraphicsView mapWidget;
 
+		// The following structs were taken from miniSphere's code
 		struct fileHeader {
-			// taken from miniSphere's code
 			char    signature[4];
 			int16_t version;
 			uint8_t type;

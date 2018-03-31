@@ -1,1 +1,0 @@
-This folder and its subfolders is used to store generated moc sources/headers, object files, etc to separate them from the final executable file.

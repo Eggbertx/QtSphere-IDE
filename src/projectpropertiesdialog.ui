@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>524</width>
-    <height>381</height>
+    <height>403</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -156,30 +156,21 @@
          </widget>
         </item>
        </layout>
-       <zorder>buildInLabel</zorder>
-       <zorder>warningLabel</zorder>
       </widget>
      </item>
      <item>
       <layout class="QFormLayout" name="buildLayout">
-       <item row="1" column="0">
-        <widget class="QLabel" name="compilerLabel">
-         <property name="text">
-          <string>Compiler</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="buildInLabel">
-         <property name="text">
-          <string>Build in</string>
-         </property>
-        </widget>
-       </item>
        <item row="0" column="1">
         <widget class="QLineEdit" name="buildInLineEdit">
          <property name="text">
           <string>dist/</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="compilerLabel">
+         <property name="text">
+          <string>Compiler</string>
          </property>
         </widget>
        </item>
@@ -208,6 +199,13 @@
         <widget class="QLineEdit" name="urlLineEdit">
          <property name="placeholderText">
           <string>Leave empty to not use git</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="buildDestLabel">
+         <property name="text">
+          <string>Build Destination</string>
          </property>
         </widget>
        </item>

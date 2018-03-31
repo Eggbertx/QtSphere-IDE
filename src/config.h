@@ -10,21 +10,21 @@ class Config {
 	public:
 		Config();
 		void loadConfig();
-        void setTheme(QString theme);
-        QString configDirectory;
-        QString configPath;
+		void setTheme(QString theme);
+		QString configDirectory;
+		QString configPath;
 		QStringList projectPaths;
-        QStringList recentFiles;
+		QStringList recentFiles;
 		QString lastOpenedProject;
 		QString theme;
 		QString whichEngine;
-        bool useWine;
-        QString legacyDir;
-        QString legacyConfigExe;
-        QString legacyEnginePath;
+		bool useWine;
+		QString legacyDir;
+		QString legacyConfigExe;
+		QString legacyEnginePath;
 
 	private:
-        QFile* jsonFile;
+		QFile* jsonFile;
 
 		QString jsonString;
 		QJsonDocument jsonDoc;

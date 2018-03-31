@@ -19,7 +19,6 @@ SOURCES += main.cpp\
     modifiedfilesdialog.cpp \
     config.cpp \
     settingswindow.cpp \
-    syntaxhighlighter.cpp \
     objects/mapfile.cpp \
     objects/spherefile.cpp \
     qsiproject.cpp \
@@ -32,7 +31,6 @@ HEADERS  += mainwindow.h \
     modifiedfilesdialog.h \
     config.h \
     settingswindow.h \
-    syntaxhighlighter.h \
     objects/mapfile.h \
     objects/spherefile.h \
     qsiproject.h \

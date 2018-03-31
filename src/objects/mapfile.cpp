@@ -16,4 +16,5 @@ bool MapFile::loadMap(QString filename) {
 	fileHeader header_struct;
 	rmpFile.readLine(header_struct.signature, 1);
 	qDebug() << header_struct.signature;
+	return true;
 }

@@ -1,10 +1,6 @@
-#ifndef QSIFILE_H
-#define QSIFILE_H
-/*
- * QSIFile is an abstract object to be inherited by all of Sphere/miniSphere's filetypes:
- *
- *
- */
+#ifndef SPHEREFILE_H
+#define SPHEREFILE_H
+
 #include <QObject>
 #include <QFile>
 #include <QTextEdit>
@@ -20,19 +16,17 @@ class SphereFile : public QWidget {
     Q_OBJECT
 public:
 	explicit SphereFile(QWidget *parent = nullptr);
-
-	//explicit SphereFile(QString fn, QTextEdit *parentWidget);
-	//explicit SphereFile(QFile *file = nullptr);
-	//explicit SphereFile(QString fn);
+    explicit SphereFile(QFile *file = nullptr);
+    explicit SphereFile(QString fn);
 
     QString fileExtension();
-    QString* fileName();
+    QString fileName();
     QString getBaseName();
 	QWidget* getWidget();
 	void save();
 
 	void readFile(QString filename);
-	void readFile(QFile f);
+    void readFile(QFile *f);
 	QString filePath();
 signals:
 
@@ -43,4 +37,4 @@ private:
 	QWidget* widget;
 };
 
-#endif // QSIFILE_H
+#endif // SPHEREFILE_H

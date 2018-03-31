@@ -312,34 +312,8 @@
             <enum>QTabWidget::South</enum>
            </property>
            <property name="currentIndex">
-            <number>2</number>
+            <number>0</number>
            </property>
-           <widget class="QWidget" name="buildLogTab">
-            <attribute name="title">
-             <string>Build Log</string>
-            </attribute>
-            <layout class="QVBoxLayout" name="verticalLayout_6">
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="QTextEdit" name="buildLogText">
-               <property name="readOnly">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
            <widget class="QWidget" name="consoleTab">
             <attribute name="title">
              <string>Console</string>
@@ -366,38 +340,28 @@
              </item>
             </layout>
            </widget>
-           <widget class="QWidget" name="exceptionsTab">
+           <widget class="QWidget" name="buildLogTab">
             <attribute name="title">
-             <string>Exceptions</string>
+             <string>Build Log</string>
             </attribute>
-            <layout class="QVBoxLayout" name="verticalLayout_3">
+            <layout class="QVBoxLayout" name="verticalLayout_6">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
              <item>
-              <widget class="QTableWidget" name="tableWidget_2">
-               <row>
-                <property name="text">
-                 <string>1</string>
-                </property>
-               </row>
-               <column>
-                <property name="text">
-                 <string>Thrown Value</string>
-                </property>
-               </column>
-               <column>
-                <property name="text">
-                 <string>Line</string>
-                </property>
-               </column>
-               <item row="0" column="0">
-                <property name="text">
-                 <string>TypeError:</string>
-                </property>
-               </item>
-               <item row="0" column="1">
-                <property name="text">
-                 <string>32</string>
-                </property>
-               </item>
+              <widget class="QTextEdit" name="buildLogText">
+               <property name="readOnly">
+                <bool>true</bool>
+               </property>
               </widget>
              </item>
             </layout>
@@ -417,7 +381,7 @@
      <x>0</x>
      <y>0</y>
      <width>936</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -431,8 +395,15 @@
      <property name="title">
       <string>Open</string>
      </property>
+     <widget class="QMenu" name="menuRecent_Files_2">
+      <property name="title">
+       <string>Recent Files</string>
+      </property>
+      <addaction name="actionplayer_rss"/>
+     </widget>
      <addaction name="openProject"/>
      <addaction name="openLastProject"/>
+     <addaction name="menuRecent_Files_2"/>
      <addaction name="separator"/>
      <addaction name="openPlainTextFile"/>
      <addaction name="openScript"/>
@@ -492,18 +463,11 @@
     <property name="title">
      <string>View</string>
     </property>
-    <widget class="QMenu" name="menuRecent_Files">
-     <property name="title">
-      <string>Recent Files</string>
-     </property>
-     <addaction name="action_files"/>
-    </widget>
     <addaction name="actionClose_Active_Pane"/>
     <addaction name="separator"/>
     <addaction name="actionStart_Page"/>
     <addaction name="actionSound_Test"/>
     <addaction name="separator"/>
-    <addaction name="menuRecent_Files"/>
    </widget>
    <widget class="QMenu" name="menuProject">
     <property name="title">
@@ -522,6 +486,9 @@
     <addaction name="actionPackage_Game"/>
    </widget>
    <widget class="QMenu" name="menuDebug">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="title">
      <string>Debug</string>
     </property>
@@ -943,6 +910,16 @@
   <action name="actionTiled_map_to_Sphere_map">
    <property name="text">
     <string>Tiled map</string>
+   </property>
+  </action>
+  <action name="actionRecent_Files">
+   <property name="text">
+    <string>Recent Files</string>
+   </property>
+  </action>
+  <action name="actionplayer_rss">
+   <property name="text">
+    <string>&lt;files&gt;</string>
    </property>
   </action>
  </widget>

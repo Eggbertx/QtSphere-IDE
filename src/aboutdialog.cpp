@@ -7,7 +7,7 @@
 
 AboutDialog::AboutDialog(QWidget *parent): QDialog(parent), ui(new Ui::AboutDialog) {
 	ui->setupUi(this);
-    ui->textBrowser->setHtml(VERSION);
+	ui->textBrowser->setHtml(VERSION);
 }
 
 AboutDialog::~AboutDialog() {

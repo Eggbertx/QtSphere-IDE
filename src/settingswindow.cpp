@@ -8,21 +8,21 @@
 #include "ui_settingswindow.h"
 
 SettingsWindow::SettingsWindow(QWidget *parent) : QDialog(parent),
-    ui(new Ui::SettingsWindow) {
-    ui->setupUi(this);
-    ui->selLegacyDir->setIcon(this->style()->standardIcon(QStyle::SP_DirOpenIcon));
+	ui(new Ui::SettingsWindow) {
+	ui->setupUi(this);
+	ui->selLegacyDir->setIcon(this->style()->standardIcon(QStyle::SP_DirOpenIcon));
 }
 
 SettingsWindow::~SettingsWindow() {
-    delete ui;
+	delete ui;
 }
 
 void SettingsWindow::on_cancelButton_clicked() {
-    this->close();
+	this->close();
 }
 
 void SettingsWindow::on_selLegacyDir_clicked() {
-    this->legacyDir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),"/home", QFileDialog::ShowDirsOnly);
-    ui->legacyDir_txt->setText(this->legacyDir);
+	this->legacyDir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),"/home", QFileDialog::ShowDirsOnly);
+	ui->legacyDir_txt->setText(this->legacyDir);
 
 }

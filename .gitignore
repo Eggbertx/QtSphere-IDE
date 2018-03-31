@@ -1,7 +1,9 @@
+build/
 src/QtSphereIDE.pro.user
 temp_files/qrc*
 temp_files/ui_*
 temp_files/moc_*
 temp_files/*.o
-qrc_qsires.cpp
+.qmake.stash
 Makefile
+qrc_qsires.cpp

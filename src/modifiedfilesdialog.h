@@ -8,7 +8,7 @@ namespace Ui {
 }
 
 class ModifiedFilesDialog : public QDialog {
-    Q_OBJECT
+	Q_OBJECT
 
 	public:
 		explicit ModifiedFilesDialog(QWidget *parent = 0);
