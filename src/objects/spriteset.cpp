@@ -96,7 +96,14 @@ void Spriteset::debugDump() {
 void Spriteset::paintEvent(QPaintEvent *e) {
 	if(e != nullptr) e->ignore();
 	QPainter painter(this);
-	painter.drawTiledPixmap(this->rect(), this->alphabg);
+
+	int all_width = this->images.length()*(this->header.frame_width+4);
+	int all_height = (this->header.frame_height+4);
+	const QRect all_rect(0,0,all_width,all_height);
+	painter.setBrush(Qt::black);
+	painter.setPen(Qt::black);
+	painter.drawRect(this->rect());
+	painter.drawTiledPixmap(all_rect, this->alphabg);
 
 	for(int i = 0; i < this->images.length(); i++) {
 		QImage img = this->images.at(i);

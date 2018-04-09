@@ -10,6 +10,8 @@ public:
 	~Spriteset();
 	bool open(char* filename);
 	void debugDump();
+	int frameWidth();
+	int frameHeight();
 
 protected:
 	void paintEvent(QPaintEvent* e);
