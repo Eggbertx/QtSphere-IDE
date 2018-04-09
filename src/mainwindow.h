@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTextEdit>
 #include <QFileSystemModel>
+#include <QWidget>
 #include <QVariant>
 #include <QComboBox>
 
@@ -25,9 +26,9 @@ class MainWindow : public QMainWindow {
 		QString getStatus();
 		void setStatus(QString status);
 		void openFile(QString fileName = "");
+		void addWidgetTab(QWidget* widget, QString tabname);
 		void openProject(QString fileName);
 		void saveCurrentTab();
-
 		void prepareForImage();
 		void prepareForMap();
 		void prepareForTileSet();
@@ -42,7 +43,7 @@ class MainWindow : public QMainWindow {
 		void on_actionAbout_triggered();
 		void on_actionSphere_2_0_API_triggered();
 		void on_actionExit_triggered();
-		void on_actionOpen_triggered();
+		//void on_actionOpen_triggered();
 		void on_actionConfigure_QtSphere_IDE_triggered();
 		void on_toolbarNewButton_triggered();
 		void on_toolbarSaveButton_triggered();
@@ -52,10 +53,11 @@ class MainWindow : public QMainWindow {
 		void on_actionUndo_triggered();
 		void on_openFileTabs_currentChanged(int index);
 		void on_toolbarProjectProperties_triggered();
-
 		void onTextWidgetChanged();
+        void on_newProject_triggered();
+		void on_actionProject_Properties_triggered();
 
-	private:
+private:
 		static MainWindow* _instance;
 		Ui::MainWindow *ui;
 		QString status;

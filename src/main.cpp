@@ -13,7 +13,6 @@ int main(int argc, char *argv[]) {
 	MainWindow w;
 	w.setWindowTitle(MAINWINDOW_TITLE);
 	ideConfig.loadConfig();
-
 	ideConfig.setTheme("stylesheet.qss");
 	w.showMaximized();
 	return a.exec();

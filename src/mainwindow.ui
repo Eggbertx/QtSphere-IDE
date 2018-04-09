@@ -387,32 +387,13 @@
    <property name="contextMenuPolicy">
     <enum>Qt::CustomContextMenu</enum>
    </property>
+   <property name="nativeMenuBar">
+    <bool>true</bool>
+   </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
      <string>File</string>
     </property>
-    <widget class="QMenu" name="menuOpen_Project">
-     <property name="title">
-      <string>Open</string>
-     </property>
-     <widget class="QMenu" name="menuRecent_Files_2">
-      <property name="title">
-       <string>Recent Files</string>
-      </property>
-      <addaction name="actionplayer_rss"/>
-     </widget>
-     <addaction name="openProject"/>
-     <addaction name="openLastProject"/>
-     <addaction name="menuRecent_Files_2"/>
-     <addaction name="separator"/>
-     <addaction name="openPlainTextFile"/>
-     <addaction name="openScript"/>
-     <addaction name="openMap"/>
-     <addaction name="openCharset"/>
-     <addaction name="openTileset"/>
-     <addaction name="openFont"/>
-     <addaction name="openWindowStyle"/>
-    </widget>
     <widget class="QMenu" name="menuNew">
      <property name="title">
       <string>New</string>
@@ -420,7 +401,6 @@
      <addaction name="newProject"/>
      <addaction name="separator"/>
      <addaction name="newPlainTextFile"/>
-     <addaction name="newScript"/>
      <addaction name="newMap"/>
      <addaction name="newTileset"/>
      <addaction name="newCharset"/>
@@ -433,9 +413,19 @@
      </property>
      <addaction name="actionTiled_map_to_Sphere_map"/>
     </widget>
+    <widget class="QMenu" name="menuOpen_Recent">
+     <property name="title">
+      <string>Open Recent</string>
+     </property>
+     <addaction name="actionProjectName"/>
+     <addaction name="separator"/>
+     <addaction name="actionFile_1"/>
+     <addaction name="actionFile_2"/>
+    </widget>
     <addaction name="menuNew"/>
-    <addaction name="menuOpen_Project"/>
-    <addaction name="actionOpen"/>
+    <addaction name="actionOpenFile"/>
+    <addaction name="actionOpenProject"/>
+    <addaction name="menuOpen_Recent"/>
     <addaction name="menuImport"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
@@ -557,7 +547,6 @@
    <addaction name="toolbarSaveButton"/>
    <addaction name="separator"/>
    <addaction name="toolbarPlayGame"/>
-   <addaction name="toolbarDebug"/>
    <addaction name="toolbarProjectProperties"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -576,9 +565,9 @@
     <string>New</string>
    </property>
   </action>
-  <action name="actionOpen">
+  <action name="actionOpenFile">
    <property name="text">
-    <string>Open...</string>
+    <string>Open File...</string>
    </property>
   </action>
   <action name="actionSave">
@@ -753,46 +742,6 @@
     <string>miniRT API</string>
    </property>
   </action>
-  <action name="openProject">
-   <property name="text">
-    <string>Project...</string>
-   </property>
-  </action>
-  <action name="openPlainTextFile">
-   <property name="text">
-    <string>Plain text...</string>
-   </property>
-  </action>
-  <action name="openScript">
-   <property name="text">
-    <string>Script...</string>
-   </property>
-  </action>
-  <action name="openMap">
-   <property name="text">
-    <string>Map...</string>
-   </property>
-  </action>
-  <action name="openCharset">
-   <property name="text">
-    <string>Tileset...</string>
-   </property>
-  </action>
-  <action name="openTileset">
-   <property name="text">
-    <string>Charset...</string>
-   </property>
-  </action>
-  <action name="openFont">
-   <property name="text">
-    <string>Font...</string>
-   </property>
-  </action>
-  <action name="openWindowStyle">
-   <property name="text">
-    <string>Windowstyle...</string>
-   </property>
-  </action>
   <action name="newProject">
    <property name="text">
     <string>Project...</string>
@@ -801,11 +750,6 @@
   <action name="newPlainTextFile">
    <property name="text">
     <string>Plain Text file</string>
-   </property>
-  </action>
-  <action name="newScript">
-   <property name="text">
-    <string>Script</string>
    </property>
   </action>
   <action name="newMap">
@@ -898,28 +842,29 @@
     <string>contextMenuItem1</string>
    </property>
   </action>
-  <action name="toolbarDebug">
-   <property name="icon">
-    <iconset resource="res/qsires.qrc">
-     <normaloff>:/icons/debug.png</normaloff>:/icons/debug.png</iconset>
-   </property>
-   <property name="text">
-    <string>Debug</string>
-   </property>
-  </action>
   <action name="actionTiled_map_to_Sphere_map">
    <property name="text">
     <string>Tiled map</string>
    </property>
   </action>
-  <action name="actionRecent_Files">
+  <action name="actionOpenProject">
    <property name="text">
-    <string>Recent Files</string>
+    <string>Open Project...</string>
    </property>
   </action>
-  <action name="actionplayer_rss">
+  <action name="actionProjectName">
    <property name="text">
-    <string>&lt;files&gt;</string>
+    <string>Project Name</string>
+   </property>
+  </action>
+  <action name="actionFile_1">
+   <property name="text">
+    <string>field.rmp</string>
+   </property>
+  </action>
+  <action name="actionFile_2">
+   <property name="text">
+    <string>field2.rmp</string>
    </property>
   </action>
  </widget>

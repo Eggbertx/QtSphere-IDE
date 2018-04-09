@@ -13,10 +13,10 @@ int question(QString title, QString message);
 
 QString getWidgetType(QObject* widget);
 
-bool handleEvents(QEvent e);
-
 void errorBox(QString message);
 
 void infoBox(QString info);
+
+bool file_read(char* filename, void* into, int size, int offset);
 
 #endif // UTIL_H

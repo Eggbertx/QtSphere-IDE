@@ -2,8 +2,8 @@
     <qresource prefix="/icons">
         <file>sphere-icon.png</file>
         <file>1385573251-24px.png</file>
-        <file>debug.png</file>
         <file>icon.png</file>
+        <file>transparency-bg.png</file>
     </qresource>
     <qresource prefix="/text">
         <file>QtSphereIDE.json</file>

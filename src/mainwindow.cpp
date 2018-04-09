@@ -15,9 +15,8 @@
 #include "aboutdialog.h"
 #include "projectpropertiesdialog.h"
 #include "settingswindow.h"
-#include "objects/mapfile.h"
+#include "objects/spriteset.h"
 #include "modifiedfilesdialog.h"
-//#include "objects/textfile.h"
 
 MainWindow* MainWindow::_instance = NULL;
 
@@ -45,9 +44,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 			this, SLOT(showContextMenu(const QPoint&)));
 
 	ui->openFileTabs->setTabsClosable(true);
-	//prepareForText();
 	openProject("");
-
 
 	QList<int> mainSplitterList;
 	QList<int> consoleSplitterList;
@@ -55,8 +52,13 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	consoleSplitterList << 350 << 1;
 	ui->splitter->setSizes(mainSplitterList);
 	ui->consoleSplitter->setSizes(consoleSplitterList);
-	//MapFile mapfile(this);
-	//mapfile.loadMap("E:\\Dropbox\\Programming\\Sphere\\games\\shmup\\maps\\level01.rmp");
+}
+
+void MainWindow::addWidgetTab(QWidget* widget, QString tabname) {
+	widget->setObjectName(tabname + QString::number(ui->openFileTabs->count()));
+	this->openFiles.append(widget);
+	ui->openFileTabs->insertTab(0, widget, tabname);
+	ui->openFileTabs->setCurrentIndex(0);
 }
 
 QString MainWindow::getStatus() {
@@ -71,9 +73,7 @@ QString MainWindow::getStatus() {
 
 void MainWindow::setStatus(QString status) {
 	QLabel* msg = ui->statusBar->findChild<QLabel *>();
-	if(msg == nullptr) {
-		return;
-	}
+	if(msg == nullptr) return;
 	msg->setText(status);
 }
 
@@ -209,18 +209,23 @@ void MainWindow::openFile(QString fileName) {
 	if(fn == "") return;
 
 	QFile* file = new QFile(fn);
-	QString fileExtension;
+
+	QString fileExtension = fn.right(fn.length() - fn.lastIndexOf("."));
+	QWidget newTab;
 	if (!file->open(QIODevice::ReadWrite | QIODevice::Text)) return;
 	QFileInfo fi = QFileInfo(fn);
-	QByteArray bytes = file->readAll();
 
-	QTextEdit* newTextEdit = new QTextEdit(this);
-	newTextEdit->setText(bytes);
-	this->setupTextEditor(newTextEdit);
-	newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()) );
-	this->openFiles.append(newTextEdit);
-	ui->openFileTabs->insertTab(0, newTextEdit, fi.fileName());
-	ui->openFileTabs->setCurrentIndex(0);
+	if(fileExtension == ".rss") {
+		Spriteset *ssWidget = new Spriteset(this);
+		ssWidget->open(fn.toLatin1().data());
+		this->addWidgetTab(ssWidget,fi.fileName());
+	} else {
+		QByteArray bytes = file->readAll();
+		QTextEdit* newTextEdit = new QTextEdit(this);
+		newTextEdit->setText(bytes);
+		this->setupTextEditor(newTextEdit);
+		this->addWidgetTab(newTextEdit, fi.fileName());
+	}
 }
 
 void MainWindow::openProject(QString fileName) {
@@ -249,9 +254,10 @@ void MainWindow::on_actionExit_triggered() {
 }
 
 
-void MainWindow::on_actionOpen_triggered() {
+
+/*void MainWindow::on_actionOpen_triggered() {
 	this->openFile();
-}
+}*/
 
 void MainWindow::on_actionConfigure_QtSphere_IDE_triggered() {
 	SettingsWindow settingsWindow(this);
@@ -301,6 +307,18 @@ void MainWindow::on_openFileTabs_currentChanged(int index) {
 }
 
 void MainWindow::on_toolbarProjectProperties_triggered() {
+	ProjectPropertiesDialog propertiesDialog;
+	propertiesDialog.setModal(true);
+	propertiesDialog.exec();
+}
+
+void MainWindow::on_newProject_triggered() {
+    ProjectPropertiesDialog propertiesDialog(true);
+    propertiesDialog.setModal(true);
+    propertiesDialog.exec();
+}
+
+void MainWindow::on_actionProject_Properties_triggered() {
 	ProjectPropertiesDialog propertiesDialog;
 	propertiesDialog.setModal(true);
 	propertiesDialog.exec();

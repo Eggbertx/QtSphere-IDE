@@ -13,21 +13,23 @@
 */
 
 class SphereFile : public QWidget {
-    Q_OBJECT
+	Q_OBJECT
+	Q_ENUMS(Type)
 public:
 	explicit SphereFile(QWidget *parent = nullptr);
-    explicit SphereFile(QFile *file = nullptr);
-    explicit SphereFile(QString fn);
+	explicit SphereFile(QFile *file = nullptr);
+	explicit SphereFile(QString fn);
 
-    QString fileExtension();
-    QString fileName();
-    QString getBaseName();
+	QString fileExtension();
+	QString fileName();
+	QString getBaseName();
 	QWidget* getWidget();
 	void save();
 
 	void readFile(QString filename);
-    void readFile(QFile *f);
+	void readFile(QFile *f);
 	QString filePath();
+	enum Type { Font, Map, Package, Spriteset, Tileset, WindowStyle }; // binary types
 signals:
 
 public slots:

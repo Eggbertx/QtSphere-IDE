@@ -1,8 +1,8 @@
+#include <fstream>
 #include <QApplication>
 #include <QMessageBox>
 #include <QDebug>
 #include <QApplication>
-
 #include "util.h"
 #include "mainwindow.h"
 #include "modifiedfilesdialog.h"
@@ -25,13 +25,8 @@ int handleModifiedFiles() {
 }
 
 QString getWidgetType(QObject* widget) {
-	// assume that we're smart enough to already ensure that widget is in fact a widget
+	if(!widget->isWidgetType()) return "";
 	return QString(widget->metaObject()->className());
-}
-
-bool handleEvents(QEvent e) {
-
-	return true;
 }
 
 void errorBox(QString message) {
@@ -40,4 +35,18 @@ void errorBox(QString message) {
 
 void infoBox(QString info) {
 	QMessageBox::information(MainWindow::instance(), "Info", info, QMessageBox::Ok);
+}
+
+bool file_read(char* filename, void* into, int size, int offset) {
+	if(size == 0) return true;
+	std::ifstream is(filename,  std::ifstream::binary);
+	if(!is.is_open()) {
+		qDebug().noquote() << "Error loading" << filename;
+		return false;
+	}
+	if(offset > 0) is.ignore(offset);
+	is.read((char *)into,size);
+	is.close();
+
+	return true;
 }
