@@ -10,4 +10,5 @@ If you're weird and insist on using a terminal, just do:
 
 ```qmake src/
 make
-./build/QtSphere```
+./build/QtSphere
+```
