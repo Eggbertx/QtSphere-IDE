@@ -54,8 +54,9 @@ class MainWindow : public QMainWindow {
 		void on_toolbarProjectProperties_triggered();
         void on_newProject_triggered();
 		void on_actionProject_Properties_triggered();
-        void nextTab();
-        void prevTab();
+		void nextTab();
+		void prevTab();
+
 
 private:
 		static MainWindow* _instance;

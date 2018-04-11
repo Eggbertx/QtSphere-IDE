@@ -44,9 +44,17 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	ui->centralWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->centralWidget, SIGNAL(customContextMenuRequested(const QPoint&)),
 			this, SLOT(showContextMenu(const QPoint&)));
-    QShortcut(QKeySequence(Qt::CTRL + Qt::Key_PageDown),
-            this, SLOT(nextTab())
-    );
+
+	QAction *nextTabAction = new QAction(this);
+	nextTabAction->setShortcut(Qt::CTRL|Qt::Key_PageDown);
+	connect(nextTabAction, SIGNAL(triggered()), this, SLOT(nextTab()));
+	this->addAction(nextTabAction);
+
+	QAction *prevTabAction = new QAction(this);
+	prevTabAction->setShortcut(Qt::CTRL|Qt::Key_PageUp);
+	connect(prevTabAction, SIGNAL(triggered()), this, SLOT(prevTab()));
+	this->addAction(prevTabAction);
+
 
 	openProject("");
 
@@ -63,16 +71,6 @@ void MainWindow::addWidgetTab(QWidget* widget, QString tabname) {
 	this->openFiles.append(widget);
 	ui->openFileTabs->insertTab(0, widget, tabname);
 	ui->openFileTabs->setCurrentIndex(0);
-}
-
-void MainWindow::nextTab() {
-    int current = ui->openFileTabs->currentIndex();
-    ui->openFileTabs->setCurrentIndex(current+1);
-}
-
-void MainWindow::prevTab() {
-    int current = ui->openFileTabs->currentIndex();
-    ui->openFileTabs->setCurrentIndex(current-1);
 }
 
 QString MainWindow::getStatus() {
@@ -314,4 +312,18 @@ void MainWindow::on_actionProject_Properties_triggered() {
 	ProjectPropertiesDialog propertiesDialog;
 	propertiesDialog.setModal(true);
 	propertiesDialog.exec();
+}
+
+void MainWindow::nextTab() {
+	int current = ui->openFileTabs->currentIndex();
+	int numTabs = ui->openFileTabs->count();
+	if(current == numTabs - 1) ui->openFileTabs->setCurrentIndex(0);
+	else ui->openFileTabs->setCurrentIndex(current+1);
+}
+
+void MainWindow::prevTab() {
+	int current = ui->openFileTabs->currentIndex();
+	int numTabs = ui->openFileTabs->count();
+	if(current == 0) ui->openFileTabs->setCurrentIndex(numTabs - 1);
+	else ui->openFileTabs->setCurrentIndex(current-1);
 }
