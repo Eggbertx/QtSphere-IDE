@@ -15,7 +15,6 @@ class AboutDialog : public QDialog {
 		~AboutDialog();
 
 	private slots:
-		void on_viewLicense_clicked();
 		void on_closeAboutDialog_clicked();
 
 	private:

@@ -15,7 +15,3 @@ AboutDialog::~AboutDialog() {
 void AboutDialog::on_closeAboutDialog_clicked() {
 	this->close();
 }
-
-void AboutDialog::on_viewLicense_clicked() {
-     QDesktopServices::openUrl(QUrl(":/LICENSE.txt"));
-}

@@ -14,7 +14,7 @@ Config::Config() {
 }
 
 void Config::loadConfig() {
-	qDebug().noquote() << QString("Loading config file from ") + this->configPath + QString("/.QtSphereIDE...");
+	qDebug().noquote() << "Loading config file from " << this->configPath;
 
 	if(!QFile(this->configPath).exists())
 		createDefaultConfig();
