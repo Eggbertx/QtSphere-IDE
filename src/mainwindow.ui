@@ -467,13 +467,10 @@
     <addaction name="actionRefresh"/>
     <addaction name="actionClose"/>
     <addaction name="separator"/>
-    <addaction name="actionProject_Properties"/>
-   </widget>
-   <widget class="QMenu" name="menuBuild">
-    <property name="title">
-     <string>Build</string>
-    </property>
+    <addaction name="actionRun_Cell"/>
     <addaction name="actionPackage_Game"/>
+    <addaction name="separator"/>
+    <addaction name="actionProject_Properties"/>
    </widget>
    <widget class="QMenu" name="menuDebug">
     <property name="enabled">
@@ -515,7 +512,6 @@
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuProject"/>
-   <addaction name="menuBuild"/>
    <addaction name="menuDebug"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
@@ -865,6 +861,11 @@
   <action name="actionFile_2">
    <property name="text">
     <string>field2.rmp</string>
+   </property>
+  </action>
+  <action name="actionRun_Cell">
+   <property name="text">
+    <string>Run Cell</string>
    </property>
   </action>
  </widget>

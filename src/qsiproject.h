@@ -20,7 +20,7 @@ class QSIProject : public QObject {
 	public slots:
 
 	private:
-		const QString path;
+        QString path;
 };
 
 #endif // QSIPROJECT_H

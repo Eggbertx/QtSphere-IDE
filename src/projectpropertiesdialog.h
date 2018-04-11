@@ -10,17 +10,16 @@ namespace Ui {
 class ProjectPropertiesDialog : public QDialog {
 	Q_OBJECT
 	public:
-        explicit ProjectPropertiesDialog(bool newFile = false, QWidget *parent = 0);
-        ~ProjectPropertiesDialog();
+		explicit ProjectPropertiesDialog(bool newFile = false, QWidget *parent = 0);
+		~ProjectPropertiesDialog();
 
-private slots:
-    void on_pathButton_triggered(QAction *arg1);
+	private slots:
+		void on_resolutionCBox_currentTextChanged(const QString &newText);
+		void on_pathButton_clicked();
 
-    void on_resolutionCBox_currentTextChanged(const QString &newText);
-
-private:
+	private:
 		Ui::ProjectPropertiesDialog *ui;
-        bool isNew = false;
+		bool isNew = false;
 };
 
 #endif // PROJECTPROPERTIESDIALOG_H

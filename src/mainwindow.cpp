@@ -5,8 +5,10 @@
 #include <QTime>
 #include <QTextStream>
 #include <QComboBox>
+#include <QKeySequence>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QShortcut>
 #include <assert.h>
 
 #include "mainwindow.h"
@@ -42,16 +44,18 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	ui->centralWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->centralWidget, SIGNAL(customContextMenuRequested(const QPoint&)),
 			this, SLOT(showContextMenu(const QPoint&)));
+    QShortcut(QKeySequence(Qt::CTRL + Qt::Key_PageDown),
+            this, SLOT(nextTab())
+    );
 
-	ui->openFileTabs->setTabsClosable(true);
 	openProject("");
 
 	QList<int> mainSplitterList;
 	QList<int> consoleSplitterList;
 	mainSplitterList << 150 << this->width()-150;
 	consoleSplitterList << 350 << 1;
-	ui->splitter->setSizes(mainSplitterList);
-	ui->consoleSplitter->setSizes(consoleSplitterList);
+    ui->splitter->setSizes(mainSplitterList);
+    ui->consoleSplitter->setSizes(consoleSplitterList);
 }
 
 void MainWindow::addWidgetTab(QWidget* widget, QString tabname) {
@@ -59,6 +63,16 @@ void MainWindow::addWidgetTab(QWidget* widget, QString tabname) {
 	this->openFiles.append(widget);
 	ui->openFileTabs->insertTab(0, widget, tabname);
 	ui->openFileTabs->setCurrentIndex(0);
+}
+
+void MainWindow::nextTab() {
+    int current = ui->openFileTabs->currentIndex();
+    ui->openFileTabs->setCurrentIndex(current+1);
+}
+
+void MainWindow::prevTab() {
+    int current = ui->openFileTabs->currentIndex();
+    ui->openFileTabs->setCurrentIndex(current-1);
 }
 
 QString MainWindow::getStatus() {
@@ -130,11 +144,6 @@ void MainWindow::on_actionMiniRT_API_triggered() {
 	QProcess process;
 }
 
-void MainWindow::onTextWidgetChanged() {
-	QObject* editorObject = QObject::sender();
-	QTextEdit* editor = static_cast<QTextEdit*>(editorObject);
-}
-
 void MainWindow::saveCurrentTab() {
 	if(ui->openFileTabs->count() == 0) return;
 	QObjectList tabChildren = ui->openFileTabs->currentWidget()->children();
@@ -184,10 +193,8 @@ void MainWindow::showContextMenu(const QPoint &pos) {
 }
 
 void MainWindow::setupTextEditor(QTextEdit *editor) {
-	QFont font;
-	font.setFamily("Monospace");
+    QFont font("Monospace", 11);
 	font.setFixedPitch(true);
-	font.setPointSize(11);
 	editor->setFont(font);
 }
 
@@ -288,22 +295,7 @@ void MainWindow::on_openFileTabs_tabCloseRequested(int index) {
 }
 
 void MainWindow::on_actionUndo_triggered() {
-	// incredibly hacky? Yes, but it works.
-	infoBox("derp!");
-	ui->openFileTabs->children().at(ui->openFileTabs->currentIndex())->findChildren<QTextEdit *>().at(0)->undo();
-}
-
-void MainWindow::on_openFileTabs_currentChanged(int index) {
-	if(this->openFiles.count() > index) {
-		/*switch(this->openFiles.at(index)->fileType) {
-			case QSIFile::JavaScript:
-				this->syntaxMode->setCurrentIndex(1);
-			break;
-			default:
-				this->syntaxMode->setCurrentIndex(0);
-			break;
-		}*/
-	}
+    ui->openFileTabs->currentWidget()->findChildren<QTextEdit *>().at(0)->undo();
 }
 
 void MainWindow::on_toolbarProjectProperties_triggered() {

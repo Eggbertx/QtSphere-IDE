@@ -58,7 +58,7 @@
           <widget class="QComboBox" name="resolutionCBox">
            <item>
             <property name="text">
-             <string>Click to set a resolution</string>
+             <string>Resolution presets</string>
             </property>
            </item>
            <item>
@@ -96,18 +96,13 @@
              <string>1920x1080</string>
             </property>
            </item>
-           <item>
-            <property name="text">
-             <string>Custom</string>
-            </property>
-           </item>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="resxLineEdit"/>
+          <widget class="QLineEdit" name="reswLineEdit"/>
          </item>
          <item>
-          <widget class="QLineEdit" name="resyLineEdit"/>
+          <widget class="QLineEdit" name="reshLineEdit"/>
          </item>
         </layout>
        </item>

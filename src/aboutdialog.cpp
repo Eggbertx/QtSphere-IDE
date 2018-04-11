@@ -1,13 +1,11 @@
-#include <iostream>
 #include <QDesktopServices>
-#include <QDir>
+#include <QFile>
 
 #include "aboutdialog.h"
 #include "ui_aboutdialog.h"
 
 AboutDialog::AboutDialog(QWidget *parent): QDialog(parent), ui(new Ui::AboutDialog) {
 	ui->setupUi(this);
-	ui->textBrowser->setHtml(VERSION);
 }
 
 AboutDialog::~AboutDialog() {
@@ -19,5 +17,5 @@ void AboutDialog::on_closeAboutDialog_clicked() {
 }
 
 void AboutDialog::on_viewLicense_clicked() {
-	 QDesktopServices::openUrl(QUrl(QDir::currentPath() + "/LICENSE.txt"));
+     QDesktopServices::openUrl(QUrl(":/LICENSE.txt"));
 }

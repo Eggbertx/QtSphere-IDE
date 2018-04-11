@@ -1,6 +1,8 @@
 #include <QDebug>
 #include <QLineEdit>
 #include <QToolButton>
+#include <QFileDialog>
+
 #include "projectpropertiesdialog.h"
 #include "ui_projectpropertiesdialog.h"
 
@@ -18,14 +20,13 @@ ProjectPropertiesDialog::~ProjectPropertiesDialog() {
 	delete ui;
 }
 
-void ProjectPropertiesDialog::on_pathButton_triggered(QAction *arg1) {
-    if(!this->isNew) return;
-
-}
-
 void ProjectPropertiesDialog::on_resolutionCBox_currentTextChanged(const QString &newText) {
     QStringList resArr = newText.split('x');
     if(resArr.size() != 2) return;
-    int width = resArr.at(0).toInt();
-    int height = resArr.at(1).toInt();
+    ui->reswLineEdit->setText(resArr.at(0));
+    ui->reshLineEdit->setText(resArr.at(1));
+}
+
+void ProjectPropertiesDialog::on_pathButton_clicked() {
+    ui->pathLineEdit->setText(QFileDialog::getExistingDirectory(this->parentWidget(),"Choose project path"));
 }

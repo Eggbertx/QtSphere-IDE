@@ -51,11 +51,11 @@ class MainWindow : public QMainWindow {
 		void on_openFileTabs_tabCloseRequested(int index);
 		void showContextMenu(const QPoint& pos);
 		void on_actionUndo_triggered();
-		void on_openFileTabs_currentChanged(int index);
 		void on_toolbarProjectProperties_triggered();
-		void onTextWidgetChanged();
         void on_newProject_triggered();
 		void on_actionProject_Properties_triggered();
+        void nextTab();
+        void prevTab();
 
 private:
 		static MainWindow* _instance;
