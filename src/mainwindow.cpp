@@ -222,8 +222,8 @@ void MainWindow::openFile(QString fileName) {
 
 	if(fileExtension == ".rss") {
 		Spriteset *ssWidget = new Spriteset(this);
-		ssWidget->open(fn.toLatin1().data());
-		this->addWidgetTab(ssWidget,fi.fileName());
+        if(ssWidget->open(fn.toLatin1().data()))
+            this->addWidgetTab(ssWidget,fi.fileName());
 	} else {
 		QByteArray bytes = file->readAll();
 		QTextEdit* newTextEdit = new QTextEdit(this);

@@ -20,7 +20,7 @@ bool Spriteset::open(char* filename) {
 	file_read(filename, &this->header, sizeof(header), 0);
 	file_position  += sizeof(header);
 	if (memcmp(header.signature, ".rss", 4) != 0) {
-		errorBox("QError: " + QString(filename) + " is not a valid spriteset!");
+        errorBox("Error: " + QString(filename) + " is not a valid spriteset!");
 		return false;
 	}
 
