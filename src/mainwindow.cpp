@@ -4,6 +4,7 @@
 #include <QCloseEvent>
 #include <QTime>
 #include <QDir>
+#include <QDirIterator>
 #include <QTextStream>
 #include <QToolButton>
 #include <QWidgetAction>
@@ -67,7 +68,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	//ui->mainToolBar->insertAction(toolButtonAction);
 	ui->mainToolBar->insertAction(ui->toolbarOpenButton,toolButtonAction);
 
-	
 	openProject("");
 
 	QList<int> mainSplitterList;
@@ -180,13 +180,12 @@ void MainWindow::saveCurrentTab() {
 }
 
 void MainWindow::showContextMenu(const QPoint &pos) {
-	//QPoint globalPos = ui->treeWidget->mapToGlobal(pos);
 	QPoint globalPos = ui->treeView->mapToGlobal(pos);
 
 	QMenu rMenu;
 	QWidget* currentWidget = ui->centralWidget->childAt(pos);
-	if(currentWidget->objectName() == "treeWidget")
-		rMenu.addAction("treeWidget");
+	if(currentWidget->objectName() == "treeView")
+		rMenu.addAction("treeView");
 	else if(currentWidget->objectName() == "treeView")
 		rMenu.addAction("treeView");
 	else
@@ -209,7 +208,7 @@ void MainWindow::setupTextEditor(QTextEdit *editor) {
 	editor->setFont(font);
 }
 
-void MainWindow::setupTreeWidget() {
+void MainWindow::setupTreeView() {
 	if(this->project->getPath() == "") return;
 	QFileSystemModel *model = new QFileSystemModel();
 	model->setRootPath(this->project->getPath());
@@ -224,8 +223,11 @@ void MainWindow::setupTreeWidget() {
 void MainWindow::openFile(QString fileName) {
 	QString fn;
 	if(fileName == "") {
+		QString usePath = "";
+		if(this->project && this->project->getPath() != "")
+			usePath = this->project->getPath();
 		fn = QFileDialog::getOpenFileName(this,
-			"Open file", QDir::currentPath(),
+			"Open file", usePath,
 			"All supported files (*.sgm *.txt *.js *.mjs *.rmp *.rss *.rws);;"
 			"Sphere projects (*.sgm);;"
 			"Script files (*.js *.mjs);;"
@@ -265,42 +267,80 @@ void MainWindow::openProject(QString fileName, bool reopen) {
 	if(reopen) this->console("Reloading \"" + baseName + "\"");
 	else this->console("Loading project: " + fileName);
 
+	bool useSSProj = false;
+	bool useSGM = false;
+	bool useJSON = false;
+	bool useCellscript = false;
+	QString projectFilePath = "";
+	QDirIterator iterator(this->project->getPath());
+	while(iterator.hasNext()) {
+		iterator.next();
+		qDebug() << iterator.filePath();
+		if(QFileInfo(iterator.filePath()).isFile() &&
+		   QFileInfo(iterator.filePath()).suffix() == "ssproj") {
+			projectFilePath = iterator.filePath();
+			useSSProj = true;
+			break;
+		}
+	}
+	if(!useSSProj) {
+		useSGM = QFileInfo(this->project->getPath() + "/game.sgm").exists();
+		useJSON = QFileInfo(this->project->getPath() + "/game.json").exists();
+		useCellscript = QFileInfo(this->project->getPath() + "/Cellscript.mjs").exists();
+	}
 
-	bool useSGM = QFileInfo(this->project->getPath() + "/game.sgm").exists();
-	bool useSSProj = QFileInfo(this->project->getPath() + baseName + ".ssproj").exists();
-	bool useJSON = QFileInfo(this->project->getPath() + "/game.json").exists();
-	bool useCellscript = QFileInfo(this->project->getPath() + "/Cellscript.mjs").exists();
+	if(!useSSProj && !useSGM && !useJSON && !useCellscript) {
+		ui->actionProject_Properties->setEnabled(false);
+	} else {
+		ui->actionProject_Properties->setEnabled(true);
+	}
 
-	if(!useSGM && !useSSProj && !useJSON && !useCellscript) {
+	if(!useCellscript) {
 		ui->actionRun_Cell->setEnabled(false);
 		ui->actionPackage_Game->setEnabled(false);
-		ui->actionProject_Properties->setEnabled(false);
 	} else {
 		ui->actionRun_Cell->setEnabled(true);
 		ui->actionPackage_Game->setEnabled(true);
-		ui->actionProject_Properties->setEnabled(true);
 	}
-	this->setupTreeWidget();
+
+	this->setupTreeView();
+	if(useSSProj) this->readProjectFile("");
+	else if(useSGM) this->readProjectFile(this->project->getPath() + "/game.sgm");
+	else {
+		qDebug() << "wat";
+	}
 }
 
-void MainWindow::readSGM(QString path) {
-	if(!QFileInfo(this->project->getPath() + "/game.sgm").exists()) return;
-	QFile* sgmFile = new QFile(this->project->getPath() + "/game.sgm");
-	if(sgmFile->open(QIODevice::ReadOnly)) {
-		QTextStream in(sgmFile);
-		while(!in.atEnd()) {
-			QStringList arr = in.readLine().split("=");
-			if(arr.length() != 2) return;
-			QString key = arr.first();
-			QString value = arr.last();
-			if(key == "name") this->project->name = value;
-			else if(key == "author") this->project->author = value;
-			else if(key == "description") this->project->summary = value;
-			else if(key == "screen_width") this->project->width = value.toInt();
-			else if(key == "screen_height") this->project->height = value.toInt();
-			else if(key == "script") this->project->script = value;
+void MainWindow::readProjectFile(QString filename) {
+	QString fileType = QFileInfo(filename).suffix().toLower();
+	QFile* projectFile = new QFile(filename);
+	qDebug() << "filename" << filename;
+	qDebug() << "fileType" << fileType;
+
+	Q_ASSERT(filename != "");
+	Q_ASSERT(fileType != "");
+	Q_ASSERT(projectFile != NULL);
+
+	if(fileType == "ssproj" || fileType == "sgm") {
+		if(projectFile->open(QIODevice::ReadOnly)) {
+			QTextStream in(projectFile);
+			while(!in.atEnd()) {
+				QStringList arr = in.readLine().split("=");
+				if(arr.length() != 2) return;
+				QString key = arr.first();
+				QString value = arr.last();
+				if(key == "name") this->project->name = value;
+				else if(key == "author") this->project->author = value;
+				else if(key == "description") this->project->summary = value;
+				else if(key == "screen_width" || key == "screenWidth") this->project->width = value.toInt();
+				else if(key == "screen_height" || key == "screenHeight") this->project->height = value.toInt();
+				else if(key == "script" || key == "mainScript") this->project->script = value;
+				else if(key == "compiler") this->project->setCompiler(value);
+				else if(key == "buildDir") this->project->buildDir = value;
+			}
 		}
-		sgmFile->close();
+	} else {
+
 	}
 }
 
@@ -378,7 +418,7 @@ void MainWindow::on_newProject_triggered() {
 }
 
 void MainWindow::on_actionProject_Properties_triggered() {
-	ProjectPropertiesDialog propertiesDialog;
+	ProjectPropertiesDialog propertiesDialog(false, this->project);
 
 	propertiesDialog.exec();
 }

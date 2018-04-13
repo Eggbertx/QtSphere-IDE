@@ -36,9 +36,9 @@ class MainWindow : public QMainWindow {
 		void prepareForTileSet();
 		void prepareForSpriteset();
 		void handleModifiedFiles();
-		void readSGM(QString path);
-		void readSSProj(QString path);
-		void readGameJSON(QString path);
+		void readSSProj();
+		void readProjectFile(QString filename);
+		void readGameJSON();
 
 		void console(QVariant s, int which = 1);
 		void closeEvent(QCloseEvent* event);
@@ -64,7 +64,6 @@ class MainWindow : public QMainWindow {
 		void on_actionRefresh_triggered();
 		void on_newTaskButton_clicked();
 		void on_actionOpenFile_triggered();
-		
 		void nextTab();
 		void prevTab();
 
@@ -81,7 +80,7 @@ private:
 		QList<QWidget *> openFiles;
 		void setupEditors();
 		void setupTextEditor(QTextEdit *editor);
-		void setupTreeWidget();
+		void setupTreeView();
 };
 
 #endif // MAINWINDOW_H

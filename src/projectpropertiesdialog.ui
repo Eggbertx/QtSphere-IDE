@@ -183,6 +183,16 @@
          </property>
         </widget>
        </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="entryScriptLabel">
+         <property name="text">
+          <string>Entry Script</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="entryScriptLineEdit"/>
+       </item>
        <item row="2" column="0">
         <widget class="QLabel" name="compilerLabel">
          <property name="text">
@@ -202,16 +212,6 @@
            <string>Vanilla</string>
           </property>
          </item>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="entryScriptLineEdit"/>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="entryScriptLabel">
-         <property name="text">
-          <string>Entry Script</string>
-         </property>
         </widget>
        </item>
       </layout>

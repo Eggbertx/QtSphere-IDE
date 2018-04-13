@@ -16,8 +16,23 @@ ProjectPropertiesDialog::ProjectPropertiesDialog(bool newFile, QSIProject* proje
 		this->setWindowTitle("New Project");
 		ui->pathLineEdit->setEnabled(true);
 		ui->pathButton->setEnabled(true);
+		this->project = new QSIProject("", this);
+	} else {
+		this->project = project;
+		ui->pathLineEdit->setEnabled(false);
+		ui->pathButton->setEnabled(false);
+		ui->pathLineEdit->setText(project->getPath());
+		ui->nameLineEdit->setText(project->name);
+		ui->authorLineEdit->setText(project->author);
+		ui->reswLineEdit->setText(QString::number(project->width));
+		ui->reshLineEdit->setText(QString::number(project->height));
+		ui->summaryText->document()->setPlainText(project->summary);
+		ui->buildInLineEdit->setText(project->buildDir);
+		ui->entryScriptLineEdit->setText(project->script);
+		if(project->getCompiler() == "Vanilla") ui->compilerCB->setCurrentIndex(0);
+		else ui->compilerCB->setCurrentIndex(1);
 	}
-	this->project = project;
+	if(this->project) this->project = new QSIProject(""); // just in case
 }
 
 ProjectPropertiesDialog::~ProjectPropertiesDialog() {
