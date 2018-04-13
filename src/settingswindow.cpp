@@ -10,7 +10,6 @@
 SettingsWindow::SettingsWindow(QWidget *parent) : QDialog(parent),
 	ui(new Ui::SettingsWindow) {
 	ui->setupUi(this);
-	ui->selLegacyDir->setIcon(this->style()->standardIcon(QStyle::SP_DirOpenIcon));
 }
 
 SettingsWindow::~SettingsWindow() {
@@ -21,8 +20,7 @@ void SettingsWindow::on_cancelButton_clicked() {
 	this->close();
 }
 
-void SettingsWindow::on_selLegacyDir_clicked() {
-	this->legacyDir = QFileDialog::getExistingDirectory(this, tr("Open Directory"),"/home", QFileDialog::ShowDirsOnly);
+void SettingsWindow::on_legacyDir_btn_clicked() {
+	this->legacyDir = QFileDialog::getExistingDirectory(this, "Open Directory");
 	ui->legacyDir_txt->setText(this->legacyDir);
-
 }

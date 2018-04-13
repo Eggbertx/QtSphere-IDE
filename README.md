@@ -8,7 +8,8 @@ Building this in Qt Creator will make things a lot easier and more convenient. W
 
 If you're weird and insist on using a terminal, just do:
 
-```qmake src/
+```
+qmake src/
 make
 ./build/QtSphere
 ```

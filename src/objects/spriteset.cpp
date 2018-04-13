@@ -3,7 +3,7 @@
 #include <QPainter>
 #include <QPoint>
 #include <QPaintEvent>
-
+#include "mainwindow.h"
 #include "spriteset.h"
 #include "util.h"
 #include "objects/spherefile.h"
@@ -15,7 +15,7 @@ bool Spriteset::open(char* filename) {
 	int file_position = 0;
 	this->filename = filename;
 	file_read(filename, &this->header, sizeof(header), 0);
-	file_position  += sizeof(header);
+	file_position += sizeof(header);
 	if (memcmp(header.signature, ".rss", 4) != 0) {
 		errorBox("Error: " + QString(filename) + " is not a valid spriteset!");
 		return false;

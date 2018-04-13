@@ -10,6 +10,7 @@
 #include <QComboBox>
 
 #include "objects/spherefile.h"
+#include "qsiproject.h"
 
 #define MAINWINDOW_TITLE TARGET " " VERSION
 
@@ -28,13 +29,17 @@ class MainWindow : public QMainWindow {
 		void setStatus(QString status);
 		void openFile(QString fileName = "");
 		void addWidgetTab(QWidget* widget, QString tabname);
-		void openProject(QString fileName);
+		void openProject(QString fileName, bool reopen = false);
 		void saveCurrentTab();
 		void prepareForImage();
 		void prepareForMap();
 		void prepareForTileSet();
 		void prepareForSpriteset();
 		void handleModifiedFiles();
+		void readSGM(QString path);
+		void readSSProj(QString path);
+		void readGameJSON(QString path);
+
 		void console(QVariant s, int which = 1);
 		void closeEvent(QCloseEvent* event);
 		static MainWindow* instance();
@@ -44,7 +49,6 @@ class MainWindow : public QMainWindow {
 		void on_actionAbout_triggered();
 		void on_actionSphere_2_0_API_triggered();
 		void on_actionExit_triggered();
-		//void on_actionOpen_triggered();
 		void on_actionConfigure_QtSphere_IDE_triggered();
 		void on_toolbarNewButton_triggered();
 		void on_toolbarSaveButton_triggered();
@@ -56,22 +60,28 @@ class MainWindow : public QMainWindow {
 		void on_newProject_triggered();
 		void on_actionProject_Properties_triggered();
 		void on_newPlainTextFile_triggered();
+		void on_actionOpenProject_triggered();
+		void on_actionRefresh_triggered();
+		void on_newTaskButton_clicked();
+		void on_actionOpenFile_triggered();
+		
 		void nextTab();
 		void prevTab();
 
-
-		void on_newTaskButton_clicked();
-
-		void on_actionOpenFile_triggered();
+		
 
 private:
 		static MainWindow* _instance;
 		Ui::MainWindow *ui;
 		QString status;
 		QLabel* statusLabel;
+		QString projectDir;
+		QSIProject* project;
+
 		QList<QWidget *> openFiles;
 		void setupEditors();
 		void setupTextEditor(QTextEdit *editor);
+		void setupTreeWidget();
 };
 
 #endif // MAINWINDOW_H

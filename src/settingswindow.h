@@ -19,7 +19,7 @@ public:
 private slots:
 	void on_cancelButton_clicked();
 
-	void on_selLegacyDir_clicked();
+	void on_legacyDir_btn_clicked();
 
 private:
 	Ui::SettingsWindow *ui;

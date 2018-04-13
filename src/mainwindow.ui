@@ -99,65 +99,13 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QTreeWidget" name="treeWidget">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+          <widget class="QTreeView" name="treeView">
+           <property name="animated">
+            <bool>true</bool>
            </property>
            <attribute name="headerVisible">
             <bool>false</bool>
            </attribute>
-           <column>
-            <property name="text">
-             <string>1</string>
-            </property>
-           </column>
-           <item>
-            <property name="text">
-             <string>Project Name</string>
-            </property>
-            <property name="icon">
-             <iconset resource="res/qsires.qrc">
-              <normaloff>:/icons/sphere-icon.png</normaloff>:/icons/sphere-icon.png</iconset>
-            </property>
-            <item>
-             <property name="text">
-              <string>images</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>image1.jpg</string>
-              </property>
-             </item>
-            </item>
-            <item>
-             <property name="text">
-              <string>maps</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>field.rmp</string>
-              </property>
-             </item>
-            </item>
-            <item>
-             <property name="text">
-              <string>scripts</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>main.js</string>
-              </property>
-             </item>
-            </item>
-            <item>
-             <property name="text">
-              <string>&lt;Project Name&gt;</string>
-             </property>
-            </item>
-           </item>
           </widget>
          </item>
         </layout>
@@ -244,6 +192,7 @@
              <string>1</string>
             </property>
            </row>
+           
            <column>
             <property name="text">
              <string>Task</string>

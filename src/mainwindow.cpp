@@ -3,9 +3,12 @@
 #include <QMenu>
 #include <QCloseEvent>
 #include <QTime>
+#include <QDir>
 #include <QTextStream>
 #include <QToolButton>
 #include <QWidgetAction>
+#include <QTreeView>
+#include <QHeaderView>
 #include <QComboBox>
 #include <QKeySequence>
 #include <QListWidget>
@@ -21,6 +24,7 @@
 #include "settingswindow.h"
 #include "objects/spriteset.h"
 #include "modifiedfilesdialog.h"
+#include "qsiproject.h"
 
 MainWindow* MainWindow::_instance = NULL;
 
@@ -32,7 +36,6 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 	this->statusLabel = new QLabel("Ready.");
 	ui->statusBar->addWidget(this->statusLabel);
-
 	//ui->toolbarNewButton->setIcon(this->style()->standardIcon(QStyle::SP_FileIcon));
 	ui->toolbarOpenButton->setIcon(this->style()->standardIcon(QStyle::SP_DialogOpenButton));
 	ui->toolbarSaveButton->setIcon(this->style()->standardIcon(QStyle::SP_DriveFDIcon));
@@ -54,18 +57,17 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	this->addAction(prevTabAction);
 
 	QToolButton* toolButton = new QToolButton();
-
 	toolButton->setIcon(this->style()->standardIcon(QStyle::SP_FileIcon));
 	toolButton->setToolTip("New file");
 	toolButton->setMenu(ui->menuNew);
 	toolButton->setPopupMode(QToolButton::InstantPopup);
-
 	QWidgetAction* toolButtonAction = new QWidgetAction(this);
 	toolButtonAction->setDefaultWidget(toolButton);
-
+	
 	//ui->mainToolBar->insertAction(toolButtonAction);
 	ui->mainToolBar->insertAction(ui->toolbarOpenButton,toolButtonAction);
 
+	
 	openProject("");
 
 	QList<int> mainSplitterList;
@@ -178,7 +180,8 @@ void MainWindow::saveCurrentTab() {
 }
 
 void MainWindow::showContextMenu(const QPoint &pos) {
-	QPoint globalPos = ui->treeWidget->mapToGlobal(pos);
+	//QPoint globalPos = ui->treeWidget->mapToGlobal(pos);
+	QPoint globalPos = ui->treeView->mapToGlobal(pos);
 
 	QMenu rMenu;
 	QWidget* currentWidget = ui->centralWidget->childAt(pos);
@@ -201,9 +204,21 @@ void MainWindow::showContextMenu(const QPoint &pos) {
 }
 
 void MainWindow::setupTextEditor(QTextEdit *editor) {
-	QFont font("Monospace", 11);
+	QFont font("Monospace", 10);
 	font.setFixedPitch(true);
 	editor->setFont(font);
+}
+
+void MainWindow::setupTreeWidget() {
+	if(this->project->getPath() == "") return;
+	QFileSystemModel *model = new QFileSystemModel();
+	model->setRootPath(this->project->getPath());
+
+	ui->treeView->setModel(model);
+	for (int i = 1; i < model->columnCount(); ++i)
+		ui->treeView->hideColumn(i);
+	ui->treeView->setRootIndex(model->index(this->project->getPath()));
+	this->setWindowTitle("QtSphereIDE " + QString(VERSION) + " - " + QDir(this->project->getPath()).dirName());
 }
 
 void MainWindow::openFile(QString fileName) {
@@ -232,6 +247,7 @@ void MainWindow::openFile(QString fileName) {
 
 	if(fileExtension == ".rss") {
 		Spriteset *ssWidget = new Spriteset(this);
+		
 		if(ssWidget->open(fn.toLatin1().data()))
 			this->addWidgetTab(ssWidget,fi.fileName());
 	} else {
@@ -243,8 +259,49 @@ void MainWindow::openFile(QString fileName) {
 	}
 }
 
-void MainWindow::openProject(QString fileName) {
-	this->console("Loading project: " + fileName);
+void MainWindow::openProject(QString fileName, bool reopen) {
+	this->project = new QSIProject(fileName, this);	
+	QString baseName = QDir(fileName).dirName();
+	if(reopen) this->console("Reloading \"" + baseName + "\"");
+	else this->console("Loading project: " + fileName);
+
+
+	bool useSGM = QFileInfo(this->project->getPath() + "/game.sgm").exists();
+	bool useSSProj = QFileInfo(this->project->getPath() + baseName + ".ssproj").exists();
+	bool useJSON = QFileInfo(this->project->getPath() + "/game.json").exists();
+	bool useCellscript = QFileInfo(this->project->getPath() + "/Cellscript.mjs").exists();
+
+	if(!useSGM && !useSSProj && !useJSON && !useCellscript) {
+		ui->actionRun_Cell->setEnabled(false);
+		ui->actionPackage_Game->setEnabled(false);
+		ui->actionProject_Properties->setEnabled(false);
+	} else {
+		ui->actionRun_Cell->setEnabled(true);
+		ui->actionPackage_Game->setEnabled(true);
+		ui->actionProject_Properties->setEnabled(true);
+	}
+	this->setupTreeWidget();
+}
+
+void MainWindow::readSGM(QString path) {
+	if(!QFileInfo(this->project->getPath() + "/game.sgm").exists()) return;
+	QFile* sgmFile = new QFile(this->project->getPath() + "/game.sgm");
+	if(sgmFile->open(QIODevice::ReadOnly)) {
+		QTextStream in(sgmFile);
+		while(!in.atEnd()) {
+			QStringList arr = in.readLine().split("=");
+			if(arr.length() != 2) return;
+			QString key = arr.first();
+			QString value = arr.last();
+			if(key == "name") this->project->name = value;
+			else if(key == "author") this->project->author = value;
+			else if(key == "description") this->project->summary = value;
+			else if(key == "screen_width") this->project->width = value.toInt();
+			else if(key == "screen_height") this->project->height = value.toInt();
+			else if(key == "script") this->project->script = value;
+		}
+		sgmFile->close();
+	}
 }
 
 void MainWindow::handleModifiedFiles() {
@@ -267,12 +324,6 @@ void MainWindow::on_actionExit_triggered() {
 	this->close(); // just temporary until I have a way to test if the currently open file has been modified
 	//if(handleModifiedFiles() > 0) this->close();
 }
-
-
-
-/*void MainWindow::on_actionOpen_triggered() {
-	this->openFile();
-}*/
 
 void MainWindow::on_actionConfigure_QtSphere_IDE_triggered() {
 	SettingsWindow settingsWindow(this);
@@ -301,7 +352,6 @@ void MainWindow::on_actionOpenFile_triggered() {
 	this->openFile();
 }
 
-
 void MainWindow::on_openFileTabs_tabCloseRequested(int index) {
 	this->openFiles.removeAt(index);
 	ui->openFileTabs->removeTab(index);
@@ -313,19 +363,23 @@ void MainWindow::on_actionUndo_triggered() {
 
 void MainWindow::on_toolbarProjectProperties_triggered() {
 	ProjectPropertiesDialog propertiesDialog;
-	propertiesDialog.setModal(true);
 	propertiesDialog.exec();
 }
 
 void MainWindow::on_newProject_triggered() {
 	ProjectPropertiesDialog propertiesDialog(true);
-	propertiesDialog.setModal(true);
-	propertiesDialog.exec();
+	if(propertiesDialog.exec() == QDialog::Accepted) {
+		QDir newDir = QDir(propertiesDialog.getProject()->getPath());
+		if(newDir.exists() || !newDir.mkpath("")) {
+			this->console("Error creating new project.");
+			return;
+		}
+	}
 }
 
 void MainWindow::on_actionProject_Properties_triggered() {
 	ProjectPropertiesDialog propertiesDialog;
-	propertiesDialog.setModal(true);
+
 	propertiesDialog.exec();
 }
 
@@ -343,6 +397,7 @@ void MainWindow::prevTab() {
 	else ui->openFileTabs->setCurrentIndex(current-1);
 }
 
+
 void MainWindow::on_newPlainTextFile_triggered() {
 	QTextEdit* newTextEdit = new QTextEdit(this);
 	newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()));
@@ -358,4 +413,12 @@ void MainWindow::on_newTaskButton_clicked() {
 	QTableWidgetItem* h = new QTableWidgetItem("");
 	h->setCheckState(Qt::Unchecked);
 	ui->tableWidget->setItem(rowCount-1, 1, h);
+}
+
+void MainWindow::on_actionOpenProject_triggered() {
+	this->openProject(QFileDialog::getExistingDirectory(this,"Choose project path"));
+}
+
+void MainWindow::on_actionRefresh_triggered() {
+	this->openProject(this->project->getPath(), true);
 }

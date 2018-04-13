@@ -5,22 +5,27 @@
 
 class QSIProject : public QObject {
 	Q_OBJECT
+	Q_ENUMS(Compiler)
 	public:
 		explicit QSIProject(QString path, QObject *parent = 0);
 		QString getPath();
 		QString name;
 		QString author;
-		QString resolution;
+		int width;
+		int height;
 		QString summary;
 		QString buildDir;
-		QString compler;
-		QString gitURL;
+		QString script;
+		QString getCompiler();
+		void setCompiler(QString set);
+		enum Compiler { Vanilla, Cell };
 	signals:
 
 	public slots:
 
 	private:
-        QString path;
+		QString path;
+		QString compler;
 };
 
 #endif // QSIPROJECT_H
