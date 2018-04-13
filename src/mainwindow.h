@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QTextEdit>
 #include <QFileSystemModel>
+#include <QLabel>
 #include <QWidget>
 #include <QVariant>
 #include <QComboBox>
@@ -52,16 +53,22 @@ class MainWindow : public QMainWindow {
 		void showContextMenu(const QPoint& pos);
 		void on_actionUndo_triggered();
 		void on_toolbarProjectProperties_triggered();
-        void on_newProject_triggered();
+		void on_newProject_triggered();
 		void on_actionProject_Properties_triggered();
+		void on_newPlainTextFile_triggered();
 		void nextTab();
 		void prevTab();
 
+
+		void on_newTaskButton_clicked();
+
+		void on_actionOpenFile_triggered();
 
 private:
 		static MainWindow* _instance;
 		Ui::MainWindow *ui;
 		QString status;
+		QLabel* statusLabel;
 		QList<QWidget *> openFiles;
 		void setupEditors();
 		void setupTextEditor(QTextEdit *editor);

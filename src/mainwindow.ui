@@ -225,7 +225,7 @@
             <bool>false</bool>
            </property>
            <property name="rowCount">
-            <number>2</number>
+            <number>1</number>
            </property>
            <attribute name="horizontalHeaderVisible">
             <bool>false</bool>
@@ -244,7 +244,6 @@
              <string>1</string>
             </property>
            </row>
-           <row/>
            <column>
             <property name="text">
              <string>Task</string>
@@ -256,11 +255,6 @@
             </property>
             <property name="checkState">
              <enum>Unchecked</enum>
-            </property>
-           </item>
-           <item row="1" column="0">
-            <property name="text">
-             <string/>
             </property>
            </item>
           </widget>
@@ -745,7 +739,7 @@
   </action>
   <action name="newPlainTextFile">
    <property name="text">
-    <string>Plain Text file</string>
+    <string>Text/Script file</string>
    </property>
   </action>
   <action name="newMap">
@@ -779,11 +773,17 @@
    </property>
   </action>
   <action name="toolbarNewButton">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>New</string>
    </property>
    <property name="toolTip">
     <string>New file</string>
+   </property>
+   <property name="visible">
+    <bool>false</bool>
    </property>
   </action>
   <action name="toolbarOpenButton">

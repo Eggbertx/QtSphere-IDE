@@ -4,6 +4,8 @@
 #include <QCloseEvent>
 #include <QTime>
 #include <QTextStream>
+#include <QToolButton>
+#include <QWidgetAction>
 #include <QComboBox>
 #include <QKeySequence>
 #include <QListWidget>
@@ -28,18 +30,14 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	ui->setupUi(this);
 	ui->menuDebug->deleteLater();
 
-	ui->statusBar->addWidget(new QLabel("Ready."));
+	this->statusLabel = new QLabel("Ready.");
+	ui->statusBar->addWidget(this->statusLabel);
 
-	ui->toolbarNewButton->setIcon(this->style()->standardIcon(QStyle::SP_FileIcon));
+	//ui->toolbarNewButton->setIcon(this->style()->standardIcon(QStyle::SP_FileIcon));
 	ui->toolbarOpenButton->setIcon(this->style()->standardIcon(QStyle::SP_DialogOpenButton));
 	ui->toolbarSaveButton->setIcon(this->style()->standardIcon(QStyle::SP_DriveFDIcon));
 
 	ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
-
-	QTableWidgetItem* h = new QTableWidgetItem("Task");
-	h->setCheckState(Qt::Unchecked);
-
-	ui->tableWidget->setItem(0, 1, h);
 
 	ui->centralWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->centralWidget, SIGNAL(customContextMenuRequested(const QPoint&)),
@@ -55,6 +53,18 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	connect(prevTabAction, SIGNAL(triggered()), this, SLOT(prevTab()));
 	this->addAction(prevTabAction);
 
+	QToolButton* toolButton = new QToolButton();
+
+	toolButton->setIcon(this->style()->standardIcon(QStyle::SP_FileIcon));
+	toolButton->setToolTip("New file");
+	toolButton->setMenu(ui->menuNew);
+	toolButton->setPopupMode(QToolButton::InstantPopup);
+
+	QWidgetAction* toolButtonAction = new QWidgetAction(this);
+	toolButtonAction->setDefaultWidget(toolButton);
+
+	//ui->mainToolBar->insertAction(toolButtonAction);
+	ui->mainToolBar->insertAction(ui->toolbarOpenButton,toolButtonAction);
 
 	openProject("");
 
@@ -62,15 +72,15 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	QList<int> consoleSplitterList;
 	mainSplitterList << 150 << this->width()-150;
 	consoleSplitterList << 350 << 1;
-    ui->splitter->setSizes(mainSplitterList);
-    ui->consoleSplitter->setSizes(consoleSplitterList);
+	ui->splitter->setSizes(mainSplitterList);
+	ui->consoleSplitter->setSizes(consoleSplitterList);
 }
 
 void MainWindow::addWidgetTab(QWidget* widget, QString tabname) {
 	widget->setObjectName(tabname + QString::number(ui->openFileTabs->count()));
 	this->openFiles.append(widget);
-	ui->openFileTabs->insertTab(0, widget, tabname);
-	ui->openFileTabs->setCurrentIndex(0);
+	ui->openFileTabs->insertTab(ui->openFileTabs->count(), widget, tabname);
+	ui->openFileTabs->setCurrentIndex(ui->openFileTabs->count()-1);
 }
 
 QString MainWindow::getStatus() {
@@ -191,7 +201,7 @@ void MainWindow::showContextMenu(const QPoint &pos) {
 }
 
 void MainWindow::setupTextEditor(QTextEdit *editor) {
-    QFont font("Monospace", 11);
+	QFont font("Monospace", 11);
 	font.setFixedPitch(true);
 	editor->setFont(font);
 }
@@ -222,8 +232,8 @@ void MainWindow::openFile(QString fileName) {
 
 	if(fileExtension == ".rss") {
 		Spriteset *ssWidget = new Spriteset(this);
-        if(ssWidget->open(fn.toLatin1().data()))
-            this->addWidgetTab(ssWidget,fi.fileName());
+		if(ssWidget->open(fn.toLatin1().data()))
+			this->addWidgetTab(ssWidget,fi.fileName());
 	} else {
 		QByteArray bytes = file->readAll();
 		QTextEdit* newTextEdit = new QTextEdit(this);
@@ -244,7 +254,7 @@ void MainWindow::handleModifiedFiles() {
 	QList<QTextEdit *> openEditors = ui->openFileTabs->findChildren<QTextEdit *>();
 
 	for(int t = 0; t < openEditors.count(); t++) {
-	   /* if(openEditors.at(t)->document()->toPlainText() != this->openFiles.at(t)->text) {
+		/* if(openEditors.at(t)->document()->toPlainText() != this->openFiles.at(t)->text) {
 			mfd.addModifiedItem(this->openFiles.at(t));
 			num_modified++;
 		}*/
@@ -287,13 +297,18 @@ void MainWindow::on_toolbarOpenButton_triggered() {
 	this->openFile();
 }
 
+void MainWindow::on_actionOpenFile_triggered() {
+	this->openFile();
+}
+
+
 void MainWindow::on_openFileTabs_tabCloseRequested(int index) {
 	this->openFiles.removeAt(index);
 	ui->openFileTabs->removeTab(index);
 }
 
 void MainWindow::on_actionUndo_triggered() {
-    ui->openFileTabs->currentWidget()->findChildren<QTextEdit *>().at(0)->undo();
+	ui->openFileTabs->currentWidget()->findChildren<QTextEdit *>().at(0)->undo();
 }
 
 void MainWindow::on_toolbarProjectProperties_triggered() {
@@ -303,9 +318,9 @@ void MainWindow::on_toolbarProjectProperties_triggered() {
 }
 
 void MainWindow::on_newProject_triggered() {
-    ProjectPropertiesDialog propertiesDialog(true);
-    propertiesDialog.setModal(true);
-    propertiesDialog.exec();
+	ProjectPropertiesDialog propertiesDialog(true);
+	propertiesDialog.setModal(true);
+	propertiesDialog.exec();
 }
 
 void MainWindow::on_actionProject_Properties_triggered() {
@@ -326,4 +341,21 @@ void MainWindow::prevTab() {
 	int numTabs = ui->openFileTabs->count();
 	if(current == 0) ui->openFileTabs->setCurrentIndex(numTabs - 1);
 	else ui->openFileTabs->setCurrentIndex(current-1);
+}
+
+void MainWindow::on_newPlainTextFile_triggered() {
+	QTextEdit* newTextEdit = new QTextEdit(this);
+	newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()));
+	this->setupTextEditor(newTextEdit);
+	this->openFiles.append(newTextEdit);
+	ui->openFileTabs->insertTab(0, newTextEdit, "<Untitled>");
+	ui->openFileTabs->setCurrentIndex(0);
+}
+
+void MainWindow::on_newTaskButton_clicked() {
+	int rowCount = ui->tableWidget->rowCount();
+	ui->tableWidget->insertRow(rowCount);
+	QTableWidgetItem* h = new QTableWidgetItem("");
+	h->setCheckState(Qt::Unchecked);
+	ui->tableWidget->setItem(rowCount-1, 1, h);
 }

@@ -1,12 +1,9 @@
-#include <fstream>
-#include <stdio.h>
-#include <QByteArray>
 #include <QDebug>
 #include <QImage>
 #include <QPainter>
 #include <QPoint>
 #include <QPaintEvent>
-#include "mainwindow.h"
+
 #include "spriteset.h"
 #include "util.h"
 #include "objects/spherefile.h"
@@ -20,7 +17,7 @@ bool Spriteset::open(char* filename) {
 	file_read(filename, &this->header, sizeof(header), 0);
 	file_position  += sizeof(header);
 	if (memcmp(header.signature, ".rss", 4) != 0) {
-        errorBox("Error: " + QString(filename) + " is not a valid spriteset!");
+		errorBox("Error: " + QString(filename) + " is not a valid spriteset!");
 		return false;
 	}
 
@@ -38,7 +35,7 @@ bool Spriteset::open(char* filename) {
 			file_read(filename, &image_bytes, num_img_bytes, file_position);
 			file_position += num_img_bytes;
 			this->images.append(QImage(
-				(unsigned char*)image_bytes,
+				image_bytes,
 				header.frame_width, header.frame_height,
 				QImage::Format_RGBA8888
 			).copy(0,0,header.frame_width,header.frame_height));
@@ -59,7 +56,7 @@ bool Spriteset::open(char* filename) {
 			file_read(filename, direction_name, str_length, file_position);
 			direction.name = direction_name;
 			file_position += str_length;
-			qDebug() << direction.name;
+
 			direction.frames = QList<rss_frame>();
 			for(int f = 0; f < num_frames;f++) {
 				rss_frame frame;
@@ -88,6 +85,12 @@ void Spriteset::debugDump() {
 		"No. directions: " << this->header.num_directions << "\n" <<
 		"Base Upper left: {" << this->header.base_x1 << "," << this->header.base_y1 << "}\n" <<
 		"Base Lower right: {" << this->header.base_x2 << "," << this->header.base_y2 << "}\n";
+	QString dumpName = "";
+	for(int d = 0; d < this->directions.length(); d++) {
+		dumpName += this->directions.at(d).name;
+		if(d < this->directions.length() - 1) dumpName += ",";
+	}
+	qDebug().nospace() << dumpName;
 	for(int f = 0; f < this->images.length(); f++) {
 		this->images.at(f).save("dump_sprite" + QString::number(f) + ".png","PNG");
 	}
