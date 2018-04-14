@@ -3,23 +3,19 @@
 #include <QMenu>
 #include <QCloseEvent>
 #include <QTime>
+#include <QDesktopServices>
 #include <QDir>
+#include <QMediaPlayer>
 #include <QDirIterator>
 #include <QTextStream>
 #include <QToolButton>
 #include <QWidgetAction>
 #include <QTreeView>
-#include <QHeaderView>
-#include <QComboBox>
 #include <QKeySequence>
-#include <QListWidget>
-#include <QListWidgetItem>
-#include <QShortcut>
-#include <assert.h>
 
 #include "mainwindow.h"
-#include "util.h"
 #include "ui_mainwindow.h"
+#include "util.h"
 #include "aboutdialog.h"
 #include "projectpropertiesdialog.h"
 #include "settingswindow.h"
@@ -33,30 +29,39 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	Q_ASSERT(!_instance);
 	_instance = this;
 	ui->setupUi(this);
-	ui->menuDebug->deleteLater();
 
 	this->statusLabel = new QLabel("Ready.");
 	ui->statusBar->addWidget(this->statusLabel);
-	//ui->toolbarNewButton->setIcon(this->style()->standardIcon(QStyle::SP_FileIcon));
 	ui->toolbarOpenButton->setIcon(this->style()->standardIcon(QStyle::SP_DialogOpenButton));
 	ui->toolbarSaveButton->setIcon(this->style()->standardIcon(QStyle::SP_DriveFDIcon));
-
+	ui->playToggleButton->setIcon(this->style()->standardIcon(QStyle::SP_MediaPlay));
+	ui->stopButton->setIcon(this->style()->standardIcon(QStyle::SP_MediaStop));
+	ui->repeatButton->setIcon(this->style()->standardIcon(QStyle::SP_BrowserReload));
 	ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
 
 	ui->centralWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(ui->centralWidget, SIGNAL(customContextMenuRequested(const QPoint&)),
 			this, SLOT(showContextMenu(const QPoint&)));
 
+	/*
+	 * move to the next file tab (or to the first if we're at the end)
+	 * when the Page Down key is pressed
+	 */
 	QAction *nextTabAction = new QAction(this);
 	nextTabAction->setShortcut(Qt::CTRL|Qt::Key_PageDown);
 	connect(nextTabAction, SIGNAL(triggered()), this, SLOT(nextTab()));
 	this->addAction(nextTabAction);
 
+	/*
+	 * Move to the previous file tab (or to the last if we're at the first)
+	 * when the Page Up key is pressed
+	 */
 	QAction *prevTabAction = new QAction(this);
 	prevTabAction->setShortcut(Qt::CTRL|Qt::Key_PageUp);
 	connect(prevTabAction, SIGNAL(triggered()), this, SLOT(prevTab()));
 	this->addAction(prevTabAction);
 
+	// add new file drop-down "button" and copy the menu from the file menu
 	QToolButton* toolButton = new QToolButton();
 	toolButton->setIcon(this->style()->standardIcon(QStyle::SP_FileIcon));
 	toolButton->setToolTip("New file");
@@ -64,11 +69,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	toolButton->setPopupMode(QToolButton::InstantPopup);
 	QWidgetAction* toolButtonAction = new QWidgetAction(this);
 	toolButtonAction->setDefaultWidget(toolButton);
-	
-	//ui->mainToolBar->insertAction(toolButtonAction);
 	ui->mainToolBar->insertAction(ui->toolbarOpenButton,toolButtonAction);
-
-	openProject("");
 
 	QList<int> mainSplitterList;
 	QList<int> consoleSplitterList;
@@ -76,6 +77,14 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	consoleSplitterList << 350 << 1;
 	ui->splitter->setSizes(mainSplitterList);
 	ui->consoleSplitter->setSizes(consoleSplitterList);
+	this->project = new QSIProject("", this);
+	this->mediaPlayer = new QMediaPlayer(this);
+	connect(this->mediaPlayer, SIGNAL(stateChanged(QMediaPlayer::State)), this,
+			SLOT(audioStateChanged(QMediaPlayer::State)));
+	connect(this->mediaPlayer, SIGNAL(positionChanged(qint64)), this,
+			SLOT(audioPositionChanged(qint64)));
+	connect(this->mediaPlayer, SIGNAL(durationChanged(qint64)), this,
+			SLOT(audioDurationChanged(qint64)));
 }
 
 void MainWindow::addWidgetTab(QWidget* widget, QString tabname) {
@@ -86,24 +95,20 @@ void MainWindow::addWidgetTab(QWidget* widget, QString tabname) {
 }
 
 QString MainWindow::getStatus() {
-	foreach(QObject* child, ui->statusBar->children()) {
-		if(getWidgetType(child) == "QLabel") {
-			QLabel* lbl = qobject_cast<QLabel*>(child);
-			return lbl->text();
-		}
-	}
-	return "";
+	return this->statusLabel->text();
 }
 
 void MainWindow::setStatus(QString status) {
-	QLabel* msg = ui->statusBar->findChild<QLabel *>();
-	if(msg == nullptr) return;
-	msg->setText(status);
+	this->statusLabel->setText(status);
 }
 
 MainWindow::~MainWindow() {
 	disconnect(ui->centralWidget, SIGNAL(customContextMenuRequested(const QPoint&)),
 			this, SLOT(showContextMenu(const QPoint&)));
+
+	disconnect(SIGNAL(triggered()), this, SLOT(nextTab()));
+	disconnect(SIGNAL(triggered()), this, SLOT(prevTab()));
+
 	delete ui;
 }
 
@@ -125,13 +130,10 @@ void MainWindow::console(QVariant s, int which) {
 	QString line = prefix + s.toString();
 	switch (which) {
 		case 0:
-			ui->buildLogText->insertPlainText(line);
+			ui->consoleText->insertPlainText(line);
 		break;
 		case 1:
-			ui->consoleText->appendPlainText(line);
-		break;
-		case 2:
-			// exceptions, probably make a QTableView
+			ui->buildLogText->insertPlainText(line);
 		break;
 		default:
 			ui->consoleText->insertPlainText(line);
@@ -141,17 +143,7 @@ void MainWindow::console(QVariant s, int which) {
 
 void MainWindow::on_actionAbout_triggered() {
 	AboutDialog aboutDialog;
-	aboutDialog.setModal(true);
 	aboutDialog.exec();
-}
-
-void MainWindow::on_actionSphere_2_0_API_triggered() {
-	QProcess process;
-}
-
-
-void MainWindow::on_actionMiniRT_API_triggered() {
-	QProcess process;
 }
 
 void MainWindow::saveCurrentTab() {
@@ -222,16 +214,19 @@ void MainWindow::setupTreeView() {
 
 void MainWindow::openFile(QString fileName) {
 	QString fn;
+
 	if(fileName == "") {
-		QString usePath = "";
-		if(this->project && this->project->getPath() != "")
+		QString usePath = QString();
+		if(this->project && this->project->getPath() != "") {
 			usePath = this->project->getPath();
+		}
 		fn = QFileDialog::getOpenFileName(this,
 			"Open file", usePath,
 			"All supported files (*.sgm *.txt *.js *.mjs *.rmp *.rss *.rws);;"
 			"Sphere projects (*.sgm);;"
 			"Script files (*.js *.mjs);;"
 			"Text files (*.txt);;"
+			"Audio files (*.wav *.ogg *.mp3 *.flac *.it *.mod *.s3m *.xm *.sid);;"
 			"All files (*.*)"
 		);
 	} else {
@@ -242,16 +237,30 @@ void MainWindow::openFile(QString fileName) {
 
 	QFile* file = new QFile(fn);
 
-	QString fileExtension = fn.right(fn.length() - fn.lastIndexOf("."));
-	QWidget newTab;
+	QStringList audioList;
+
+	audioList <<
+				"wav" << "ogg" << "mp3" << "flac" << "it" <<
+				"mod" << "s3m" << "xm" << "sid";
+
 	if (!file->open(QIODevice::ReadWrite | QIODevice::Text)) return;
 	QFileInfo fi = QFileInfo(fn);
-
-	if(fileExtension == ".rss") {
+	QString fileExtension = fi.suffix();
+	if(fileExtension == "rss") {
 		Spriteset *ssWidget = new Spriteset(this);
-		
 		if(ssWidget->open(fn.toLatin1().data()))
 			this->addWidgetTab(ssWidget,fi.fileName());
+	} else if(audioList.indexOf(fileExtension) > -1) {
+		this->mediaPlayer->stop();
+		this->mediaPlayer->setMedia(QUrl::fromLocalFile(fn));
+		this->audioDuration = this->mediaPlayer->duration();
+		ui->horizontalSlider->setEnabled(true);
+		ui->horizontalSlider->setMinimum(0);
+		ui->horizontalSlider->setMaximum(100);
+		//ui->horizontalSlider->setRange(0,this->audioDuration);
+		this->mediaPlayer->play();
+		ui->currAudioLbl->setText(fi.fileName());
+		ui->playToggleButton->setIcon(this->style()->standardIcon(QStyle::SP_MediaPause));
 	} else {
 		QByteArray bytes = file->readAll();
 		QTextEdit* newTextEdit = new QTextEdit(this);
@@ -275,7 +284,6 @@ void MainWindow::openProject(QString fileName, bool reopen) {
 	QDirIterator iterator(this->project->getPath());
 	while(iterator.hasNext()) {
 		iterator.next();
-		qDebug() << iterator.filePath();
 		if(QFileInfo(iterator.filePath()).isFile() &&
 		   QFileInfo(iterator.filePath()).suffix() == "ssproj") {
 			projectFilePath = iterator.filePath();
@@ -305,17 +313,12 @@ void MainWindow::openProject(QString fileName, bool reopen) {
 
 	this->setupTreeView();
 	if(useSSProj) this->readProjectFile("");
-	else if(useSGM) this->readProjectFile(this->project->getPath() + "/game.sgm");
-	else {
-		qDebug() << "wat";
-	}
+	this->readProjectFile(projectFilePath);
 }
 
 void MainWindow::readProjectFile(QString filename) {
 	QString fileType = QFileInfo(filename).suffix().toLower();
 	QFile* projectFile = new QFile(filename);
-	qDebug() << "filename" << filename;
-	qDebug() << "fileType" << fileType;
 
 	Q_ASSERT(filename != "");
 	Q_ASSERT(fileType != "");
@@ -369,15 +372,6 @@ void MainWindow::on_actionConfigure_QtSphere_IDE_triggered() {
 	SettingsWindow settingsWindow(this);
 	settingsWindow.setModal(true);
 	settingsWindow.exec();
-}
-
-void MainWindow::on_toolbarNewButton_triggered() {
-	QTextEdit* newTextEdit = new QTextEdit(this);
-	newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()));
-	this->setupTextEditor(newTextEdit);
-	this->openFiles.append(newTextEdit);
-	ui->openFileTabs->insertTab(0, newTextEdit, "<Untitled>");
-	ui->openFileTabs->setCurrentIndex(0);
 }
 
 void MainWindow::on_toolbarSaveButton_triggered() {
@@ -461,4 +455,79 @@ void MainWindow::on_actionOpenProject_triggered() {
 
 void MainWindow::on_actionRefresh_triggered() {
 	this->openProject(this->project->getPath(), true);
+}
+
+void MainWindow::on_actionQSIGithub_triggered() {
+	QDesktopServices::openUrl(QUrl("https://github.com/Eggbertx/QtSphere-IDE"));
+}
+
+void MainWindow::on_actionMSGithub_triggered() {
+	QDesktopServices::openUrl(QUrl("https://github.com/fatcerberus/miniSphere"));
+}
+
+void MainWindow::on_treeView_doubleClicked(const QModelIndex &index) {
+	QFileSystemModel* model = new QFileSystemModel();
+	model->setRootPath(this->project->getPath());
+	if(model->fileInfo(index).isFile()) this->openFile(model->filePath(index));
+}
+
+void MainWindow::on_playToggleButton_clicked() {
+	switch(this->mediaPlayer->state()) {
+		case QMediaPlayer::StoppedState: {
+			this->mediaPlayer->setPosition(0);
+			this->mediaPlayer->play();
+			break;
+		}
+		case QMediaPlayer::PlayingState:
+			this->mediaPlayer->pause();
+			break;
+		case QMediaPlayer::PausedState:
+			this->mediaPlayer->play();
+			break;
+	}
+}
+
+void MainWindow::on_stopButton_clicked() {
+	this->mediaPlayer->stop();
+	ui->playToggleButton->setIcon(this->style()->standardIcon(QStyle::SP_MediaPlay));
+}
+
+void MainWindow::on_repeatButton_clicked(bool checked) {
+	this->loopingAudio = checked;
+}
+
+void MainWindow::audioDurationChanged(qint64 duration) {
+	this->audioDuration = duration;
+}
+
+void MainWindow::audioPositionChanged(qint64 position) {
+	float floatPos = (float)position;
+	int percent = floatPos/this->audioDuration*100;
+	if(!ui->horizontalSlider->isSliderDown()) ui->horizontalSlider->setSliderPosition(percent);
+}
+
+void MainWindow::audioStateChanged(QMediaPlayer::State state) {
+	switch(state) {
+		case QMediaPlayer::PlayingState:
+			ui->playToggleButton->setIcon(this->style()->standardIcon(QStyle::SP_MediaPause));
+			break;
+		case QMediaPlayer::PausedState:
+			ui->playToggleButton->setIcon(this->style()->standardIcon(QStyle::SP_MediaPlay));
+			break;
+		case QMediaPlayer::StoppedState: {
+			ui->playToggleButton->setIcon(this->style()->standardIcon(QStyle::SP_MediaPlay));
+			if(this->mediaPlayer->position() == this->audioDuration && this->loopingAudio) {
+				this->mediaPlayer->play();
+			}
+			break;
+		}
+	}
+}
+
+void MainWindow::on_horizontalSlider_valueChanged(int value) {
+	if(!ui->horizontalSlider->isSliderDown()) return;
+	qint64 newPos = 0;
+	float floatPos = (float)value;
+	newPos = this->audioDuration*(floatPos/100);
+	this->mediaPlayer->setPosition(newPos);
 }

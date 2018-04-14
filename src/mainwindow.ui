@@ -192,7 +192,6 @@
              <string>1</string>
             </property>
            </row>
-           
            <column>
             <property name="text">
              <string>Task</string>
@@ -206,6 +205,141 @@
              <enum>Unchecked</enum>
             </property>
            </item>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="mediaPlayerTab">
+        <attribute name="title">
+         <string>Media Player</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <item>
+          <widget class="QScrollArea" name="scrollArea">
+           <property name="frameShape">
+            <enum>QFrame::NoFrame</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Plain</enum>
+           </property>
+           <property name="widgetResizable">
+            <bool>true</bool>
+           </property>
+           <widget class="QWidget" name="scrollAreaWidgetContents">
+            <property name="geometry">
+             <rect>
+              <x>0</x>
+              <y>0</y>
+              <width>619</width>
+              <height>422</height>
+             </rect>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <item>
+              <spacer name="verticalSpacer">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QLabel" name="currentlyPlaying">
+               <property name="text">
+                <string>Currently playing:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="currAudioLbl">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="horizontalSlider">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="maximum">
+                <number>100</number>
+               </property>
+               <property name="sliderPosition">
+                <number>0</number>
+               </property>
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout">
+               <item>
+                <widget class="QToolButton" name="playToggleButton">
+                 <property name="text">
+                  <string>Play</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="stopButton">
+                 <property name="text">
+                  <string>Stop</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="repeatButton">
+                 <property name="text">
+                  <string>Repeat</string>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_2">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>418</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <spacer name="verticalSpacer_2">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </widget>
           </widget>
          </item>
         </layout>
@@ -345,8 +479,8 @@
      <addaction name="separator"/>
      <addaction name="newPlainTextFile"/>
      <addaction name="newMap"/>
+     <addaction name="actionSpriteset"/>
      <addaction name="newTileset"/>
-     <addaction name="newCharset"/>
      <addaction name="newFont"/>
      <addaction name="newWindowstyle"/>
     </widget>
@@ -368,6 +502,7 @@
     <addaction name="menuNew"/>
     <addaction name="actionOpenFile"/>
     <addaction name="actionOpenProject"/>
+    <addaction name="actionClose_Project"/>
     <addaction name="menuOpen_Recent"/>
     <addaction name="menuImport"/>
     <addaction name="separator"/>
@@ -415,23 +550,6 @@
     <addaction name="separator"/>
     <addaction name="actionProject_Properties"/>
    </widget>
-   <widget class="QMenu" name="menuDebug">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="title">
-     <string>Debug</string>
-    </property>
-    <addaction name="actionTest_Game"/>
-    <addaction name="separator"/>
-    <addaction name="actionStart_Debugging"/>
-    <addaction name="actionBreak_Into_Debugger"/>
-    <addaction name="actionStop_Debugging"/>
-    <addaction name="separator"/>
-    <addaction name="actionStep_Into"/>
-    <addaction name="actionStep_Over"/>
-    <addaction name="actionStep_Out"/>
-   </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">
      <string>Tools</string>
@@ -446,8 +564,9 @@
     <property name="title">
      <string>Help</string>
     </property>
-    <addaction name="actionSphere_2_0_API"/>
-    <addaction name="actionMiniRT_API"/>
+    <addaction name="separator"/>
+    <addaction name="actionQSIGithub"/>
+    <addaction name="actionMSGithub"/>
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
@@ -455,7 +574,6 @@
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuProject"/>
-   <addaction name="menuDebug"/>
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -493,15 +611,8 @@
    <property name="text">
     <string>Close Project</string>
    </property>
-  </action>
-  <action name="openLastProject">
-   <property name="text">
-    <string>Open Last Project</string>
-   </property>
-  </action>
-  <action name="actionNew">
-   <property name="text">
-    <string>New</string>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="actionOpenFile">
@@ -604,47 +715,6 @@
     <string>Package Game...</string>
    </property>
   </action>
-  <action name="actionTest_Game">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="text">
-    <string>Test Game</string>
-   </property>
-   <property name="iconVisibleInMenu">
-    <bool>false</bool>
-   </property>
-  </action>
-  <action name="actionStart_Debugging">
-   <property name="text">
-    <string>Start Debugging</string>
-   </property>
-  </action>
-  <action name="actionBreak_Into_Debugger">
-   <property name="text">
-    <string>Break Into Debugger</string>
-   </property>
-  </action>
-  <action name="actionStop_Debugging">
-   <property name="text">
-    <string>Stop Debugging</string>
-   </property>
-  </action>
-  <action name="actionStep_Into">
-   <property name="text">
-    <string>Step Into</string>
-   </property>
-  </action>
-  <action name="actionStep_Over">
-   <property name="text">
-    <string>Step Over</string>
-   </property>
-  </action>
-  <action name="actionStep_Out">
-   <property name="text">
-    <string>Step Out</string>
-   </property>
-  </action>
   <action name="actionConfigure_Engine">
    <property name="text">
     <string>Configure Engine...</string>
@@ -671,16 +741,6 @@
     <bool>true</bool>
    </property>
   </action>
-  <action name="actionSphere_2_0_API">
-   <property name="text">
-    <string>Sphere 2.0 API</string>
-   </property>
-  </action>
-  <action name="actionMiniRT_API">
-   <property name="text">
-    <string>miniRT API</string>
-   </property>
-  </action>
   <action name="newProject">
    <property name="text">
     <string>Project...</string>
@@ -699,11 +759,6 @@
   <action name="newTileset">
    <property name="text">
     <string>Tileset</string>
-   </property>
-  </action>
-  <action name="newCharset">
-   <property name="text">
-    <string>Charset</string>
    </property>
   </action>
   <action name="newFont">
@@ -815,6 +870,21 @@
   <action name="actionRun_Cell">
    <property name="text">
     <string>Run Cell</string>
+   </property>
+  </action>
+  <action name="actionSpriteset">
+   <property name="text">
+    <string>Spriteset</string>
+   </property>
+  </action>
+  <action name="actionQSIGithub">
+   <property name="text">
+    <string>QtSphere IDE on GitHub</string>
+   </property>
+  </action>
+  <action name="actionMSGithub">
+   <property name="text">
+    <string>miniSphere on GitHub</string>
    </property>
   </action>
  </widget>

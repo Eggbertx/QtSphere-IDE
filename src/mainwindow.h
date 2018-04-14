@@ -8,6 +8,7 @@
 #include <QWidget>
 #include <QVariant>
 #include <QComboBox>
+#include <QMediaPlayer>
 
 #include "objects/spherefile.h"
 #include "qsiproject.h"
@@ -40,17 +41,19 @@ class MainWindow : public QMainWindow {
 		void readProjectFile(QString filename);
 		void readGameJSON();
 
-		void console(QVariant s, int which = 1);
+		void console(QVariant s, int which = 0);
 		void closeEvent(QCloseEvent* event);
 		static MainWindow* instance();
 
 	private slots:
-		void on_actionMiniRT_API_triggered();
+		void nextTab();
+		void prevTab();
+		void audioStateChanged(QMediaPlayer::State state);
+		void audioPositionChanged(qint64 position);
+		void audioDurationChanged(qint64 duration);
 		void on_actionAbout_triggered();
-		void on_actionSphere_2_0_API_triggered();
 		void on_actionExit_triggered();
 		void on_actionConfigure_QtSphere_IDE_triggered();
-		void on_toolbarNewButton_triggered();
 		void on_toolbarSaveButton_triggered();
 		void on_toolbarOpenButton_triggered();
 		void on_openFileTabs_tabCloseRequested(int index);
@@ -64,10 +67,13 @@ class MainWindow : public QMainWindow {
 		void on_actionRefresh_triggered();
 		void on_newTaskButton_clicked();
 		void on_actionOpenFile_triggered();
-		void nextTab();
-		void prevTab();
-
-		
+		void on_actionQSIGithub_triggered();
+		void on_actionMSGithub_triggered();
+		void on_treeView_doubleClicked(const QModelIndex &index);
+		void on_playToggleButton_clicked();
+		void on_stopButton_clicked();
+		void on_repeatButton_clicked(bool checked);
+		void on_horizontalSlider_valueChanged(int value);
 
 private:
 		static MainWindow* _instance;
@@ -76,7 +82,9 @@ private:
 		QLabel* statusLabel;
 		QString projectDir;
 		QSIProject* project;
-
+		QMediaPlayer* mediaPlayer;
+		bool loopingAudio = false;
+		qint64 audioDuration;
 		QList<QWidget *> openFiles;
 		void setupEditors();
 		void setupTextEditor(QTextEdit *editor);
