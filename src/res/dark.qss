@@ -1,0 +1,81 @@
+#mainSpriteAreaLayout, #mainSpriteAreaLayout QFrame { 
+	background-color: #1e1e1e;
+}
+
+#palette {
+	background-color: black;
+}
+
+QTabBar {
+	color: white;
+}
+
+QTabBar::tab:selected {
+	background-color: #1e1e1e;
+	border-color: #1e1e1e;
+	padding: 8px;
+}
+
+#openFileTabs QTabBar::tab:!selected {
+	background-color: #2d2d2d;
+	border-right: 1px solid #111111;
+	padding: 8px;
+}
+
+#sideBar QTabBar::tab:!selected {
+	background-color: #2d2d2d;
+	border-bottom: 1px solid #111111;
+	padding: 8px;
+	border-color: #111111;
+}
+
+#sideBar,QSplitter, QSplitterHandle {
+	background-color:#1e1e1e;
+	border-color: #252526;
+}
+
+#centralWidget {
+	color: white;
+	background-color: #1e1e1e;
+	border-color: #252526;
+}
+
+QLineEdit, #tableWidget {
+	color: white;
+	background-color: #3c3c3c;
+}
+
+QTabWidget, QDialog, QStatusBar, #mediaPlayerContents,QComboBox { 
+	color:white;
+	background-color: #222222;
+	border-color: #252526;
+}
+
+#consoleSplitter {
+	background-color: #333333;
+	border-color: #252526;
+}
+
+QAbstractButton, QComboBox:item:selected {
+	color:white;
+	background-color: #0e639c;
+}
+
+QMenuBar, QToolBar, QToolBar QToolButton {
+	color: white;
+	background-color: #454749;
+}
+
+QTreeView,QFrame, #sideBar QTabWidget {
+	color: white;
+	background-color: #252526;
+	border-color: #252526;
+}
+
+QWidget {
+	border-color: #1e1e1e;
+}
+
+QLabel {
+	color: white;
+}

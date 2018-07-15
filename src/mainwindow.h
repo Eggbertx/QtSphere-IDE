@@ -8,10 +8,11 @@
 #include <QWidget>
 #include <QVariant>
 #include <QComboBox>
-#include <QMediaPlayer>
 
+#include "config.h"
 #include "objects/spherefile.h"
 #include "qsiproject.h"
+#include "soundplayer.h"
 
 #define MAINWINDOW_TITLE TARGET " " VERSION
 
@@ -24,7 +25,7 @@ class MainWindow : public QMainWindow {
 	Q_OBJECT
 
 	public:
-		explicit MainWindow(QWidget *parent = Q_NULLPTR);
+		explicit MainWindow(Config* config = Q_NULLPTR, QWidget *parent = Q_NULLPTR);
 		~MainWindow();
 		QString getStatus();
 		void setStatus(QString status);
@@ -44,13 +45,12 @@ class MainWindow : public QMainWindow {
 		void console(QVariant s, int which = 0);
 		void closeEvent(QCloseEvent* event);
 		static MainWindow* instance();
+		Config* config;
 
 	private slots:
 		void nextTab();
 		void prevTab();
-		void audioStateChanged(QMediaPlayer::State state);
-		void audioPositionChanged(qint64 position);
-		void audioDurationChanged(qint64 duration);
+		void checkCloseProjectOption();
 		void on_actionAbout_triggered();
 		void on_actionExit_triggered();
 		void on_actionConfigure_QtSphere_IDE_triggered();
@@ -70,10 +70,6 @@ class MainWindow : public QMainWindow {
 		void on_actionQSIGithub_triggered();
 		void on_actionMSGithub_triggered();
 		void on_treeView_doubleClicked(const QModelIndex &index);
-		void on_playToggleButton_clicked();
-		void on_stopButton_clicked();
-		void on_repeatButton_clicked(bool checked);
-		void on_horizontalSlider_valueChanged(int value);
 
 private:
 		static MainWindow* _instance;
@@ -82,9 +78,7 @@ private:
 		QLabel* statusLabel;
 		QString projectDir;
 		QSIProject* project;
-		QMediaPlayer* mediaPlayer;
-		bool loopingAudio = false;
-		qint64 audioDuration;
+		SoundPlayer* soundPlayer;
 		QList<QWidget *> openFiles;
 		void setupEditors();
 		void setupTextEditor(QTextEdit *editor);

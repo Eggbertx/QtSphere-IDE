@@ -17,7 +17,7 @@ void Config::loadConfig() {
 	qDebug().noquote() << "Loading config file from " << this->configPath;
 
 	if(!QFile(this->configPath).exists())
-		createDefaultConfig();
+		this->createDefaultConfig();
 
 	jsonFile->setFileName(this->configPath);
 	jsonFile->open(QIODevice::ReadWrite | QIODevice::Text);
@@ -33,24 +33,31 @@ void Config::loadConfig() {
 	for(int p = 0; p < projectArray.size(); p++) {
 		this->projectPaths.append(projectArray[p].toString());
 	}
-	qDebug().noquote() << jsonObj["legacySphere"].toObject()["legacySphereDir"].toString();
 }
 
-void Config::setTheme(QString theme = "stylesheet.qss") {
-	QFile styleFile(this->configDirectory + theme);
-	if(!styleFile.open(QFile::ReadOnly)) {
-		MainWindow::instance()->console("Failed to open stylesheet (" + theme + "):" + styleFile.errorString(), 1);
+void Config::setTheme(QString theme = "customstyle.qss", bool inConfigDir) {
+	QFile* styleFile;
+	if(inConfigDir) styleFile = new QFile(this->configDirectory + theme);
+	else styleFile = new QFile(theme);
+	if(!styleFile->open(QFile::ReadOnly)) {
+		QString errorText = "Failed to open stylesheet (" + theme + "):" + styleFile->errorString();
+		MainWindow::instance()->console(errorText, 1);
+		qDebug() << errorText;
 		return;
 	}
-	QString stylesheet = QLatin1String(styleFile.readAll());
-	styleFile.close();
+
+	QString stylesheet = QLatin1String(styleFile->readAll());
+	styleFile->close();
+	delete styleFile;
 	qApp->setStyleSheet(stylesheet);
 }
 
+void Config::save() {
+
+}
+
 void Config::createDefaultConfig() {
+	if(QFile::exists(this->configDirectory)) return;
 	QDir().mkdir(QDir::homePath() + "/.QtSphereIDE");
-	QFile* defaultConfig = new QFile(":/text/QtSphereIDE.json");
-	defaultConfig->copy(this->configPath);
-	// open settings dialog
-	defaultConfig->close();
+	QFile::copy(":/text/QtSphereIDE.json", this->configDirectory);
 }

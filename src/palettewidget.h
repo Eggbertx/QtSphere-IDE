@@ -5,25 +5,31 @@
 #include <QMenu>
 #include <QColor>
 #include <QList>
+#include "spritesetview.h"
 
 class PaletteWidget : public QWidget {
 	Q_OBJECT
 
 public:
-	explicit PaletteWidget(QWidget *parent = 0);
+	explicit PaletteWidget(SpritesetView *parent = 0);
 	~PaletteWidget();
 	void changePalette(QColor palettearr[], int numColors);
+	void importPalette(QString path);
+	void exportPalette(QString path);
+
 	QList<QColor> paletteColors;
 	int selectedIndex;
-	int squareSize = 10;
+	const int squareSize = 10;
 
 private:
 	bool eventFilter(QObject* object, QEvent* event);
 	QMenu* rightClickMenu;
 	QPoint mousePos;
 
-	/* All of these are based on the palettes in Chad Austin's Sphere editor
+	/*
+	 * All of these are based on the palettes in Chad Austin's Sphere editor
 	 * see /sphere/source/common/common_palettes.cpp
+	 * TODO: Move these to and load them from files
 	 */
 	QColor dos_palette[256] = {
 		QColor(0, 0, 0),

@@ -1,22 +1,21 @@
+#include <QFileInfo>
 #include "spherefile.h"
 
-SphereFile::SphereFile(QWidget *parent) : QWidget(parent) {
-	QString fileExtension;
-}
+
+SphereFile::SphereFile(QObject *parent) {}
+
+SphereFile::~SphereFile() {}
+
+void SphereFile::createNew() {}
+
+bool SphereFile::open(QString filename) {}
+
+bool SphereFile::save() {}
 
 QString SphereFile::fileName() {
 	return this->file->fileName();
 }
 
-void SphereFile::readFile(QString fn) {
-	QString fileExtension;
-	this->file = new QFile(fn);
-	if (!this->file->open(QIODevice::ReadWrite | QIODevice::Text)) return;
-	QByteArray bytes = this->file->readAll();
-}
-
-void SphereFile::readFile(QFile *f) {
-	this->file = f;
-	if (!this->file->open(QIODevice::ReadWrite | QIODevice::Text)) return;
-
+QString SphereFile::getBaseName() {
+	return QFileInfo(this->file->fileName()).baseName();
 }

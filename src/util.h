@@ -17,6 +17,6 @@ void errorBox(QString message);
 
 void infoBox(QString info);
 
-bool file_read(char* filename, void* into, int size, int offset);
+bool readFile(QString filename, void* into, int size, int offset);
 
 #endif // UTIL_H

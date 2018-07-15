@@ -21,6 +21,7 @@ ProjectPropertiesDialog::ProjectPropertiesDialog(bool newFile, QSIProject* proje
 		this->project = project;
 		ui->pathLineEdit->setEnabled(false);
 		ui->pathButton->setEnabled(false);
+		if(!project) return;
 		ui->pathLineEdit->setText(project->getPath());
 		ui->nameLineEdit->setText(project->name);
 		ui->authorLineEdit->setText(project->author);

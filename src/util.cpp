@@ -3,6 +3,8 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QApplication>
+#include <QDataStream>
+#include <QFile>
 #include "util.h"
 #include "mainwindow.h"
 #include "modifiedfilesdialog.h"
@@ -37,9 +39,9 @@ void infoBox(QString info) {
 	QMessageBox::information(MainWindow::instance(), "Info", info, QMessageBox::Ok);
 }
 
-bool file_read(char* filename, void* into, int size, int offset) {
+bool readFile(QString filename, void* into, int size, int offset) {
 	if(size == 0) return true;
-	std::ifstream is(filename,  std::ifstream::binary);
+	std::ifstream is(filename.toStdString().c_str(),  std::ifstream::binary);
 	if(!is.is_open()) {
 		qDebug().noquote() << "Error loading" << filename;
 		return false;

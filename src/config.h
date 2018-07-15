@@ -10,7 +10,8 @@ class Config {
 	public:
 		Config();
 		void loadConfig();
-		void setTheme(QString theme);
+		void setTheme(QString theme, bool inConfigDir = false);
+		void save();
 		QString configDirectory;
 		QString configPath;
 		QStringList projectPaths;
@@ -25,7 +26,6 @@ class Config {
 
 	private:
 		QFile* jsonFile;
-
 		QString jsonString;
 		QJsonDocument jsonDoc;
 		QJsonObject jsonObj;

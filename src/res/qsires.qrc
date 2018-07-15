@@ -7,5 +7,6 @@
     </qresource>
     <qresource prefix="/text">
         <file>QtSphereIDE.json</file>
+        <file>dark.qss</file>
     </qresource>
 </RCC>

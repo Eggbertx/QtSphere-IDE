@@ -5,38 +5,26 @@
 #include <QFile>
 #include <QTextEdit>
 
-/* SphereFile is treated as a standard widget
- * to be inherited by other classes representing
- * Sphere filetypes. All Sphere subclasses implement
- * readFile, save, etc, along with any necessary
- * slots/signals
-*/
-
-class SphereFile : public QWidget {
+class SphereFile : public QObject {
 	Q_OBJECT
 	Q_ENUMS(Type)
-public:
-	explicit SphereFile(QWidget *parent = nullptr);
-	explicit SphereFile(QFile *file = nullptr);
-	explicit SphereFile(QString fn);
+	public:
+		explicit SphereFile(QObject *parent = nullptr);
+		~SphereFile();
+		virtual bool save();
+		virtual bool open(QString filename);
+		virtual void createNew();
+		QString fileExtension();
+		QString fileName();
+		QString getBaseName();
+		QString filePath();
+		enum Type { Font, Map, Package, Spriteset, Tileset, WindowStyle }; // binary types
+	signals:
 
-	QString fileExtension();
-	QString fileName();
-	QString getBaseName();
-	QWidget* getWidget();
-	void save();
+	public slots:
 
-	void readFile(QString filename);
-	void readFile(QFile *f);
-	QString filePath();
-	enum Type { Font, Map, Package, Spriteset, Tileset, WindowStyle }; // binary types
-signals:
-
-public slots:
-
-private:
-	QFile* file;
-	QWidget* widget;
+	private:
+		QFile* file;
 };
 
 #endif // SPHEREFILE_H

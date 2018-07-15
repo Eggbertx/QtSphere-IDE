@@ -1,10 +1,9 @@
 QT += core gui multimedia multimediawidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
 TARGET = QtSphereIDE
 TEMPLATE = app
-VERSION = 0.2.4
+VERSION = 0.2.5
 DEFINES += QT_DEPRECATED_WARNINGS TARGET=\\\"$$TARGET\\\" VERSION=\\\"$$VERSION\\\"
 QMAKE_LFLAGS += -no-pie
 
@@ -13,7 +12,8 @@ DESTDIR=build
 OBJECTS_DIR=temp_files
 MOC_DIR=temp_files
 
-SOURCES += main.cpp\
+SOURCES += \
+	main.cpp\
 	mainwindow.cpp \
 	aboutdialog.cpp \
 	util.cpp \
@@ -24,10 +24,16 @@ SOURCES += main.cpp\
 	objects/spherefile.cpp \
 	qsiproject.cpp \
 	projectpropertiesdialog.cpp \
-	objects/spriteset.cpp
-	
+	objects/spriteset.cpp \
+	spritesetview.cpp \
+	palettewidget.cpp \
+	imagechooser.cpp \
+	drawingwidget.cpp \
+	ssdirectionview.cpp \
+    soundplayer.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS += \
+	mainwindow.h \
 	aboutdialog.h \
 	util.h \
 	modifiedfilesdialog.h \
@@ -37,15 +43,26 @@ HEADERS  += mainwindow.h \
 	objects/spherefile.h \
 	qsiproject.h \
 	projectpropertiesdialog.h \
-	objects/spriteset.h
+	objects/spriteset.h \
+	spritesetview.h \
+	palettewidget.h \
+	imagechooser.h \
+	drawingwidget.h \
+	ssdirectionview.h \
+    soundplayer.h
 
-FORMS    += mainwindow.ui \
+FORMS += \
+	mainwindow.ui \
 	aboutdialog.ui \
 	modifiedfilesdialog.ui \
 	settingswindow.ui \
-	projectpropertiesdialog.ui
+	projectpropertiesdialog.ui \
+	spritesetview.ui \
+	drawingwidget.ui \
+    soundplayer.ui
 
-RESOURCES += \
-	res/qsires.qrc
+RESOURCES += res/qsires.qrc
 
 RC_FILE = res/icon.rc
+
+DISTFILES +=
