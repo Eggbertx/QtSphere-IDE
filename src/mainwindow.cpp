@@ -82,7 +82,6 @@ MainWindow::MainWindow(Config* config, QWidget *parent): QMainWindow(parent), ui
 
 	this->soundPlayer = new SoundPlayer();
 	ui->mediaPlayerTab->layout()->addWidget(this->soundPlayer);
-	this->addWidgetTab(new SpritesetView(this),"SpritesetView");
 }
 
 MainWindow::~MainWindow() {
@@ -243,9 +242,10 @@ void MainWindow::openFile(QString fileName) {
 	QFileInfo fi = QFileInfo(fn);
 	QString fileExtension = fi.suffix();
 	if(fileExtension == "rss") {
-		/*Spriteset *ssWidget = new Spriteset(this);
+		Spriteset *ssWidget = new Spriteset(this);
 		if(ssWidget->open(fn.toLatin1().data()))
-			this->addWidgetTab(ssWidget,fi.fileName());*/
+			this->addWidgetTab(new SpritesetView(fi.filePath(), this),fi.fileName());
+			//this->addWidgetTab(ssWidget,fi.fileName());
 	} else if(audioList.indexOf(fileExtension) > -1) {
 		this->soundPlayer->load(fn);
 	} else {

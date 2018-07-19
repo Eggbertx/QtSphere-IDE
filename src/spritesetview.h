@@ -11,7 +11,7 @@ class SpritesetView: public QWidget {
 	Q_OBJECT
 
 public:
-	explicit SpritesetView(QWidget *parent = 0);
+	explicit SpritesetView(QString file, QWidget *parent = 0);
 	~SpritesetView();
 	void addDirection(QString name = "", int numFrames = 1);
 

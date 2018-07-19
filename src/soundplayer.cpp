@@ -73,8 +73,6 @@ void SoundPlayer::on_stopBtn_clicked() {
 }
 
 void SoundPlayer::on_repeatBtn_clicked(bool checked) {
-	qDebug() << checked;
-
 	this->loopingAudio = checked;
 }
 

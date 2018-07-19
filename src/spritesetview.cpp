@@ -1,4 +1,3 @@
-#include <QDebug>
 #include <QMenu>
 #include <QAction>
 #include <QHBoxLayout>
@@ -10,6 +9,7 @@
 #include <QGraphicsScene>
 #include <QLineEdit>
 #include <QToolButton>
+#include <QFileInfo>
 
 #include "spritesetview.h"
 #include "ui_spritesetview.h"
@@ -19,7 +19,7 @@
 #include "objects/spriteset.h"
 
 
-SpritesetView::SpritesetView(QWidget *parent): QWidget(parent), ui(new Ui::SpritesetView) {
+SpritesetView::SpritesetView(QString file, QWidget *parent): QWidget(parent), ui(new Ui::SpritesetView) {
 	ui->setupUi(this);
 
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -35,9 +35,8 @@ SpritesetView::SpritesetView(QWidget *parent): QWidget(parent), ui(new Ui::Sprit
 	QPalette pal = palette();
 	pal.setColor(QPalette::Background, QColor(40,40,40));
 
-
-	Spriteset penguin(this);
-	penguin.open("penguin.rss");
+	Spriteset spriteset_file(this);
+	spriteset_file.open(file);
 
 	ImageChooser* ic = new ImageChooser(true, this);
 	ui->ssImages->setWidget(ic);
@@ -52,8 +51,8 @@ SpritesetView::SpritesetView(QWidget *parent): QWidget(parent), ui(new Ui::Sprit
 	ui->choosers->setSizes(sizes);
 	sizes.clear();
 
-	ic->setImages(penguin.images);
-	const QPixmap animPixmap = QPixmap::fromImage(penguin.images.at(0));
+	ic->setImages(spriteset_file.images);
+	const QPixmap animPixmap = QPixmap::fromImage(spriteset_file.images.at(0));
 
 	QGraphicsPixmapItem* animFrame = new QGraphicsPixmapItem(animPixmap);
 	ui->animView->setScene(new QGraphicsScene(ui->animView));
@@ -61,8 +60,8 @@ SpritesetView::SpritesetView(QWidget *parent): QWidget(parent), ui(new Ui::Sprit
 	ui->animView->scene()->addItem(animFrame);
 
 	ui->animView->setBackgroundBrush(QBrush(QPixmap(":/icons/transparency-bg.png")));
-	QList<Spriteset::rss_direction> penguin_directions = penguin.getDirections();
-	int num_directions = penguin_directions.length();
+	QList<Spriteset::rss_direction> spriteset_file_directions = spriteset_file.getDirections();
+	int num_directions = spriteset_file_directions.length();
 	for(int d = 0; d < num_directions; d++) {
 		this->addDirection("",4);
 	}
@@ -83,8 +82,6 @@ void SpritesetView::addDirection(QString name, int numFrames) {
 }
 
 void SpritesetView::showContextMenu(const QPoint &pos) {
-	qDebug() << this->childAt(pos)->objectName();
-
 	QMenu menu(this);
 	menu.addAction("Add direction");
 	menu.addAction("2");
