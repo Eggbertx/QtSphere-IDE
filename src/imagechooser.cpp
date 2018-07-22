@@ -53,7 +53,6 @@ bool ImageChooser::eventFilter(QObject* object, QEvent* event) {
 	switch (event->type()) {
 		case QEvent::Paint: {
 			QPainter painter(this);
-			//painter.drawTiledPixmap(all_rect, this->alphabg);
 			painter.drawTiledPixmap(this->rect(), this->alphabg);
 			int x = 0;
 			int y = 0;
@@ -79,7 +78,7 @@ bool ImageChooser::eventFilter(QObject* object, QEvent* event) {
 		case QEvent::MouseButtonPress: {
 			QMouseEvent* me = static_cast<QMouseEvent*>(event);
 			int buttonPressed = me->button();
-			if(buttonPressed == Qt::LeftButton|Qt::RightButton) {
+			if(buttonPressed == Qt::LeftButton || buttonPressed == Qt::RightButton) {
 				int numImages = this->images.length();
 				int x = 0;
 				int y = 0;

@@ -6,8 +6,6 @@
 #include <QImage>
 #include <QMenu>
 
-#include "spritesetview.h"
-
 class ImageChooser: public QWidget {
 	Q_OBJECT
 
