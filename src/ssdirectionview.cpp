@@ -1,4 +1,5 @@
 #include <QGraphicsView>
+#include <QGraphicsPixmapItem>
 #include <QLayout>
 #include <QLineEdit>
 #include <QMenu>
@@ -26,6 +27,7 @@ SSDirectionView::SSDirectionView(QString name, int numFrames, QWidget *parent): 
 	this->setLayout(dirLayout);
 
 	this->nameLineEdit = new QLineEdit(name);
+	this->nameLineEdit->setText(name);
 	this->nameLineEdit->setFixedWidth(100);
 	dirLayout->addWidget(this->nameLineEdit);
 	this->framesContainer = new QWidget();
@@ -61,6 +63,13 @@ SSDirectionView::~SSDirectionView() {
 			   this, SLOT(removeFrameSlot()));
 	disconnect(this->addFrameButton, SIGNAL(triggered(QAction*)),
 			   this, SLOT(addFrameSlot()));
+}
+
+void SSDirectionView::setImage(int index, QImage image) {
+	QGraphicsScene* scene = new QGraphicsScene();
+	this->frameViews.at(index)->setScene(scene);
+	QGraphicsPixmapItem* item = new QGraphicsPixmapItem(QPixmap::fromImage(image));
+	scene->addItem(item);
 }
 
 QString SSDirectionView::getName() {
@@ -103,6 +112,7 @@ void SSDirectionView::removeFrame(int index) {
 }
 
 void SSDirectionView::addFrame(QImage *image) {
+//	Q_ASSERT(image != nullptr);
 	QGraphicsView* newView = new QGraphicsView(new QGraphicsScene());
 	newView->setFixedSize(60,60);
 	newView->setBackgroundBrush(QBrush(QPixmap(":/icons/transparency-bg.png")));

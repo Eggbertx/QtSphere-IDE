@@ -1,38 +1,42 @@
 #ifndef SPRITESET_H
 #define SPRITESET_H
 
-#include <QWidget>
+
+#include <QFile>
 #include "objects/spherefile.h"
+#include "importoptionsdialog.h"
 
 class Spriteset : public SphereFile {
 	Q_OBJECT
 	public:
 		explicit Spriteset(QObject *parent = nullptr);
 		~Spriteset();
-		static struct rss_frame {
+		static Spriteset* fromImage(QString filename, QSize frameSize, bool removeDuplicates, QColor inColor, QColor outColor);
+		static struct SSFrame {
 			uint16_t imageIndex;
 			uint16_t delay;
 			uint8_t reserved[4];
 		}frame_struct;
 
-		static struct rss_direction {
-			char* name;
-			QList<rss_frame> frames;
+		static struct SSDirection {
+			QString name;
+			QList<SSFrame> frames;
+			uint8_t reserved[6];
 		}direction_struct;
 
 		void createNew() override;
 		bool open(QString filename);
-		bool save();
+		bool save(QString filename);
 		void debugDump();
 		int frameWidth();
 		int frameHeight();
-		QList<rss_direction> getDirections();
+		QList<SSDirection> directions;
 		QRect getBaseRect();
-		void addDirection(QString name, QList<rss_frame> frames);
-
+		void addDirection(QString name, int numFrames);
+		void addDirection(QString name, QList<SSFrame> frames);
+		void addDirection(QString name, SSFrame frame);
 		QList<QImage> images;
-
-
+		bool valid;
 	private:
 		QString filename;
 		typedef struct header_struct {
@@ -49,7 +53,7 @@ class Spriteset : public SphereFile {
 			uint8_t reserved[106];
 		}rss_header;
 		rss_header header;
-		QList<rss_direction> directions;
+
 };
 
 #endif // SPRITESET_H

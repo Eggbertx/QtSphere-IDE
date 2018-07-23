@@ -70,8 +70,10 @@ class MainWindow : public QMainWindow {
 		void on_actionQSIGithub_triggered();
 		void on_actionMSGithub_triggered();
 		void on_treeView_doubleClicked(const QModelIndex &index);
+		void on_actionImage_to_Spriteset_triggered();
+		void on_actionSave_triggered();
 
-private:
+	private:
 		static MainWindow* _instance;
 		Ui::MainWindow *ui;
 		QString status;

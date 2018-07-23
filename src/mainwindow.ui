@@ -382,6 +382,7 @@
       <string>Import</string>
      </property>
      <addaction name="actionTiled_map_to_Sphere_map"/>
+     <addaction name="actionImage_to_Spriteset"/>
     </widget>
     <widget class="QMenu" name="menuOpen_Recent">
      <property name="title">
@@ -778,6 +779,11 @@
   <action name="actionMSGithub">
    <property name="text">
     <string>miniSphere on GitHub</string>
+   </property>
+  </action>
+  <action name="actionImage_to_Spriteset">
+   <property name="text">
+    <string>Image to Spriteset</string>
    </property>
   </action>
  </widget>

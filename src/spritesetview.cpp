@@ -1,3 +1,4 @@
+#include <QDebug>
 #include <QMenu>
 #include <QAction>
 #include <QHBoxLayout>
@@ -18,8 +19,7 @@
 #include "ssdirectionview.h"
 #include "objects/spriteset.h"
 
-
-SpritesetView::SpritesetView(QString file, QWidget *parent): QWidget(parent), ui(new Ui::SpritesetView) {
+SpritesetView::SpritesetView(QWidget *parent): QWidget(parent), ui(new Ui::SpritesetView) {
 	ui->setupUi(this);
 
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -35,56 +35,74 @@ SpritesetView::SpritesetView(QString file, QWidget *parent): QWidget(parent), ui
 	QPalette pal = palette();
 	pal.setColor(QPalette::Background, QColor(40,40,40));
 
-	Spriteset spriteset_file(this);
-	spriteset_file.open(file);
-
-	ImageChooser* ic = new ImageChooser(true, this);
-	ui->ssImages->setWidget(ic);
+	this->spriteset = new Spriteset(this);
+	this->images = new ImageChooser(true, this);
+	ui->ssImages->setWidget(this->images);
 	ui->ssImages->setAlignment(Qt::AlignLeft|Qt::AlignTop);
 
 	QList<int> sizes;
 	sizes << 600 << 100;
 	ui->ssViewSplitter->setSizes(sizes);
 	sizes.clear();
-
 	sizes << 200 << 150 << 200;
 	ui->choosers->setSizes(sizes);
 	sizes.clear();
 
-	ic->setImages(spriteset_file.images);
-	const QPixmap animPixmap = QPixmap::fromImage(spriteset_file.images.at(0));
-
-	QGraphicsPixmapItem* animFrame = new QGraphicsPixmapItem(animPixmap);
-	ui->animView->setScene(new QGraphicsScene(ui->animView));
-	animFrame->setScale(2);
-	ui->animView->scene()->addItem(animFrame);
-
 	ui->animView->setBackgroundBrush(QBrush(QPixmap(":/icons/transparency-bg.png")));
-	QList<Spriteset::rss_direction> spriteset_file_directions = spriteset_file.getDirections();
-	int num_directions = spriteset_file_directions.length();
-	for(int d = 0; d < num_directions; d++) {
-		this->addDirection("",4);
-	}
 
 	ui->dirsLayout->addStretch(5);
-	//static_cast<QHBoxLayout>(ui->mainSpriteAreaLayout).addStretch(4);
 }
 
 SpritesetView::~SpritesetView() {
 	delete ui;
 	disconnect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
-			this, SLOT(showContextMenu(const QPoint&)));
+			   this, SLOT(showContextMenu(const QPoint&)));
+}
+
+bool SpritesetView::attach(Spriteset* spriteset) {
+	this->spriteset = spriteset;
+	this->images->setImages(spriteset->images);
+	if(this->spriteset->images.length() == 0) return true;
+
+	const QPixmap animPixmap = QPixmap::fromImage(this->spriteset->images.at(0));
+	QGraphicsPixmapItem* animFrame = new QGraphicsPixmapItem(animPixmap);
+	ui->animView->setScene(new QGraphicsScene(ui->animView));
+	animFrame->setScale(2);
+	ui->animView->scene()->addItem(animFrame);
+
+	int num_directions = this->spriteset->directions.length();
+	for(int d = 0; d < num_directions; d++) {
+		Spriteset::SSDirection direction = this->spriteset->directions.at(d);
+		this->addDirection(direction);
+	}
+
+	return true;
+}
+
+bool SpritesetView::openFile(QString filename) {
+	bool success = this->spriteset->open(filename);
+	if(!success) return false;
+	return this->attach(this->spriteset);
 }
 
 void SpritesetView::addDirection(QString name, int numFrames) {
 	SSDirectionView* dirView = new SSDirectionView(name, numFrames);
-	ui->dirsLayout->insertWidget(ui->dirsLayout->children().length(),dirView);
+	ui->dirsContainer->addWidget(dirView);
+}
+
+void SpritesetView::addDirection(Spriteset::SSDirection direction) {
+	SSDirectionView* dirView = new SSDirectionView(direction.name, direction.frames.length());
+
+	for(int f = 0; f < direction.frames.length(); f++) {
+		QImage frameImage = static_cast<QImage>(this->spriteset->images.at(direction.frames.at(f).imageIndex));
+		dirView->setImage(f, frameImage);
+	}
+	ui->dirsContainer->addWidget(dirView);
 }
 
 void SpritesetView::showContextMenu(const QPoint &pos) {
 	QMenu menu(this);
 	menu.addAction("Add direction");
-	menu.addAction("2");
 	QAction* result = menu.exec(this->mapToGlobal(pos));
 	if(!result) return;
 	if(result->text() == "Add direction") {

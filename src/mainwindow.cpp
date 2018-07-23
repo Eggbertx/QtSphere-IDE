@@ -1,4 +1,5 @@
 #include <QProcess>
+#include <QColorDialog>
 #include <QFileDialog>
 #include <QMenu>
 #include <QCloseEvent>
@@ -17,6 +18,7 @@
 #include "ui_mainwindow.h"
 #include "util.h"
 #include "aboutdialog.h"
+#include "importoptionsdialog.h"
 #include "projectpropertiesdialog.h"
 #include "settingswindow.h"
 #include "objects/spriteset.h"
@@ -147,7 +149,9 @@ void MainWindow::saveCurrentTab() {
 	if(ui->openFileTabs->count() == 0) return;
 	QObjectList tabChildren = ui->openFileTabs->currentWidget()->children();
 	QWidget* currentWidget = ui->openFileTabs->currentWidget();
-	if(QString(currentWidget->metaObject()->className()) == "QTextEdit") {
+	QString widgetType = currentWidget->metaObject()->className();
+
+	if(widgetType == "QTextEdit") {
 		QTextEdit* currentEditor = static_cast<QTextEdit*>(ui->openFileTabs->currentWidget());
 
 		QString saveFileName = QFileDialog::getSaveFileName(this,
@@ -164,6 +168,13 @@ void MainWindow::saveCurrentTab() {
 			out << currentEditor->document()->toPlainText();
 			saveFile.flush();
 			saveFile.close();
+		}
+	} else if(widgetType == "SpritesetView") {
+		SpritesetView* currentEditor = static_cast<SpritesetView*>(ui->openFileTabs->currentWidget());
+		QString saveFileName = QFileDialog::getSaveFileName(this,
+								"Save spriteset", "","Spriteset (*.rss);;All files (*)");
+		if(!currentEditor->spriteset->save(saveFileName)) {
+			errorBox("Failed saving file: " + currentEditor->spriteset->fileName());
 		}
 	}
 }
@@ -242,10 +253,13 @@ void MainWindow::openFile(QString fileName) {
 	QFileInfo fi = QFileInfo(fn);
 	QString fileExtension = fi.suffix();
 	if(fileExtension == "rss") {
-		Spriteset *ssWidget = new Spriteset(this);
-		if(ssWidget->open(fn.toLatin1().data()))
-			this->addWidgetTab(new SpritesetView(fi.filePath(), this),fi.fileName());
-			//this->addWidgetTab(ssWidget,fi.fileName());
+		SpritesetView* ssView = new SpritesetView(this);
+		if(ssView->openFile(fi.filePath())) {
+			this->addWidgetTab(ssView, fi.fileName());
+		}else {
+			errorBox("Failed loading spriteset: " + fn);
+			return;
+		}
 	} else if(audioList.indexOf(fileExtension) > -1) {
 		this->soundPlayer->load(fn);
 	} else {
@@ -463,4 +477,31 @@ void MainWindow::on_treeView_doubleClicked(const QModelIndex &index) {
 void MainWindow::checkCloseProjectOption() {
 	if(!this->project || this->project->getPath() == "") ui->actionClose_Project->setEnabled(false);
 	else ui->actionClose_Project->setEnabled(true);
+}
+
+void MainWindow::on_actionImage_to_Spriteset_triggered() {
+	QString imagePath = QFileDialog::getOpenFileName(this,
+		"Import image", "",
+		"Image files (*.bmp *.gif *.jpg *.jpeg *.png *.pbm *.pgm *.ppm *.xbm *.xpm);;"
+		"All files (*.*)"
+	);
+	ImportOptionsDialog* dialog = new ImportOptionsDialog(this);
+	if(dialog->exec() == QDialog::Accepted) {
+		Spriteset* imported = Spriteset::fromImage(
+			imagePath,dialog->getFrameSize(),
+			dialog->removeDuplicatesChecked(),
+			dialog->getTransparencyIn(),
+			dialog->getTransparencyOut()
+		);
+		if(!imported->valid) return;
+
+		SpritesetView* ssView = new SpritesetView(this);
+		ssView->attach(imported);
+		QFileInfo fi = QFileInfo(imagePath);
+		this->addWidgetTab(ssView, fi.baseName() + ".rss*");
+	}
+}
+
+void MainWindow::on_actionSave_triggered() {
+	this->saveCurrentTab();
 }

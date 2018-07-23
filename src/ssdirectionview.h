@@ -18,7 +18,7 @@ class SSDirectionView : public QFrame {
 		QList<QImage*> getImages();
 		QImage* getImage(int index);
 		void setImages(QList<QImage*> images);
-		void setImage(int index, QImage* image);
+		void setImage(int index, QImage image);
 		QString getName();
 		void setName(QString name);
 		void addFrame(QImage* image);

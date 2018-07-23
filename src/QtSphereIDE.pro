@@ -30,7 +30,8 @@ SOURCES += \
 	imagechooser.cpp \
 	drawingwidget.cpp \
 	ssdirectionview.cpp \
-    soundplayer.cpp
+	soundplayer.cpp \
+	importoptionsdialog.cpp
 
 HEADERS += \
 	mainwindow.h \
@@ -49,7 +50,8 @@ HEADERS += \
 	imagechooser.h \
 	drawingwidget.h \
 	ssdirectionview.h \
-    soundplayer.h
+	soundplayer.h \
+	importoptionsdialog.h
 
 FORMS += \
 	mainwindow.ui \
@@ -59,7 +61,8 @@ FORMS += \
 	projectpropertiesdialog.ui \
 	spritesetview.ui \
 	drawingwidget.ui \
-    soundplayer.ui
+	soundplayer.ui \
+	importoptionsdialog.ui
 
 RESOURCES += res/qsires.qrc
 

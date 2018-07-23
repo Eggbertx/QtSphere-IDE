@@ -11,7 +11,7 @@ class SphereFile : public QObject {
 	public:
 		explicit SphereFile(QObject *parent = nullptr);
 		~SphereFile();
-		virtual bool save();
+		virtual bool save(QString filename);
 		virtual bool open(QString filename);
 		virtual void createNew();
 		QString fileExtension();
@@ -23,7 +23,7 @@ class SphereFile : public QObject {
 
 	public slots:
 
-	private:
+	protected:
 		QFile* file;
 };
 
