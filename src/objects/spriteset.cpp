@@ -161,6 +161,8 @@ bool Spriteset::open(QString filename) {
 
 bool Spriteset::save(QString filename) {
 	QFile* outFile = new QFile(filename);
+	memset(&this->header.reserved[0], 0, sizeof(this->header.reserved));
+
 	writeFile(outFile, &this->header, sizeof(this->header));
 
 	switch(this->header.version) {
@@ -180,6 +182,7 @@ bool Spriteset::save(QString filename) {
 		foreach(SSDirection direction, this->directions) {
 			int16_t num_frames = direction.frames.length();
 			writeFile(outFile, &num_frames, sizeof(num_frames));
+			memset(&direction.reserved[0], 0, sizeof(direction.reserved));
 			writeFile(outFile, direction.reserved, sizeof(direction.reserved));
 
 			uint16_t str_length = direction.name.length() + 1;
@@ -192,6 +195,7 @@ bool Spriteset::save(QString filename) {
 			foreach (SSFrame frame, direction.frames) {
 				writeFile(outFile, &frame.imageIndex, sizeof(frame.imageIndex));
 				writeFile(outFile, &frame.delay, sizeof(frame.delay));
+				memset(&frame.reserved[0], 0, sizeof(frame.reserved));
 				writeFile(outFile, &frame.reserved, sizeof(frame.reserved));
 			}
 		}
@@ -232,7 +236,7 @@ void Spriteset::addDirection(QString name, int numFrames) {
 	QList<SSFrame> frames;
 	for(int f = 0; f < numFrames; f++) {
 		SSFrame frame = SSFrame();
-		frame.delay = 1;
+		frame.delay = 8;
 		frame.imageIndex = 0;
 		frames.append(frame);
 	}
