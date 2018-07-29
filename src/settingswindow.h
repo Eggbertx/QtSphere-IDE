@@ -22,10 +22,16 @@ private slots:
 	void on_legacyDir_btn_clicked();
 	void on_themeCombo_currentIndexChanged(const QString &newtext);
 	void on_okButton_clicked();
+	void on_applyButton_clicked();
+	void on_addDirButton_clicked();
+	void on_removeDirButton_clicked();
 
-private:
+	private:
 	Ui::SettingsWindow *ui;
 	MainWindow* mainWindow;
+	QString currentTheme;
+	QString newTheme;
+	void saveSettings();
 };
 
 #endif // SETTINGSWINDOW_H

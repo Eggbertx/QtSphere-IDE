@@ -16,6 +16,8 @@ QString getWidgetType(QObject* widget);
 
 void errorBox(QString message);
 
+void warningBox(QString message);
+
 void infoBox(QString info);
 
 int readFile(QFile* file, void* into, int size);

@@ -45,7 +45,7 @@ PaletteWidget::PaletteWidget(SpritesetView *parent): QWidget(parent) {
 }
 
 PaletteWidget::~PaletteWidget() {
-
+	delete this->rightClickMenu;
 }
 
 void PaletteWidget::changePalette(QColor palettearr[], int numColors) {

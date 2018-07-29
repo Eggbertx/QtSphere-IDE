@@ -86,12 +86,20 @@ bool SpritesetView::openFile(QString filename) {
 }
 
 void SpritesetView::addDirection(QString name, int numFrames) {
-	SSDirectionView* dirView = new SSDirectionView(name, numFrames);
+	Spriteset::SSDirection direction;
+	direction.name = "";
+	direction.frames = QList<Spriteset::SSFrame>();
+	Spriteset::SSFrame frame;
+	frame.delay = 8;
+	frame.imageIndex = 1;
+	direction.frames.append(frame);
+
+	SSDirectionView* dirView = new SSDirectionView(name, numFrames, &direction, this);
 	ui->dirsContainer->addWidget(dirView);
 }
 
 void SpritesetView::addDirection(Spriteset::SSDirection direction) {
-	SSDirectionView* dirView = new SSDirectionView(direction.name, direction.frames.length());
+	SSDirectionView* dirView = new SSDirectionView(direction.name, direction.frames.length(), &direction, this);
 
 	for(int f = 0; f < direction.frames.length(); f++) {
 		QImage frameImage = static_cast<QImage>(this->spriteset->images.at(direction.frames.at(f).imageIndex));

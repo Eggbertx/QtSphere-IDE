@@ -1,9 +1,9 @@
-QT += core gui multimedia multimediawidgets
+QT += core gui multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = QtSphereIDE
 TEMPLATE = app
-VERSION = 0.3.0
+VERSION = 0.3.1
 DEFINES += QT_DEPRECATED_WARNINGS TARGET=\\\"$$TARGET\\\" VERSION=\\\"$$VERSION\\\"
 QMAKE_LFLAGS += -no-pie
 
@@ -18,7 +18,6 @@ SOURCES += \
 	aboutdialog.cpp \
 	util.cpp \
 	modifiedfilesdialog.cpp \
-	config.cpp \
 	settingswindow.cpp \
 	objects/mapfile.cpp \
 	objects/spherefile.cpp \
@@ -31,14 +30,14 @@ SOURCES += \
 	drawingwidget.cpp \
 	ssdirectionview.cpp \
 	soundplayer.cpp \
-	importoptionsdialog.cpp
+	importoptionsdialog.cpp \
+    startpage.cpp
 
 HEADERS += \
 	mainwindow.h \
 	aboutdialog.h \
 	util.h \
 	modifiedfilesdialog.h \
-	config.h \
 	settingswindow.h \
 	objects/mapfile.h \
 	objects/spherefile.h \
@@ -51,7 +50,8 @@ HEADERS += \
 	drawingwidget.h \
 	ssdirectionview.h \
 	soundplayer.h \
-	importoptionsdialog.h
+	importoptionsdialog.h \
+    startpage.h
 
 FORMS += \
 	mainwindow.ui \
@@ -62,7 +62,8 @@ FORMS += \
 	spritesetview.ui \
 	drawingwidget.ui \
 	soundplayer.ui \
-	importoptionsdialog.ui
+	importoptionsdialog.ui \
+    startpage.ui
 
 RESOURCES += res/qsires.qrc
 

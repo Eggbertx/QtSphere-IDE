@@ -8,7 +8,7 @@ class QSIProject : public QObject {
 	Q_ENUMS(Compiler)
 	public:
 		explicit QSIProject(QString path, QObject *parent = 0);
-		QString getPath();
+		QString getPath(bool projectFile);
 		QString name;
 		QString author;
 		int width;
@@ -16,6 +16,7 @@ class QSIProject : public QObject {
 		QString summary;
 		QString buildDir;
 		QString script;
+		QIcon* getIcon();
 		QString getCompiler();
 		void setCompiler(QString set);
 		enum Compiler { Vanilla, Cell };
@@ -25,6 +26,7 @@ class QSIProject : public QObject {
 
 	private:
 		QString path;
+		QString projectPath;
 		QString compler;
 };
 

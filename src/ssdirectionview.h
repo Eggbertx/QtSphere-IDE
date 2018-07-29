@@ -9,11 +9,12 @@
 #include <QToolButton>
 #include <QWidget>
 
+#include "objects/spriteset.h"
 
 class SSDirectionView : public QFrame {
 	Q_OBJECT
 	public:
-		explicit SSDirectionView(QString name = "", int numFrames = 1, QWidget *parent = 0);
+		explicit SSDirectionView(QString name = "", int numFrames = 1, Spriteset::SSDirection* ssDirection = nullptr, QWidget *parent = 0);
 		~SSDirectionView();
 		QList<QImage*> getImages();
 		QImage* getImage(int index);
@@ -23,11 +24,14 @@ class SSDirectionView : public QFrame {
 		void setName(QString name);
 		void addFrame(QImage* image);
 		void removeFrame(int index);
+		void setZoom(int factor = 2);
+		int getZoom();
 
 	private slots:
 		void showContextMenu(const QPoint&pos);
 		void addFrameSlot();
 		void removeFrameSlot();
+		void changeDirectionName(QString name);
 
 	private:
 		QWidget* framesContainer;
@@ -36,6 +40,9 @@ class SSDirectionView : public QFrame {
 		QList<QGraphicsView*> frameViews;
 		QToolButton* addFrameButton;
 		QToolButton* removeFrameButton;
+		Spriteset* spriteset;
+		Spriteset::SSDirection* ssDirection;
+		int zoomFactor;
 
 };
 

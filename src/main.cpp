@@ -1,19 +1,25 @@
 #include <QApplication>
+#include <QSettings>
+
 #include "util.h"
 #include "mainwindow.h"
-#include "config.h"
 #include "util.h"
 
 int main(int argc, char *argv[]) {
 	Q_INIT_RESOURCE(qsires);
 	QApplication a(argc, argv);
-	qDebug().noquote() << "Starting Qt Sphere IDE v" << VERSION;
+	qDebug().nospace() << "Starting QtSphere IDE v" << VERSION;
+
+	a.setOrganizationName("Spherical");
+	a.setOrganizationDomain("spheredev.org");
+	a.setApplicationName("QtSphere IDE");
 	a.setApplicationVersion(VERSION);
-	Config* ideConfig = new Config();
-	MainWindow w(ideConfig);
-	w.setWindowTitle(MAINWINDOW_TITLE);
-	ideConfig->loadConfig();
+
+	MainWindow w;
+	w.setWindowTitle(a.applicationDisplayName() + " v" + a.applicationVersion());
 	w.setWindowIcon(QIcon(QPixmap(":/icons/icon.png")));
+	QSettings settings;
+	w.setTheme(settings.value("theme").toString());
 	w.showMaximized();
 	return a.exec();
 }

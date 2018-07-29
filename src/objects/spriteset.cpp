@@ -81,7 +81,7 @@ void Spriteset::createNew() {
 }
 
 bool Spriteset::open(QString filename) {
-	qDebug() << "opening" << filename << "from spriteset.cpp";
+	qDebug() << "Opening" << filename;
 	this->filename = (char*)filename.toStdString().c_str();
 	this->file = new QFile(this->filename);
 
@@ -111,9 +111,10 @@ bool Spriteset::open(QString filename) {
 	case 3: {
 		this->images = QList<QImage>();
 		for(int i = 0; i < header.num_images; i++) {
-			const int num_img_bytes = header.frame_width*header.frame_height*4;
-			unsigned char image_bytes[num_img_bytes];
-			readFile(this->file, &image_bytes, num_img_bytes);
+			int num_img_bytes = this->header.frame_width*header.frame_height*4;
+			unsigned char* image_bytes = new unsigned char[num_img_bytes];
+
+			readFile(this->file, image_bytes, num_img_bytes);
 
 			this->images.append(QImage(
 				image_bytes,
@@ -133,7 +134,7 @@ bool Spriteset::open(QString filename) {
 			readFile(this->file, &str_length, sizeof(str_length));
 
 			const uint16_t str_length_const = str_length; // because MSVC loves to be cantankerous with non-constant array indices
-			char direction_name[str_length_const];
+			char* direction_name = new char[str_length_const];
 			readFile(this->file, direction_name, str_length);
 			direction.name = QString(direction_name);
 

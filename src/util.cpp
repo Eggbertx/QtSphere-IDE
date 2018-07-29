@@ -39,6 +39,10 @@ void errorBox(QString message) {
 	QMessageBox::critical(MainWindow::instance(), "Error!", message, QMessageBox::Ok);
 }
 
+void warningBox(QString message) {
+	QMessageBox::warning(MainWindow::instance(), "Warning", message, QMessageBox::Ok);
+}
+
 void infoBox(QString info) {
 	QMessageBox::information(MainWindow::instance(), "Info", info, QMessageBox::Ok);
 }

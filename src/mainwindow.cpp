@@ -1,3 +1,4 @@
+#include <QApplication>
 #include <QProcess>
 #include <QColorDialog>
 #include <QFileDialog>
@@ -26,24 +27,21 @@
 #include "qsiproject.h"
 #include "soundplayer.h"
 #include "spritesetview.h"
+#include "startpage.h"
 
 MainWindow* MainWindow::_instance = NULL;
 
-MainWindow::MainWindow(Config* config, QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
+MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
 	Q_ASSERT(!_instance);
 	_instance = this;
 	ui->setupUi(this);
-	this->config = config;
 
 	this->statusLabel = new QLabel("Ready.");
 	ui->statusBar->addWidget(this->statusLabel);
 	ui->toolbarOpenButton->setIcon(this->style()->standardIcon(QStyle::SP_DialogOpenButton));
 	ui->toolbarSaveButton->setIcon(this->style()->standardIcon(QStyle::SP_DriveFDIcon));
-	ui->taskListTable->horizontalHeader()->setStretchLastSection(true);
-
 	ui->centralWidget->setContextMenuPolicy(Qt::CustomContextMenu);
-	connect(ui->centralWidget, SIGNAL(customContextMenuRequested(const QPoint&)),
-			this, SLOT(showContextMenu(const QPoint&)));
+	ui->taskListTable->setContextMenuPolicy(Qt::CustomContextMenu);
 
 	/*
 	 * move to the next file tab (or to the first if we're at the end)
@@ -84,16 +82,16 @@ MainWindow::MainWindow(Config* config, QWidget *parent): QMainWindow(parent), ui
 
 	this->soundPlayer = new SoundPlayer();
 	ui->mediaPlayerTab->layout()->addWidget(this->soundPlayer);
+	ui->openFileTabs->addTab(new StartPage(ui->openFileTabs), "Start Page");
 }
 
 MainWindow::~MainWindow() {
-	disconnect(ui->centralWidget, SIGNAL(customContextMenuRequested(const QPoint&)),
-			this, SLOT(showContextMenu(const QPoint&)));
 	disconnect(this, SLOT(nextTab()));
 	disconnect(this, SLOT(prevTab()));
 	// disconnect(ui->menuFile, SIGNAL(aboutToShow()), this, SLOT(checkCloseProjectOption()));
 	delete ui;
-	delete this->config;
+	delete this->soundPlayer;
+	delete this->project;
 }
 
 MainWindow* MainWindow::instance() {
@@ -115,6 +113,28 @@ QString MainWindow::getStatus() {
 
 void MainWindow::setStatus(QString status) {
 	this->statusLabel->setText(status);
+}
+
+QString MainWindow::getTheme() {
+	return this->theme;
+}
+
+void MainWindow::setTheme(QString theme) {
+	QString stylesheet = "";
+	if(theme != "") {
+		QFile* styleFile = new QFile(theme);
+		if(!styleFile->open(QFile::ReadOnly)) {
+			errorBox("Failed to open stylesheet (" + theme + "):" + styleFile->errorString());
+			styleFile->close();
+			delete styleFile;
+			return;
+		}
+		stylesheet = QLatin1String(styleFile->readAll());
+		styleFile->close();
+		delete styleFile;
+	}
+	qApp->setStyleSheet(stylesheet);
+	this->theme = theme;
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
@@ -208,15 +228,19 @@ void MainWindow::setupTextEditor(QTextEdit *editor) {
 }
 
 void MainWindow::setupTreeView() {
-	if(this->project->getPath() == "") return;
+	if(this->project->getPath(false) == "") return;
 	QFileSystemModel *model = new QFileSystemModel();
-	model->setRootPath(this->project->getPath());
+	model->setRootPath(this->project->getPath(false));
 
 	ui->treeView->setModel(model);
 	for (int i = 1; i < model->columnCount(); ++i)
 		ui->treeView->hideColumn(i);
-	ui->treeView->setRootIndex(model->index(this->project->getPath()));
-	this->setWindowTitle("QtSphereIDE " + QString(VERSION) + " - " + QDir(this->project->getPath()).dirName());
+	ui->treeView->setRootIndex(model->index(this->project->getPath(false)));
+	this->setWindowTitle("QtSphereIDE " + QString(VERSION) + " - " + QDir(this->project->getPath(false)).dirName());
+}
+
+void MainWindow::refreshProjectList() {
+
 }
 
 void MainWindow::openFile(QString fileName) {
@@ -224,8 +248,8 @@ void MainWindow::openFile(QString fileName) {
 
 	if(fileName == "") {
 		QString usePath = QString();
-		if(this->project && this->project->getPath() != "") {
-			usePath = this->project->getPath();
+		if(this->project && this->project->getPath(false) != "") {
+			usePath = this->project->getPath(false);
 		}
 		fn = QFileDialog::getOpenFileName(this,
 			"Open file", usePath,
@@ -271,82 +295,9 @@ void MainWindow::openFile(QString fileName) {
 	}
 }
 
-void MainWindow::openProject(QString fileName, bool reopen) {
-	this->project = new QSIProject(fileName, this);	
-	QString baseName = QDir(fileName).dirName();
-	if(reopen) this->console("Reloading \"" + baseName + "\"");
-	else this->console("Loading project: " + fileName);
-
-	bool useSSProj = false;
-	bool useSGM = false;
-	bool useJSON = false;
-	bool useCellscript = false;
-	QString projectFilePath = "";
-	QDirIterator iterator(this->project->getPath());
-	while(iterator.hasNext()) {
-		iterator.next();
-		if(QFileInfo(iterator.filePath()).isFile() &&
-			QFileInfo(iterator.filePath()).suffix() == "ssproj") {
-			projectFilePath = iterator.filePath();
-			useSSProj = true;
-			break;
-		}
-	}
-	if(!useSSProj) {
-		useSGM = QFileInfo(this->project->getPath() + "/game.sgm").exists();
-		useJSON = QFileInfo(this->project->getPath() + "/game.json").exists();
-		useCellscript = QFileInfo(this->project->getPath() + "/Cellscript.mjs").exists();
-	}
-
-	if(!useSSProj && !useSGM && !useJSON && !useCellscript) {
-		ui->actionProject_Properties->setEnabled(false);
-	} else {
-		ui->actionProject_Properties->setEnabled(true);
-	}
-
-	if(!useCellscript) {
-		ui->actionRun_Cell->setEnabled(false);
-		ui->actionPackage_Game->setEnabled(false);
-	} else {
-		ui->actionRun_Cell->setEnabled(true);
-		ui->actionPackage_Game->setEnabled(true);
-	}
-
+void MainWindow::openProject(QString fileName) {
+	this->project = new QSIProject(fileName, this);
 	this->setupTreeView();
-	this->readProjectFile(projectFilePath);
-}
-
-void MainWindow::readProjectFile(QString filename) {
-	QString fileType = QFileInfo(filename).suffix().toLower();
-	QFile* projectFile = new QFile(filename);
-	if(filename == "") return;
-	Q_ASSERT(filename != "");
-	Q_ASSERT(fileType != "");
-	Q_ASSERT(projectFile != NULL);
-
-	if(fileType == "ssproj" || fileType == "sgm") {
-		if(projectFile->open(QIODevice::ReadOnly)) {
-			QTextStream in(projectFile);
-			while(!in.atEnd()) {
-				QStringList arr = in.readLine().split("=");
-				if(arr.length() != 2) return;
-				QString key = arr.first();
-				QString value = arr.last();
-				if(key == "name") this->project->name = value;
-				else if(key == "author") this->project->author = value;
-				else if(key == "description") this->project->summary = value;
-				else if(key == "screen_width" || key == "screenWidth") this->project->width = value.toInt();
-				else if(key == "screen_height" || key == "screenHeight") this->project->height = value.toInt();
-				else if(key == "script" || key == "mainScript") this->project->script = value;
-				else if(key == "compiler") this->project->setCompiler(value);
-				else if(key == "buildDir") this->project->buildDir = value;
-			}
-		}
-	} else {
-		// parse JSON file
-	}
-	if(projectFile) projectFile->close();
-	delete projectFile;
 }
 
 void MainWindow::handleModifiedFiles() {
@@ -405,7 +356,7 @@ void MainWindow::on_toolbarProjectProperties_triggered() {
 void MainWindow::on_newProject_triggered() {
 	ProjectPropertiesDialog propertiesDialog(true);
 	if(propertiesDialog.exec() == QDialog::Accepted) {
-		QDir newDir = QDir(propertiesDialog.getProject()->getPath());
+		QDir newDir = QDir(propertiesDialog.getProject()->getPath(false));
 		if(newDir.exists() || !newDir.mkpath("")) {
 			this->console("Error creating new project.");
 			return;
@@ -415,7 +366,6 @@ void MainWindow::on_newProject_triggered() {
 
 void MainWindow::on_actionProject_Properties_triggered() {
 	ProjectPropertiesDialog propertiesDialog(false, this->project);
-
 	propertiesDialog.exec();
 }
 
@@ -449,14 +399,28 @@ void MainWindow::on_newTaskButton_clicked() {
 	QTableWidgetItem* h = new QTableWidgetItem("");
 	h->setCheckState(Qt::Unchecked);
 	ui->taskListTable->setItem(rowCount-1, 1, h);
+	ui->delTaskButton->setEnabled(true);
 }
+
+void MainWindow::on_delTaskButton_clicked() {
+	int rowCount = ui->taskListTable->rowCount();
+	QList<QTableWidgetItem*> selected = ui->taskListTable->selectedItems();
+	if(selected.length() == 0) ui->taskListTable->removeRow(rowCount - 1);
+	else {
+		for(int r = 0; r < selected.length(); r++) {
+			ui->taskListTable->removeRow(selected.at(r)->row());
+		}
+	}
+	if(ui->taskListTable->rowCount() == 0) ui->delTaskButton->setEnabled(false);
+}
+
 
 void MainWindow::on_actionOpenProject_triggered() {
 	this->openProject(QFileDialog::getExistingDirectory(this,"Choose project path"));
 }
 
 void MainWindow::on_actionRefresh_triggered() {
-	this->openProject(this->project->getPath(), true);
+	this->openProject(this->project->getPath(false));
 }
 
 void MainWindow::on_actionQSIGithub_triggered() {
@@ -468,14 +432,14 @@ void MainWindow::on_actionMSGithub_triggered() {
 }
 
 void MainWindow::on_treeView_doubleClicked(const QModelIndex &index) {
-	QFileSystemModel* model = new QFileSystemModel();
-	model->setRootPath(this->project->getPath());
-	if(model->fileInfo(index).isFile()) this->openFile(model->filePath(index));
-	delete model;
+	QFileSystemModel* model = dynamic_cast<QFileSystemModel*>(ui->treeView->model()); // new QFileSystemModel();
+	model->setRootPath(this->project->getPath(false));
+	if(model->fileInfo(index).isFile())
+		this->openFile(model->filePath(index));
 }
 
 void MainWindow::checkCloseProjectOption() {
-	if(!this->project || this->project->getPath() == "") ui->actionClose_Project->setEnabled(false);
+	if(!this->project || this->project->getPath(false) == "") ui->actionClose_Project->setEnabled(false);
 	else ui->actionClose_Project->setEnabled(true);
 }
 
@@ -504,4 +468,29 @@ void MainWindow::on_actionImage_to_Spriteset_triggered() {
 
 void MainWindow::on_actionSave_triggered() {
 	this->saveCurrentTab();
+}
+
+void MainWindow::on_actionStart_Page_triggered() {
+
+}
+
+void MainWindow::on_taskListTable_customContextMenuRequested(const QPoint &pos) {
+	QMenu* contextMenu = new QMenu();
+
+	contextMenu->addAction("Load task list...");
+	contextMenu->addAction("Save task list");
+	contextMenu->addAction("Save task list as...");
+	QWidget* child = ui->taskListTable->childAt(pos);
+	if(child != nullptr) {
+		QAction* result = contextMenu->exec(child->mapToGlobal(pos));
+		if(result == nullptr) return;
+		QString text = result->text();
+		if(text == "Load task list...") {
+
+		} else if(text == "save task list") {
+
+		} else if(text == "Save task list as...") {
+
+		}
+	}
 }

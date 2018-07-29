@@ -89,7 +89,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QListWidget" name="listWidget">
+        <widget class="QListWidget" name="projectDirsList">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
            <horstretch>0</horstretch>
@@ -99,29 +99,22 @@
          <property name="resizeMode">
           <enum>QListView::Adjust</enum>
          </property>
-         <item>
-          <property name="text">
-           <string>/home/eggbertx/Projects</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>/home/eggbertx/Dropbox/Programming/Sphere/games</string>
-          </property>
-         </item>
+         <property name="sortingEnabled">
+          <bool>false</bool>
+         </property>
         </widget>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QPushButton" name="pushButton">
+          <widget class="QPushButton" name="addDirButton">
            <property name="text">
             <string>+</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_2">
+          <widget class="QPushButton" name="removeDirButton">
            <property name="text">
             <string>-</string>
            </property>

@@ -22,7 +22,7 @@ ProjectPropertiesDialog::ProjectPropertiesDialog(bool newFile, QSIProject* proje
 		ui->pathLineEdit->setEnabled(false);
 		ui->pathButton->setEnabled(false);
 		if(!project) return;
-		ui->pathLineEdit->setText(project->getPath());
+		ui->pathLineEdit->setText(project->getPath(false));
 		ui->nameLineEdit->setText(project->name);
 		ui->authorLineEdit->setText(project->author);
 		ui->reswLineEdit->setText(QString::number(project->width));

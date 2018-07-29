@@ -9,12 +9,10 @@
 #include <QVariant>
 #include <QComboBox>
 
-#include "config.h"
 #include "objects/spherefile.h"
 #include "qsiproject.h"
 #include "soundplayer.h"
-
-#define MAINWINDOW_TITLE TARGET " " VERSION
+#include "startpage.h"
 
 namespace Ui {
 	class MainWindow;
@@ -25,27 +23,26 @@ class MainWindow : public QMainWindow {
 	Q_OBJECT
 
 	public:
-		explicit MainWindow(Config* config = Q_NULLPTR, QWidget *parent = Q_NULLPTR);
+		explicit MainWindow(QWidget* parent = Q_NULLPTR);
 		~MainWindow();
 		QString getStatus();
 		void setStatus(QString status);
+		QString getTheme();
+		void setTheme(QString theme = "default");
 		void openFile(QString fileName = "");
 		void addWidgetTab(QWidget* widget, QString tabname);
-		void openProject(QString fileName, bool reopen = false);
+		void openProject(QString fileName);
+		void refreshProjectList();
 		void saveCurrentTab();
 		void prepareForImage();
 		void prepareForMap();
 		void prepareForTileSet();
 		void prepareForSpriteset();
 		void handleModifiedFiles();
-		void readSSProj();
-		void readProjectFile(QString filename);
-		void readGameJSON();
 
 		void console(QVariant s, int which = 0);
 		void closeEvent(QCloseEvent* event);
 		static MainWindow* instance();
-		Config* config;
 
 	private slots:
 		void nextTab();
@@ -72,16 +69,19 @@ class MainWindow : public QMainWindow {
 		void on_treeView_doubleClicked(const QModelIndex &index);
 		void on_actionImage_to_Spriteset_triggered();
 		void on_actionSave_triggered();
+		void on_actionStart_Page_triggered();
+		void on_taskListTable_customContextMenuRequested(const QPoint &pos);
+		void on_delTaskButton_clicked();
 
 	private:
 		static MainWindow* _instance;
 		Ui::MainWindow *ui;
 		QString status;
 		QLabel* statusLabel;
-		QString projectDir;
 		QSIProject* project;
 		SoundPlayer* soundPlayer;
 		QList<QWidget *> openFiles;
+		QString theme;
 		void setupEditors();
 		void setupTextEditor(QTextEdit *editor);
 		void setupTreeView();

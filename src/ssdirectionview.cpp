@@ -4,22 +4,25 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QPalette>
+#include <QPixmap>
 #include <QPushButton>
 #include <QStyle>
 #include <QToolButton>
 
+#include "objects/spriteset.h"
+#include "spritesetview.h"
 #include "ssdirectionview.h"
 #include "util.h"
 
-SSDirectionView::SSDirectionView(QString name, int numFrames, QWidget *parent): QFrame(parent) {
+SSDirectionView::SSDirectionView(QString name, int numFrames, Spriteset::SSDirection* ssDirection, QWidget *parent): QFrame(parent) {
+	this->zoomFactor = 2;
+	this->ssDirection = ssDirection;
+	if(parent != nullptr) {
+		this->spriteset = static_cast<SpritesetView*>(parent)->spriteset;
+	}
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
-	//this->setFrameStyle(QFrame::Panel | QFrame::Raised);
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
 			this, SLOT(showContextMenu(const QPoint&)));
-	/*QPalette pal = palette();
-	pal.setColor(QPalette::Background, QColor(40,40,40));
-	this->setAutoFillBackground(true);
-	this->setPalette(pal);*/
 
 	QHBoxLayout* dirLayout = new QHBoxLayout();
 	dirLayout->setSpacing(0);
@@ -29,6 +32,8 @@ SSDirectionView::SSDirectionView(QString name, int numFrames, QWidget *parent): 
 	this->nameLineEdit = new QLineEdit(name);
 	this->nameLineEdit->setText(name);
 	this->nameLineEdit->setFixedWidth(100);
+	connect(this->nameLineEdit, SIGNAL(textChanged(QString)), this,
+			SLOT(changeDirectionName(QString)));
 	dirLayout->addWidget(this->nameLineEdit);
 	this->framesContainer = new QWidget();
 	//this->framesLayout = new QGridLayout();
@@ -42,7 +47,6 @@ SSDirectionView::SSDirectionView(QString name, int numFrames, QWidget *parent): 
 		this->addFrame(nullptr);
 	}
 	dirLayout->addWidget(this->framesContainer);
-
 
 	this->removeFrameButton = new QToolButton(this);
 	this->removeFrameButton->setText("-");
@@ -66,10 +70,15 @@ SSDirectionView::~SSDirectionView() {
 }
 
 void SSDirectionView::setImage(int index, QImage image) {
-	QGraphicsScene* scene = new QGraphicsScene();
-	this->frameViews.at(index)->setScene(scene);
+	this->frameViews.at(index)->setFixedSize(image.width()*this->zoomFactor+this->zoomFactor, image.height()*this->zoomFactor+this->zoomFactor);
 	QGraphicsPixmapItem* item = new QGraphicsPixmapItem(QPixmap::fromImage(image));
-	scene->addItem(item);
+
+	if(item == nullptr) {
+		QImage first = this->spriteset->images.first();
+		item = new QGraphicsPixmapItem(QPixmap::fromImage(first));
+	}
+	item->setScale(this->zoomFactor);
+	this->frameViews.at(index)->scene()->addItem(item);
 }
 
 QString SSDirectionView::getName() {
@@ -111,12 +120,38 @@ void SSDirectionView::removeFrame(int index) {
 	delete this->frameViews.takeAt(index);
 }
 
-void SSDirectionView::addFrame(QImage *image) {
-//	Q_ASSERT(image != nullptr);
+int SSDirectionView::getZoom() {
+	return this->zoomFactor;
+}
+
+void SSDirectionView::setZoom(int factor) {
+	this->zoomFactor = factor;
+}
+
+void SSDirectionView::addFrame(QImage* image) {
 	QGraphicsView* newView = new QGraphicsView(new QGraphicsScene());
-	newView->setFixedSize(60,60);
+	newView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	newView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+	int scaledWidth = 32*this->zoomFactor;
+	int scaledHeight = 32*this->zoomFactor;
 	newView->setBackgroundBrush(QBrush(QPixmap(":/icons/transparency-bg.png")));
-	//this->framesContainer->layout()->addWidget(newView);
+
+	QGraphicsPixmapItem* frameImage;
+	if(image == nullptr) {
+		frameImage = new QGraphicsPixmapItem(QPixmap::fromImage(this->spriteset->images.first()));
+		scaledWidth = frameImage->pixmap().width()*this->zoomFactor;
+		scaledHeight = frameImage->pixmap().height()*this->zoomFactor;
+	} else {
+		frameImage = new QGraphicsPixmapItem(QPixmap::fromImage(*image));
+		scaledWidth = image->width()*this->zoomFactor;
+		scaledHeight = image->height()*this->zoomFactor;
+	}
+
+	newView->scene()->addItem(frameImage);
+	frameImage->setScale(this->zoomFactor);
+	newView->setFixedSize(scaledWidth,scaledHeight);
+
 	this->framesLayout->addWidget(newView);
 	this->frameViews.append(newView);
 }
@@ -127,5 +162,9 @@ void SSDirectionView::removeFrameSlot() {
 }
 
 void SSDirectionView::addFrameSlot() {
-	this->addFrame(nullptr);
+	this->addFrame(&this->spriteset->images.first());
+}
+
+void SSDirectionView::changeDirectionName(QString name) {
+	this->ssDirection->name = name;
 }
