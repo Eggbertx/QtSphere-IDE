@@ -487,10 +487,14 @@ void MainWindow::on_taskListTable_customContextMenuRequested(const QPoint &pos) 
 		QString text = result->text();
 		if(text == "Load task list...") {
 
-		} else if(text == "save task list") {
+		} else if(text == "Save task list") {
 
 		} else if(text == "Save task list as...") {
 
 		}
 	}
+}
+
+void MainWindow::on_actionSpherical_community_triggered() {
+	QDesktopServices::openUrl(QUrl("http://www.spheredev.org/"));
 }

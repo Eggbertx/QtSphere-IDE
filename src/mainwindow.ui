@@ -364,7 +364,7 @@
      <x>0</x>
      <y>0</y>
      <width>936</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -486,6 +486,7 @@
     <addaction name="separator"/>
     <addaction name="actionQSIGithub"/>
     <addaction name="actionMSGithub"/>
+    <addaction name="actionSpherical_community"/>
     <addaction name="separator"/>
     <addaction name="actionAbout"/>
    </widget>
@@ -834,6 +835,11 @@
   <action name="actionProject_Explorer">
    <property name="text">
     <string>Project Explorer</string>
+   </property>
+  </action>
+  <action name="actionSpherical_community">
+   <property name="text">
+    <string>Spherical community</string>
    </property>
   </action>
  </widget>

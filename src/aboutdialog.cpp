@@ -1,3 +1,4 @@
+#include <QDebug>
 #include <QDesktopServices>
 #include <QFile>
 
@@ -6,6 +7,7 @@
 
 AboutDialog::AboutDialog(QWidget *parent): QDialog(parent), ui(new Ui::AboutDialog) {
 	ui->setupUi(this);
+	ui->label->setText(ui->label->text().replace("{VERSION}", VERSION));
 }
 
 AboutDialog::~AboutDialog() {

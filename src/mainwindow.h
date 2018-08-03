@@ -72,6 +72,7 @@ class MainWindow : public QMainWindow {
 		void on_actionStart_Page_triggered();
 		void on_taskListTable_customContextMenuRequested(const QPoint &pos);
 		void on_delTaskButton_clicked();
+		void on_actionSpherical_community_triggered();
 
 	private:
 		static MainWindow* _instance;
