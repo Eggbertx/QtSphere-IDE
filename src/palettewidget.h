@@ -24,6 +24,8 @@ public:
 private:
 	bool eventFilter(QObject* object, QEvent* event);
 	QMenu* rightClickMenu;
+	QMenu* fileMenu;
+	QMenu* defaultMenu;
 	QPoint mousePos;
 
 	/*

@@ -14,24 +14,21 @@
 PaletteWidget::PaletteWidget(SpritesetView *parent): QWidget(parent) {
 	this->installEventFilter(this);
 	this->paletteColors = QList<QColor>();
-	//QPalette pal = palette();
-	//pal.setColor(QPalette::Background, Qt::black);
-	//this->setAutoFillBackground(true);
-	//this->setPalette(pal);
+	this->changePalette(hsl256_palette, 256);
 
 	this->rightClickMenu = new QMenu(this);
-	QMenu* fileMenu = this->rightClickMenu->addMenu("File");
-	fileMenu->addAction("New");
-	fileMenu->addAction("Import...");
-	fileMenu->addAction("Export...");
+	this->fileMenu = this->rightClickMenu->addMenu("File");
+	this->fileMenu->addAction("New");
+	this->fileMenu->addAction("Import...");
+	this->fileMenu->addAction("Export...");
 
-	QMenu* defaultMenu = this->rightClickMenu->addMenu("Presets");
-	defaultMenu->addAction("DOS");
-	defaultMenu->addAction("VERGE");
-	defaultMenu->addAction("PLASMA");
-	defaultMenu->addAction("RGB332");
-	defaultMenu->addAction("VISIBONE2");
-	defaultMenu->addAction("HSL256");
+	this->defaultMenu = this->rightClickMenu->addMenu("Presets");
+	this->defaultMenu->addAction("DOS");
+	this->defaultMenu->addAction("HSL256");
+	this->defaultMenu->addAction("PLASMA");
+	this->defaultMenu->addAction("RGB332");
+	this->defaultMenu->addAction("VERGE");
+	this->defaultMenu->addAction("VISIBONE2");
 
 	this->rightClickMenu->addSeparator();
 	this->rightClickMenu->addAction("Insert before");
@@ -39,12 +36,13 @@ PaletteWidget::PaletteWidget(SpritesetView *parent): QWidget(parent) {
 	this->rightClickMenu->addAction("Replace");
 	this->rightClickMenu->addAction("Remove");
 	this->selectedIndex = 0;
-	this->paletteColors << QColor();
 	parent->setMinimumSize(160,160);
 	this->repaint();
 }
 
 PaletteWidget::~PaletteWidget() {
+	delete this->fileMenu;
+	delete this->defaultMenu;
 	delete this->rightClickMenu;
 }
 

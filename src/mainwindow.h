@@ -39,8 +39,6 @@ class MainWindow : public QMainWindow {
 		void prepareForTileSet();
 		void prepareForSpriteset();
 		void handleModifiedFiles();
-
-		void console(QVariant s, int which = 0);
 		void closeEvent(QCloseEvent* event);
 		static MainWindow* instance();
 
@@ -54,7 +52,6 @@ class MainWindow : public QMainWindow {
 		void on_toolbarSaveButton_triggered();
 		void on_toolbarOpenButton_triggered();
 		void on_openFileTabs_tabCloseRequested(int index);
-		void showContextMenu(const QPoint& pos);
 		void on_actionUndo_triggered();
 		void on_toolbarProjectProperties_triggered();
 		void on_newProject_triggered();

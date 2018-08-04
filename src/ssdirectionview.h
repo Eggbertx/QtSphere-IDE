@@ -34,6 +34,7 @@ class SSDirectionView : public QFrame {
 		void changeDirectionName(QString name);
 
 	private:
+		void mousePressEvent(QMouseEvent* event);
 		QWidget* framesContainer;
 		QHBoxLayout* framesLayout;
 		QLineEdit* nameLineEdit;

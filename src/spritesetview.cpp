@@ -21,7 +21,6 @@
 
 SpritesetView::SpritesetView(QWidget *parent): QWidget(parent), ui(new Ui::SpritesetView) {
 	ui->setupUi(this);
-
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
 			this, SLOT(showContextMenu(const QPoint&)));
@@ -49,7 +48,6 @@ SpritesetView::SpritesetView(QWidget *parent): QWidget(parent), ui(new Ui::Sprit
 	sizes.clear();
 
 	ui->animView->setBackgroundBrush(QBrush(QPixmap(":/icons/transparency-bg.png")));
-
 	ui->dirsLayout->addStretch(5);
 }
 

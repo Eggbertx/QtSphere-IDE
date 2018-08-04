@@ -28,7 +28,6 @@ private slots:
 private:
 	Ui::SpritesetView *ui;
 	ImageChooser* images;
-
 };
 
 #endif // SPRITESETVIEW_H

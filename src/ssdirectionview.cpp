@@ -1,8 +1,10 @@
+#include <QEvent>
 #include <QGraphicsView>
 #include <QGraphicsPixmapItem>
 #include <QLayout>
 #include <QLineEdit>
 #include <QMenu>
+#include <QMouseEvent>
 #include <QPalette>
 #include <QPixmap>
 #include <QPushButton>
@@ -36,7 +38,6 @@ SSDirectionView::SSDirectionView(QString name, int numFrames, Spriteset::SSDirec
 			SLOT(changeDirectionName(QString)));
 	dirLayout->addWidget(this->nameLineEdit);
 	this->framesContainer = new QWidget();
-	//this->framesLayout = new QGridLayout();
 	this->framesLayout = new QHBoxLayout();
 	this->framesLayout->setSpacing(1);
 	this->framesLayout->setMargin(2);
@@ -129,12 +130,22 @@ void SSDirectionView::setZoom(int factor) {
 }
 
 void SSDirectionView::addFrame(QImage* image) {
+	/*QPushButton* btn = new QPushButton("");
+	btn->setFlat(true);
+	btn->setAutoFillBackground(true);
+	QIcon icon(QPixmap::fromImage(this->spriteset->images.first()).scaled(32*2,32*2));
+	btn->setIconSize(btn->size());
+	btn->setIcon(icon);
+	btn->setStyleSheet("border:4px solid white");*/
+
 	QGraphicsView* newView = new QGraphicsView(new QGraphicsScene());
+	newView->setObjectName("frame" + QString::number(this->frameViews.length()));
 	newView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	newView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
 	int scaledWidth = 32*this->zoomFactor;
 	int scaledHeight = 32*this->zoomFactor;
+	//btn->setFixedSize(scaledWidth, scaledHeight);
 	newView->setBackgroundBrush(QBrush(QPixmap(":/icons/transparency-bg.png")));
 
 	QGraphicsPixmapItem* frameImage;
@@ -152,6 +163,7 @@ void SSDirectionView::addFrame(QImage* image) {
 	frameImage->setScale(this->zoomFactor);
 	newView->setFixedSize(scaledWidth,scaledHeight);
 
+	//this->framesLayout->addWidget(btn);
 	this->framesLayout->addWidget(newView);
 	this->frameViews.append(newView);
 }
@@ -167,4 +179,12 @@ void SSDirectionView::addFrameSlot() {
 
 void SSDirectionView::changeDirectionName(QString name) {
 	this->ssDirection->name = name;
+}
+
+void SSDirectionView::mousePressEvent(QMouseEvent* event) {
+	if(event->button() == Qt::LeftButton) {
+		// QWidget* child = this->childAt(event->pos());
+		// qDebug() << child->objectName();
+	}
+	event->accept();
 }

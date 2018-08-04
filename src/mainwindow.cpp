@@ -29,7 +29,7 @@
 #include "spritesetview.h"
 #include "startpage.h"
 
-MainWindow* MainWindow::_instance = NULL;
+MainWindow* MainWindow::_instance = nullptr;
 
 MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWindow) {
 	Q_ASSERT(!_instance);
@@ -73,11 +73,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	ui->mainToolBar->insertAction(ui->toolbarOpenButton,toolButtonAction);
 
 	QList<int> mainSplitterList;
-	QList<int> consoleSplitterList;
 	mainSplitterList << 150 << this->width()-150;
-	consoleSplitterList << 350 << 100;
 	ui->splitter->setSizes(mainSplitterList);
-	ui->consoleSplitter->setSizes(consoleSplitterList);
 	this->project = new QSIProject("", this);
 
 	this->soundPlayer = new SoundPlayer();
@@ -144,22 +141,6 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 		event->accept();*/
 }
 
-void MainWindow::console(QVariant s, int which) {
-	QString prefix = "[" + QTime::currentTime().toString("h:mm:s ap") + "] ";
-	QString line = prefix + s.toString();
-	switch (which) {
-		case 0:
-			ui->consoleText->insertPlainText(line);
-		break;
-		case 1:
-			ui->buildLogText->insertPlainText(line);
-		break;
-		default:
-			ui->consoleText->insertPlainText(line);
-		break;
-	}
-}
-
 void MainWindow::on_actionAbout_triggered() {
 	AboutDialog aboutDialog;
 	aboutDialog.exec();
@@ -180,7 +161,7 @@ void MainWindow::saveCurrentTab() {
 		if(!saveFile.open(QIODevice::WriteOnly)) {
 			QString errorString = saveFile.errorString();
 			if(errorString != "No file name specified")
-				this->console("Failed saving file: " + saveFile.errorString());
+				errorBox("Failed saving file: " + saveFile.errorString());
 			return;
 		} else {
 			QTextStream out(&saveFile);
@@ -197,28 +178,6 @@ void MainWindow::saveCurrentTab() {
 			errorBox("Failed saving file: " + currentEditor->spriteset->fileName());
 		}
 	}
-}
-
-void MainWindow::showContextMenu(const QPoint &pos) {
-	QPoint globalPos = ui->treeView->mapToGlobal(pos);
-
-	QMenu rMenu;
-	QWidget* currentWidget = ui->centralWidget->childAt(pos);
-	if(!currentWidget) return;
-	if(currentWidget->objectName() == "treeView")
-		rMenu.addAction("treeView");
-	else
-		rMenu.addAction(getWidgetType(currentWidget));
-	rMenu.addAction("Menu item 1");
-	rMenu.addAction(ui->toolbarPlayGame);
-
-	QAction* selectedItem = rMenu.exec(globalPos);
-	if (selectedItem) {
-		this->console("selectedItem", 1);
-	} else {
-		this->console("notSelectedItem", 1);
-	}
-	// delete currentWidget;
 }
 
 void MainWindow::setupTextEditor(QTextEdit *editor) {
@@ -358,7 +317,7 @@ void MainWindow::on_newProject_triggered() {
 	if(propertiesDialog.exec() == QDialog::Accepted) {
 		QDir newDir = QDir(propertiesDialog.getProject()->getPath(false));
 		if(newDir.exists() || !newDir.mkpath("")) {
-			this->console("Error creating new project.");
+			errorBox("Error creating new project.");
 			return;
 		}
 	}

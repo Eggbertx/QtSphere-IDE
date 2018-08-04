@@ -82,7 +82,7 @@ void Spriteset::createNew() {
 
 bool Spriteset::open(QString filename) {
 	qDebug() << "Opening" << filename;
-	this->filename = (char*)filename.toStdString().c_str();
+	this->filename = filename;
 	this->file = new QFile(this->filename);
 
 	if(!this->file->exists()) {
@@ -107,7 +107,6 @@ bool Spriteset::open(QString filename) {
 		errorBox("v1 and v2 spritesets are not currently supported.");
 		this->file->close();
 		return false;
-		break;
 	case 3: {
 		this->images = QList<QImage>();
 		for(int i = 0; i < header.num_images; i++) {
@@ -153,7 +152,6 @@ bool Spriteset::open(QString filename) {
 		errorBox("Invalid spriteset version: " + QString::number(this->header.version));
 		this->file->close();
 		return false;
-		break;
 	}
 	this->file->close();
 	delete this->file;
@@ -173,7 +171,6 @@ bool Spriteset::save(QString filename) {
 		errorBox("v1 and v2 spritesets are not currently supported.");
 		outFile->close();
 		return false;
-		break;
 	case 3: {
 		foreach(QImage image, this->images) {
 			QByteArray* bytes = imageBytes(&image);
@@ -187,8 +184,7 @@ bool Spriteset::save(QString filename) {
 			writeFile(outFile, direction.reserved, sizeof(direction.reserved));
 
 			uint16_t str_length = direction.name.length() + 1;
-			const uint16_t str_length_const = str_length; // because MSVC loves to be cantankerous with non-constant array indices
-			char* direction_name = (char*)direction.name.toStdString().c_str();
+			char* direction_name = const_cast<char*>(direction.name.toStdString().c_str());
 
 			writeFile(outFile, &str_length, sizeof(str_length));
 			writeFile(outFile, direction_name, str_length);
@@ -207,7 +203,6 @@ bool Spriteset::save(QString filename) {
 		errorBox("Invalid spriteset version: " + QString::number(this->header.version));
 		outFile->close();
 		return false;
-		break;
 	}
 	return true;
 }
@@ -246,7 +241,8 @@ void Spriteset::addDirection(QString name, int numFrames) {
 
 void Spriteset::addDirection(QString name, QList<Spriteset::SSFrame> frames) {
 	SSDirection newDirection = SSDirection();
-	newDirection.name = (char*)name.toStdString().c_str();
+	newDirection.name = (const char*)name.toStdString().c_str();
+
 	newDirection.frames = frames;
 	this->directions.append(newDirection);
 }
