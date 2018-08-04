@@ -327,10 +327,8 @@
      <property name="title">
       <string>Open Recent</string>
      </property>
-     <addaction name="actionProjectName"/>
+     <addaction name="actionClearRecent"/>
      <addaction name="separator"/>
-     <addaction name="actionFile_1"/>
-     <addaction name="actionFile_2"/>
     </widget>
     <addaction name="menuNew"/>
     <addaction name="actionOpenFile"/>
@@ -698,9 +696,9 @@
     <string>Open Project...</string>
    </property>
   </action>
-  <action name="actionProjectName">
+  <action name="actionClearRecent">
    <property name="text">
-    <string>Project Name</string>
+    <string>Clear recent</string>
    </property>
   </action>
   <action name="actionFile_1">
@@ -766,6 +764,11 @@
   <action name="actionSpherical_community">
    <property name="text">
     <string>Spherical community</string>
+   </property>
+  </action>
+  <action name="actionProject_Name">
+   <property name="text">
+    <string>Project Name</string>
    </property>
   </action>
  </widget>

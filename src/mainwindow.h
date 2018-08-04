@@ -39,6 +39,7 @@ class MainWindow : public QMainWindow {
 		void prepareForTileSet();
 		void prepareForSpriteset();
 		void handleModifiedFiles();
+		void refreshRecentFiles();
 		void closeEvent(QCloseEvent* event);
 		static MainWindow* instance();
 
@@ -70,6 +71,7 @@ class MainWindow : public QMainWindow {
 		void on_taskListTable_customContextMenuRequested(const QPoint &pos);
 		void on_delTaskButton_clicked();
 		void on_actionSpherical_community_triggered();
+		void on_actionClearRecent_triggered();
 
 	private:
 		static MainWindow* _instance;

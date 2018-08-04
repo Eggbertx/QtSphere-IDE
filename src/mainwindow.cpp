@@ -14,6 +14,7 @@
 #include <QWidgetAction>
 #include <QTreeView>
 #include <QKeySequence>
+#include <QSettings>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -80,6 +81,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	this->soundPlayer = new SoundPlayer();
 	ui->mediaPlayerTab->layout()->addWidget(this->soundPlayer);
 	ui->openFileTabs->addTab(new StartPage(ui->openFileTabs), "Start Page");
+	this->refreshRecentFiles();
 }
 
 MainWindow::~MainWindow() {
@@ -228,11 +230,13 @@ void MainWindow::openFile(QString fileName) {
 	QFile* file = new QFile(fn);
 
 	QStringList audioList;
-
 	audioList << "wav" << "ogg" << "mp3" << "flac" << "it" <<
 				 "mod" << "s3m" << "xm" << "sid";
 
-	if (!file->open(QIODevice::ReadWrite | QIODevice::Text)) return;
+	if (!file->open(QIODevice::ReadWrite | QIODevice::Text)) {
+		errorBox("Error opening" + fn + ": " + file->errorString());
+		return;
+	}
 	QFileInfo fi = QFileInfo(fn);
 	QString fileExtension = fi.suffix();
 	if(fileExtension == "rss") {
@@ -272,6 +276,38 @@ void MainWindow::handleModifiedFiles() {
 		}*/
 	}
 	if(num_modified > 0) mfd.exec();
+}
+
+void MainWindow::refreshRecentFiles() {
+	QList<QAction*> recentItems = ui->menuOpen_Recent->actions();
+	for(int a = 0; a < recentItems.length(); a++) {
+		if(recentItems.at(a)->text() != "Clear recent") {
+			delete recentItems.at(a);
+		}
+
+	}
+	ui->menuOpen_Recent->addSeparator();
+
+	QSettings settings;
+	int size = settings.beginReadArray("recentProjects");
+	for(int i = 0; i < size; ++i) {
+		settings.setArrayIndex(i);
+		ui->menuOpen_Recent->addAction(settings.value("project").toString());
+	}
+	settings.endArray();
+	ui->menuOpen_Recent->addSeparator();
+
+	size = settings.beginReadArray("recentFiles");
+	for(int i = 0; i < size; i++) {
+		settings.setArrayIndex(i);
+		QAction* fileAction = ui->menuOpen_Recent->addAction(settings.value("file").toString());
+		connect(fileAction, &QAction::triggered,
+				this, [this,fileAction]() {
+					this->openFile(fileAction->text());
+				}
+		);
+	}
+	settings.endArray();
 }
 
 void MainWindow::on_actionExit_triggered() {
@@ -456,4 +492,11 @@ void MainWindow::on_taskListTable_customContextMenuRequested(const QPoint &pos) 
 
 void MainWindow::on_actionSpherical_community_triggered() {
 	QDesktopServices::openUrl(QUrl("http://www.spheredev.org/"));
+}
+
+void MainWindow::on_actionClearRecent_triggered() {
+	QSettings settings;
+	settings.remove("recentProjects");
+	settings.remove("recentFiles");
+	this->refreshRecentFiles();
 }
