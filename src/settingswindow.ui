@@ -107,14 +107,14 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <widget class="QPushButton" name="addDirButton">
+          <widget class="QToolButton" name="addDirButton">
            <property name="text">
             <string>+</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="removeDirButton">
+          <widget class="QToolButton" name="removeDirButton">
            <property name="text">
             <string>-</string>
            </property>

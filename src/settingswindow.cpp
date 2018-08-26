@@ -13,6 +13,7 @@
 
 SettingsWindow::SettingsWindow(QWidget *parent) : QDialog(parent), ui(new Ui::SettingsWindow) {
 	ui->setupUi(this);
+	ui->legacyDir_btn->setIcon(this->style()->standardIcon(QStyle::SP_DialogOpenButton));
 	this->mainWindow = static_cast<MainWindow*>(parent);
 	this->currentTheme = this->mainWindow->getTheme();
 	this->newTheme = this->currentTheme;

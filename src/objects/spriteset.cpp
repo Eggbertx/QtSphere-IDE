@@ -127,7 +127,11 @@ bool Spriteset::open(QString filename) {
 			SSDirection direction = SSDirection();
 			uint16_t num_frames;
 			readFile(this->file, &num_frames, sizeof(num_frames));
-			this->file->skip(6);
+
+			//QFile::skip() is apparently a relatively new method
+			char* dump6 = (char*)malloc(6);
+			readFile(this->file, dump6, 6);
+			free(dump6);
 
 			uint16_t str_length;
 			readFile(this->file, &str_length, sizeof(str_length));

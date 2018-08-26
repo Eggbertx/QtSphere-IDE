@@ -114,7 +114,7 @@ bool PaletteWidget::eventFilter(QObject* object, QEvent* event) {
 			int buttonPressed = me->button();
 			QPoint pos = me->pos();
 
-			if(buttonPressed == Qt::LeftButton|Qt::RightButton) {
+			if(buttonPressed == (Qt::LeftButton|Qt::RightButton)) {
 				int numColors = this->paletteColors.length();
 				int x = 0;
 				int y = 0;

@@ -151,42 +151,7 @@
           <widget class="QComboBox" name="animDirChoose">
            <item>
             <property name="text">
-             <string>north</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>northeast</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>east</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>southeast</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>south</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>southwest</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>west</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>northwest</string>
+             <string>&lt;no directions&gt;</string>
             </property>
            </item>
           </widget>
