@@ -2,7 +2,7 @@
 #define MODIFIEDFILESDIALOG_H
 
 #include <QDialog>
-#include <objects/spherefile.h>
+#include <formats/spherefile.h>
 namespace Ui {
 	class ModifiedFilesDialog;
 }

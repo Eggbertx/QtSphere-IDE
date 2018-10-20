@@ -10,7 +10,7 @@
 #include "mainwindow.h"
 #include "spriteset.h"
 #include "util.h"
-#include "objects/spherefile.h"
+#include "formats/spherefile.h"
 #include "importoptionsdialog.h"
 
 Spriteset::Spriteset(QObject *parent) : SphereFile(parent) {}

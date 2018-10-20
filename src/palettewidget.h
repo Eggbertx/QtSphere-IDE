@@ -5,7 +5,7 @@
 #include <QMenu>
 #include <QColor>
 #include <QList>
-#include "spritesetview.h"
+#include "editors/spritesetview.h"
 
 class PaletteWidget : public QWidget {
 	Q_OBJECT

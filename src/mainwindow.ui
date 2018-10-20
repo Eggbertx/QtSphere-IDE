@@ -273,9 +273,6 @@
           <property name="tabsClosable">
            <bool>true</bool>
           </property>
-          <property name="movable">
-           <bool>true</bool>
-          </property>
          </widget>
         </item>
        </layout>
@@ -290,7 +287,7 @@
      <x>0</x>
      <y>0</y>
      <width>936</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">

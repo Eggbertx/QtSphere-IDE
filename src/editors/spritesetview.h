@@ -2,18 +2,19 @@
 #define SPRITESETVIEW_H
 
 #include <QWidget>
-#include "objects/spriteset.h"
+#include "formats/spriteset.h"
+#include "editors/sphereeditor.h"
 #include "imagechooser.h"
 
 namespace Ui {
 	class SpritesetView;
 }
 
-class SpritesetView: public QWidget {
+class SpritesetView: public SphereEditor {
 	Q_OBJECT
 
 public:
-	explicit SpritesetView(QWidget *parent = 0);
+	explicit SpritesetView(QWidget *parent = nullptr);
 	~SpritesetView();
 	void addDirection(QString name = "", int numFrames = 1);
 	void addDirection(Spriteset::SSDirection direction);
@@ -24,6 +25,7 @@ public:
 
 private slots:
 	void showContextMenu(const QPoint &pos);
+	void on_animDirChoose_currentIndexChanged(int index);
 
 private:
 	Ui::SpritesetView *ui;

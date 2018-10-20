@@ -7,7 +7,7 @@
 #include <QPalette>
 #include <QPixmap>
 #include "imagechooser.h"
-#include "objects/spriteset.h"
+#include "formats/spriteset.h"
 
 ImageChooser::ImageChooser(bool showTransparency, QWidget *parent): QWidget(parent) {
 	this->installEventFilter(this);

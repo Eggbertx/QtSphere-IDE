@@ -12,7 +12,7 @@
 #include "util.h"
 #include "mainwindow.h"
 #include "modifiedfilesdialog.h"
-#include "objects/spherefile.h"
+#include "formats/spherefile.h"
 
 
 int handleModifiedFiles() {

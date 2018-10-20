@@ -23,11 +23,13 @@
 #include "importoptionsdialog.h"
 #include "projectpropertiesdialog.h"
 #include "settingswindow.h"
-#include "objects/spriteset.h"
+#include "formats/spriteset.h"
 #include "modifiedfilesdialog.h"
 #include "qsiproject.h"
 #include "soundplayer.h"
-#include "spritesetview.h"
+#include "editors/sphereeditor.h"
+#include "editors/spritesetview.h"
+#include "editors/texteditor.h"
 #include "startpage.h"
 
 MainWindow* MainWindow::_instance = nullptr;
@@ -99,12 +101,12 @@ MainWindow* MainWindow::instance() {
 	return _instance;
 }
 
-void MainWindow::addWidgetTab(QWidget* widget, QString tabname) {
+/*void MainWindow::addWidgetTab(QWidget* widget, QString tabname) {
 	widget->setObjectName(tabname + QString::number(ui->openFileTabs->count()));
-	this->openFiles.append(widget);
+	this->openEditors.append(widget);
 	ui->openFileTabs->insertTab(ui->openFileTabs->count(), widget, tabname);
 	ui->openFileTabs->setCurrentIndex(ui->openFileTabs->count()-1);
-}
+}*/
 
 QString MainWindow::getStatus() {
 	return this->statusLabel->text();
@@ -141,6 +143,17 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 	/*event->ignore();
 	if(handleModifiedFiles() > 0)
 		event->accept();*/
+}
+
+SphereEditor* MainWindow::getCurrentEditor() {
+	int currentTabIndex = ui->openFileTabs->currentIndex();
+	qDebug().nospace() << "tabs[" << currentTabIndex << "] = " << ui->openFileTabs->tabText(currentTabIndex);
+
+	foreach (SphereEditor* editor, this->openEditors) {
+		if(editor->tabIndex == currentTabIndex)
+			return editor;
+	}
+	return nullptr;
 }
 
 void MainWindow::on_actionAbout_triggered() {
@@ -180,12 +193,6 @@ void MainWindow::saveCurrentTab() {
 			errorBox("Failed saving file: " + currentEditor->spriteset->fileName());
 		}
 	}
-}
-
-void MainWindow::setupTextEditor(QTextEdit *editor) {
-	QFont font("Monospace", 10);
-	font.setFixedPitch(true);
-	editor->setFont(font);
 }
 
 void MainWindow::setupTreeView() {
@@ -242,7 +249,9 @@ void MainWindow::openFile(QString fileName) {
 	if(fileExtension == "rss") {
 		SpritesetView* ssView = new SpritesetView(this);
 		if(ssView->openFile(fi.filePath())) {
-			this->addWidgetTab(ssView, fi.fileName());
+			ssView->tabIndex = ui->openFileTabs->insertTab(0, ssView, fi.fileName());
+			ui->openFileTabs->setCurrentIndex(0);
+			this->openEditors.append(ssView);
 		}else {
 			errorBox("Failed loading spriteset: " + fn);
 			return;
@@ -251,10 +260,13 @@ void MainWindow::openFile(QString fileName) {
 		this->soundPlayer->load(fn);
 	} else {
 		QByteArray bytes = file->readAll();
-		QTextEdit* newTextEdit = new QTextEdit(this);
-		newTextEdit->setText(bytes);
-		this->setupTextEditor(newTextEdit);
-		this->addWidgetTab(newTextEdit, fi.fileName());
+		TextEditor* newTextEdit = new TextEditor(this);
+		newTextEdit->textEditorWidget->setText(bytes);
+
+
+		newTextEdit->tabIndex = ui->openFileTabs->insertTab(0, newTextEdit->textEditorWidget, file->fileName());
+		ui->openFileTabs->setCurrentIndex(0);
+		this->openEditors.append(newTextEdit);
 	}
 }
 
@@ -264,14 +276,14 @@ void MainWindow::openProject(QString fileName) {
 }
 
 void MainWindow::handleModifiedFiles() {
-	if(this->openFiles.count() == 0) return;
+	if(this->openEditors.count() == 0) return;
 	ModifiedFilesDialog mfd(this);
 	int num_modified = 0;
 	QList<QTextEdit *> openEditors = ui->openFileTabs->findChildren<QTextEdit *>();
 
 	for(int t = 0; t < openEditors.count(); t++) {
-		/* if(openEditors.at(t)->document()->toPlainText() != this->openFiles.at(t)->text) {
-			mfd.addModifiedItem(this->openFiles.at(t));
+		/* if(openEditors.at(t)->document()->toPlainText() != this->openEditors.at(t)->text) {
+			mfd.addModifiedItem(this->openEditors.at(t));
 			num_modified++;
 		}*/
 	}
@@ -311,7 +323,7 @@ void MainWindow::refreshRecentFiles() {
 }
 
 void MainWindow::on_actionExit_triggered() {
-	handleModifiedFiles();
+	this->handleModifiedFiles();
 	this->close(); // just temporary until I have a way to test if the currently open file has been modified
 	//if(handleModifiedFiles() > 0) this->close();
 }
@@ -335,12 +347,32 @@ void MainWindow::on_actionOpenFile_triggered() {
 }
 
 void MainWindow::on_openFileTabs_tabCloseRequested(int index) {
-	this->openFiles.removeAt(index);
+	this->openEditors.removeAt(index);
 	ui->openFileTabs->removeTab(index);
 }
 
 void MainWindow::on_actionUndo_triggered() {
-	ui->openFileTabs->currentWidget()->findChildren<QTextEdit *>().at(0)->undo();
+	SphereEditor* currentEditor = this->getCurrentEditor();
+	if(currentEditor == nullptr) return;
+
+	switch (currentEditor->editorType()) {
+	case SphereEditor::TextEditor: {
+		TextEditor* editor = static_cast<TextEditor*>(currentEditor);
+		editor->undo();
+		break;
+	}
+	default:
+		break;
+	}
+	//ui->openFileTabs->currentWidget()->findChildren<QTextEdit *>().at(0)->undo();
+}
+
+void MainWindow::on_actionRedo_triggered() {
+	SphereEditor* currentEditor = this->getCurrentEditor();
+	if(currentEditor != nullptr) {
+		qDebug() << "currentEditor type: " << currentEditor->editorType();
+		currentEditor->redo();
+	}
 }
 
 void MainWindow::on_toolbarProjectProperties_triggered() {
@@ -380,11 +412,11 @@ void MainWindow::prevTab() {
 
 
 void MainWindow::on_newPlainTextFile_triggered() {
-	QTextEdit* newTextEdit = new QTextEdit(this);
+	//QTextEdit* newTextEdit = new QTextEdit(this);
+	TextEditor* newTextEdit = new TextEditor(this);
 	newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()));
-	this->setupTextEditor(newTextEdit);
-	this->openFiles.append(newTextEdit);
-	ui->openFileTabs->insertTab(0, newTextEdit, "<Untitled>");
+	newTextEdit->tabIndex = ui->openFileTabs->insertTab(0, newTextEdit->textEditorWidget, "<Untitled>");
+	this->openEditors.append(newTextEdit);
 	ui->openFileTabs->setCurrentIndex(0);
 }
 
@@ -457,7 +489,8 @@ void MainWindow::on_actionImage_to_Spriteset_triggered() {
 		SpritesetView* ssView = new SpritesetView(this);
 		ssView->attach(imported);
 		QFileInfo fi = QFileInfo(imagePath);
-		this->addWidgetTab(ssView, fi.baseName() + ".rss*");
+		ssView->tabIndex = ui->openFileTabs->insertTab(0, ssView, fi.fileName());
+		ui->openFileTabs->setCurrentIndex(0);
 	}
 }
 

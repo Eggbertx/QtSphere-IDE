@@ -1,3 +1,4 @@
+#include <QWidget>
 #include <QDebug>
 #include <QColor>
 #include <QColorDialog>
@@ -9,7 +10,7 @@
 #include <QSizePolicy>
 #include <QPaintEvent>
 #include "palettewidget.h"
-#include "spritesetview.h"
+#include "editors/spritesetview.h"
 
 PaletteWidget::PaletteWidget(SpritesetView *parent): QWidget(parent) {
 	this->installEventFilter(this);

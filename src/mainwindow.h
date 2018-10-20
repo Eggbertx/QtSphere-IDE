@@ -9,7 +9,8 @@
 #include <QVariant>
 #include <QComboBox>
 
-#include "objects/spherefile.h"
+#include "editors/sphereeditor.h"
+#include "formats/spherefile.h"
 #include "qsiproject.h"
 #include "soundplayer.h"
 #include "startpage.h"
@@ -30,7 +31,7 @@ class MainWindow : public QMainWindow {
 		QString getTheme();
 		void setTheme(QString theme = "default");
 		void openFile(QString fileName = "");
-		void addWidgetTab(QWidget* widget, QString tabname);
+		//void addWidgetTab(QWidget* widget, QString tabname);
 		void openProject(QString fileName);
 		void refreshProjectList();
 		void saveCurrentTab();
@@ -41,6 +42,7 @@ class MainWindow : public QMainWindow {
 		void handleModifiedFiles();
 		void refreshRecentFiles();
 		void closeEvent(QCloseEvent* event);
+		SphereEditor* getCurrentEditor();
 		static MainWindow* instance();
 
 	private slots:
@@ -54,6 +56,7 @@ class MainWindow : public QMainWindow {
 		void on_toolbarOpenButton_triggered();
 		void on_openFileTabs_tabCloseRequested(int index);
 		void on_actionUndo_triggered();
+		void on_actionRedo_triggered();
 		void on_toolbarProjectProperties_triggered();
 		void on_newProject_triggered();
 		void on_actionProject_Properties_triggered();
@@ -80,10 +83,9 @@ class MainWindow : public QMainWindow {
 		QLabel* statusLabel;
 		QSIProject* project;
 		SoundPlayer* soundPlayer;
-		QList<QWidget *> openFiles;
+		QList<SphereEditor *> openEditors;
 		QString theme;
 		void setupEditors();
-		void setupTextEditor(QTextEdit *editor);
 		void setupTreeView();
 };
 

@@ -19,19 +19,21 @@ SOURCES += \
 	util.cpp \
 	modifiedfilesdialog.cpp \
 	settingswindow.cpp \
-	objects/mapfile.cpp \
-	objects/spherefile.cpp \
+	formats/mapfile.cpp \
+	formats/spherefile.cpp \
 	qsiproject.cpp \
 	projectpropertiesdialog.cpp \
-	objects/spriteset.cpp \
-	spritesetview.cpp \
+	formats/spriteset.cpp \
+	editors/spritesetview.cpp \
 	palettewidget.cpp \
 	imagechooser.cpp \
 	drawingwidget.cpp \
-	ssdirectionview.cpp \
+	editors/ssdirectionview.cpp \
 	soundplayer.cpp \
 	importoptionsdialog.cpp \
-    startpage.cpp
+	startpage.cpp \
+	editors/sphereeditor.cpp \
+	editors/texteditor.cpp
 
 HEADERS += \
 	mainwindow.h \
@@ -39,19 +41,21 @@ HEADERS += \
 	util.h \
 	modifiedfilesdialog.h \
 	settingswindow.h \
-	objects/mapfile.h \
-	objects/spherefile.h \
+	formats/mapfile.h \
+	formats/spherefile.h \
 	qsiproject.h \
 	projectpropertiesdialog.h \
-	objects/spriteset.h \
-	spritesetview.h \
+	formats/spriteset.h \
+	editors/spritesetview.h \
 	palettewidget.h \
 	imagechooser.h \
 	drawingwidget.h \
-	ssdirectionview.h \
+	editors/ssdirectionview.h \
 	soundplayer.h \
 	importoptionsdialog.h \
-    startpage.h
+	startpage.h \
+	editors/sphereeditor.h \
+	editors/texteditor.h
 
 FORMS += \
 	mainwindow.ui \
@@ -59,11 +63,11 @@ FORMS += \
 	modifiedfilesdialog.ui \
 	settingswindow.ui \
 	projectpropertiesdialog.ui \
-	spritesetview.ui \
+	editors/spritesetview.ui \
 	drawingwidget.ui \
 	soundplayer.ui \
 	importoptionsdialog.ui \
-    startpage.ui
+	startpage.ui
 
 RESOURCES += res/qsires.qrc
 

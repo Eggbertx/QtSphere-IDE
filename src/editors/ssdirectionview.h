@@ -9,7 +9,7 @@
 #include <QToolButton>
 #include <QWidget>
 
-#include "objects/spriteset.h"
+#include "formats/spriteset.h"
 
 class SSDirectionView : public QFrame {
 	Q_OBJECT

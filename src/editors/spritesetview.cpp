@@ -16,11 +16,13 @@
 #include "ui_spritesetview.h"
 #include "palettewidget.h"
 #include "imagechooser.h"
-#include "ssdirectionview.h"
-#include "objects/spriteset.h"
+#include "editors/ssdirectionview.h"
+#include "formats/spriteset.h"
+#include "editors/sphereeditor.h"
 
-SpritesetView::SpritesetView(QWidget *parent): QWidget(parent), ui(new Ui::SpritesetView) {
+SpritesetView::SpritesetView(QWidget *parent): SphereEditor (parent), ui(new Ui::SpritesetView) {
 	ui->setupUi(this);
+	this->type = SphereEditor::SpritesetView;
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
 			this, SLOT(showContextMenu(const QPoint&)));
@@ -114,4 +116,8 @@ void SpritesetView::showContextMenu(const QPoint &pos) {
 	if(result->text() == "Add direction") {
 		this->addDirection("",1);
 	}
+}
+
+void SpritesetView::on_animDirChoose_currentIndexChanged(int index) {
+
 }

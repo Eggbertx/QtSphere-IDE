@@ -11,7 +11,7 @@
 #include <QStyle>
 #include <QToolButton>
 
-#include "objects/spriteset.h"
+#include "formats/spriteset.h"
 #include "spritesetview.h"
 #include "ssdirectionview.h"
 #include "util.h"
