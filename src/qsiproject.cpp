@@ -120,16 +120,6 @@ QSIProject::QSIProject(QString path, QObject *parent) : QObject(parent) {
 			this->width = 320;
 			this->height = 240;
 		}
-
-		qDebug().nospace() <<
-			"Name: " << this->name << "\n" <<
-			"Author: " << this->author << "\n" <<
-			"API Level: " << this->apiLevel << "\n" <<
-			"Version: " << this->version << "\n" <<
-			"Summary: " << this->summary << "\n" <<
-			"Save ID: " << this->saveID << "\n" <<
-			"Resolution: (" << this->width << "," << this->height << ")";
-		qDebug() << "\n";
 	} else if(suffix == "sgm") {
 		while(!stream.atEnd()) {
 			line = stream.readLine();

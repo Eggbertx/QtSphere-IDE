@@ -173,6 +173,7 @@ void MainWindow::saveCurrentTab() {
 		QString saveFileName = QFileDialog::getSaveFileName(this,
 								"Save script", "","Script (*.js);;Text file (*.txt);;All files (*)");
 		QFile saveFile(saveFileName);
+		QFileInfo fi(saveFile);
 		if(!saveFile.open(QIODevice::WriteOnly)) {
 			QString errorString = saveFile.errorString();
 			if(errorString != "No file name specified")
@@ -182,6 +183,8 @@ void MainWindow::saveCurrentTab() {
 			QTextStream out(&saveFile);
 			out.setCodec("UTF-8");
 			out << currentEditor->document()->toPlainText();
+			ui->openFileTabs->setTabText(ui->openFileTabs->currentIndex(), fi.fileName());
+			ui->openFileTabs->setTabToolTip(ui->openFileTabs->currentIndex(), fi.filePath());
 			saveFile.flush();
 			saveFile.close();
 		}
@@ -250,6 +253,7 @@ void MainWindow::openFile(QString fileName) {
 		SpritesetView* ssView = new SpritesetView(this);
 		if(ssView->openFile(fi.filePath())) {
 			ssView->tabIndex = ui->openFileTabs->insertTab(0, ssView, fi.fileName());
+			ui->openFileTabs->setTabToolTip(0, file->fileName());
 			ui->openFileTabs->setCurrentIndex(0);
 			this->openEditors.append(ssView);
 		}else {
@@ -262,9 +266,9 @@ void MainWindow::openFile(QString fileName) {
 		QByteArray bytes = file->readAll();
 		TextEditor* newTextEdit = new TextEditor(this);
 		newTextEdit->textEditorWidget->setText(bytes);
+		newTextEdit->tabIndex = ui->openFileTabs->insertTab(0, newTextEdit->textEditorWidget, fi.fileName());
 
-
-		newTextEdit->tabIndex = ui->openFileTabs->insertTab(0, newTextEdit->textEditorWidget, file->fileName());
+		ui->openFileTabs->setTabToolTip(0, file->fileName());
 		ui->openFileTabs->setCurrentIndex(0);
 		this->openEditors.append(newTextEdit);
 	}
@@ -416,6 +420,7 @@ void MainWindow::on_newPlainTextFile_triggered() {
 	TextEditor* newTextEdit = new TextEditor(this);
 	newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()));
 	newTextEdit->tabIndex = ui->openFileTabs->insertTab(0, newTextEdit->textEditorWidget, "<Untitled>");
+	ui->openFileTabs->setTabToolTip(0, "<Untitled>");
 	this->openEditors.append(newTextEdit);
 	ui->openFileTabs->setCurrentIndex(0);
 }
