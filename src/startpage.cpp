@@ -44,6 +44,7 @@ QString StartPage::getGameInfoText() {
 }
 
 void StartPage::refreshGameList() {
+	this->gameList.clear();
 	ui->projectIcons->clear();
 	QStringList projectDirs;
 	QSettings settings;

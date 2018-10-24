@@ -209,7 +209,7 @@
          </item>
          <item>
           <property name="text">
-           <string>Vanilla</string>
+           <string>None (use game.sgm)</string>
           </property>
          </item>
         </widget>

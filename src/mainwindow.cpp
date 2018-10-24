@@ -12,6 +12,7 @@
 #include <QTextStream>
 #include <QToolButton>
 #include <QWidgetAction>
+#include <QStandardItemModel>
 #include <QTreeView>
 #include <QKeySequence>
 #include <QSettings>
@@ -38,6 +39,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	Q_ASSERT(!_instance);
 	_instance = this;
 	ui->setupUi(this);
+
+	ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+	this->setupTreeView();
 
 	this->statusLabel = new QLabel("Ready.");
 	ui->statusBar->addWidget(this->statusLabel);
@@ -89,7 +93,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 MainWindow::~MainWindow() {
 	disconnect(this, SLOT(nextTab()));
 	disconnect(this, SLOT(prevTab()));
-	// disconnect(ui->menuFile, SIGNAL(aboutToShow()), this, SLOT(checkCloseProjectOption()));
+	disconnect(ui->menuFile, SIGNAL(aboutToShow()), this, SLOT(checkCloseProjectOption()));
 	delete ui;
 	delete this->soundPlayer;
 	delete this->project;
@@ -199,10 +203,15 @@ void MainWindow::saveCurrentTab() {
 }
 
 void MainWindow::setupTreeView() {
-	if(this->project->getPath(false) == "") return;
+	if(!this->projectLoaded || this->project->getPath(false) == "") {
+		QStandardItemModel* blankTreeModel = new QStandardItemModel(0,0,ui->treeView);
+		QStandardItem* child = new QStandardItem("<No open project>");
+		blankTreeModel->appendRow(child);
+		ui->treeView->setModel(blankTreeModel);
+		return;
+	}
 	QFileSystemModel *model = new QFileSystemModel();
 	model->setRootPath(this->project->getPath(false));
-
 	ui->treeView->setModel(model);
 	for (int i = 1; i < model->columnCount(); ++i)
 		ui->treeView->hideColumn(i);
@@ -276,6 +285,7 @@ void MainWindow::openFile(QString fileName) {
 
 void MainWindow::openProject(QString fileName) {
 	this->project = new QSIProject(fileName, this);
+	this->projectLoaded = true;
 	this->setupTreeView();
 }
 
@@ -464,6 +474,7 @@ void MainWindow::on_actionMSGithub_triggered() {
 }
 
 void MainWindow::on_treeView_doubleClicked(const QModelIndex &index) {
+	if(!this->projectLoaded) return;
 	QFileSystemModel* model = dynamic_cast<QFileSystemModel*>(ui->treeView->model()); // new QFileSystemModel();
 	model->setRootPath(this->project->getPath(false));
 	if(model->fileInfo(index).isFile())

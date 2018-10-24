@@ -81,6 +81,7 @@ class MainWindow : public QMainWindow {
 		Ui::MainWindow *ui;
 		QString status;
 		QLabel* statusLabel;
+		bool projectLoaded;
 		QSIProject* project;
 		SoundPlayer* soundPlayer;
 		QList<SphereEditor *> openEditors;
