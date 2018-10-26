@@ -89,31 +89,6 @@ void StartPage::setGameInfoText(QString name, QString author, QString resolution
 	);
 }
 
-void StartPage::on_projectIcons_itemDoubleClicked(QListWidgetItem *item) {
-	qDebug() << "Starting" << item->text();
-}
-
-void StartPage::on_projectIcons_itemClicked(QListWidgetItem *item) {
-	int currentRow = ui->projectIcons->currentRow();
-	QSIProject* currentProject = this->gameList.at(currentRow);
-
-	if(currentProject != nullptr) {
-		QString displayResolution = "";
-		if(currentProject->width > 0 && currentProject->height > 0) {
-			displayResolution = QString::number(currentProject->width) + "x" + QString::number(currentProject->height);
-		}
-		this->setGameInfoText(
-			currentProject->name,
-			currentProject->author,
-			displayResolution,
-			currentProject->getPath(false),
-			currentProject->summary
-		);
-	}
-}
-
-
-
 void StartPage::on_projectIcons_customContextMenuRequested(const QPoint &pos) {
 	QListWidgetItem* selected = ui->projectIcons->itemAt(pos);
 
@@ -134,5 +109,28 @@ void StartPage::on_projectIcons_customContextMenuRequested(const QPoint &pos) {
 
 	} else if(text == "Refresh game list") {
 		this->refreshGameList();
+	}
+}
+
+void StartPage::on_projectIcons_itemActivated(QListWidgetItem *item) {
+	MainWindow::instance()->openProject(this->gameList.at(ui->projectIcons->currentRow())->getPath(true));
+}
+
+void StartPage::on_projectIcons_itemSelectionChanged() {
+	int currentRow = ui->projectIcons->currentRow();
+	QSIProject* currentProject = this->gameList.at(currentRow);
+
+	if(currentProject != nullptr) {
+		QString displayResolution = "";
+		if(currentProject->width > 0 && currentProject->height > 0) {
+			displayResolution = QString::number(currentProject->width) + "x" + QString::number(currentProject->height);
+		}
+		this->setGameInfoText(
+			currentProject->name,
+			currentProject->author,
+			displayResolution,
+			currentProject->getPath(false),
+			currentProject->summary
+		);
 	}
 }

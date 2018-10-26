@@ -22,9 +22,9 @@ class StartPage : public QWidget {
 		void setGameInfoText(QString name, QString author, QString resolution, QString path, QString description);
 
 	private slots:
-		void on_projectIcons_itemDoubleClicked(QListWidgetItem *item);
-		void on_projectIcons_itemClicked(QListWidgetItem *item);
 		void on_projectIcons_customContextMenuRequested(const QPoint &pos);
+		void on_projectIcons_itemActivated(QListWidgetItem *item);
+		void on_projectIcons_itemSelectionChanged();
 
 	private:
 		Ui::StartPage *ui;

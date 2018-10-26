@@ -39,9 +39,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	Q_ASSERT(!_instance);
 	_instance = this;
 	ui->setupUi(this);
-
 	ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	this->setupTreeView();
 
 	this->statusLabel = new QLabel("Ready.");
 	ui->statusBar->addWidget(this->statusLabel);
@@ -87,6 +85,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	this->soundPlayer = new SoundPlayer();
 	ui->mediaPlayerTab->layout()->addWidget(this->soundPlayer);
 	ui->openFileTabs->addTab(new StartPage(ui->openFileTabs), "Start Page");
+	this->updateTreeView();
 	this->refreshRecentFiles();
 }
 
@@ -151,8 +150,6 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 
 SphereEditor* MainWindow::getCurrentEditor() {
 	int currentTabIndex = ui->openFileTabs->currentIndex();
-	qDebug().nospace() << "tabs[" << currentTabIndex << "] = " << ui->openFileTabs->tabText(currentTabIndex);
-
 	foreach (SphereEditor* editor, this->openEditors) {
 		if(editor->tabIndex == currentTabIndex)
 			return editor;
@@ -202,7 +199,7 @@ void MainWindow::saveCurrentTab() {
 	}
 }
 
-void MainWindow::setupTreeView() {
+void MainWindow::updateTreeView() {
 	if(!this->projectLoaded || this->project->getPath(false) == "") {
 		QStandardItemModel* blankTreeModel = new QStandardItemModel(0,0,ui->treeView);
 		QStandardItem* child = new QStandardItem("<No open project>");
@@ -286,7 +283,8 @@ void MainWindow::openFile(QString fileName) {
 void MainWindow::openProject(QString fileName) {
 	this->project = new QSIProject(fileName, this);
 	this->projectLoaded = true;
-	this->setupTreeView();
+	ui->menuProject->setEnabled(true);
+	this->updateTreeView();
 }
 
 void MainWindow::handleModifiedFiles() {
@@ -515,7 +513,11 @@ void MainWindow::on_actionSave_triggered() {
 }
 
 void MainWindow::on_actionStart_Page_triggered() {
-
+	int numTabs = ui->openFileTabs->count();
+	for(int t = 0; t < numTabs; t++) {
+		if(QString(ui->openFileTabs->widget(t)->metaObject()->className()) == "StartPage") return;
+	}
+	ui->openFileTabs->addTab(new StartPage(ui->openFileTabs), "Start Page");
 }
 
 void MainWindow::on_taskListTable_customContextMenuRequested(const QPoint &pos) {
@@ -548,4 +550,11 @@ void MainWindow::on_actionClearRecent_triggered() {
 	settings.remove("recentProjects");
 	settings.remove("recentFiles");
 	this->refreshRecentFiles();
+}
+
+void MainWindow::on_actionClose_Project_triggered() {
+	this->project = new QSIProject("", this);
+	this->projectLoaded = false;
+	ui->menuProject->setEnabled(false);
+	this->updateTreeView();
 }

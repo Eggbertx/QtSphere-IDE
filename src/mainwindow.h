@@ -75,6 +75,7 @@ class MainWindow : public QMainWindow {
 		void on_delTaskButton_clicked();
 		void on_actionSpherical_community_triggered();
 		void on_actionClearRecent_triggered();
+		void on_actionClose_Project_triggered();
 
 	private:
 		static MainWindow* _instance;
@@ -87,7 +88,7 @@ class MainWindow : public QMainWindow {
 		QList<SphereEditor *> openEditors;
 		QString theme;
 		void setupEditors();
-		void setupTreeView();
+		void updateTreeView();
 };
 
 #endif // MAINWINDOW_H
