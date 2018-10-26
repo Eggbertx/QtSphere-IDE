@@ -490,6 +490,8 @@ void MainWindow::on_actionImage_to_Spriteset_triggered() {
 		"Image files (*.bmp *.gif *.jpg *.jpeg *.png *.pbm *.pgm *.ppm *.xbm *.xpm);;"
 		"All files (*.*)"
 	);
+	if(imagePath == "") return; // user pressed cancel
+
 	ImportOptionsDialog* dialog = new ImportOptionsDialog(this);
 	if(dialog->exec() == QDialog::Accepted) {
 		Spriteset* imported = Spriteset::fromImage(
