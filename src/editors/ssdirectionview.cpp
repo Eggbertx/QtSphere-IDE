@@ -12,7 +12,7 @@
 #include <QToolButton>
 
 #include "formats/spriteset.h"
-#include "spritesetview.h"
+#include "spriteseteditor.h"
 #include "ssdirectionview.h"
 #include "util.h"
 
@@ -20,7 +20,7 @@ SSDirectionView::SSDirectionView(QString name, int numFrames, Spriteset::SSDirec
 	this->zoomFactor = 2;
 	this->ssDirection = ssDirection;
 	if(parent != nullptr) {
-		this->spriteset = static_cast<SpritesetView*>(parent)->spriteset;
+		this->spriteset = dynamic_cast<SpritesetEditor*>(parent)->spriteset;
 	}
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),

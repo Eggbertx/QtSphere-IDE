@@ -14,8 +14,7 @@
 SettingsWindow::SettingsWindow(QWidget *parent) : QDialog(parent), ui(new Ui::SettingsWindow) {
 	ui->setupUi(this);
 	ui->legacyDir_btn->setIcon(this->style()->standardIcon(QStyle::SP_DialogOpenButton));
-	this->mainWindow = static_cast<MainWindow*>(parent);
-	this->currentTheme = this->mainWindow->getTheme();
+	this->currentTheme = MainWindow::instance()->getTheme();
 	this->newTheme = this->currentTheme;
 	QSettings settings;
 	int size = settings.beginReadArray("projectDirs");
@@ -33,7 +32,7 @@ SettingsWindow::~SettingsWindow() {
 }
 
 void SettingsWindow::on_cancelButton_clicked() {
-	this->mainWindow->setTheme(this->currentTheme);
+	MainWindow::instance()->setTheme(this->currentTheme);
 	this->reject();
 }
 
@@ -45,7 +44,8 @@ void SettingsWindow::on_legacyDir_btn_clicked() {
 void SettingsWindow::on_themeCombo_currentIndexChanged(const QString &newtext) {
 	if(newtext == "Default") this->newTheme = "";
 	else if(newtext == "Dark") this->newTheme = ":/text/dark.qss";
-	this->mainWindow->setTheme(this->newTheme);
+	MainWindow::instance()->setTheme(this->newTheme);
+
 }
 
 void SettingsWindow::on_okButton_clicked() {

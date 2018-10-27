@@ -30,7 +30,7 @@ class MainWindow : public QMainWindow {
 		void setStatus(QString status);
 		QString getTheme();
 		void setTheme(QString theme = "default");
-		void openFile(QString fileName = "");
+		void openFile(QString filename = "");
 		//void addWidgetTab(QWidget* widget, QString tabname);
 		void openProject(QString fileName);
 		void refreshProjectList();

@@ -1,5 +1,5 @@
-#ifndef SPRITESETVIEW_H
-#define SPRITESETVIEW_H
+#ifndef SPRITESETEDITOR_H
+#define SPRITESETEDITOR_H
 
 #include <QWidget>
 #include "formats/spriteset.h"
@@ -7,15 +7,15 @@
 #include "imagechooser.h"
 
 namespace Ui {
-	class SpritesetView;
+	class SpritesetEditor;
 }
 
-class SpritesetView: public SphereEditor {
+class SpritesetEditor: public SphereEditor {
 	Q_OBJECT
 
 public:
-	explicit SpritesetView(QWidget *parent = nullptr);
-	~SpritesetView();
+	explicit SpritesetEditor(QWidget *parent = nullptr);
+	~SpritesetEditor();
 	void addDirection(QString name = "", int numFrames = 1);
 	void addDirection(Spriteset::SSDirection direction);
 	bool openFile(QString filename);
@@ -28,8 +28,8 @@ private slots:
 	void on_animDirChoose_currentIndexChanged(int index);
 
 private:
-	Ui::SpritesetView *ui;
+	Ui::SpritesetEditor *ui;
 	ImageChooser* images;
 };
 
-#endif // SPRITESETVIEW_H
+#endif // SPRITESETEDITOR_H

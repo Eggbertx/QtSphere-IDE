@@ -29,7 +29,7 @@
 #include "qsiproject.h"
 #include "soundplayer.h"
 #include "editors/sphereeditor.h"
-#include "editors/spritesetview.h"
+#include "editors/spriteseteditor.h"
 #include "editors/texteditor.h"
 #include "startpage.h"
 
@@ -169,7 +169,7 @@ void MainWindow::saveCurrentTab() {
 	QString widgetType = currentWidget->metaObject()->className();
 
 	if(widgetType == "QTextEdit") {
-		QTextEdit* currentEditor = static_cast<QTextEdit*>(ui->openFileTabs->currentWidget());
+		QTextEdit* currentEditor = dynamic_cast<QTextEdit*>(ui->openFileTabs->currentWidget());
 
 		QString saveFileName = QFileDialog::getSaveFileName(this,
 								"Save script", "","Script (*.js);;Text file (*.txt);;All files (*)");
@@ -180,17 +180,16 @@ void MainWindow::saveCurrentTab() {
 			if(errorString != "No file name specified")
 				errorBox("Failed saving file: " + saveFile.errorString());
 			return;
-		} else {
-			QTextStream out(&saveFile);
-			out.setCodec("UTF-8");
-			out << currentEditor->document()->toPlainText();
-			ui->openFileTabs->setTabText(ui->openFileTabs->currentIndex(), fi.fileName());
-			ui->openFileTabs->setTabToolTip(ui->openFileTabs->currentIndex(), fi.filePath());
-			saveFile.flush();
-			saveFile.close();
 		}
-	} else if(widgetType == "SpritesetView") {
-		SpritesetView* currentEditor = static_cast<SpritesetView*>(ui->openFileTabs->currentWidget());
+		QTextStream out(&saveFile);
+		out.setCodec("UTF-8");
+		out << currentEditor->document()->toPlainText();
+		ui->openFileTabs->setTabText(ui->openFileTabs->currentIndex(), fi.fileName());
+		ui->openFileTabs->setTabToolTip(ui->openFileTabs->currentIndex(), fi.filePath());
+		saveFile.flush();
+		saveFile.close();
+	} else if(widgetType == "SpritesetEditor") {
+		SpritesetEditor* currentEditor = dynamic_cast<SpritesetEditor*>(ui->openFileTabs->currentWidget());
 		QString saveFileName = QFileDialog::getSaveFileName(this,
 								"Save spriteset", "","Spriteset (*.rss);;All files (*)");
 		if(!currentEditor->spriteset->save(saveFileName)) {
@@ -220,10 +219,10 @@ void MainWindow::refreshProjectList() {
 
 }
 
-void MainWindow::openFile(QString fileName) {
+void MainWindow::openFile(QString filename) {
 	QString fn;
 
-	if(fileName == "") {
+	if(filename == "") {
 		QString usePath = QString();
 		if(this->project && this->project->getPath(false) != "") {
 			usePath = this->project->getPath(false);
@@ -238,7 +237,7 @@ void MainWindow::openFile(QString fileName) {
 			"All files (*.*)"
 		);
 	} else {
-		fn = fileName;
+		fn = filename;
 	}
 
 	if(fn == "") return;
@@ -256,7 +255,7 @@ void MainWindow::openFile(QString fileName) {
 	QFileInfo fi = QFileInfo(fn);
 	QString fileExtension = fi.suffix();
 	if(fileExtension == "rss") {
-		SpritesetView* ssView = new SpritesetView(this);
+		SpritesetEditor* ssView = new SpritesetEditor(this);
 		if(ssView->openFile(fi.filePath())) {
 			ssView->tabIndex = ui->openFileTabs->insertTab(0, ssView, fi.fileName());
 			ui->openFileTabs->setTabToolTip(0, file->fileName());
@@ -280,8 +279,8 @@ void MainWindow::openFile(QString fileName) {
 	}
 }
 
-void MainWindow::openProject(QString fileName) {
-	this->project = new QSIProject(fileName, this);
+void MainWindow::openProject(QString filename) {
+	this->project = new QSIProject(filename, this);
 	this->projectLoaded = true;
 	ui->menuProject->setEnabled(true);
 	this->updateTreeView();
@@ -369,7 +368,7 @@ void MainWindow::on_actionUndo_triggered() {
 
 	switch (currentEditor->editorType()) {
 	case SphereEditor::TextEditor: {
-		TextEditor* editor = static_cast<TextEditor*>(currentEditor);
+		TextEditor* editor = dynamic_cast<TextEditor*>(currentEditor);
 		editor->undo();
 		break;
 	}
@@ -502,7 +501,7 @@ void MainWindow::on_actionImage_to_Spriteset_triggered() {
 		);
 		if(!imported->valid) return;
 
-		SpritesetView* ssView = new SpritesetView(this);
+		SpritesetEditor* ssView = new SpritesetEditor(this);
 		ssView->attach(imported);
 		QFileInfo fi = QFileInfo(imagePath);
 		ssView->tabIndex = ui->openFileTabs->insertTab(0, ssView, fi.fileName());

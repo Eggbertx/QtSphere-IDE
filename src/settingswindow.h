@@ -28,7 +28,6 @@ private slots:
 
 	private:
 	Ui::SettingsWindow *ui;
-	MainWindow* mainWindow;
 	QString currentTheme;
 	QString newTheme;
 	void saveSettings();

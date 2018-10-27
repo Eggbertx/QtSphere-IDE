@@ -24,7 +24,7 @@ SOURCES += \
 	qsiproject.cpp \
 	projectpropertiesdialog.cpp \
 	formats/spriteset.cpp \
-	editors/spritesetview.cpp \
+	editors/spriteseteditor.cpp \
 	palettewidget.cpp \
 	imagechooser.cpp \
 	drawingwidget.cpp \
@@ -46,7 +46,7 @@ HEADERS += \
 	qsiproject.h \
 	projectpropertiesdialog.h \
 	formats/spriteset.h \
-	editors/spritesetview.h \
+    editors/spriteseteditor.h \
 	palettewidget.h \
 	imagechooser.h \
 	drawingwidget.h \
@@ -63,7 +63,7 @@ FORMS += \
 	modifiedfilesdialog.ui \
 	settingswindow.ui \
 	projectpropertiesdialog.ui \
-	editors/spritesetview.ui \
+	editors/spriteseteditor.ui \
 	drawingwidget.ui \
 	soundplayer.ui \
 	importoptionsdialog.ui \

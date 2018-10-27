@@ -73,7 +73,7 @@ QSIProject::QSIProject(QString path, QObject *parent) : QObject(parent) {
 			else if(key == "screenHeight") this->height = value.toInt();
 			else if(key == "screenWidth") this->width = value.toInt();
 		}
-	} else if(filename == "Cellscript.mjs" || filename == "Cellscript.mjs") {
+	} else if(filename == "Cellscript.mjs" || filename == "Cellscript.js") {
 		QString text = stream.readAll();
 		bool ok = false;
 		QRegularExpression nameRe("name[(\\s*=\\s*):\\s\"']*(.*)[\"']+", QRegularExpression::OptimizeOnFirstUsageOption);

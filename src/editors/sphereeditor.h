@@ -12,7 +12,7 @@ class SphereEditor : public QWidget {
 		void undo();
 		void redo();
 		int tabIndex;
-		enum Type { None, SpritesetView, TextEditor };
+		enum Type { None, SpritesetEditor, TextEditor };
 		Type editorType();
 	public slots:
 

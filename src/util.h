@@ -10,8 +10,6 @@
 
 int handleModifiedFiles();
 
-int question(QString title, QString message);
-
 QString getWidgetType(QObject* widget);
 
 void errorBox(QString message);
@@ -24,9 +22,9 @@ int readFile(QFile* file, void* into, int size);
 
 int writeFile(QFile* file, void* from, int size);
 
-QByteArray* imageBytes(QImage *image);
+QByteArray* imageBytes(QImage* image);
 
-void replaceColor(QImage *imgIn, QColor colorIn, QColor colorOut);
+void replaceColor(QImage* imgIn, QColor colorIn, QColor colorOut);
 
 QList<QImage> getUniqueImages(QList<QImage> list);
 

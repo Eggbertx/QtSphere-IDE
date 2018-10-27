@@ -5,13 +5,13 @@
 #include <QMenu>
 #include <QColor>
 #include <QList>
-#include "editors/spritesetview.h"
+#include "editors/spriteseteditor.h"
 
 class PaletteWidget : public QWidget {
 	Q_OBJECT
 
 public:
-	explicit PaletteWidget(SpritesetView *parent = 0);
+	explicit PaletteWidget(SpritesetEditor *parent = nullptr);
 	~PaletteWidget();
 	void changePalette(QColor palettearr[], int numColors);
 	void importPalette(QString path);

@@ -10,9 +10,9 @@
 #include <QSizePolicy>
 #include <QPaintEvent>
 #include "palettewidget.h"
-#include "editors/spritesetview.h"
+#include "editors/spriteseteditor.h"
 
-PaletteWidget::PaletteWidget(SpritesetView *parent): QWidget(parent) {
+PaletteWidget::PaletteWidget(SpritesetEditor *parent): QWidget(parent) {
 	this->installEventFilter(this);
 	this->paletteColors = QList<QColor>();
 	this->changePalette(hsl256_palette, 256);
@@ -55,7 +55,7 @@ void PaletteWidget::changePalette(QColor palettearr[], int numColors) {
 	repaint();
 }
 
-void PaletteWidget::importPalette(QString path) {
+void PaletteWidget::importPalette(const QString path) {
 	QFile* pal = new QFile(path);
 	if(!pal->open(QIODevice::ReadOnly)) return;
 	this->paletteColors.clear();
@@ -85,7 +85,7 @@ bool PaletteWidget::eventFilter(QObject* object, QEvent* event) {
 	(void)object;
 	switch(event->type()) {
 		case QEvent::MouseMove: {
-			this->mousePos = static_cast<QMouseEvent*>(event)->pos();
+			this->mousePos = dynamic_cast<QMouseEvent*>(event)->pos();
 			break;
 		}
 		case QEvent::Paint: {
@@ -111,7 +111,7 @@ bool PaletteWidget::eventFilter(QObject* object, QEvent* event) {
 			break;
 		}
 		case QEvent::MouseButtonPress: {
-			QMouseEvent* me = static_cast<QMouseEvent*>(event);
+			QMouseEvent* me = dynamic_cast<QMouseEvent*>(event);
 			int buttonPressed = me->button();
 			QPoint pos = me->pos();
 

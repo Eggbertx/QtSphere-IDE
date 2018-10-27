@@ -71,12 +71,12 @@ bool ImageChooser::eventFilter(QObject* object, QEvent* event) {
 			break;
 		}
 		case QEvent::MouseMove: {
-			QMouseEvent* me = static_cast<QMouseEvent*>(event);
+			QMouseEvent* me = dynamic_cast<QMouseEvent*>(event);
 			this->mousePos = me->pos();
 			break;
 		}
 		case QEvent::MouseButtonPress: {
-			QMouseEvent* me = static_cast<QMouseEvent*>(event);
+			QMouseEvent* me = dynamic_cast<QMouseEvent*>(event);
 			int buttonPressed = me->button();
 			if(buttonPressed == Qt::LeftButton || buttonPressed == Qt::RightButton) {
 				int numImages = this->images.length();

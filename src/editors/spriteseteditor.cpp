@@ -12,17 +12,17 @@
 #include <QToolButton>
 #include <QFileInfo>
 
-#include "spritesetview.h"
-#include "ui_spritesetview.h"
+#include "spriteseteditor.h"
+#include "ui_spriteseteditor.h"
 #include "palettewidget.h"
 #include "imagechooser.h"
 #include "editors/ssdirectionview.h"
 #include "formats/spriteset.h"
 #include "editors/sphereeditor.h"
 
-SpritesetView::SpritesetView(QWidget *parent): SphereEditor (parent), ui(new Ui::SpritesetView) {
+SpritesetEditor::SpritesetEditor(QWidget *parent): SphereEditor (parent), ui(new Ui::SpritesetEditor) {
 	ui->setupUi(this);
-	this->type = SphereEditor::SpritesetView;
+	this->type = SphereEditor::SpritesetEditor;
 	this->setContextMenuPolicy(Qt::CustomContextMenu);
 	connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
 			this, SLOT(showContextMenu(const QPoint&)));
@@ -53,13 +53,13 @@ SpritesetView::SpritesetView(QWidget *parent): SphereEditor (parent), ui(new Ui:
 	ui->dirsLayout->addStretch(5);
 }
 
-SpritesetView::~SpritesetView() {
+SpritesetEditor::~SpritesetEditor() {
 	delete ui;
 	disconnect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
 			   this, SLOT(showContextMenu(const QPoint&)));
 }
 
-bool SpritesetView::attach(Spriteset* spriteset) {
+bool SpritesetEditor::attach(Spriteset* spriteset) {
 	this->spriteset = spriteset;
 	this->images->setImages(spriteset->images);
 	if(this->spriteset->images.length() == 0) return true;
@@ -79,13 +79,13 @@ bool SpritesetView::attach(Spriteset* spriteset) {
 	return true;
 }
 
-bool SpritesetView::openFile(QString filename) {
+bool SpritesetEditor::openFile(QString filename) {
 	bool success = this->spriteset->open(filename);
 	if(!success) return false;
 	return this->attach(this->spriteset);
 }
 
-void SpritesetView::addDirection(QString name, int numFrames) {
+void SpritesetEditor::addDirection(QString name, int numFrames) {
 	Spriteset::SSDirection direction;
 	direction.name = "";
 	direction.frames = QList<Spriteset::SSFrame>();
@@ -98,7 +98,7 @@ void SpritesetView::addDirection(QString name, int numFrames) {
 	ui->dirsContainer->addWidget(dirView);
 }
 
-void SpritesetView::addDirection(Spriteset::SSDirection direction) {
+void SpritesetEditor::addDirection(Spriteset::SSDirection direction) {
 	SSDirectionView* dirView = new SSDirectionView(direction.name, direction.frames.length(), &direction, this);
 
 	for(int f = 0; f < direction.frames.length(); f++) {
@@ -108,7 +108,7 @@ void SpritesetView::addDirection(Spriteset::SSDirection direction) {
 	ui->dirsContainer->addWidget(dirView);
 }
 
-void SpritesetView::showContextMenu(const QPoint &pos) {
+void SpritesetEditor::showContextMenu(const QPoint &pos) {
 	QMenu menu(this);
 	menu.addAction("Add direction");
 	QAction* result = menu.exec(this->mapToGlobal(pos));
@@ -118,6 +118,6 @@ void SpritesetView::showContextMenu(const QPoint &pos) {
 	}
 }
 
-void SpritesetView::on_animDirChoose_currentIndexChanged(int index) {
+void SpritesetEditor::on_animDirChoose_currentIndexChanged(int index) {
 
 }
