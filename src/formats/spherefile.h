@@ -24,6 +24,7 @@ class SphereFile : public QObject {
 	public slots:
 
 	protected:
+		QString readNextString();
 		QFile* file;
 };
 

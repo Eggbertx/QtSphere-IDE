@@ -5,3 +5,4 @@ temp_files/
 Makefile*
 qrc_qsires.cpp
 **/*.bak
+.vscode/

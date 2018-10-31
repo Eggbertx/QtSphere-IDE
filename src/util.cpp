@@ -49,10 +49,11 @@ void infoBox(QString info) {
 
 int readFile(QFile* file, void* into, int size) {
 	if(size < 1) return true;
-	if(!file->exists()) {
+
+	/*if(!file->exists()) {
 		errorBox(file->fileName() +" doesn't exist!");
 		return false;
-	}
+	}*/
 	if(!file->isOpen()){
 		if(!file->open(QIODevice::ReadOnly)) {
 			errorBox("Failed opening " + file->fileName() + " for reading");
@@ -73,6 +74,11 @@ int writeFile(QFile *file, void *from, int size) {
 	int numBytes = file->write(reinterpret_cast<char*>(from), size);
 	file->flush();
 	return numBytes;
+}
+
+void skipBytes(QFile* file, const int numBytes) {
+	uint8_t* dump = new uint8_t[numBytes];
+	file->read((char*)dump, numBytes);
 }
 
 void replaceColor(QImage *imgIn, QColor colorIn, QColor colorOut) {

@@ -3,7 +3,7 @@ QT += core gui multimedia
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = QtSphereIDE
 TEMPLATE = app
-VERSION = 0.4.0
+VERSION = 0.5.0
 DEFINES += QT_DEPRECATED_WARNINGS TARGET=\\\"$$TARGET\\\" VERSION=\\\"$$VERSION\\\"
 QMAKE_LFLAGS += -no-pie
 
@@ -33,7 +33,8 @@ SOURCES += \
 	importoptionsdialog.cpp \
 	startpage.cpp \
 	editors/sphereeditor.cpp \
-	editors/texteditor.cpp
+	editors/texteditor.cpp \
+	editors/mapeditor.cpp
 
 HEADERS += \
 	mainwindow.h \
@@ -55,7 +56,8 @@ HEADERS += \
 	importoptionsdialog.h \
 	startpage.h \
 	editors/sphereeditor.h \
-	editors/texteditor.h
+	editors/texteditor.h \
+	editors/mapeditor.h
 
 FORMS += \
 	mainwindow.ui \
@@ -67,7 +69,8 @@ FORMS += \
 	drawingwidget.ui \
 	soundplayer.ui \
 	importoptionsdialog.ui \
-	startpage.ui
+	startpage.ui \
+	editors/mapeditor.ui
 
 RESOURCES += res/qsires.qrc
 

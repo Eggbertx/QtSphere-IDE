@@ -24,10 +24,12 @@
 #include "importoptionsdialog.h"
 #include "projectpropertiesdialog.h"
 #include "settingswindow.h"
+#include "formats/mapfile.h"
 #include "formats/spriteset.h"
 #include "modifiedfilesdialog.h"
 #include "qsiproject.h"
 #include "soundplayer.h"
+#include "editors/mapeditor.h"
 #include "editors/sphereeditor.h"
 #include "editors/spriteseteditor.h"
 #include "editors/texteditor.h"
@@ -254,7 +256,17 @@ void MainWindow::openFile(QString filename) {
 	}
 	QFileInfo fi = QFileInfo(fn);
 	QString fileExtension = fi.suffix();
-	if(fileExtension == "rss") {
+	if(fileExtension == "rmp") {
+		MapEditor* rmpEditor = new MapEditor(this);
+		if(rmpEditor->openFile(fi.filePath())) {
+			rmpEditor->tabIndex = ui->openFileTabs->insertTab(0,rmpEditor, fi.fileName());
+			ui->openFileTabs->setTabToolTip(0, file->fileName());
+			ui->openFileTabs->setCurrentIndex(0);
+			this->openEditors.append(rmpEditor);
+		} else {
+			return;
+		}
+	} else if(fileExtension == "rss") {
 		SpritesetEditor* ssView = new SpritesetEditor(this);
 		if(ssView->openFile(fi.filePath())) {
 			ssView->tabIndex = ui->openFileTabs->insertTab(0, ssView, fi.fileName());

@@ -39,6 +39,7 @@ class Spriteset : public SphereFile {
 		bool valid;
 	private:
 		QString filename;
+		#pragma pack(push, 1)
 		typedef struct header_struct {
 			uint8_t signature[4];	// Must be ".rss"
 			uint16_t version;		// Must be 1 or 2, or 3
@@ -53,6 +54,7 @@ class Spriteset : public SphereFile {
 			uint8_t reserved[106];
 		}rss_header;
 		rss_header header;
+		#pragma pack(pop)
 
 };
 
