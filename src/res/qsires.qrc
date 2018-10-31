@@ -4,6 +4,8 @@
         <file>1385573251-24px.png</file>
         <file>icon.png</file>
         <file>transparency-bg.png</file>
+        <file>eye.png</file>
+        <file>eye-closed.png</file>
     </qresource>
     <qresource prefix="/text">
         <file>dark.qss</file>

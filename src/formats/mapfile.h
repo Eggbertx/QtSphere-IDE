@@ -99,6 +99,7 @@ class MapFile : public SphereFile {
 
 		typedef struct layer {
 			int index;
+			QString name;
 			layer_header header;
 			QList<uint8_t> tiles;
 		}layer;

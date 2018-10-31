@@ -1,6 +1,7 @@
 #ifndef MAPEDITOR_H
 #define MAPEDITOR_H
 
+#include <QGraphicsScene>
 #include <QWidget>
 #include "sphereeditor.h"
 #include "formats/mapfile.h"
@@ -20,6 +21,7 @@ class MapEditor : public SphereEditor {
 	private:
 		Ui::MapEditor *ui;
 		MapFile* mapFile;
+		QGraphicsScene* mapScene;
 
 };
 

@@ -78,9 +78,10 @@ bool MapFile::open(QString filename) {
 	for(int l = 0; l < this->header.num_layers; l++) {
 		layer cur_layer;
 		cur_layer.index = l;
-		this->file->read(reinterpret_cast<char*>(&cur_layer.header), sizeof(&cur_layer.header));
+		this->file->read(reinterpret_cast<char*>(&cur_layer.header), sizeof(cur_layer.header));
+		cur_layer.name = this->readNextString();
 
-		qDebug().nospace() << "Layer[" << this->readNextString() << "] data:\n" <<
+		qDebug().nospace() << "Layer[" << cur_layer.name << "] data:\n" <<
 			"Width: " << cur_layer.header.width << "\n" <<
 			"Height: " << cur_layer.header.height << "\n" <<
 			"Flags: " << cur_layer.header.flags << "\n" <<
