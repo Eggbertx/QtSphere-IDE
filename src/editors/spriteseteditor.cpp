@@ -71,8 +71,10 @@ bool SpritesetEditor::attach(Spriteset* spriteset) {
 	ui->animView->scene()->addItem(animFrame);
 
 	int num_directions = this->spriteset->directions.length();
+	ui->animDirChoose->clear();
 	for(int d = 0; d < num_directions; d++) {
 		Spriteset::SSDirection direction = this->spriteset->directions.at(d);
+		ui->animDirChoose->addItem(direction.name);
 		this->addDirection(direction);
 	}
 
