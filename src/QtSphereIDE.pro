@@ -35,8 +35,7 @@ SOURCES += \
 	editors/sphereeditor.cpp \
 	editors/texteditor.cpp \
 	editors/mapeditor.cpp \
-    formats/tileset.cpp \
-    tileview.cpp
+	formats/tileset.cpp
 
 HEADERS += \
 	mainwindow.h \
@@ -60,8 +59,7 @@ HEADERS += \
 	editors/sphereeditor.h \
 	editors/texteditor.h \
 	editors/mapeditor.h \
-    formats/tileset.h \
-    tileview.h
+	formats/tileset.h
 
 FORMS += \
 	mainwindow.ui \
