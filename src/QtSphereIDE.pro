@@ -3,7 +3,7 @@ QT += core gui multimedia
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = QtSphereIDE
 TEMPLATE = app
-VERSION = 0.5.1
+VERSION = 0.6.0
 DEFINES += QT_DEPRECATED_WARNINGS TARGET=\\\"$$TARGET\\\" VERSION=\\\"$$VERSION\\\"
 QMAKE_LFLAGS += -no-pie
 
@@ -34,7 +34,9 @@ SOURCES += \
 	startpage.cpp \
 	editors/sphereeditor.cpp \
 	editors/texteditor.cpp \
-	editors/mapeditor.cpp
+	editors/mapeditor.cpp \
+    formats/tileset.cpp \
+    tileview.cpp
 
 HEADERS += \
 	mainwindow.h \
@@ -57,7 +59,9 @@ HEADERS += \
 	startpage.h \
 	editors/sphereeditor.h \
 	editors/texteditor.h \
-	editors/mapeditor.h
+	editors/mapeditor.h \
+    formats/tileset.h \
+    tileview.h
 
 FORMS += \
 	mainwindow.ui \

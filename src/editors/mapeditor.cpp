@@ -1,7 +1,11 @@
 #include <QDebug>
+#include <QDir>
+#include <QFileInfo>
+#include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
 #include <QHBoxLayout>
 #include <QIcon>
+#include <QPixmap>
 #include <QPushButton>
 #include <QTableWidgetItem>
 #include <QWidget>
@@ -9,12 +13,18 @@
 #include "ui_mapeditor.h"
 #include "sphereeditor.h"
 #include "formats/mapfile.h"
+#include "formats/tileset.h"
 #include "util.h"
 
 MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEditor) {
 	ui->setupUi(this);
 	this->mapFile = new MapFile(this);
+	ui->tilesetView->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+	ui->tilesetView->setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
+	ui->mapView->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+	ui->mapView->setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
 	this->mapScene = new QGraphicsScene(ui->mapView);
+	this->tilesScene = new QGraphicsScene(ui->tilesetView);
 }
 
 MapEditor::~MapEditor() {
@@ -29,6 +39,10 @@ bool MapEditor::openFile(QString filename) {
 }
 
 bool MapEditor::attach(MapFile* attachedMap) {
+	Tileset attachedTileset;
+	QFileInfo mapFi(attachedMap->fileName());
+	attachedTileset.open(mapFi.dir().absoluteFilePath(attachedMap->tilesetFilename));
+
 	QList<MapFile::layer> layers = attachedMap->getLayers();
 	int numLayers = layers.length();
 	ui->layersTable->setRowCount(0);
@@ -58,13 +72,24 @@ bool MapEditor::attach(MapFile* attachedMap) {
 		deleteLayerWidget->setLayout(deleteLayout);
 		ui->layersTable->setCellWidget(l,2,deleteLayerWidget);
 
-		int num_tiles = cur_layer.tiles.length();
-		for(int t = 0; t < num_tiles; t++) {
-			uint8_t cur_tile = cur_layer.tiles.at(t);
+		for(int t = 0; t < cur_layer.tiles.length(); t++) {
+			uint16_t cur_tile = cur_layer.tiles.at(t);
+			QGraphicsPixmapItem* tilePixmap = this->mapScene->addPixmap(QPixmap::fromImage(attachedTileset.getImage(cur_tile)));
+			tilePixmap->setZValue(l);
 
+			int x = t % cur_layer.header.width;
+			int y = (t - x) / cur_layer.header.width;
+			tilePixmap->setOffset(x * attachedTileset.header.tile_width,y * attachedTileset.header.tile_height);
 		}
-
-		ui->mapView->setScene(this->mapScene);
+		ui->tilesetBox->setTitle("Tiles (" + QString::number(attachedTileset.header.num_tiles) + ")");
 	}
+	ui->mapView->setScene(this->mapScene);
+	QList<QImage> images = attachedTileset.getTileImages();
+
+	for(int i = 0; i < images.length(); i++) {
+		QGraphicsPixmapItem* tilePixmap = this->tilesScene->addPixmap(QPixmap::fromImage(images.at(i)));
+		tilePixmap->setOffset(i*attachedTileset.header.tile_width+16,10)		;
+	}
+	ui->tilesetView->setScene(this->tilesScene);
 	return true;
 }

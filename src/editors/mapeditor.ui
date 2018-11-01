@@ -39,7 +39,7 @@
       <property name="childrenCollapsible">
        <bool>false</bool>
       </property>
-      <widget class="QGroupBox" name="tilesetView">
+      <widget class="QGroupBox" name="tilesetBox">
        <property name="title">
         <string>Tiles</string>
        </property>
@@ -57,11 +57,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="QWidget" name="widget" native="true">
-          <property name="styleSheet">
-           <string notr="true">background-color:black;</string>
-          </property>
-         </widget>
+         <widget class="QGraphicsView" name="tilesetView"/>
         </item>
        </layout>
       </widget>

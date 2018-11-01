@@ -22,6 +22,7 @@ class MapEditor : public SphereEditor {
 		Ui::MapEditor *ui;
 		MapFile* mapFile;
 		QGraphicsScene* mapScene;
+		QGraphicsScene* tilesScene;
 
 };
 

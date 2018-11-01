@@ -5,11 +5,7 @@
 SphereFile::SphereFile(QObject *parent) {}
 
 SphereFile::~SphereFile() {
-	if(this->file != nullptr) {
-		if(this->file->isOpen())
-			this->file->close();
-		delete this->file;
-	}
+	//delete this->file;
 }
 
 void SphereFile::createNew() {}

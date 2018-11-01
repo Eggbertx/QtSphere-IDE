@@ -1,7 +1,8 @@
-#include <QFile>
 #include <QByteArray>
 #include <QDebug>
-
+#include <QFile>
+#include <QRect>
+#include <stdio.h>
 #include "spherefile.h"
 #include "mapfile.h"
 #include "util.h"
@@ -12,6 +13,7 @@ MapFile::MapFile(QObject *parent) : SphereFile(parent) {
 
 bool MapFile::open(QString filename) {
 	this->file = new QFile(filename);
+
 	if(!this->file->open(QIODevice::ReadOnly)) {
 		errorBox("ERROR: Could not read file " + filename + ": " + this->file->errorString());
 		return false;
@@ -54,7 +56,7 @@ bool MapFile::open(QString filename) {
 
 	}
 
-	qDebug() <<  filename << "data:\n" <<
+	/*qDebug() <<  filename << "data:\n" <<
 		"Version:" << header.version << "\n" <<
 		"Type:" << header.type << "\n" <<
 		"Layers:" << header.num_layers << "\n" <<
@@ -73,15 +75,16 @@ bool MapFile::open(QString filename) {
 		"North script:" << this->northScript << "\n" <<
 		"East script:" << this->eastScript << "\n" <<
 		"South script:" << this->southScript << "\n" <<
-		"West script:" << this->westScript;
+		"West script:" << this->westScript;*/
 
 	for(int l = 0; l < this->header.num_layers; l++) {
 		layer cur_layer;
 		cur_layer.index = l;
+
 		this->file->read(reinterpret_cast<char*>(&cur_layer.header), sizeof(cur_layer.header));
 		cur_layer.name = this->readNextString();
 
-		qDebug().nospace() << "Layer[" << cur_layer.name << "] data:\n" <<
+		/*qDebug().nospace() << "Layer[" << cur_layer.name << "] data:\n" <<
 			"Width: " << cur_layer.header.width << "\n" <<
 			"Height: " << cur_layer.header.height << "\n" <<
 			"Flags: " << cur_layer.header.flags << "\n" <<
@@ -90,13 +93,13 @@ bool MapFile::open(QString filename) {
 			"Scrolling X: " << cur_layer.header.scrolling_x << "\n" <<
 			"Scrolling Y: " << cur_layer.header.scrolling_y << "\n" <<
 			"Num segments: " << cur_layer.header.num_segments << "\n" <<
-			"Reflective: " << cur_layer.header.reflective;
+			"Reflective: " << cur_layer.header.reflective;*/
 
-		int num_bytes = cur_layer.header.width * cur_layer.header.height * 2;
+		int num_bytes = cur_layer.header.width * cur_layer.header.height;
 		for(int b = 0; b < num_bytes; b++) {
-			uint8_t layer_byte;
-			this->file->read(reinterpret_cast<char*>(&layer_byte), 1);
-			cur_layer.tiles.append(layer_byte);
+			uint16_t tile_index;
+			this->file->read(reinterpret_cast<char*>(&tile_index), 2);
+			cur_layer.tiles.append(tile_index);
 		}
 		this->layers.append(cur_layer);
 
@@ -133,8 +136,8 @@ bool MapFile::open(QString filename) {
 			cur_entity.on_activate_talk = this->readNextString();
 			cur_entity.generate_commands = this->readNextString();
 			skipBytes(this->file, 16);
-			qDebug() << "Entity name:" << cur_entity.name << "\n" <<
-						"Entity spriteset:" << cur_entity.spriteset;
+			/*qDebug() << "Entity name:" << cur_entity.name << "\n" <<
+						"Entity spriteset:" << cur_entity.spriteset;*/
 		}
 		break;
 		case 2: {
@@ -164,6 +167,19 @@ bool MapFile::save(QString filename) {
 	bool success = false;
 
 	return success;
+}
+
+QRect* MapFile::largestLayerRect() {
+	int largestWidth = 0;
+	int largestHeight = 0;
+	for(int i = 0; i < this->layers.length(); i++) {
+		layer_header cur_header = this->layers.at(i).header;
+		if(cur_header.width > largestWidth && cur_header.height > largestHeight) {
+			largestWidth = cur_header.width;
+			largestHeight = cur_header.height;
+		}
+	}
+	return new QRect(0, 0, largestWidth, largestHeight);
 }
 
 QList<MapFile::layer> MapFile::getLayers() {

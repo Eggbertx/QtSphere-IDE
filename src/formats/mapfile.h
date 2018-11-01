@@ -16,7 +16,7 @@ class MapFile : public SphereFile {
 		bool save(QString filename) override;
 		bool mapOrigin();
 		void setParallax(bool is_parallax, float mult_x, float mult_y, float scrollspeed_x, float scrollspeed_y);
-
+		QRect *largestLayerRect();
 
 		QString tilesetFilename;
 		QString musicFilename;
@@ -55,7 +55,7 @@ class MapFile : public SphereFile {
 			float		parallax_y;
 			float		scrolling_x;
 			float		scrolling_y;
-			int32_t		num_segments;
+			uint32_t	num_segments;
 			uint8_t		reflective;
 			uint8_t		reserved[3];
 		}layer_header;
@@ -101,7 +101,7 @@ class MapFile : public SphereFile {
 			int index;
 			QString name;
 			layer_header header;
-			QList<uint8_t> tiles;
+			QList<uint16_t> tiles;
 		}layer;
 
 		QList<layer> getLayers();
