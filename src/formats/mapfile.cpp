@@ -101,6 +101,7 @@ bool MapFile::open(QString filename) {
 			this->file->read(reinterpret_cast<char*>(&tile_index), 2);
 			cur_layer.tiles.append(tile_index);
 		}
+		cur_layer.visible = true;
 		this->layers.append(cur_layer);
 
 		for(int s = 0; s < cur_layer.header.num_segments; s++) {
@@ -184,6 +185,10 @@ QRect* MapFile::largestLayerRect() {
 
 QList<MapFile::layer> MapFile::getLayers() {
 	return this->layers;
+}
+
+MapFile::layer* MapFile::getLayer(int index) {
+	return &this->layers[index];
 }
 
 int MapFile::getTileIndex(int l, int x, int y) {

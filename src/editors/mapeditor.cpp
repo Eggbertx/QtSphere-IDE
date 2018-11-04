@@ -1,14 +1,8 @@
-#include <QDebug>
-#include <QDir>
+﻿#include <QDir>
 #include <QFileInfo>
 #include <QGraphicsPixmapItem>
-#include <QGraphicsScene>
-#include <QHBoxLayout>
-#include <QIcon>
-#include <QPixmap>
-#include <QPushButton>
-#include <QTableWidgetItem>
-#include <QWidget>
+#include <QLabel>
+
 #include "mapeditor.h"
 #include "ui_mapeditor.h"
 #include "sphereeditor.h"
@@ -45,43 +39,33 @@ bool MapEditor::attach(MapFile* attachedMap) {
 
 	QList<MapFile::layer> layers = attachedMap->getLayers();
 	int numLayers = layers.length();
-	ui->layersTable->setRowCount(0);
-	for(int l = 0; l < numLayers; l++) {
-		MapFile::layer cur_layer = layers.at(numLayers-l-1);
+	ui->layersTable->clear();
+	ui->layersTable->setRowCount(numLayers);
+	for(int l = numLayers; l > 0; l--) {
+		int i = numLayers - l;
+		MapFile::layer cur_layer = layers.at(i);
 
-		ui->layersTable->insertRow(l);
-		QWidget* eyeWidget = new QWidget();
-		QHBoxLayout* eyeLayout = new QHBoxLayout(eyeWidget);
-		QPushButton* eyeButton = new QPushButton(QIcon(":/icons/eye.png"),"");
-		eyeButton->setStyleSheet("background-color:#00FFFFFF;");
-		eyeLayout->addWidget(eyeButton);
-		eyeLayout->setAlignment(Qt::AlignCenter);
-		eyeLayout->setContentsMargins(0,0,0,0);
-		eyeWidget->setLayout(eyeLayout);
-		ui->layersTable->setCellWidget(l,0,eyeWidget);
+		QLabel* eyeLabel = new QLabel();
+		//eyeLabel->setScaledContents(true);
+		eyeLabel->setPixmap(QPixmap(":/icons/eye.png"));
+		eyeLabel->setAlignment(Qt::AlignCenter);
+		ui->layersTable->setCellWidget(l-1,0,eyeLabel);
 
-		ui->layersTable->setItem(l,1, new QTableWidgetItem(cur_layer.name));
+		ui->layersTable->setItem(l-1,1, new QTableWidgetItem(cur_layer.name));
 
-		QWidget* deleteLayerWidget = new QWidget();
-		QHBoxLayout* deleteLayout = new QHBoxLayout(deleteLayerWidget);
-		QPushButton* deleteLayerBtn = new QPushButton("X");
-		deleteLayerBtn->setStyleSheet("color:red; background-color:#00FFFFFF;");
-		deleteLayout->addWidget(deleteLayerBtn);
-		deleteLayout->setAlignment(Qt::AlignCenter);
-		deleteLayout->setContentsMargins(0, 0, 0, 0);
-		deleteLayerWidget->setLayout(deleteLayout);
-		ui->layersTable->setCellWidget(l,2,deleteLayerWidget);
+		QLabel* deleteLabel = new QLabel("X");
+		deleteLabel->setStyleSheet("color:red;");
+		deleteLabel->setAlignment(Qt::AlignCenter);
+		ui->layersTable->setCellWidget(l-1,2,deleteLabel);
 
 		for(int t = 0; t < cur_layer.tiles.length(); t++) {
 			uint16_t cur_tile = cur_layer.tiles.at(t);
 			QGraphicsPixmapItem* tilePixmap = this->mapScene->addPixmap(QPixmap::fromImage(attachedTileset.getImage(cur_tile)));
-			tilePixmap->setZValue(l);
 
 			int x = t % cur_layer.header.width;
 			int y = (t - x) / cur_layer.header.width;
 			tilePixmap->setOffset(x * attachedTileset.header.tile_width,y * attachedTileset.header.tile_height);
 		}
-		ui->tilesetBox->setTitle("Tiles (" + QString::number(attachedTileset.header.num_tiles) + ")");
 	}
 	ui->mapView->setScene(this->mapScene);
 	QList<QImage> images = attachedTileset.getTileImages();
@@ -91,5 +75,30 @@ bool MapEditor::attach(MapFile* attachedMap) {
 		tilePixmap->setOffset(i*attachedTileset.header.tile_width+16,10)		;
 	}
 	ui->tilesetView->setScene(this->tilesScene);
+	ui->tilesetBox->setTitle("Tiles (" + QString::number(attachedTileset.header.num_tiles) + ")");
 	return true;
+}
+
+void MapEditor::on_layersTable_cellClicked(int row, int column) {
+	switch(column) {
+		case 0: {
+			QWidget* item = ui->layersTable->cellWidget(row,column);
+			QLabel* eyeLabel = dynamic_cast<QLabel*>(item);
+			MapFile::layer* toggled_layer = this->mapFile->getLayer(row);
+			toggled_layer->visible = !toggled_layer->visible;
+
+			if(!toggled_layer->visible)
+				eyeLabel->setPixmap(QPixmap(":/icons/eye-closed.png"));
+			else
+				eyeLabel->setPixmap(QPixmap(":/icons/eye.png"));
+		}
+		break;
+		case 2: {
+			if(ui->layersTable->rowCount() > 1)
+				ui->layersTable->removeRow(row);
+		}
+		break;
+		default:
+		break;
+	}
 }

@@ -102,9 +102,11 @@ class MapFile : public SphereFile {
 			QString name;
 			layer_header header;
 			QList<uint16_t> tiles;
+			bool visible; // this is used by MapEditor
 		}layer;
 
 		QList<layer> getLayers();
+		layer* getLayer(int index);
 		int getTileIndex(int l, int x, int y);
 	signals:
 

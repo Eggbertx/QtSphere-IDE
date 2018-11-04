@@ -18,6 +18,10 @@ class MapEditor : public SphereEditor {
 		~MapEditor();
 		bool openFile(QString filename);
 		bool attach(MapFile* attachedMap);
+
+	private slots:
+		void on_layersTable_cellClicked(int row, int column);
+
 	private:
 		Ui::MapEditor *ui;
 		MapFile* mapFile;
