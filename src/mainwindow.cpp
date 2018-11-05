@@ -79,9 +79,9 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	toolButtonAction->setDefaultWidget(toolButton);
 	ui->mainToolBar->insertAction(ui->toolbarOpenButton,toolButtonAction);
 
-	QList<int> mainSplitterList;
-	mainSplitterList << 150 << this->width()-150;
-	ui->splitter->setSizes(mainSplitterList);
+	ui->splitter->setStretchFactor(1,4);
+	ui->splitter->setSizes(QList<int>({200, this->width()-200}));
+
 	this->project = new QSIProject("", this);
 
 	this->soundPlayer = new SoundPlayer();

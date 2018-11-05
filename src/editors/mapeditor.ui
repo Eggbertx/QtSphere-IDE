@@ -27,12 +27,12 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QSplitter" name="splitter_2">
+    <widget class="QSplitter" name="mainSplitter">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QGraphicsView" name="mapView"/>
-     <widget class="QSplitter" name="splitter">
+     <widget class="QSplitter" name="sideSplitter">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
@@ -70,8 +70,26 @@
          <string>Layers</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
          <item>
           <widget class="QTableWidget" name="layersTable">
+           <property name="contextMenuPolicy">
+            <enum>Qt::CustomContextMenu</enum>
+           </property>
            <property name="selectionMode">
             <enum>QAbstractItemView::SingleSelection</enum>
            </property>
@@ -113,11 +131,51 @@
         <attribute name="title">
          <string>Entities</string>
         </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_4">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QTableWidget" name="entitiesTable"/>
+         </item>
+        </layout>
        </widget>
        <widget class="QWidget" name="zonesTab">
         <attribute name="title">
          <string>Zones</string>
         </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QTableWidget" name="zonesTable"/>
+         </item>
+        </layout>
        </widget>
       </widget>
      </widget>

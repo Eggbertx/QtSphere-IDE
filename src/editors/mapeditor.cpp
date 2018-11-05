@@ -19,6 +19,12 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	ui->mapView->setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
 	this->mapScene = new QGraphicsScene(ui->mapView);
 	this->tilesScene = new QGraphicsScene(ui->tilesetView);
+	ui->layersTable->setColumnWidth(0,48);
+	ui->layersTable->setColumnWidth(2,24);
+	ui->layersTable->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Fixed);
+	ui->layersTable->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
+	ui->layersTable->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Fixed);
+	ui->mainSplitter->setStretchFactor(0,1);
 }
 
 MapEditor::~MapEditor() {
@@ -46,7 +52,7 @@ bool MapEditor::attach(MapFile* attachedMap) {
 		MapFile::layer cur_layer = layers.at(i);
 
 		QLabel* eyeLabel = new QLabel();
-		//eyeLabel->setScaledContents(true);
+		eyeLabel->setToolTip("Toggle layer visibility");
 		eyeLabel->setPixmap(QPixmap(":/icons/eye.png"));
 		eyeLabel->setAlignment(Qt::AlignCenter);
 		ui->layersTable->setCellWidget(l-1,0,eyeLabel);
@@ -54,7 +60,8 @@ bool MapEditor::attach(MapFile* attachedMap) {
 		ui->layersTable->setItem(l-1,1, new QTableWidgetItem(cur_layer.name));
 
 		QLabel* deleteLabel = new QLabel("X");
-		deleteLabel->setStyleSheet("color:red;");
+		deleteLabel->setToolTip("Delete layer");
+		deleteLabel->setStyleSheet("color:red;font-weight:bold;");
 		deleteLabel->setAlignment(Qt::AlignCenter);
 		ui->layersTable->setCellWidget(l-1,2,deleteLabel);
 
@@ -76,6 +83,7 @@ bool MapEditor::attach(MapFile* attachedMap) {
 	}
 	ui->tilesetView->setScene(this->tilesScene);
 	ui->tilesetBox->setTitle("Tiles (" + QString::number(attachedTileset.header.num_tiles) + ")");
+	ui->layersTable->selectRow(0);
 	return true;
 }
 

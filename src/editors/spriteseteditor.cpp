@@ -16,6 +16,7 @@
 #include "ui_spriteseteditor.h"
 #include "palettewidget.h"
 #include "imagechooser.h"
+#include "mainwindow.h"
 #include "editors/ssdirectionview.h"
 #include "formats/spriteset.h"
 #include "editors/sphereeditor.h"
@@ -41,13 +42,10 @@ SpritesetEditor::SpritesetEditor(QWidget *parent): SphereEditor (parent), ui(new
 	ui->ssImages->setWidget(this->images);
 	ui->ssImages->setAlignment(Qt::AlignLeft|Qt::AlignTop);
 
-	QList<int> sizes;
-	sizes << 600 << 100;
-	ui->ssViewSplitter->setSizes(sizes);
-	sizes.clear();
-	sizes << 200 << 150 << 200;
-	ui->choosers->setSizes(sizes);
-	sizes.clear();
+	int mainWidth = MainWindow::instance()->width();
+	ui->ssViewSplitter->setStretchFactor(0,4);
+	ui->ssViewSplitter->setSizes(QList<int>({mainWidth-164,164}));
+	ui->choosers->setSizes(QList<int>({200,150,200}));
 
 	ui->animView->setBackgroundBrush(QBrush(QPixmap(":/icons/transparency-bg.png")));
 	ui->dirsLayout->addStretch(5);
