@@ -174,7 +174,7 @@ void MainWindow::saveCurrentTab() {
 		QTextEdit* currentEditor = dynamic_cast<QTextEdit*>(ui->openFileTabs->currentWidget());
 
 		QString saveFileName = QFileDialog::getSaveFileName(this,
-								"Save script", "","Script (*.js);;Text file (*.txt);;All files (*)");
+							"Save script", "","Script (*.mjs *.js);;Text file (*.txt);;All files (*)");
 		QFile saveFile(saveFileName);
 		QFileInfo fi(saveFile);
 		if(!saveFile.open(QIODevice::WriteOnly)) {

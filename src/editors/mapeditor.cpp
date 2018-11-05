@@ -39,10 +39,6 @@ bool MapEditor::openFile(QString filename) {
 }
 
 bool MapEditor::attach(MapFile* attachedMap) {
-	Tileset attachedTileset;
-	QFileInfo mapFi(attachedMap->fileName());
-	attachedTileset.open(mapFi.dir().absoluteFilePath(attachedMap->tilesetFilename));
-
 	QList<MapFile::layer> layers = attachedMap->getLayers();
 	int numLayers = layers.length();
 	ui->layersTable->clear();
@@ -67,22 +63,22 @@ bool MapEditor::attach(MapFile* attachedMap) {
 
 		for(int t = 0; t < cur_layer.tiles.length(); t++) {
 			uint16_t cur_tile = cur_layer.tiles.at(t);
-			QGraphicsPixmapItem* tilePixmap = this->mapScene->addPixmap(QPixmap::fromImage(attachedTileset.getImage(cur_tile)));
+			QGraphicsPixmapItem* tilePixmap = this->mapScene->addPixmap(QPixmap::fromImage(attachedMap->tileset->getImage(cur_tile)));
 
 			int x = t % cur_layer.header.width;
 			int y = (t - x) / cur_layer.header.width;
-			tilePixmap->setOffset(x * attachedTileset.header.tile_width,y * attachedTileset.header.tile_height);
+			tilePixmap->setOffset(x * attachedMap->tileset->header.tile_width,y * attachedMap->tileset->header.tile_height);
 		}
 	}
 	ui->mapView->setScene(this->mapScene);
-	QList<QImage> images = attachedTileset.getTileImages();
+	QList<QImage> images = attachedMap->tileset->getTileImages();
 
 	for(int i = 0; i < images.length(); i++) {
 		QGraphicsPixmapItem* tilePixmap = this->tilesScene->addPixmap(QPixmap::fromImage(images.at(i)));
-		tilePixmap->setOffset(i*attachedTileset.header.tile_width+16,10)		;
+		tilePixmap->setOffset(i*attachedMap->tileset->header.tile_width+16,10)		;
 	}
 	ui->tilesetView->setScene(this->tilesScene);
-	ui->tilesetBox->setTitle("Tiles (" + QString::number(attachedTileset.header.num_tiles) + ")");
+	ui->tilesetBox->setTitle("Tiles (" + QString::number(attachedMap->tileset->header.num_tiles) + ")");
 	ui->layersTable->selectRow(0);
 	return true;
 }

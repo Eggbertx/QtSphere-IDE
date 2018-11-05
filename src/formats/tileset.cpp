@@ -1,3 +1,5 @@
+#include <QByteArray>
+#include <QDataStream>
 #include "spherefile.h"
 #include "tileset.h"
 #include "util.h"
@@ -6,27 +8,19 @@ Tileset::Tileset(QObject *parent) : SphereFile (parent) {
 
 }
 
-bool Tileset::open(QString filename) {
-	this->file = new QFile(filename);
-	if(!this->file->open(QIODevice::ReadOnly)) {
-		errorBox("ERROR: Could not read file " + filename + ": " + this->file->errorString());
-		return false;
-	}
-
-	this->file->read(reinterpret_cast<char*>(&this->header), sizeof(this->header));
+bool Tileset::readBytes(QByteArray arr) {
+	QDataStream stream(&arr, QIODevice::ReadOnly);
+	stream.readRawData(reinterpret_cast<char*>(&this->header), sizeof (this->header));
 	if(memcmp(this->header.signature, ".rts", 4) != 0) {
-		errorBox("Error: " + QString(filename) + " is not a valid tileset file (invalid signature)!");
-		this->file->close();
+		errorBox("Error: " + QString(this->fileName()) + " is not a valid tileset file (invalid signature)!");
 		return false;
 	}
 	if(this->header.version != 1) {
 		errorBox("Error: Invalid tileset version (must be 1)!");
-		this->file->close();
 		return false;
 	}
 	if(this->header.tile_width < 1 || this->header.tile_height < 1) {
 		errorBox("Error: Invalid tile resolution (Must be > 0)!");
-		this->file->close();
 		return false;
 	}
 
@@ -36,7 +30,7 @@ bool Tileset::open(QString filename) {
 		int num_img_bytes = this->header.tile_width * this->header.tile_height * 4;
 		unsigned char* image_bytes = new unsigned char[num_img_bytes];
 
-		this->file->read(reinterpret_cast<char*>(image_bytes), num_img_bytes);
+		stream.readRawData(reinterpret_cast<char*>(image_bytes), num_img_bytes);
 
 		cur_tile.image = QImage(
 			image_bytes,
@@ -46,10 +40,20 @@ bool Tileset::open(QString filename) {
 		this->tiles.append(cur_tile);
 	}
 	for(int t = 0; t < this->header.num_tiles; t++) {
-		this->file->read(reinterpret_cast<char*>(&this->tiles[t].info), sizeof(this->tiles[t].info));
+		stream.readRawData(reinterpret_cast<char*>(&this->tiles[t].info), sizeof(this->tiles[t].info));
 	}
-
 	return true;
+}
+
+bool Tileset::open(QString filename) {
+	QByteArray arr;
+
+	this->file = new QFile(filename);
+	if(!this->file->open(QIODevice::ReadOnly)) {
+		errorBox("ERROR: Could not read file " + filename + ": " + this->file->errorString());
+		return false;
+	}
+	return this->readBytes(this->file->readAll());
 }
 
 bool Tileset::save(QString filename) {

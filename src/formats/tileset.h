@@ -11,6 +11,7 @@ class Tileset : public SphereFile {
 
 		bool open(QString filename) override;
 		bool save(QString filename) override;
+		bool readBytes(QByteArray arr);
 
 		int getDelay(int index);
 		void setDelay(int index);

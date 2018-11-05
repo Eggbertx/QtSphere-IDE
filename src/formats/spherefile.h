@@ -18,7 +18,7 @@ class SphereFile : public QObject {
 		QString fileName();
 		QString getBaseName();
 		QString filePath();
-		enum Type { Font, Map, Package, Spriteset, Tileset, WindowStyle }; // binary types
+		enum Type { Font, Map, Package, Spriteset, TilesetFile, WindowStyle }; // binary types
 	signals:
 
 	public slots:

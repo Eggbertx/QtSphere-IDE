@@ -4,7 +4,8 @@
 #include <QObject>
 #include <QGraphicsView>
 
-#include "spherefile.h"
+#include "formats/spherefile.h"
+#include "formats/tileset.h"
 
 class MapFile : public SphereFile {
 	Q_OBJECT
@@ -102,12 +103,14 @@ class MapFile : public SphereFile {
 			QString name;
 			layer_header header;
 			QList<uint16_t> tiles;
-			bool visible; // this is used by MapEditor
+			bool visible; // this is used by MapEditor and isn't saved to/loaded from the file
 		}layer;
 
 		QList<layer> getLayers();
 		layer* getLayer(int index);
 		int getTileIndex(int l, int x, int y);
+		Tileset* tileset;
+
 	signals:
 
 	public slots:

@@ -1,10 +1,13 @@
 #include <QByteArray>
 #include <QDebug>
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QRect>
 #include <stdio.h>
 #include "spherefile.h"
 #include "mapfile.h"
+#include "formats/tileset.h"
 #include "util.h"
 
 MapFile::MapFile(QObject *parent) : SphereFile(parent) {
@@ -49,11 +52,6 @@ bool MapFile::open(QString filename) {
 		this->eastScript = this->readNextString();
 		this->southScript = this->readNextString();
 		this->westScript = this->readNextString();
-	}
-	if(this->tilesetFilename == "") {
-
-	} else {
-
 	}
 
 	/*qDebug() <<  filename << "data:\n" <<
@@ -160,6 +158,13 @@ bool MapFile::open(QString filename) {
 		this->zones.append(cur_zone);
 	}
 
+	this->tileset = new Tileset(this);
+	if(this->tilesetFilename == "") {
+		this->tileset->readBytes(this->file->readAll());
+	} else {
+		QFileInfo fi(this->fileName());
+		this->tileset->open(fi.dir().absoluteFilePath(this->tilesetFilename));
+	}
 	this->file->close();
 	return true;
 }

@@ -2,9 +2,9 @@
 Version=1.0
 Name=QtSphere IDE
 Comment=A cross-platform IDE for the miniSphere game engine
-Exec=/home/josh/src/QtSphere-IDE/build/QtSphereIDE
+Exec=./build/QtSphereIDE
 MimeType=application/x-sphere-spk;application/x-sphere-sgm;application/x-sphere-s2gm;
-Icon=/home/josh/src/QtSphere-IDE/src/res/icon.png
+Icon=./src/res/icon.png
 Terminal=false;
 Type=Application
 Categories=Application;Development;
