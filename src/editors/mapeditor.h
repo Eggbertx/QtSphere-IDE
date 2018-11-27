@@ -2,6 +2,7 @@
 #define MAPEDITOR_H
 
 #include <QGraphicsScene>
+#include <QToolBar>
 #include <QWidget>
 #include "sphereeditor.h"
 #include "formats/mapfile.h"
@@ -21,13 +22,16 @@ class MapEditor : public SphereEditor {
 
 	private slots:
 		void on_layersTable_cellClicked(int row, int column);
+		void setPencilSize(QAction* size);
 
 	private:
 		Ui::MapEditor *ui;
 		MapFile* mapFile;
 		QGraphicsScene* mapScene;
 		QGraphicsScene* tilesScene;
-
+		QToolBar* menuBar;
+		QMenu* pencilMenu;
+		int pencilSize;
 };
 
 #endif // MAPEDITOR_H

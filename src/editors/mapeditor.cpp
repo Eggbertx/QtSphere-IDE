@@ -2,6 +2,9 @@
 #include <QFileInfo>
 #include <QGraphicsPixmapItem>
 #include <QLabel>
+#include <QMenu>
+#include <QToolBar>
+#include <QToolButton>
 
 #include "mapeditor.h"
 #include "ui_mapeditor.h"
@@ -12,6 +15,46 @@
 
 MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEditor) {
 	ui->setupUi(this);
+	this->menuBar = new QToolBar();
+	this->menuBar->setFixedHeight(32);
+
+	this->pencilMenu = new QMenu(this);
+
+	QList<QAction*> pencilActions({
+		new QAction(QIcon(":/icons/1x1grid.png"), "1x1"),
+		new QAction(QIcon(":/icons/3x3grid.png"), "3x3"),
+		new QAction(QIcon(":/icons/5x5grid.png"), "5x5")
+	});
+
+	this->pencilSize = 1;
+	this->pencilMenu->addActions(pencilActions);
+	this->pencilMenu->setDefaultAction(pencilActions.at(0));
+
+	QToolButton* pencilMenuButton = new QToolButton();
+	pencilMenuButton->setText("Pencil");
+	pencilMenuButton->setIcon(QIcon(":/icons/pencil.png"));
+	pencilMenuButton->setMenu(this->pencilMenu);
+	pencilMenuButton->setPopupMode(QToolButton::MenuButtonPopup);
+	this->menuBar->addWidget(pencilMenuButton);
+	connect(this->pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
+
+	QAction* lineToolButton = new QAction("Line");
+	lineToolButton->setIcon(QIcon(":/icons/linetool.png"));
+	this->menuBar->addAction(lineToolButton);
+
+	QAction* rectToolButton = new QAction("Rectangle");
+	rectToolButton ->setIcon(QIcon(":/icons/rectangletool.png"));
+	this->menuBar->addAction(rectToolButton );
+
+	QAction* fillToolButton = new QAction("Fill layer");
+	fillToolButton->setIcon(QIcon(":/icons/paintbucket.png"));
+	this->menuBar->addAction(fillToolButton);
+
+	QAction* tilePickerButton = new QAction("Select tile");
+	tilePickerButton ->setIcon(QIcon(":/icons/dropper.png"));
+	this->menuBar->addAction(tilePickerButton );
+
+	ui->mapViewLayout->setMenuBar(this->menuBar);
 	this->mapFile = new MapFile(this);
 	ui->tilesetView->setAlignment(Qt::AlignLeft|Qt::AlignTop);
 	ui->tilesetView->setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
@@ -31,6 +74,7 @@ MapEditor::~MapEditor() {
 	delete ui;
 	delete this->mapFile;
 	delete this->mapScene;
+	disconnect(this->pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
 }
 
 bool MapEditor::openFile(QString filename) {
@@ -105,4 +149,16 @@ void MapEditor::on_layersTable_cellClicked(int row, int column) {
 		default:
 		break;
 	}
+}
+
+void MapEditor::setPencilSize(QAction *size) {
+	QString actionText = size->text();
+	if(actionText == "1x1") {
+		this->pencilSize = 1;
+	} else if(actionText == "3x3") {
+		this->pencilSize = 3;
+	} else if(actionText == "5x5") {
+		this->pencilSize = 5;
+	}
+	this->pencilMenu->setDefaultAction(size);
 }

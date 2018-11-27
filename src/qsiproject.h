@@ -1,6 +1,7 @@
 #ifndef QSIPROJECT_H
 #define QSIPROJECT_H
 
+#include <QFile>
 #include <QObject>
 
 class QSIProject : public QObject {
@@ -30,7 +31,10 @@ class QSIProject : public QObject {
 	private:
 		QString path;
 		QString projectPath;
-		QString compler;
+		QString compiler;
+		bool readSSProj(QFile* projectFile);
+		bool readCellscript(QFile *projectFile);
+		bool readSGM(QFile *projectFile);
 };
 
 #endif // QSIPROJECT_H

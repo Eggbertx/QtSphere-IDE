@@ -6,6 +6,14 @@
         <file>transparency-bg.png</file>
         <file>eye.png</file>
         <file>eye-closed.png</file>
+        <file>1x1grid.png</file>
+        <file>3x3grid.png</file>
+        <file>5x5grid.png</file>
+        <file>pencil.png</file>
+        <file>linetool.png</file>
+        <file>paintbucket.png</file>
+        <file>dropper.png</file>
+        <file>rectangletool.png</file>
     </qresource>
     <qresource prefix="/text">
         <file>dark.qss</file>

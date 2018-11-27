@@ -57,7 +57,7 @@ bool Tileset::open(QString filename) {
 }
 
 bool Tileset::save(QString filename) {
-
+	return true;
 }
 
 QImage Tileset::getImage(int index) {
