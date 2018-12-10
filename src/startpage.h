@@ -30,6 +30,7 @@ class StartPage : public QWidget {
 		Ui::StartPage *ui;
 		QString baseInfoHTML;
 		QList<QSIProject*> gameList;
+		QSIProject* currentProject;
 		// Right click menu and options
 		QMenu* rightClickMenu;
 		QAction* startGameAction;

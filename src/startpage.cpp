@@ -37,6 +37,7 @@ StartPage::StartPage(QWidget *parent) : QWidget(parent), ui(new Ui::StartPage) {
 
 StartPage::~StartPage() {
 	delete ui;
+	if(this->currentProject != nullptr) delete this->currentProject;
 }
 
 QString StartPage::getGameInfoText() {
@@ -71,11 +72,10 @@ void StartPage::refreshGameList() {
 	settings.endArray();
 	int listSize = this->gameList.length();
 	for(int m = 0; m < listSize; m++) {
-		QListWidgetItem* item = new QListWidgetItem(this->gameList.at(m)->name);
-		item->setIcon(QIcon(":/icons/sphere-icon.png"));
-		item->setSizeHint(QSize(120,64));
-		ui->projectIcons->addItem(item);
+		QListWidgetItem* item = new QListWidgetItem(QIcon(":/icons/sphere-icon.png"), this->gameList.at(m)->name);
 		item->setTextAlignment(Qt::AlignCenter);
+		item->setSizeHint(QSize(180,80));
+		ui->projectIcons->addItem(item);
 	}
 }
 
@@ -118,19 +118,19 @@ void StartPage::on_projectIcons_itemActivated(QListWidgetItem *item) {
 
 void StartPage::on_projectIcons_itemSelectionChanged() {
 	int currentRow = ui->projectIcons->currentRow();
-	QSIProject* currentProject = this->gameList.at(currentRow);
+	if(this->gameList.length() == 0) return;
+	this->currentProject = this->gameList.at(currentRow);
+	if(this->currentProject == nullptr) return;
 
-	if(currentProject != nullptr) {
-		QString displayResolution = "";
-		if(currentProject->width > 0 && currentProject->height > 0) {
-			displayResolution = QString::number(currentProject->width) + "x" + QString::number(currentProject->height);
-		}
-		this->setGameInfoText(
-			currentProject->name,
-			currentProject->author,
-			displayResolution,
-			currentProject->getPath(false),
-			currentProject->summary
-		);
+	QString displayResolution = "";
+	if(this->currentProject->width > 0 && this->currentProject->height > 0) {
+		displayResolution = QString::number(this->currentProject->width) + "x" + QString::number(currentProject->height);
 	}
+	this->setGameInfoText(
+		this->currentProject->name,
+		this->currentProject->author,
+		displayResolution,
+		this->currentProject->getPath(false),
+		this->currentProject->summary
+	);
 }

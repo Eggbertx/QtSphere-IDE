@@ -44,37 +44,34 @@
        </property>
        <item row="0" column="0">
         <widget class="QListWidget" name="projectIcons">
+         <property name="showDropIndicator" stdset="0">
+          <bool>false</bool>
+         </property>
          <property name="dragDropMode">
-          <enum>QAbstractItemView::DragDrop</enum>
+          <enum>QAbstractItemView::NoDragDrop</enum>
          </property>
          <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectRows</enum>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>32</width>
-           <height>32</height>
-          </size>
+          <enum>QAbstractItemView::SelectItems</enum>
          </property>
          <property name="movement">
-          <enum>QListView::Snap</enum>
+          <enum>QListView::Static</enum>
+         </property>
+         <property name="flow">
+          <enum>QListView::LeftToRight</enum>
+         </property>
+         <property name="isWrapping" stdset="0">
+          <bool>true</bool>
          </property>
          <property name="resizeMode">
           <enum>QListView::Adjust</enum>
          </property>
-         <property name="gridSize">
-          <size>
-           <width>120</width>
-           <height>120</height>
-          </size>
-         </property>
          <property name="viewMode">
           <enum>QListView::IconMode</enum>
          </property>
-         <property name="uniformItemSizes">
+         <property name="wordWrap">
           <bool>true</bool>
          </property>
-         <property name="wordWrap">
+         <property name="selectionRectVisible">
           <bool>true</bool>
          </property>
         </widget>
