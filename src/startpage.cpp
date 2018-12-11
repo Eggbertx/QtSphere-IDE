@@ -37,7 +37,6 @@ StartPage::StartPage(QWidget *parent) : QWidget(parent), ui(new Ui::StartPage) {
 
 StartPage::~StartPage() {
 	delete ui;
-	if(this->currentProject != nullptr) delete this->currentProject;
 }
 
 QString StartPage::getGameInfoText() {
@@ -74,7 +73,7 @@ void StartPage::refreshGameList() {
 	for(int m = 0; m < listSize; m++) {
 		QListWidgetItem* item = new QListWidgetItem(QIcon(":/icons/sphere-icon.png"), this->gameList.at(m)->name);
 		item->setTextAlignment(Qt::AlignCenter);
-		item->setSizeHint(QSize(180,80));
+		item->setSizeHint(QSize(150,80));
 		ui->projectIcons->addItem(item);
 	}
 }

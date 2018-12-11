@@ -76,6 +76,7 @@ class MainWindow : public QMainWindow {
 		void on_actionSpherical_community_triggered();
 		void on_actionClearRecent_triggered();
 		void on_actionClose_Project_triggered();
+		void on_actionClose_triggered();
 
 	private:
 		static MainWindow* _instance;

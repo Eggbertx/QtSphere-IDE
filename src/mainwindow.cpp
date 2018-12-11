@@ -566,7 +566,16 @@ void MainWindow::on_actionClearRecent_triggered() {
 }
 
 void MainWindow::on_actionClose_Project_triggered() {
-	this->project = new QSIProject("", this);
+	//this->project = new QSIProject("", this);
+	delete this->project;
+	this->projectLoaded = false;
+	ui->menuProject->setEnabled(false);
+	this->updateTreeView();
+}
+
+void MainWindow::on_actionClose_triggered() {
+	//this->project = new QSIProject("", this);
+	delete this->project;
 	this->projectLoaded = false;
 	ui->menuProject->setEnabled(false);
 	this->updateTreeView();
