@@ -18,24 +18,24 @@ bool MapFile::open(QString filename) {
 	this->file = new QFile(filename);
 
 	if(!this->file->open(QIODevice::ReadOnly)) {
-		errorBox("ERROR: Could not read file " + filename + ": " + this->file->errorString());
+		errorBox("ERROR: Could not read file '" + filename + "': " + this->file->errorString());
 		return false;
 	}
 
 	this->file->read(reinterpret_cast<char*>(&this->header), sizeof(this->header));
 
 	if(memcmp(header.signature, ".rmp", 4) != 0) {
-		errorBox("Error: " + QString(filename) + " is not a valid map file (invalid signature)!");
+		errorBox("Error: '" + filename + "' is not a valid map file (invalid signature)!");
 		this->file->close();
 		return false;
 	}
 	if(header.version != 1) {
-		errorBox("Error:" + QString(filename) + "is not a valid map file (version != 1)!");
+		errorBox("Error: '" + filename + "' is not a valid map file (version != 1)!");
 		this->file->close();
 		return false;
 	}
 	if(header.num_strings != 3 && header.num_strings != 5 && header.num_strings != 9) {
-		errorBox("Error:" + QString(filename) + "is not a valid map file (invalid strings field)!");
+		errorBox("Error: '" + filename + "' is not a valid map file (invalid strings field)!");
 		this->file->close();
 		return false;
 	}

@@ -12,11 +12,11 @@ bool Tileset::readBytes(QByteArray arr) {
 	QDataStream stream(&arr, QIODevice::ReadOnly);
 	stream.readRawData(reinterpret_cast<char*>(&this->header), sizeof (this->header));
 	if(memcmp(this->header.signature, ".rts", 4) != 0) {
-		errorBox("Error: " + QString(this->fileName()) + " is not a valid tileset file (invalid signature)!");
+		errorBox("Error: '" + this->fileName() + "' is not a valid tileset file (invalid signature)!");
 		return false;
 	}
 	if(this->header.version != 1) {
-		errorBox("Error: Invalid tileset version (must be 1)!");
+		errorBox("Error: Invalid tileset version (got " + QString::number(this->header.version) + ",  must be 1)!");
 		return false;
 	}
 	if(this->header.tile_width < 1 || this->header.tile_height < 1) {
@@ -58,6 +58,10 @@ bool Tileset::open(QString filename) {
 
 bool Tileset::save(QString filename) {
 	return true;
+}
+
+int Tileset::numTiles() {
+	return this->tiles.length();
 }
 
 QImage Tileset::getImage(int index) {

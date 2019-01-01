@@ -16,6 +16,7 @@ class Tileset : public SphereFile {
 		int getDelay(int index);
 		void setDelay(int index);
 		QImage getImage(int index);
+		int numTiles();
 
 		#pragma pack(push, 1)
 		typedef struct rts_header {

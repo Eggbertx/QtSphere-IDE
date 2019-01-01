@@ -1,3 +1,4 @@
+#include <QDebug>
 #include <QFileInfo>
 #include "spherefile.h"
 
@@ -21,7 +22,9 @@ bool SphereFile::save(QString filename) {
 }
 
 QString SphereFile::fileName() {
-	return this->file->fileName();
+	if(this->file) return this->file->fileName();
+	return "";
+	//return this->file->fileName();
 }
 
 QString SphereFile::getBaseName() {

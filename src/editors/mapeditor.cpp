@@ -1,10 +1,13 @@
-﻿#include <QDir>
+﻿#include <QDebug>
+#include <QDir>
 #include <QFileInfo>
-#include <QGraphicsPixmapItem>
+#include <QGraphicsItem>
 #include <QLabel>
 #include <QMenu>
+#include <QActionGroup>
 #include <QToolBar>
 #include <QToolButton>
+#include <QWidget>
 
 #include "mapeditor.h"
 #include "ui_mapeditor.h"
@@ -17,18 +20,16 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	ui->setupUi(this);
 	this->menuBar = new QToolBar();
 	this->menuBar->setFixedHeight(32);
+	QActionGroup toolActions(this->menuBar);
 
 	this->pencilMenu = new QMenu(this);
-
-	QList<QAction*> pencilActions({
+	this->pencilSize = 1;
+	this->pencilMenu->addActions(QList<QAction*>({
 		new QAction(QIcon(":/icons/1x1grid.png"), "1x1"),
 		new QAction(QIcon(":/icons/3x3grid.png"), "3x3"),
 		new QAction(QIcon(":/icons/5x5grid.png"), "5x5")
-	});
-
-	this->pencilSize = 1;
-	this->pencilMenu->addActions(pencilActions);
-	this->pencilMenu->setDefaultAction(pencilActions.at(0));
+	}));
+	this->pencilMenu->setDefaultAction(this->pencilMenu->actions().at(0));
 
 	QToolButton* pencilMenuButton = new QToolButton();
 	pencilMenuButton->setText("Pencil");
@@ -38,30 +39,27 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	this->menuBar->addWidget(pencilMenuButton);
 	connect(this->pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
 
-	QAction* lineToolButton = new QAction("Line");
-	lineToolButton->setIcon(QIcon(":/icons/linetool.png"));
-	this->menuBar->addAction(lineToolButton);
-
-	QAction* rectToolButton = new QAction("Rectangle");
-	rectToolButton ->setIcon(QIcon(":/icons/rectangletool.png"));
-	this->menuBar->addAction(rectToolButton );
-
-	QAction* fillToolButton = new QAction("Fill layer");
-	fillToolButton->setIcon(QIcon(":/icons/paintbucket.png"));
-	this->menuBar->addAction(fillToolButton);
-
-	QAction* tilePickerButton = new QAction("Select tile");
-	tilePickerButton ->setIcon(QIcon(":/icons/dropper.png"));
-	this->menuBar->addAction(tilePickerButton );
+	this->menuBar->addAction(QIcon(":/icons/linetool.png"), "Line");
+	this->menuBar->addAction(QIcon(":/icons/rectangletool.png"), "Rectangle");
+	this->menuBar->addAction(QIcon(":/icons/paintbucket.png"), "Fill layer");
+	this->menuBar->addAction(QIcon(":/icons/dropper.png"), "Select tile");
+	connect(this->menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
 
 	ui->mapViewLayout->setMenuBar(this->menuBar);
 	this->mapFile = new MapFile(this);
-	ui->tilesetView->setAlignment(Qt::AlignLeft|Qt::AlignTop);
-	ui->tilesetView->setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
+
+	this->tilesetView = new WrappedGraphicsView();
+
+	this->tilesetLayout = new QVBoxLayout();
+	this->tilesetLayout->addWidget(tilesetView);
+	this->tilesetLayout->setMargin(0);
+	ui->tilesetBox->setLayout(tilesetLayout);
+
+
 	ui->mapView->setAlignment(Qt::AlignLeft|Qt::AlignTop);
 	ui->mapView->setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
 	this->mapScene = new QGraphicsScene(ui->mapView);
-	this->tilesScene = new QGraphicsScene(ui->tilesetView);
+
 	ui->layersTable->setColumnWidth(0,48);
 	ui->layersTable->setColumnWidth(2,24);
 	ui->layersTable->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Fixed);
@@ -71,10 +69,13 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 }
 
 MapEditor::~MapEditor() {
+	disconnect(this->menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
+	disconnect(this->pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
 	delete ui;
 	delete this->mapFile;
 	delete this->mapScene;
-	disconnect(this->pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
+	delete this->pencilMenu;
+	delete this->menuBar;
 }
 
 bool MapEditor::openFile(QString filename) {
@@ -96,7 +97,6 @@ bool MapEditor::attach(MapFile* attachedMap) {
 		eyeLabel->setPixmap(QPixmap(":/icons/eye.png"));
 		eyeLabel->setAlignment(Qt::AlignCenter);
 		ui->layersTable->setCellWidget(l-1,0,eyeLabel);
-
 		ui->layersTable->setItem(l-1,1, new QTableWidgetItem(cur_layer.name));
 
 		QLabel* deleteLabel = new QLabel("X");
@@ -111,19 +111,19 @@ bool MapEditor::attach(MapFile* attachedMap) {
 
 			int x = t % cur_layer.header.width;
 			int y = (t - x) / cur_layer.header.width;
-			tilePixmap->setOffset(x * attachedMap->tileset->header.tile_width,y * attachedMap->tileset->header.tile_height);
+			tilePixmap->setPos(x * attachedMap->tileset->header.tile_width,y * attachedMap->tileset->header.tile_height);
 		}
 	}
 	ui->mapView->setScene(this->mapScene);
-	QList<QImage> images = attachedMap->tileset->getTileImages();
-
-	for(int i = 0; i < images.length(); i++) {
-		QGraphicsPixmapItem* tilePixmap = this->tilesScene->addPixmap(QPixmap::fromImage(images.at(i)));
-		tilePixmap->setOffset(i*attachedMap->tileset->header.tile_width+16,10)		;
+	int numTiles = attachedMap->tileset->numTiles();
+	for(int i = 0; i < numTiles; i++) {
+		this->tilesetView->addPixmap(QPixmap::fromImage(attachedMap->tileset->getImage(i)));
 	}
-	ui->tilesetView->setScene(this->tilesScene);
+
 	ui->tilesetBox->setTitle("Tiles (" + QString::number(attachedMap->tileset->header.num_tiles) + ")");
 	ui->layersTable->selectRow(0);
+	ui->mainSplitter->setSizes(QList<int>({this->width()-300, 300}));
+	ui->tilesSplitter->setSizes(QList<int>({1,1}));
 	return true;
 }
 
@@ -161,4 +161,8 @@ void MapEditor::setPencilSize(QAction *size) {
 		this->pencilSize = 5;
 	}
 	this->pencilMenu->setDefaultAction(size);
+}
+
+void MapEditor::setCurrentTool(QAction* tool) {
+	qDebug() << tool->text();
 }

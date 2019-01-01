@@ -35,7 +35,8 @@ SOURCES += \
 	editors/sphereeditor.cpp \
 	editors/texteditor.cpp \
 	editors/mapeditor.cpp \
-	formats/tileset.cpp
+	formats/tileset.cpp \
+	wrappedgraphicsview.cpp
 
 HEADERS += \
 	mainwindow.h \
@@ -59,7 +60,8 @@ HEADERS += \
 	editors/sphereeditor.h \
 	editors/texteditor.h \
 	editors/mapeditor.h \
-	formats/tileset.h
+	formats/tileset.h \
+	wrappedgraphicsview.h
 
 FORMS += \
 	mainwindow.ui \
