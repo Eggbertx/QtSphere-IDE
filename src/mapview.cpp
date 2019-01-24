@@ -86,6 +86,10 @@ int MapView::getDrawSize() {
 	return this->drawSize;
 }
 
+void MapView::setCurrentTile(int tile) {
+	this->currentTile = tile;
+}
+
 MapFile::layer* MapView::getLayer(int index) {
 	return this->mapFile->getLayer(index);
 }

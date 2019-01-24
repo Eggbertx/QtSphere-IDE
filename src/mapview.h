@@ -24,6 +24,7 @@ class MapView : public QGraphicsView {
 		QPoint mapToWidgetPos(int x, int y);
 		void setDrawSize(int size);
 		int getDrawSize();
+		void setCurrentTile(int tile);
 
 	signals:
 
@@ -48,6 +49,7 @@ class MapView : public QGraphicsView {
 		QGraphicsItemGroup* pointerGroup;
 		QPoint pointerPosition;
 		QString mapStatusFormat;
+		int currentTile = -1;
 
 };
 

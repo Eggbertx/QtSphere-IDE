@@ -19,11 +19,10 @@
 MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEditor) {
 	ui->setupUi(this);
 	this->menuBar = new QToolBar();
-	this->menuBar->setFixedHeight(32);
+//	this->menuBar->setFixedHeight(32);
 	QActionGroup toolActions(this->menuBar);
 
 	this->pencilMenu = new QMenu(this);
-	this->pencilSize = 1;
 	this->pencilMenu->addActions(QList<QAction*>({
 		new QAction(QIcon(":/icons/1x1grid.png"), "1x1"),
 		new QAction(QIcon(":/icons/3x3grid.png"), "3x3"),
@@ -44,6 +43,7 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	this->menuBar->addAction(QIcon(":/icons/paintbucket.png"), "Fill layer");
 	this->menuBar->addAction(QIcon(":/icons/dropper.png"), "Select tile");
 	connect(this->menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
+
 	this->mapView = new MapView(ui->mapViewLayout->widget());
 	ui->mapViewLayout->addWidget(this->mapView);
 	ui->mapViewLayout->setMenuBar(this->menuBar);
@@ -51,11 +51,11 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	this->mapView->setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
 
 	this->tilesetView = new WrappedGraphicsView();
-
 	this->tilesetLayout = new QVBoxLayout();
 	this->tilesetLayout->addWidget(tilesetView);
 	this->tilesetLayout->setMargin(0);
 	ui->tilesetBox->setLayout(tilesetLayout);
+	connect(this->tilesetView, SIGNAL(indexChanged(int)), this, SLOT(setTileIndex(int)));
 
 	ui->layersTable->setColumnWidth(0,48);
 	ui->layersTable->setColumnWidth(2,24);
@@ -68,6 +68,7 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 MapEditor::~MapEditor() {
 	disconnect(this->menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
 	disconnect(this->pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
+	disconnect(this->tilesetView, SIGNAL(indexChanged(int)), this, SLOT(setTileIndex(int)));
 	delete ui;
 	delete this->mapView;
 	delete this->pencilMenu;
@@ -141,18 +142,19 @@ void MapEditor::on_layersTable_cellClicked(int row, int column) {
 void MapEditor::setPencilSize(QAction *size) {
 	QString actionText = size->text();
 	if(actionText == "1x1") {
-		this->pencilSize = 1;
 		this->mapView->setDrawSize(1);
 	} else if(actionText == "3x3") {
-		this->pencilSize = 3;
 		this->mapView->setDrawSize(3);
 	} else if(actionText == "5x5") {
-		this->pencilSize = 5;
 		this->mapView->setDrawSize(5);
 	}
 	this->pencilMenu->setDefaultAction(size);
 }
 
 void MapEditor::setCurrentTool(QAction* tool) {
-//	qDebug() << tool->text();
+	//	qDebug() << tool->text();
+}
+
+void MapEditor::setTileIndex(int tile) {
+	this->mapView->setCurrentTile(tile);
 }

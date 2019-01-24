@@ -20,6 +20,8 @@ class WrappedGraphicsView : public QGraphicsView {
 		void mouseReleaseEvent(QMouseEvent* event) override;
 		int indexAt(QPoint pos);
 
+	signals:
+		void indexChanged(int value);
 
 	private:
 		int arrangeItems(int width = -1, int height = -1);

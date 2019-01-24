@@ -29,6 +29,7 @@ class MapEditor : public SphereEditor {
 		void on_layersTable_cellClicked(int row, int column);
 		void setPencilSize(QAction* size);
 		void setCurrentTool(QAction* tool);
+		void setTileIndex(int tile);
 
 	private:
 		Ui::MapEditor *ui;
@@ -38,7 +39,6 @@ class MapEditor : public SphereEditor {
 		WrappedGraphicsView* tilesetView;
 		QToolBar* menuBar;
 		QMenu* pencilMenu;
-		int pencilSize;
 };
 
 #endif // MAPEDITOR_H
