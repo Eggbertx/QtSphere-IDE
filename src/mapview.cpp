@@ -94,6 +94,26 @@ MapFile::layer* MapView::getLayer(int index) {
 	return this->mapFile->getLayer(index);
 }
 
+void MapView::drawTile(int index) {
+	int tileWidth = this->mapFile->tileSize().width();
+	int tileHeight = this->mapFile->tileSize().height();
+	QRect pRect = this->pointerRect(true);
+
+	for(int rY = pRect.y(); rY < pRect.bottom()+1; rY++) {
+		for(int rX = pRect.x(); rX < pRect.right()+1; rX++) {
+			int sceneX = rX * tileWidth;
+			int sceneY = rY * tileHeight;
+			QList<QGraphicsItem*> mouseItems = this->items(sceneX,sceneY);
+			foreach(QGraphicsItem* item, mouseItems) {
+				if(item->type() != QGraphicsPixmapItem::Type) continue;
+				QGraphicsPixmapItem* tile = reinterpret_cast<QGraphicsPixmapItem*>(item);
+				tile->setPixmap(QPixmap::fromImage(this->mapFile->tileset->getImage(index)));
+				break;
+			}
+		}
+	}
+}
+
 void MapView::mouseMoveEvent(QMouseEvent* event) {
 	QRect mapRect = *this->mapFile->largestLayerRect();
 	QSize tileSize = this->mapFile->tileSize();
@@ -123,15 +143,25 @@ void MapView::mouseMoveEvent(QMouseEvent* event) {
 		QString::number(event->pos().x()), QString::number(event->pos().y())
 	));
 	this->pointerGroup->setPos(pointerUL);
+
+	if(this->drawing) {
+		this->drawTile(this->currentTile);
+	}
 	this->setSceneRect(widgetRect);
 }
 
 void MapView::mousePressEvent(QMouseEvent* event) {
+	this->drawing = true;
+	this->drawTile(this->currentTile);
+}
 
+void MapView::mouseReleaseEvent(QMouseEvent *event) {
+	this->drawing = false;
 }
 
 void MapView::leaveEvent(QEvent *event) {
 	this->pointerGroup->hide();
+	this->drawing = false;
 	MainWindow::instance()->setStatus("Ready");
 }
 
@@ -149,4 +179,24 @@ QGraphicsItemGroup* MapView::createPointer(int size) {
 	this->pointerGroup = pointerGroup;
 	this->mapScene->addItem(this->pointerGroup);
 	return pointerGroup;
+}
+
+QRect MapView::pointerRect(bool tiles) {
+	int rX = this->pointerGroup->x();
+	int rY = this->pointerGroup->y();
+	if(tiles) {
+		QPoint tilePos = this->widgetToMapPos(
+			rX + this->horizontalScrollBar()->value(),
+			rY + this->verticalScrollBar()->value()
+		);
+		rX = tilePos.x();
+		rY = tilePos.y();
+	}
+
+	QSize rSize = QSize(this->drawSize, this->drawSize);
+	if(!tiles) {
+		rSize.setWidth(rSize.width() * this->mapFile->tileSize().width());
+		rSize.setHeight(rSize.height() * this->mapFile->tileSize().height());
+	}
+	return QRect(rX, rY, rSize.width(), rSize.height());
 }

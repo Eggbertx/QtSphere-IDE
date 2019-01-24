@@ -31,12 +31,15 @@ class MapView : public QGraphicsView {
 	public slots:
 
 	protected:
-		void mouseMoveEvent(QMouseEvent* event);
-		void mousePressEvent(QMouseEvent* event);
-		void leaveEvent(QEvent *event);
+		void mouseMoveEvent(QMouseEvent* event) override;
+		void mousePressEvent(QMouseEvent* event) override;
+		void mouseReleaseEvent(QMouseEvent* event) override;
+		void leaveEvent(QEvent *event) override;
 
 	private:
 		QGraphicsItemGroup* createPointer(int size);
+		QRect pointerRect(bool tiles);
+		void drawTile(int index);
 		QGraphicsScene* mapScene;
 		typedef struct rmp_layer {
 			QList<QGraphicsPixmapItem*> tiles;
@@ -49,7 +52,8 @@ class MapView : public QGraphicsView {
 		QGraphicsItemGroup* pointerGroup;
 		QPoint pointerPosition;
 		QString mapStatusFormat;
-		int currentTile = -1;
+		bool drawing = false;
+		int currentTile = 0;
 
 };
 

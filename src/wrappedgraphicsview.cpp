@@ -79,7 +79,6 @@ int WrappedGraphicsView::arrangeItems(int width, int height) {
 		this->tSize = this->scene()->items().at(0)->boundingRect().size().toSize();
 	}
 
-
 	int numItems = this->pixmaps.length();
 	this->wScene->clear();
 
