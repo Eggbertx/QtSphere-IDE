@@ -18,6 +18,8 @@ class MapFile : public SphereFile {
 		bool mapOrigin();
 		void setParallax(bool is_parallax, float mult_x, float mult_y, float scrollspeed_x, float scrollspeed_y);
 		QRect *largestLayerRect();
+		QSize tileSize();
+		QSize mapSize();
 
 		QString tilesetFilename;
 		QString musicFilename;

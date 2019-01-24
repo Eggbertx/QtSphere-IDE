@@ -1,5 +1,6 @@
 #include <QByteArray>
 #include <QDebug>
+#include <QDesktopServices>
 #include <QDir>
 #include <QList>
 #include <QListWidget>
@@ -92,20 +93,20 @@ void StartPage::on_projectIcons_customContextMenuRequested(const QPoint &pos) {
 	QListWidgetItem* selected = ui->projectIcons->itemAt(pos);
 
 	bool actionsEnabled = (selected != nullptr);
-	this->startGameAction->setEnabled(actionsEnabled);
+	this->startGameAction->setEnabled(false);
 	this->loadProjectAction->setEnabled(actionsEnabled);
 	this->openProjectDirAction->setEnabled(actionsEnabled);
 
 	QAction* choice = this->rightClickMenu->exec(ui->projectIcons->mapToGlobal(pos));
 
-	if(!choice) return;
+	if(!choice || !this->currentProject) return;
 	QString text = choice->text();
 	if(text == "Start game") {
 
 	} else if(text == "Load project")  {
-
+		MainWindow::instance()->openProject(this->gameList.at(ui->projectIcons->currentRow())->getPath(true));
 	} else if(text == "Open project directory") {
-
+		QDesktopServices::openUrl(QUrl(this->currentProject->getPath(false)).path());
 	} else if(text == "Refresh game list") {
 		this->refreshGameList();
 	}

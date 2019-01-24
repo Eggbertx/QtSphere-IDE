@@ -44,9 +44,11 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	this->menuBar->addAction(QIcon(":/icons/paintbucket.png"), "Fill layer");
 	this->menuBar->addAction(QIcon(":/icons/dropper.png"), "Select tile");
 	connect(this->menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
-
+	this->mapView = new MapView(ui->mapViewLayout->widget());
+	ui->mapViewLayout->addWidget(this->mapView);
 	ui->mapViewLayout->setMenuBar(this->menuBar);
-	this->mapFile = new MapFile(this);
+	this->mapView->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+	this->mapView->setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
 
 	this->tilesetView = new WrappedGraphicsView();
 
@@ -54,11 +56,6 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	this->tilesetLayout->addWidget(tilesetView);
 	this->tilesetLayout->setMargin(0);
 	ui->tilesetBox->setLayout(tilesetLayout);
-
-
-	ui->mapView->setAlignment(Qt::AlignLeft|Qt::AlignTop);
-	ui->mapView->setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
-	this->mapScene = new QGraphicsScene(ui->mapView);
 
 	ui->layersTable->setColumnWidth(0,48);
 	ui->layersTable->setColumnWidth(2,24);
@@ -72,15 +69,14 @@ MapEditor::~MapEditor() {
 	disconnect(this->menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
 	disconnect(this->pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
 	delete ui;
-	delete this->mapFile;
-	delete this->mapScene;
+	delete this->mapView;
 	delete this->pencilMenu;
 	delete this->menuBar;
 }
 
 bool MapEditor::openFile(QString filename) {
-	if(!this->mapFile->open(filename)) return false;
-	return this->attach(this->mapFile);
+	if(!this->mapView->openFile(filename)) return false;
+	return this->attach(this->mapView->attachedMap());
 }
 
 bool MapEditor::attach(MapFile* attachedMap) {
@@ -104,17 +100,8 @@ bool MapEditor::attach(MapFile* attachedMap) {
 		deleteLabel->setStyleSheet("color:red;font-weight:bold;");
 		deleteLabel->setAlignment(Qt::AlignCenter);
 		ui->layersTable->setCellWidget(l-1,2,deleteLabel);
-
-		for(int t = 0; t < cur_layer.tiles.length(); t++) {
-			uint16_t cur_tile = cur_layer.tiles.at(t);
-			QGraphicsPixmapItem* tilePixmap = this->mapScene->addPixmap(QPixmap::fromImage(attachedMap->tileset->getImage(cur_tile)));
-
-			int x = t % cur_layer.header.width;
-			int y = (t - x) / cur_layer.header.width;
-			tilePixmap->setPos(x * attachedMap->tileset->header.tile_width,y * attachedMap->tileset->header.tile_height);
-		}
 	}
-	ui->mapView->setScene(this->mapScene);
+
 	int numTiles = attachedMap->tileset->numTiles();
 	for(int i = 0; i < numTiles; i++) {
 		this->tilesetView->addPixmap(QPixmap::fromImage(attachedMap->tileset->getImage(i)));
@@ -132,7 +119,7 @@ void MapEditor::on_layersTable_cellClicked(int row, int column) {
 		case 0: {
 			QWidget* item = ui->layersTable->cellWidget(row,column);
 			QLabel* eyeLabel = dynamic_cast<QLabel*>(item);
-			MapFile::layer* toggled_layer = this->mapFile->getLayer(row);
+			MapFile::layer* toggled_layer = this->mapView->getLayer(row);
 			toggled_layer->visible = !toggled_layer->visible;
 
 			if(!toggled_layer->visible)
@@ -155,14 +142,17 @@ void MapEditor::setPencilSize(QAction *size) {
 	QString actionText = size->text();
 	if(actionText == "1x1") {
 		this->pencilSize = 1;
+		this->mapView->setDrawSize(1);
 	} else if(actionText == "3x3") {
 		this->pencilSize = 3;
+		this->mapView->setDrawSize(3);
 	} else if(actionText == "5x5") {
 		this->pencilSize = 5;
+		this->mapView->setDrawSize(5);
 	}
 	this->pencilMenu->setDefaultAction(size);
 }
 
 void MapEditor::setCurrentTool(QAction* tool) {
-	qDebug() << tool->text();
+//	qDebug() << tool->text();
 }

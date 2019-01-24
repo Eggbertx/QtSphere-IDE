@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/icons">
         <file>sphere-icon.png</file>
-        <file>1385573251-24px.png</file>
         <file>icon.png</file>
         <file>transparency-bg.png</file>
         <file>eye.png</file>
@@ -14,6 +13,7 @@
         <file>paintbucket.png</file>
         <file>dropper.png</file>
         <file>rectangletool.png</file>
+        <file>gears.png</file>
     </qresource>
     <qresource prefix="/text">
         <file>dark.qss</file>

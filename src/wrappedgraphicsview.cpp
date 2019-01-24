@@ -23,7 +23,6 @@ void WrappedGraphicsView::resizeEvent(QResizeEvent* resize) {
 
 void WrappedGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
 	int newIndex = this->indexAt(event->pos());
-	qDebug().nospace() << "Index at (" << event->x() << "," << event->y() << "): " << newIndex;
 	if(newIndex > -1) {
 		this->selectedIndex = newIndex;
 		this->arrangeItems();

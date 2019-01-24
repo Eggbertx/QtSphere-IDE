@@ -188,6 +188,16 @@ QRect* MapFile::largestLayerRect() {
 	return new QRect(0, 0, largestWidth, largestHeight);
 }
 
+QSize MapFile::tileSize() {
+	return QSize(this->tileset->header.tile_width, this->tileset->header.tile_height);
+}
+
+QSize MapFile::mapSize() {
+	QSize tSize = this->tileSize();
+
+	return tSize;
+}
+
 QList<MapFile::layer> MapFile::getLayers() {
 	return this->layers;
 }

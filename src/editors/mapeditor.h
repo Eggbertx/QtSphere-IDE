@@ -8,6 +8,7 @@
 
 #include "sphereeditor.h"
 #include "formats/mapfile.h"
+#include "mapview.h"
 #include "wrappedgraphicsview.h"
 
 namespace Ui {
@@ -32,8 +33,7 @@ class MapEditor : public SphereEditor {
 	private:
 		Ui::MapEditor *ui;
 		int currentTool = MapEditor::Pencil;
-		MapFile* mapFile;
-		QGraphicsScene* mapScene;
+		MapView* mapView;
 		QVBoxLayout* tilesetLayout;
 		WrappedGraphicsView* tilesetView;
 		QToolBar* menuBar;

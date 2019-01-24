@@ -46,7 +46,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	this->statusLabel = new QLabel("Ready.");
 	ui->statusBar->addWidget(this->statusLabel);
 	ui->toolbarOpenButton->setIcon(this->style()->standardIcon(QStyle::SP_DialogOpenButton));
-	ui->toolbarSaveButton->setIcon(this->style()->standardIcon(QStyle::SP_DriveFDIcon));
+	ui->toolbarSaveButton->setIcon(this->style()->standardIcon(QStyle::SP_DialogSaveButton));
 	ui->centralWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 	ui->taskListTable->setContextMenuPolicy(Qt::CustomContextMenu);
 

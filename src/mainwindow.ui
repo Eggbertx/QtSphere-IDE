@@ -424,12 +424,6 @@
    <property name="movable">
     <bool>false</bool>
    </property>
-   <property name="iconSize">
-    <size>
-     <width>16</width>
-     <height>16</height>
-    </size>
-   </property>
    <property name="floatable">
     <bool>false</bool>
    </property>
@@ -687,7 +681,7 @@
   <action name="toolbarProjectProperties">
    <property name="icon">
     <iconset resource="res/qsires.qrc">
-     <normaloff>:/icons/1385573251-24px.png</normaloff>:/icons/1385573251-24px.png</iconset>
+     <normaloff>:/icons/gears.png</normaloff>:/icons/gears.png</iconset>
    </property>
    <property name="text">
     <string>Project Properties</string>
