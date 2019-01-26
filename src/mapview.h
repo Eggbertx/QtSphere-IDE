@@ -12,7 +12,7 @@ class MapView : public QGraphicsView {
 	Q_OBJECT
 	public:
 		explicit MapView(QWidget *parent = nullptr);
-		~MapView();
+		~MapView() override;
 		bool loadMap(QString filename);
 		bool attachMap(MapFile* map);
 		MapFile::layer *getLayer(int index);

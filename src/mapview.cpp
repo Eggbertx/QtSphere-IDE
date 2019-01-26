@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <QPen>
+#include <QSettings>
 #include <math.h>
 
 #include "formats/mapfile.h"
@@ -151,8 +152,10 @@ void MapView::mouseMoveEvent(QMouseEvent* event) {
 }
 
 void MapView::mousePressEvent(QMouseEvent* event) {
-	this->drawing = true;
-	this->drawTile(this->currentTile);
+	if(event->button() == Qt::LeftButton) {
+		this->drawing = true;
+		this->drawTile(this->currentTile);
+	}
 }
 
 void MapView::mouseReleaseEvent(QMouseEvent *event) {
@@ -166,13 +169,18 @@ void MapView::leaveEvent(QEvent *event) {
 }
 
 QGraphicsItemGroup* MapView::createPointer(int size) {
+	QSettings settings;
 	this->mapScene->removeItem(this->pointerGroup);
 	QGraphicsItemGroup* pointerGroup = new QGraphicsItemGroup();
 	QSize rectSize = this->mapFile->tileSize();
+	QColor cursorColor(settings.value("mapCursorColor","#0080FF").toString());
+	if(!cursorColor.isValid()) cursorColor = QColor(0,128,255,128);
+
+	cursorColor.setAlpha(128);
 	for(int y = 0; y < size; y++) {
 		for(int x = 0; x < size; x++) {
 			QGraphicsRectItem* ri = new QGraphicsRectItem(x*rectSize.width(),y*rectSize.height(),rectSize.width(),rectSize.height());
-			ri->setPen(QPen(Qt::yellow));
+			ri->setBrush(cursorColor);
 			pointerGroup->addToGroup(ri);
 		}
 	}

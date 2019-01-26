@@ -2,6 +2,7 @@
 #include <QEvent>
 #include <QGraphicsPixmapItem>
 #include <QResizeEvent>
+#include <QSettings>
 
 #include "wrappedgraphicsview.h"
 
@@ -70,6 +71,10 @@ int WrappedGraphicsView::scaleFactor() {
 
 int WrappedGraphicsView::arrangeItems(int width, int height) {
 	if(this->pixmaps.length() == 0) return 0;
+	QSettings settings;
+	QColor cursorColor(settings.value("mapCursorColor","#0080FF").toString());
+	if(!cursorColor.isValid()) cursorColor = QColor(0,128,255,128);
+	cursorColor.setAlpha(128);
 	int x = 0;
 	int y = 0;
 	int rows = 0;
@@ -92,7 +97,8 @@ int WrappedGraphicsView::arrangeItems(int width, int height) {
 
 		pixmap->setPos(x*this->scaleMult,y*this->scaleMult);
 		if(this->selectedIndex == i) {
-			QGraphicsRectItem* selectionBox = this->wScene->addRect(x,y,tSize.width()-1, tSize.height()-1, QPen(Qt::yellow,1));
+			QGraphicsRectItem* selectionBox = this->wScene->addRect(x,y,tSize.width()-1, tSize.height()-1);
+			selectionBox->setBrush(cursorColor);
 			selectionBox->setZValue(1);
 		}
 		this->setSceneRect(0,0,x+tSize.width()*this->scaleMult,y+tSize.height()*this->scaleMult);
