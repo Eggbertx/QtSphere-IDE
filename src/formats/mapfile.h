@@ -17,7 +17,7 @@ class MapFile : public SphereFile {
 		bool save(QString filename) override;
 		bool mapOrigin();
 		void setParallax(bool is_parallax, float mult_x, float mult_y, float scrollspeed_x, float scrollspeed_y);
-		QRect *largestLayerRect();
+		QRect* largestLayerRect();
 		QSize tileSize();
 		QSize mapSize();
 
@@ -110,7 +110,12 @@ class MapFile : public SphereFile {
 
 		QList<layer> getLayers();
 		layer* getLayer(int index);
+		int removeLayer(int index);
+		int numLayers();
+
 		int getTileIndex(int l, int x, int y);
+		QList<entity> getEntities(int layer = -1);
+		entity* getEntity(int index);
 		Tileset* tileset;
 
 	signals:

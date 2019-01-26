@@ -203,7 +203,17 @@ QList<MapFile::layer> MapFile::getLayers() {
 }
 
 MapFile::layer* MapFile::getLayer(int index) {
-	return &this->layers[index];
+	if(index > 0 && index < this->layers.length()) return &this->layers[index];
+	return nullptr;
+}
+
+int MapFile::removeLayer(int index) {
+	this->layers.removeAt(index);
+	return this->layers.length();
+}
+
+int MapFile::numLayers() {
+	return this->layers.length();
 }
 
 int MapFile::getTileIndex(int l, int x, int y) {
@@ -214,5 +224,18 @@ int MapFile::getTileIndex(int l, int x, int y) {
 	int arr_index =  x + cur_layer.header.width * y;
 	if(arr_index >= cur_layer.tiles.length()) return -1;
 
-	 return cur_layer.tiles.at(arr_index);
+	return cur_layer.tiles.at(arr_index);
+}
+
+QList<MapFile::entity> MapFile::getEntities(int layer) {
+	QList<MapFile::entity> layerEntities;
+	foreach(entity e, this->entities) {
+		if(e.layer == layer || layer == -1) layerEntities.append(e);
+	}
+	return this->entities;
+}
+
+MapFile::entity* MapFile::getEntity(int index) {
+	if(index > this->entities.length()) return nullptr;
+	return &this->entities[index];
 }
