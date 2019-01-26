@@ -1,10 +1,12 @@
-﻿#include <QDebug>
+﻿#include <QActionGroup>
+#include <QDebug>
 #include <QDir>
 #include <QFileInfo>
 #include <QGraphicsItem>
 #include <QLabel>
 #include <QMenu>
-#include <QActionGroup>
+#include <QPushButton>
+#include <QTableWidgetItem>
 #include <QToolBar>
 #include <QToolButton>
 #include <QWidget>
@@ -59,9 +61,8 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 
 	ui->layersTable->setColumnWidth(0,48);
 	ui->layersTable->setColumnWidth(2,24);
-	ui->layersTable->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Fixed);
 	ui->layersTable->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
-	ui->layersTable->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Fixed);
+	ui->entitiesTable->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
 	ui->mainSplitter->setStretchFactor(0,1);
 }
 
@@ -101,6 +102,20 @@ bool MapEditor::attach(MapFile* attachedMap) {
 		deleteLabel->setStyleSheet("color:red;font-weight:bold;");
 		deleteLabel->setAlignment(Qt::AlignCenter);
 		ui->layersTable->setCellWidget(l-1,2,deleteLabel);
+	}
+
+	QList<MapFile::entity> entities = attachedMap->getEntities();
+	int numEntities = entities.length();
+	ui->entitiesTable->clear();
+	ui->entitiesTable->setRowCount(numEntities);
+	for(int e = 0; e < numEntities; e++) {
+		MapFile::entity cur_entity = entities.at(e);
+		ui->entitiesTable->setCellWidget(e, 0, new QLabel(cur_entity.name));
+		ui->entitiesTable->setCellWidget(e, 1, new QLabel(cur_entity.spriteset));
+		QToolButton* browseBtn = new QToolButton();
+		browseBtn->setText("...");
+		ui->entitiesTable->setCellWidget(e,2,browseBtn);
+		ui->entitiesTable->setColumnWidth(2,browseBtn->width());
 	}
 
 	int numTiles = attachedMap->tileset->numTiles();

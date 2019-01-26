@@ -14,6 +14,7 @@
         <file>dropper.png</file>
         <file>rectangletool.png</file>
         <file>gears.png</file>
+        <file>map-person.png</file>
     </qresource>
     <qresource prefix="/text">
         <file>dark.qss</file>
