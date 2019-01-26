@@ -98,6 +98,9 @@ MainWindow::~MainWindow() {
 	delete ui;
 	delete this->soundPlayer;
 	delete this->project;
+	QSettings settings;
+	settings.setValue("geometry", this->geometry());
+	settings.setValue("maximized", this->isMaximized());
 }
 
 MainWindow* MainWindow::instance() {

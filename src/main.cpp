@@ -20,6 +20,12 @@ int main(int argc, char *argv[]) {
 	w.setWindowIcon(QIcon(QPixmap(":/icons/icon.png")));
 	QSettings settings;
 	w.setTheme(settings.value("theme").toString());
-	w.showMaximized();
+	if(settings.value("maximized", true).toBool()) {
+		w.showMaximized();
+	}else {
+		QRect geom = settings.value("geometry",QRect(0,50,900,700)).toRect();
+		w.setGeometry(geom);
+		w.showNormal();
+	}
 	return a.exec();
 }

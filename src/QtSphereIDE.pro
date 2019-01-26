@@ -37,7 +37,9 @@ SOURCES += \
 	editors/mapeditor.cpp \
 	formats/tileset.cpp \
 	wrappedgraphicsview.cpp \
-	mapview.cpp
+	mapview.cpp \
+	colorbutton.cpp \
+	entityeditdialog.cpp
 
 HEADERS += \
 	mainwindow.h \
@@ -63,7 +65,9 @@ HEADERS += \
 	editors/mapeditor.h \
 	formats/tileset.h \
 	wrappedgraphicsview.h \
-	mapview.h
+	mapview.h \
+	colorbutton.h \
+	entityeditdialog.h
 
 FORMS += \
 	mainwindow.ui \
@@ -76,7 +80,8 @@ FORMS += \
 	soundplayer.ui \
 	importoptionsdialog.ui \
 	startpage.ui \
-	editors/mapeditor.ui
+	editors/mapeditor.ui \
+	entityeditdialog.ui
 
 RESOURCES += res/qsires.qrc
 

@@ -1,10 +1,12 @@
-#include <QStyle>
-#include <QFileDialog>
+#include <QColorDialog>
 #include <QDebug>
+#include <QFileDialog>
 #include <QLineEdit>
 #include <QListWidget>
 #include <QListWidgetItem>
+#include <QPixmap>
 #include <QSettings>
+#include <QStyle>
 
 #include "mainwindow.h"
 #include "settingswindow.h"
@@ -25,9 +27,14 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Se
 		ui->projectDirsList->addItem(item);
 	}
 	settings.endArray();
+	this->mapCursorColor = settings.value("mapCursorColor", "#0080ff").toString();
+	QColor col(this->mapCursorColor);
+	if(col.isValid()) ui->mapCursorCol_btn->setColor(col);
+	connect(ui->mapCursorCol_btn,SIGNAL(colorChanged(QColor)),this,SLOT(mapCursorColChanged(QColor)));
 }
 
 SettingsWindow::~SettingsWindow() {
+	disconnect(ui->mapCursorCol_btn,SIGNAL(colorChanged(QColor)),this,SLOT(mapCursorColChanged(QColor)));
 	delete ui;
 }
 
@@ -77,6 +84,7 @@ void SettingsWindow::saveSettings() {
 		settings.setValue("whichEngine", "legacy");
 	else settings.setValue("whichEngine", "minisphere");
 	settings.setValue("legacyEnginePath", ui->legacyDir_txt->text());
+	settings.setValue("mapCursorColor", this->mapCursorColor);
 }
 
 void SettingsWindow::on_addDirButton_clicked() {
@@ -87,9 +95,9 @@ void SettingsWindow::on_addDirButton_clicked() {
 }
 
 void SettingsWindow::on_removeDirButton_clicked() {
-	QListWidgetItem* cur = ui->projectDirsList->currentItem();
-	if(cur == nullptr) return;
-	//ui->projectDirsList->removeItemWidget(cur);
 	ui->projectDirsList->takeItem(ui->projectDirsList->currentRow());
-	delete cur;
+}
+
+void SettingsWindow::mapCursorColChanged(QColor color) {
+	this->mapCursorColor = color.name();
 }
