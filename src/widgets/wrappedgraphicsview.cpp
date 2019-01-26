@@ -4,7 +4,7 @@
 #include <QResizeEvent>
 #include <QSettings>
 
-#include "wrappedgraphicsview.h"
+#include "widgets/wrappedgraphicsview.h"
 
 WrappedGraphicsView::WrappedGraphicsView(QWidget *parent): QGraphicsView(parent) {
 	this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

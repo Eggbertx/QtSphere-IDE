@@ -5,8 +5,8 @@
 #include <QFileInfo>
 #include <QRect>
 #include <stdio.h>
-#include "spherefile.h"
-#include "mapfile.h"
+#include "formats/spherefile.h"
+#include "formats/mapfile.h"
 #include "formats/tileset.h"
 #include "util.h"
 

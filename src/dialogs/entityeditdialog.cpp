@@ -1,4 +1,4 @@
-#include "entityeditdialog.h"
+#include "dialogs/entityeditdialog.h"
 #include "ui_entityeditdialog.h"
 
 EntityEditDialog::EntityEditDialog(QWidget *parent): QDialog(parent), ui(new Ui::EntityEditDialog) {

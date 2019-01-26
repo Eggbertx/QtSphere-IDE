@@ -1,6 +1,6 @@
 #include <QDebug>
 #include <QFileInfo>
-#include "spherefile.h"
+#include "formats/spherefile.h"
 
 
 SphereFile::SphereFile(QObject *parent) {}

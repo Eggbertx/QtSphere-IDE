@@ -2,7 +2,7 @@
 #define TEXTEDITOR_H
 
 #include <QTextEdit>
-#include "editors/sphereeditor.h"
+#include "widgets/sphereeditor.h"
 
 class TextEditor: public SphereEditor {
 	public:

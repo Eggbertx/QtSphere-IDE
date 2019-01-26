@@ -3,7 +3,7 @@
 
 #include <QDialog>
 
-#include "formats/mapfile.h";
+#include "formats/mapfile.h"
 
 namespace Ui {
 	class EntityEditDialog;

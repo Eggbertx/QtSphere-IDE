@@ -11,9 +11,9 @@
 #include <QToolButton>
 #include <QWidget>
 
-#include "mapeditor.h"
+#include "widgets/map/mapeditor.h"
 #include "ui_mapeditor.h"
-#include "sphereeditor.h"
+#include "widgets/sphereeditor.h"
 #include "formats/mapfile.h"
 #include "formats/tileset.h"
 #include "util.h"

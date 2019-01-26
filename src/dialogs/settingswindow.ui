@@ -226,7 +226,7 @@
   <customwidget>
    <class>ColorButton</class>
    <extends>QToolButton</extends>
-   <header>colorbutton.h</header>
+   <header>widgets/colorbutton.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

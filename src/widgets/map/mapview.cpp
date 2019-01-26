@@ -10,7 +10,7 @@
 
 #include "formats/mapfile.h"
 #include "mainwindow.h"
-#include "mapview.h"
+#include "widgets/map/mapview.h"
 
 MapView::MapView(QWidget *parent) : QGraphicsView(parent) {
 	this->mapStatusFormat = "Map tile: (%1, %2) Pixel: (%3, %4)";

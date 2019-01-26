@@ -1,4 +1,4 @@
-#include "drawingwidget.h"
+#include "widgets/drawingwidget.h"
 #include "ui_drawingwidget.h"
 
 DrawingWidget::DrawingWidget(QWidget *parent): QWidget(parent), ui(new Ui::DrawingWidget) {

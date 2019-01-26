@@ -1,6 +1,6 @@
 #include <QTreeWidgetItem>
 
-#include "modifiedfilesdialog.h"
+#include "dialogs/modifiedfilesdialog.h"
 #include "ui_modifiedfilesdialog.h"
 
 ModifiedFilesDialog::ModifiedFilesDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ModifiedFilesDialog) {

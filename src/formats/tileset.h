@@ -2,7 +2,7 @@
 #define TILESET_H
 
 #include <QObject>
-#include "spherefile.h"
+#include "formats/spherefile.h"
 
 class Tileset : public SphereFile {
 	Q_OBJECT

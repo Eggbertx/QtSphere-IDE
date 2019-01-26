@@ -2,7 +2,7 @@
 #include <QFileInfo>
 #include <QSizePolicy>
 #include <QToolButton>
-#include "soundplayer.h"
+#include "widgets/soundplayer.h"
 #include "ui_soundplayer.h"
 #include "mainwindow.h"
 

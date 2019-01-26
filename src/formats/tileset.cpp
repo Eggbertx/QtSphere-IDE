@@ -1,7 +1,7 @@
 #include <QByteArray>
 #include <QDataStream>
-#include "spherefile.h"
-#include "tileset.h"
+#include "formats/spherefile.h"
+#include "formats/tileset.h"
 #include "util.h"
 
 Tileset::Tileset(QObject *parent) : SphereFile (parent) {

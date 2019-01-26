@@ -11,7 +11,7 @@
 #include <QStringList>
 #include <QTextEdit>
 
-#include "startpage.h"
+#include "widgets/startpage.h"
 #include "ui_startpage.h"
 #include "mainwindow.h"
 #include "qsiproject.h"

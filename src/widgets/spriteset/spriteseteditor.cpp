@@ -12,14 +12,14 @@
 #include <QToolButton>
 #include <QFileInfo>
 
-#include "spriteseteditor.h"
+#include "widgets/spriteset/spriteseteditor.h"
 #include "ui_spriteseteditor.h"
-#include "palettewidget.h"
-#include "imagechooser.h"
+#include "widgets/palettewidget.h"
+#include "widgets/imagechooser.h"
 #include "mainwindow.h"
-#include "editors/ssdirectionview.h"
+#include "widgets/spriteset/ssdirectionview.h"
 #include "formats/spriteset.h"
-#include "editors/sphereeditor.h"
+#include "widgets/sphereeditor.h"
 
 SpritesetEditor::SpritesetEditor(QWidget *parent): SphereEditor (parent), ui(new Ui::SpritesetEditor) {
 	ui->setupUi(this);

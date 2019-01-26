@@ -2,7 +2,7 @@
 #include <QMouseEvent>
 #include <QStyle>
 
-#include "colorbutton.h"
+#include "widgets/colorbutton.h"
 
 ColorButton::ColorButton(QWidget *parent,QColor color): QToolButton(parent) {
 	this->color = color;

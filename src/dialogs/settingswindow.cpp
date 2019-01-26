@@ -9,7 +9,7 @@
 #include <QStyle>
 
 #include "mainwindow.h"
-#include "settingswindow.h"
+#include "dialogs/settingswindow.h"
 #include "ui_settingswindow.h"
 #include "util.h"
 

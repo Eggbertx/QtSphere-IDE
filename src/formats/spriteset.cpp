@@ -8,10 +8,10 @@
 #include <QPoint>
 
 #include "mainwindow.h"
-#include "spriteset.h"
+#include "formats/spriteset.h"
 #include "util.h"
 #include "formats/spherefile.h"
-#include "importoptionsdialog.h"
+#include "dialogs/importoptionsdialog.h"
 
 Spriteset::Spriteset(QObject *parent) : SphereFile(parent) {}
 

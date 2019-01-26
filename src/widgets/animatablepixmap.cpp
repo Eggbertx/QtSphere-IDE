@@ -5,7 +5,7 @@
 #include <QPixmap>
 #include <QTimer>
 
-#include "animatablepixmap.h"
+#include "widgets/animatablepixmap.h"
 
 AnimatablePixmap::AnimatablePixmap(bool showTransparency, QWidget *parent) : QGraphicsView(parent) {
 	this->init(showTransparency);

@@ -1,6 +1,6 @@
 #include <QUndoStack>
 
-#include "sphereeditor.h"
+#include "widgets/sphereeditor.h"
 
 SphereEditor::SphereEditor(QWidget* parent): QWidget(parent) {
 	this->type = SphereEditor::None;

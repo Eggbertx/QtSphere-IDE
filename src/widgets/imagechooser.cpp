@@ -6,7 +6,7 @@
 #include <QPoint>
 #include <QPalette>
 #include <QPixmap>
-#include "imagechooser.h"
+#include "widgets/imagechooser.h"
 #include "formats/spriteset.h"
 
 ImageChooser::ImageChooser(bool showTransparency, QWidget *parent): QWidget(parent) {

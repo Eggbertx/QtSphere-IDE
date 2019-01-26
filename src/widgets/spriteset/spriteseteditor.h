@@ -3,8 +3,8 @@
 
 #include <QWidget>
 #include "formats/spriteset.h"
-#include "editors/sphereeditor.h"
-#include "imagechooser.h"
+#include "widgets/sphereeditor.h"
+#include "widgets/imagechooser.h"
 
 namespace Ui {
 	class SpritesetEditor;

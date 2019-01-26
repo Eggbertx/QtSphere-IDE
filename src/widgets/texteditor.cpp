@@ -1,6 +1,6 @@
 #include <QFont>
 #include <QTextEdit>
-#include "texteditor.h"
+#include "widgets/texteditor.h"
 
 TextEditor::TextEditor(QWidget *parent): SphereEditor(parent) {
 	this->type = SphereEditor::TextEditor;

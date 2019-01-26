@@ -5,7 +5,7 @@
 #include <QSize>
 #include <QSpinBox>
 
-#include "importoptionsdialog.h"
+#include "dialogs/importoptionsdialog.h"
 #include "ui_importoptionsdialog.h"
 
 ImportOptionsDialog::ImportOptionsDialog(QWidget *parent): QDialog(parent), ui(new Ui::ImportOptionsDialog) {

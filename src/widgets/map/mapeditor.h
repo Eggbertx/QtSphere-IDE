@@ -6,10 +6,10 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-#include "sphereeditor.h"
+#include "widgets/sphereeditor.h"
 #include "formats/mapfile.h"
-#include "mapview.h"
-#include "wrappedgraphicsview.h"
+#include "widgets/map/mapview.h"
+#include "widgets/wrappedgraphicsview.h"
 
 namespace Ui {
 	class MapEditor;

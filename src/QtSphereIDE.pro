@@ -15,73 +15,73 @@ MOC_DIR=temp_files
 SOURCES += \
 	main.cpp\
 	mainwindow.cpp \
-	aboutdialog.cpp \
+	dialogs/aboutdialog.cpp \
 	util.cpp \
-	modifiedfilesdialog.cpp \
-	settingswindow.cpp \
+	dialogs/modifiedfilesdialog.cpp \
+	dialogs/settingswindow.cpp \
 	formats/mapfile.cpp \
 	formats/spherefile.cpp \
 	qsiproject.cpp \
-	projectpropertiesdialog.cpp \
+	dialogs/projectpropertiesdialog.cpp \
 	formats/spriteset.cpp \
-	editors/spriteseteditor.cpp \
-	palettewidget.cpp \
-	imagechooser.cpp \
-	drawingwidget.cpp \
-	editors/ssdirectionview.cpp \
-	soundplayer.cpp \
-	importoptionsdialog.cpp \
-	startpage.cpp \
-	editors/sphereeditor.cpp \
-	editors/texteditor.cpp \
-	editors/mapeditor.cpp \
+	widgets/spriteset/spriteseteditor.cpp \
+	widgets/palettewidget.cpp \
+	widgets/imagechooser.cpp \
+	widgets/drawingwidget.cpp \
+	widgets/spriteset/ssdirectionview.cpp \
+	widgets/soundplayer.cpp \
+	dialogs/importoptionsdialog.cpp \
+	widgets/startpage.cpp \
+	widgets/sphereeditor.cpp \
+	widgets/texteditor.cpp \
+	widgets/map/mapeditor.cpp \
 	formats/tileset.cpp \
-	wrappedgraphicsview.cpp \
-	mapview.cpp \
-	colorbutton.cpp \
-	entityeditdialog.cpp
+	widgets/wrappedgraphicsview.cpp \
+	widgets/map/mapview.cpp \
+	widgets/colorbutton.cpp \
+	dialogs/entityeditdialog.cpp
 
 HEADERS += \
 	mainwindow.h \
-	aboutdialog.h \
+	dialogs/aboutdialog.h \
 	util.h \
-	modifiedfilesdialog.h \
-	settingswindow.h \
+	dialogs/modifiedfilesdialog.h \
+	dialogs/settingswindow.h \
 	formats/mapfile.h \
 	formats/spherefile.h \
 	qsiproject.h \
-	projectpropertiesdialog.h \
+	dialogs/projectpropertiesdialog.h \
 	formats/spriteset.h \
-    editors/spriteseteditor.h \
-	palettewidget.h \
-	imagechooser.h \
-	drawingwidget.h \
-	editors/ssdirectionview.h \
-	soundplayer.h \
-	importoptionsdialog.h \
-	startpage.h \
-	editors/sphereeditor.h \
-	editors/texteditor.h \
-	editors/mapeditor.h \
+	widgets/spriteset/spriteseteditor.h \
+	widgets/palettewidget.h \
+	widgets/imagechooser.h \
+	widgets/drawingwidget.h \
+	widgets/spriteset/ssdirectionview.h \
+	widgets/soundplayer.h \
+	dialogs/importoptionsdialog.h \
+	widgets/startpage.h \
+	widgets/sphereeditor.h \
+	widgets/texteditor.h \
+	widgets/map/mapeditor.h \
 	formats/tileset.h \
-	wrappedgraphicsview.h \
-	mapview.h \
-	colorbutton.h \
-	entityeditdialog.h
+	widgets/wrappedgraphicsview.h \
+	widgets/map/mapview.h \
+	widgets/colorbutton.h \
+	dialogs/entityeditdialog.h
 
 FORMS += \
 	mainwindow.ui \
-	aboutdialog.ui \
-	modifiedfilesdialog.ui \
-	settingswindow.ui \
-	projectpropertiesdialog.ui \
-	editors/spriteseteditor.ui \
-	drawingwidget.ui \
-	soundplayer.ui \
-	importoptionsdialog.ui \
-	startpage.ui \
-	editors/mapeditor.ui \
-	entityeditdialog.ui
+	dialogs/aboutdialog.ui \
+	dialogs/modifiedfilesdialog.ui \
+	dialogs/settingswindow.ui \
+	dialogs/projectpropertiesdialog.ui \
+	widgets/spriteset/spriteseteditor.ui \
+	widgets/drawingwidget.ui \
+	widgets/soundplayer.ui \
+	dialogs/importoptionsdialog.ui \
+	widgets/startpage.ui \
+	widgets/map/mapeditor.ui \
+	dialogs/entityeditdialog.ui
 
 RESOURCES += res/qsires.qrc
 

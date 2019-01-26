@@ -10,7 +10,7 @@
 
 #include "util.h"
 #include "mainwindow.h"
-#include "modifiedfilesdialog.h"
+#include "dialogs/modifiedfilesdialog.h"
 #include "formats/spherefile.h"
 
 

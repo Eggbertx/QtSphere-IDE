@@ -12,8 +12,8 @@
 #include <QToolButton>
 
 #include "formats/spriteset.h"
-#include "spriteseteditor.h"
-#include "ssdirectionview.h"
+#include "widgets/spriteset/spriteseteditor.h"
+#include "widgets/spriteset/ssdirectionview.h"
 #include "util.h"
 
 SSDirectionView::SSDirectionView(QString name, int numFrames, Spriteset::SSDirection* ssDirection, QWidget *parent): QFrame(parent) {

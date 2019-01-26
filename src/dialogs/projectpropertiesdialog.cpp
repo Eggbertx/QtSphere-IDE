@@ -5,7 +5,7 @@
 #include <QToolButton>
 #include <QFileDialog>
 
-#include "projectpropertiesdialog.h"
+#include "dialogs/projectpropertiesdialog.h"
 #include "ui_projectpropertiesdialog.h"
 #include "qsiproject.h"
 

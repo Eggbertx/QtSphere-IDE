@@ -4,7 +4,7 @@
 
 #include <QFile>
 #include "formats/spherefile.h"
-#include "importoptionsdialog.h"
+#include "dialogs/importoptionsdialog.h"
 
 class Spriteset : public SphereFile {
 	Q_OBJECT

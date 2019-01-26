@@ -9,11 +9,11 @@
 #include <QVariant>
 #include <QComboBox>
 
-#include "editors/sphereeditor.h"
+#include "widgets/sphereeditor.h"
 #include "formats/spherefile.h"
 #include "qsiproject.h"
-#include "soundplayer.h"
-#include "startpage.h"
+#include "widgets/soundplayer.h"
+#include "widgets/startpage.h"
 
 namespace Ui {
 	class MainWindow;
