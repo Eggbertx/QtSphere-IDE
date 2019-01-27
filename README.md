@@ -1,7 +1,7 @@
 # QtSphere IDE
 A cross-platform IDE for the [Sphere game engine](http://spheredev.org)
 
-![Screenshot](screenshots/screenshot-spriteset.png)
+![Screenshot](screenshots/screenshot-map.png)
 
 ## Dependencies
 * Qt5
