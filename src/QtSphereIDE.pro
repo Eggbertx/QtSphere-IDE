@@ -39,7 +39,9 @@ SOURCES += \
 	widgets/wrappedgraphicsview.cpp \
 	widgets/map/mapview.cpp \
 	widgets/colorbutton.cpp \
-	dialogs/entityeditdialog.cpp
+	dialogs/entityeditdialog.cpp \
+	widgets/map/maplayerstable.cpp \
+	dialogs/layerpropertiesdialog.cpp
 
 HEADERS += \
 	mainwindow.h \
@@ -67,7 +69,9 @@ HEADERS += \
 	widgets/wrappedgraphicsview.h \
 	widgets/map/mapview.h \
 	widgets/colorbutton.h \
-	dialogs/entityeditdialog.h
+	dialogs/entityeditdialog.h \
+	widgets/map/maplayerstable.h \
+	dialogs/layerpropertiesdialog.h
 
 FORMS += \
 	mainwindow.ui \
@@ -81,7 +85,8 @@ FORMS += \
 	dialogs/importoptionsdialog.ui \
 	widgets/startpage.ui \
 	widgets/map/mapeditor.ui \
-	dialogs/entityeditdialog.ui
+	dialogs/entityeditdialog.ui \
+	dialogs/layerpropertiesdialog.ui
 
 RESOURCES += res/qsires.qrc
 
