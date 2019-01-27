@@ -203,7 +203,7 @@ QList<MapFile::layer> MapFile::getLayers() {
 }
 
 MapFile::layer* MapFile::getLayer(int index) {
-	if(index > 0 && index < this->layers.length()) return &this->layers[index];
+	if(index > -1 && index < this->layers.length()) return &this->layers[index];
 	return nullptr;
 }
 

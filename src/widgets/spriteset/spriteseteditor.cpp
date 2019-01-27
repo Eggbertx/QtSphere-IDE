@@ -21,7 +21,7 @@
 #include "formats/spriteset.h"
 #include "widgets/sphereeditor.h"
 
-SpritesetEditor::SpritesetEditor(QWidget *parent): SphereEditor (parent), ui(new Ui::SpritesetEditor) {
+SpritesetEditor::SpritesetEditor(QWidget *parent): SphereEditor(parent), ui(new Ui::SpritesetEditor) {
 	ui->setupUi(this);
 	this->type = SphereEditor::SpritesetEditor;
 	this->setContextMenuPolicy(Qt::CustomContextMenu);

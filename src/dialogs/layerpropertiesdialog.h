@@ -17,15 +17,21 @@ class LayerPropertiesDialog : public QDialog {
 		~LayerPropertiesDialog();
 		QString getName();
 		void setName(QString name);
+		int getWidth();
+		int getHeight();
+		void setSize(int width, int height);
 		int getHorizontalParallax();
 		int getVerticalParallax();
 		void setParallax(int h, int v);
 		bool parallaxEnabled();
 		void setParallaxEnabled(bool enabled);
+		void setReflectiveEnabled(bool enabled);
 		bool reflectiveEnabled();
+		int getAutoScrollingWidth();
+		int getAutoScrollingHeight();
+		void setAutoScrolling(int h, int v);
 
 	private slots:
-		void on_reflective_chk_stateChanged(int arg1);
 		void on_parallaxChk_stateChanged(int arg1);
 		void on_horizontalParallaxSlider_valueChanged(int value);
 		void on_verticalParallaxSlider_valueChanged(int value);

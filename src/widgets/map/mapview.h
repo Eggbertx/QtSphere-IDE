@@ -14,10 +14,12 @@ class MapView : public QGraphicsView {
 		explicit MapView(QWidget *parent = nullptr);
 		~MapView() override;
 		bool loadMap(QString filename);
-		bool attachMap(MapFile* map);
-		MapFile::layer *getLayer(int index);
 		bool openFile(QString filename);
 		MapFile* attachedMap();
+		bool attachMap(MapFile* map);
+		MapFile::layer *getLayer(int index);
+		void setLayerVisible(int layer, bool visible);
+		bool toggleLayerVisible(int layer);
 		QPoint widgetToMapPos(QPoint pos);
 		QPoint widgetToMapPos(int x, int y);
 		QPoint mapToWidgetPos(QPoint pos);
@@ -46,7 +48,7 @@ class MapView : public QGraphicsView {
 			int width;
 			int height;
 		}rmp_layer;
-		QList<rmp_layer> layers;
+//		QList<rmp_layer> layers;
 		MapFile* mapFile;
 		int drawSize = 1;
 		QGraphicsItemGroup* pointerGroup;

@@ -14,6 +14,7 @@
 #include "widgets/map/mapeditor.h"
 #include "ui_mapeditor.h"
 #include "widgets/sphereeditor.h"
+#include "dialogs/layerpropertiesdialog.h"
 #include "formats/mapfile.h"
 #include "formats/tileset.h"
 #include "util.h"
@@ -23,6 +24,14 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	this->menuBar = new QToolBar();
 //	this->menuBar->setFixedHeight(32);
 	QActionGroup toolActions(this->menuBar);
+	ui->layersTable->setContextMenuPolicy(Qt::CustomContextMenu);
+	this->layerMenu = new QMenu(this);
+	this->layerMenu->addAction("Insert layer");
+	this->layerMenu->addAction("Delete layer");
+	this->layerMenu->addAction("Duplicate layer");
+	this->layerMenu->addSeparator();
+	this->layerMenu->addAction("Toggle lock layer");
+	this->layerMenu->addAction("Properties", this, SLOT(layerPropertiesRequested(bool)));
 
 	this->pencilMenu = new QMenu(this);
 	this->pencilMenu->addActions(QList<QAction*>({
@@ -70,10 +79,13 @@ MapEditor::~MapEditor() {
 	disconnect(this->menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
 	disconnect(this->pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
 	disconnect(this->tilesetView, SIGNAL(indexChanged(int)), this, SLOT(setTileIndex(int)));
+	disconnect(this->layerMenu, SIGNAL(triggered(bool)), this, SLOT(layerPropertiesRequested(bool)));
 	delete ui;
 	delete this->mapView;
 	delete this->pencilMenu;
+	delete this->layerMenu;
 	delete this->menuBar;
+	delete this->tilesetView;
 }
 
 bool MapEditor::openFile(QString filename) {
@@ -135,21 +147,16 @@ void MapEditor::on_layersTable_cellClicked(int row, int column) {
 		case 0: {
 			QWidget* item = ui->layersTable->cellWidget(row,column);
 			QLabel* eyeLabel = dynamic_cast<QLabel*>(item);
-			MapFile::layer* toggled_layer = this->mapView->getLayer(row);
-			toggled_layer->visible = !toggled_layer->visible;
-
-			if(!toggled_layer->visible)
-				eyeLabel->setPixmap(QPixmap(":/icons/eye-closed.png"));
-			else
+			if(this->mapView->toggleLayerVisible(row))
 				eyeLabel->setPixmap(QPixmap(":/icons/eye.png"));
+			else
+				eyeLabel->setPixmap(QPixmap(":/icons/eye-closed.png"));
 		}
 		break;
 		case 2: {
 			if(ui->layersTable->rowCount() > 1)
 				ui->layersTable->removeRow(row);
 		}
-		break;
-		default:
 		break;
 	}
 }
@@ -172,4 +179,26 @@ void MapEditor::setCurrentTool(QAction* tool) {
 
 void MapEditor::setTileIndex(int tile) {
 	this->mapView->setCurrentTile(tile);
+}
+
+void MapEditor::on_layersTable_customContextMenuRequested(const QPoint &pos) {
+	this->layerMenu->exec(ui->layersTable->mapToGlobal(pos));
+}
+
+void MapEditor::layerPropertiesRequested(bool triggered) {
+	LayerPropertiesDialog lpd;
+	MapFile::layer* l = this->mapView->getLayer(ui->layersTable->currentRow());
+	lpd.setName(l->name);
+	lpd.setSize(l->header.width,l->header.height);
+	lpd.setReflectiveEnabled(l->header.reflective);
+	lpd.setParallax(l->header.parallax_x,l->header.parallax_y);
+	lpd.setAutoScrolling(l->header.scrolling_x,l->header.scrolling_y);
+	if(lpd.exec() == QDialog::Rejected) return;
+
+	ui->layersTable->item(ui->layersTable->currentRow(),1)->setText(lpd.getName());
+}
+
+void MapEditor::on_layersTable_itemChanged(QTableWidgetItem *item) {
+	if(item->column() != 1) return;
+	this->mapView->getLayer(item->row())->name = item->text();
 }

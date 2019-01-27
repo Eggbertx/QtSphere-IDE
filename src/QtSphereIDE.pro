@@ -40,7 +40,6 @@ SOURCES += \
 	widgets/map/mapview.cpp \
 	widgets/colorbutton.cpp \
 	dialogs/entityeditdialog.cpp \
-	widgets/map/maplayerstable.cpp \
 	dialogs/layerpropertiesdialog.cpp
 
 HEADERS += \
@@ -70,7 +69,6 @@ HEADERS += \
 	widgets/map/mapview.h \
 	widgets/colorbutton.h \
 	dialogs/entityeditdialog.h \
-	widgets/map/maplayerstable.h \
 	dialogs/layerpropertiesdialog.h
 
 FORMS += \

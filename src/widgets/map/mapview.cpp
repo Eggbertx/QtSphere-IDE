@@ -95,6 +95,22 @@ MapFile::layer* MapView::getLayer(int index) {
 	return this->mapFile->getLayer(index);
 }
 
+void MapView::setLayerVisible(int layer, bool visible) {
+	MapFile::layer* l = this->mapFile->getLayer(layer);
+	if(l != nullptr) {
+		l->visible = visible;
+	}
+}
+
+bool MapView::toggleLayerVisible(int layer) {
+	MapFile::layer* l = this->mapFile->getLayer(layer);
+	if(l != nullptr) {
+		l->visible = !l->visible;
+		return l->visible;
+	}
+	return false;
+}
+
 void MapView::drawTile(int index) {
 	int tileWidth = this->mapFile->tileSize().width();
 	int tileHeight = this->mapFile->tileSize().height();

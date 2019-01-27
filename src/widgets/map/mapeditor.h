@@ -2,6 +2,7 @@
 #define MAPEDITOR_H
 
 #include <QGraphicsScene>
+#include <QTableWidgetItem>
 #include <QToolBar>
 #include <QVBoxLayout>
 #include <QWidget>
@@ -30,6 +31,9 @@ class MapEditor : public SphereEditor {
 		void setPencilSize(QAction* size);
 		void setCurrentTool(QAction* tool);
 		void setTileIndex(int tile);
+		void on_layersTable_customContextMenuRequested(const QPoint &pos);
+		void layerPropertiesRequested(bool triggered);
+		void on_layersTable_itemChanged(QTableWidgetItem* item);
 
 	private:
 		Ui::MapEditor *ui;
@@ -39,6 +43,7 @@ class MapEditor : public SphereEditor {
 		WrappedGraphicsView* tilesetView;
 		QToolBar* menuBar;
 		QMenu* pencilMenu;
+		QMenu* layerMenu;
 };
 
 #endif // MAPEDITOR_H

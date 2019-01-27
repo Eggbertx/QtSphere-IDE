@@ -17,6 +17,19 @@ void LayerPropertiesDialog::setName(QString name) {
 	ui->nameLineEdit->setText(name);
 }
 
+int LayerPropertiesDialog::getWidth() {
+	return ui->widthSpinBox->value();
+}
+
+int LayerPropertiesDialog::getHeight() {
+	return ui->heightSpinBox->value();
+}
+
+void LayerPropertiesDialog::setSize(int width, int height) {
+	ui->widthSpinBox->setValue(width);
+	ui->heightSpinBox->setValue(height);
+}
+
 int LayerPropertiesDialog::getHorizontalParallax() {
 	return ui->horizontalParallaxSlider->value();
 }
@@ -38,19 +51,32 @@ void LayerPropertiesDialog::setParallaxEnabled(bool enabled) {
 	ui->parallaxChk->setChecked(enabled);
 }
 
+void LayerPropertiesDialog::setReflectiveEnabled(bool enabled) {
+	ui->reflective_chk->setChecked(enabled);
+}
+
 bool LayerPropertiesDialog::reflectiveEnabled() {
 	return ui->reflective_chk->isChecked();
 }
 
+int LayerPropertiesDialog::getAutoScrollingWidth() {
+	return ui->horizontalAsSlider->value();
+}
 
-void LayerPropertiesDialog::on_reflective_chk_stateChanged(int arg1) {
-	ui->horizontalAsSlider->setEnabled(arg1 == Qt::Checked);
-	ui->verticalAsSlider->setEnabled(arg1 == Qt::Checked);
+int LayerPropertiesDialog::getAutoScrollingHeight() {
+	return ui->verticalAsSlider->value();
+}
+
+void LayerPropertiesDialog::setAutoScrolling(int h, int v) {
+	ui->horizontalAsSlider->setValue(h);
+	ui->verticalAsSlider->setValue(v);
 }
 
 void LayerPropertiesDialog::on_parallaxChk_stateChanged(int arg1) {
 	ui->horizontalParallaxSlider->setEnabled(arg1 == Qt::Checked);
 	ui->verticalParallaxSlider->setEnabled(arg1 == Qt::Checked);
+	ui->horizontalAsSlider->setEnabled(arg1 == Qt::Checked);
+	ui->verticalAsSlider->setEnabled(arg1 == Qt::Checked);
 }
 
 void LayerPropertiesDialog::on_horizontalParallaxSlider_valueChanged(int value) {
