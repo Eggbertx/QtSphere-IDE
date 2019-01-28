@@ -31,9 +31,7 @@ class MainWindow : public QMainWindow {
 		QString getTheme();
 		void setTheme(QString theme = "default");
 		void openFile(QString filename = "");
-		//void addWidgetTab(QWidget* widget, QString tabname);
 		void openProject(QString fileName);
-		void refreshProjectList();
 		void saveCurrentTab();
 		void prepareForImage();
 		void prepareForMap();

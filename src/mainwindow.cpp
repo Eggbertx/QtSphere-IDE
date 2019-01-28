@@ -41,8 +41,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	Q_ASSERT(!_instance);
 	_instance = this;
 	ui->setupUi(this);
+	this->setMenuBar(ui->menuBar);
 	ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-
 	this->statusLabel = new QLabel("Ready.");
 	ui->statusBar->addWidget(this->statusLabel);
 	ui->toolbarOpenButton->setIcon(this->style()->standardIcon(QStyle::SP_DialogOpenButton));
@@ -196,7 +196,7 @@ void MainWindow::saveCurrentTab() {
 	} else if(widgetType == "SpritesetEditor") {
 		SpritesetEditor* currentEditor = dynamic_cast<SpritesetEditor*>(ui->openFileTabs->currentWidget());
 		QString saveFileName = QFileDialog::getSaveFileName(this,
-								"Save spriteset", "","Spriteset (*.rss);;All files (*)");
+			"Save spriteset", "","Spriteset (*.rss);;All files (*)");
 		if(!currentEditor->spriteset->save(saveFileName)) {
 			errorBox("Failed saving file: " + currentEditor->spriteset->fileName());
 		}
@@ -218,10 +218,6 @@ void MainWindow::updateTreeView() {
 		ui->treeView->hideColumn(i);
 	ui->treeView->setRootIndex(model->index(this->project->getPath(false)));
 	this->setWindowTitle("QtSphereIDE " + QString(VERSION) + " - " + QDir(this->project->getPath(false)).dirName());
-}
-
-void MainWindow::refreshProjectList() {
-
 }
 
 void MainWindow::openFile(QString filename) {

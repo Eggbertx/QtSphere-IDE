@@ -81,7 +81,6 @@ void Spriteset::createNew() {
 }
 
 bool Spriteset::open(QString filename) {
-	qDebug() << "Opening" << filename;
 	this->filename = filename;
 	this->file = new QFile(this->filename);
 

@@ -17,7 +17,6 @@ int main(int argc, char *argv[]) {
 
 	MainWindow w;
 	w.setWindowTitle(a.applicationDisplayName() + " v" + a.applicationVersion());
-	w.setWindowIcon(QIcon(QPixmap(":/icons/icon.png")));
 	QSettings settings;
 	w.setTheme(settings.value("theme").toString());
 	if(settings.value("maximized", true).toBool()) {

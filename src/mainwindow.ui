@@ -19,14 +19,9 @@
   <property name="windowTitle">
    <string>QtSphere IDE</string>
   </property>
-  <property name="documentMode">
-   <bool>false</bool>
-  </property>
-  <property name="tabShape">
-   <enum>QTabWidget::Rounded</enum>
-  </property>
-  <property name="unifiedTitleAndToolBarOnMac">
-   <bool>false</bool>
+  <property name="windowIcon">
+   <iconset resource="res/qsires.qrc">
+    <normaloff>:/icons/icon.png</normaloff>:/icons/icon.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="autoFillBackground">
@@ -295,7 +290,7 @@
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
-     <string>File</string>
+     <string>&amp;File</string>
     </property>
     <widget class="QMenu" name="menuNew">
      <property name="title">
@@ -339,7 +334,7 @@
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Edit</string>
+     <string>&amp;Edit</string>
     </property>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
@@ -350,9 +345,46 @@
     <addaction name="separator"/>
     <addaction name="actionSelect_All"/>
    </widget>
+   <widget class="QMenu" name="menuProject">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="title">
+     <string>&amp;Project</string>
+    </property>
+    <addaction name="actionOpen_Game_Directory"/>
+    <addaction name="actionRefresh"/>
+    <addaction name="actionClose"/>
+    <addaction name="separator"/>
+    <addaction name="actionRun_Cell"/>
+    <addaction name="actionPackage_Game"/>
+    <addaction name="separator"/>
+    <addaction name="actionProject_Properties"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>&amp;Tools</string>
+    </property>
+    <addaction name="actionConfigure_Engine"/>
+    <addaction name="actionConfigure_QtSphere_IDE"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="separator"/>
+    <addaction name="actionQSIGithub"/>
+    <addaction name="actionMSGithub"/>
+    <addaction name="actionSpherical_community"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
+   </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
-     <string>View</string>
+     <string>&amp;View</string>
     </property>
     <widget class="QMenu" name="menuZoom">
      <property name="title">
@@ -372,43 +404,6 @@
     <addaction name="actionSound_Test"/>
     <addaction name="separator"/>
     <addaction name="menuZoom"/>
-   </widget>
-   <widget class="QMenu" name="menuProject">
-    <property name="enabled">
-     <bool>false</bool>
-    </property>
-    <property name="title">
-     <string>Project</string>
-    </property>
-    <addaction name="actionOpen_Game_Directory"/>
-    <addaction name="actionRefresh"/>
-    <addaction name="actionClose"/>
-    <addaction name="separator"/>
-    <addaction name="actionRun_Cell"/>
-    <addaction name="actionPackage_Game"/>
-    <addaction name="separator"/>
-    <addaction name="actionProject_Properties"/>
-   </widget>
-   <widget class="QMenu" name="menuTools">
-    <property name="title">
-     <string>Tools</string>
-    </property>
-    <addaction name="actionConfigure_Engine"/>
-    <addaction name="actionConfigure_QtSphere_IDE"/>
-   </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="enabled">
-     <bool>true</bool>
-    </property>
-    <property name="title">
-     <string>Help</string>
-    </property>
-    <addaction name="separator"/>
-    <addaction name="actionQSIGithub"/>
-    <addaction name="actionMSGithub"/>
-    <addaction name="actionSpherical_community"/>
-    <addaction name="separator"/>
-    <addaction name="actionAbout"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -443,7 +438,7 @@
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionClose_Project">
    <property name="text">
-    <string>Close Project</string>
+    <string>&amp;Close Project</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
@@ -451,12 +446,12 @@
   </action>
   <action name="actionOpenFile">
    <property name="text">
-    <string>Open File...</string>
+    <string>&amp;Open File...</string>
    </property>
   </action>
   <action name="actionSave">
    <property name="text">
-    <string>Save</string>
+    <string>&amp;Save</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -464,12 +459,12 @@
   </action>
   <action name="actionSave_As">
    <property name="text">
-    <string>Save As...</string>
+    <string>Save &amp;As...</string>
    </property>
   </action>
   <action name="actionSave_All">
    <property name="text">
-    <string>Save All</string>
+    <string>Save A&amp;ll</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+S</string>
@@ -493,7 +488,7 @@
   </action>
   <action name="actionCut">
    <property name="text">
-    <string>Cut</string>
+    <string>Cu&amp;t</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+X</string>
@@ -501,7 +496,7 @@
   </action>
   <action name="actionCopy">
    <property name="text">
-    <string>Copy</string>
+    <string>&amp;Copy</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+C</string>
@@ -509,7 +504,7 @@
   </action>
   <action name="actionPaste">
    <property name="text">
-    <string>Paste</string>
+    <string>&amp;Paste</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
@@ -517,7 +512,7 @@
   </action>
   <action name="actionSelect_All">
    <property name="text">
-    <string>Select All</string>
+    <string>Select &amp;All</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
@@ -581,7 +576,7 @@
   </action>
   <action name="actionExit">
    <property name="text">
-    <string>Exit</string>
+    <string>E&amp;xit</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -697,7 +692,7 @@
   </action>
   <action name="actionOpenProject">
    <property name="text">
-    <string>Open Project...</string>
+    <string>Open &amp;Project...</string>
    </property>
   </action>
   <action name="actionClearRecent">
