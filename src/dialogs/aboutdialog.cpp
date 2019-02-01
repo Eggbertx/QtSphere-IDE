@@ -15,5 +15,5 @@ AboutDialog::~AboutDialog() {
 }
 
 void AboutDialog::on_closeAboutDialog_clicked() {
-	this->close();
+	close();
 }

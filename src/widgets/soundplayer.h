@@ -13,10 +13,10 @@ class SoundPlayer : public QWidget {
 
 	public:
 		explicit SoundPlayer(QWidget *parent = 0);
+		~SoundPlayer();
 		void load(QString file);
 		void play();
 		void stop();
-		~SoundPlayer();
 
 	private slots:
 		void audioStateChanged(QMediaPlayer::State state);
@@ -29,9 +29,9 @@ class SoundPlayer : public QWidget {
 
 	private:
 		Ui::SoundPlayer *ui;
-		QMediaPlayer *mediaPlayer;
-		bool loopingAudio = false;
-		qint64 audioDuration;
+		QMediaPlayer* m_mediaPlayer;
+		bool m_loopingAudio = false;
+		qint64 m_audioDuration;
 
 };
 

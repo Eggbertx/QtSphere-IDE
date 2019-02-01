@@ -23,8 +23,8 @@ class ProjectPropertiesDialog : public QDialog {
 
 private:
 		Ui::ProjectPropertiesDialog *ui;
-		bool isNew = false;
-		QSIProject* project;
+		bool m_isNew = false;
+		QSIProject* m_project;
 };
 
 #endif // PROJECTPROPERTIESDIALOG_H

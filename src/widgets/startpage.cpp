@@ -19,21 +19,23 @@
 
 StartPage::StartPage(QWidget *parent) : QWidget(parent), ui(new Ui::StartPage) {
 	ui->setupUi(this);
-	this->baseInfoHTML = ui->gameInfoText->toHtml();
+	m_baseInfoHTML = ui->gameInfoText->toHtml();
 	QList<int> mainSplitterList;
 	mainSplitterList << 250 << 100;
 	ui->splitter->setSizes(mainSplitterList);
-	this->setGameInfoText("","","","","");
-	this->gameList = QList<QSIProject*>();
+	setGameInfoText("","","","","");
+	m_gameList = QList<QSIProject*>();
 	ui->projectIcons->setContextMenuPolicy(Qt::CustomContextMenu);
-	this->rightClickMenu = new QMenu(ui->projectIcons);
-	this->startGameAction = this->rightClickMenu->addAction("Start game");
-	this->loadProjectAction = this->rightClickMenu->addAction("Load project");
-	this->openProjectDirAction = this->rightClickMenu->addAction("Open project directory");
-	this->rightClickMenu->addSeparator();
-	this->rightClickMenu->addAction("Refresh game list");
+	m_rightClickMenu = new QMenu(ui->projectIcons);
 
-	this->refreshGameList();
+
+	m_startGameAction = m_rightClickMenu->addAction("Start game");
+	m_loadProjectAction = m_rightClickMenu->addAction("Load project");
+	m_openProjectDirAction = m_rightClickMenu->addAction("Open project directory");
+	m_rightClickMenu->addSeparator();
+	m_rightClickMenu->addAction("Refresh game list");
+
+	refreshGameList();
 }
 
 StartPage::~StartPage() {
@@ -45,7 +47,7 @@ QString StartPage::getGameInfoText() {
 }
 
 void StartPage::refreshGameList() {
-	this->gameList.clear();
+	m_gameList.clear();
 	ui->projectIcons->clear();
 	QStringList projectDirs;
 	QSettings settings;
@@ -61,18 +63,18 @@ void StartPage::refreshGameList() {
 		int numDirs = dirs.length();
 		for(int d = 0; d < numDirs; d++) {
 			QSIProject* qp = new QSIProject(dirs.at(d).absoluteFilePath());
-			if(qp->name == "") {
-				qp->name = dirs.at(d).fileName();
-				qp->width = -1;
-				qp->height = -1;
+			if(qp->getName() == "") {
+				qp->setName(dirs.at(d).fileName());
+				qp->setWidth(-1);
+				qp->setWidth(-1);
 			}
-			this->gameList << qp;
+			m_gameList << qp;
 		}
 	}
 	settings.endArray();
-	int listSize = this->gameList.length();
+	int listSize = m_gameList.length();
 	for(int m = 0; m < listSize; m++) {
-		QListWidgetItem* item = new QListWidgetItem(QIcon(":/icons/sphere-icon.png"), this->gameList.at(m)->name);
+		QListWidgetItem* item = new QListWidgetItem(QIcon(":/icons/sphere-icon.png"), m_gameList.at(m)->getName());
 		item->setTextAlignment(Qt::AlignCenter);
 		item->setSizeHint(QSize(150,80));
 		ui->projectIcons->addItem(item);
@@ -80,7 +82,7 @@ void StartPage::refreshGameList() {
 }
 
 void StartPage::setGameInfoText(QString name, QString author, QString resolution, QString path, QString description) {
-	ui->gameInfoText->setHtml(this->baseInfoHTML.right(this->baseInfoHTML.length())
+	ui->gameInfoText->setHtml(m_baseInfoHTML.right(m_baseInfoHTML.length())
 		.replace("[PROJECTNAME]", name)
 		.replace("[PROJECTAUTHOR]", author)
 		.replace("[PROJECTRESOLUTION]", resolution)
@@ -93,44 +95,44 @@ void StartPage::on_projectIcons_customContextMenuRequested(const QPoint &pos) {
 	QListWidgetItem* selected = ui->projectIcons->itemAt(pos);
 
 	bool actionsEnabled = (selected != nullptr);
-	this->startGameAction->setEnabled(false);
-	this->loadProjectAction->setEnabled(actionsEnabled);
-	this->openProjectDirAction->setEnabled(actionsEnabled);
+	m_startGameAction->setEnabled(false);
+	m_loadProjectAction->setEnabled(actionsEnabled);
+	m_openProjectDirAction->setEnabled(actionsEnabled);
 
-	QAction* choice = this->rightClickMenu->exec(ui->projectIcons->mapToGlobal(pos));
+	QAction* choice = m_rightClickMenu->exec(ui->projectIcons->mapToGlobal(pos));
 
-	if(!choice || !this->currentProject) return;
+	if(!choice || !m_currentProject) return;
 	QString text = choice->text();
 	if(text == "Start game") {
 
 	} else if(text == "Load project")  {
-		MainWindow::instance()->openProject(this->gameList.at(ui->projectIcons->currentRow())->getPath(true));
+		MainWindow::instance()->openProject(m_gameList.at(ui->projectIcons->currentRow())->getPath(true));
 	} else if(text == "Open project directory") {
-		QDesktopServices::openUrl(QUrl(this->currentProject->getPath(false)).path());
+		QDesktopServices::openUrl(QUrl(m_currentProject->getPath(false)).path());
 	} else if(text == "Refresh game list") {
-		this->refreshGameList();
+		refreshGameList();
 	}
 }
 
 void StartPage::on_projectIcons_itemActivated(QListWidgetItem *item) {
-	MainWindow::instance()->openProject(this->gameList.at(ui->projectIcons->currentRow())->getPath(true));
+	MainWindow::instance()->openProject(m_gameList.at(ui->projectIcons->currentRow())->getPath(true));
 }
 
 void StartPage::on_projectIcons_itemSelectionChanged() {
 	int currentRow = ui->projectIcons->currentRow();
-	if(this->gameList.length() == 0) return;
-	this->currentProject = this->gameList.at(currentRow);
-	if(this->currentProject == nullptr) return;
+	if(m_gameList.length() == 0) return;
+	m_currentProject = m_gameList.at(currentRow);
+	if(m_currentProject == nullptr) return;
 
 	QString displayResolution = "";
-	if(this->currentProject->width > 0 && this->currentProject->height > 0) {
-		displayResolution = QString::number(this->currentProject->width) + "x" + QString::number(currentProject->height);
+	if(m_currentProject->getWidth() > 0 && m_currentProject->getHeight() > 0) {
+		displayResolution = QString::number(m_currentProject->getWidth()) + "x" + QString::number(m_currentProject->getHeight());
 	}
-	this->setGameInfoText(
-		this->currentProject->name,
-		this->currentProject->author,
+	setGameInfoText(
+		m_currentProject->getName(),
+		m_currentProject->getAuthor(),
 		displayResolution,
-		this->currentProject->getPath(false),
-		this->currentProject->summary
+		m_currentProject->getPath(false),
+		m_currentProject->getSummary()
 	);
 }

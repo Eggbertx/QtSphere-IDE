@@ -14,7 +14,7 @@
 class SSDirectionView : public QFrame {
 	Q_OBJECT
 	public:
-		explicit SSDirectionView(QString name = "", int numFrames = 1, Spriteset::SSDirection* ssDirection = nullptr, QWidget *parent = 0);
+		explicit SSDirectionView(Spriteset* spriteset, int index, QWidget* parent = nullptr);
 		~SSDirectionView();
 		QList<QImage*> getImages();
 		QImage* getImage(int index);
@@ -27,6 +27,9 @@ class SSDirectionView : public QFrame {
 		void setZoom(int factor = 2);
 		int getZoom();
 
+	protected:
+		void mousePressEvent(QMouseEvent* event);
+
 	private slots:
 		void showContextMenu(const QPoint&pos);
 		void addFrameSlot();
@@ -34,16 +37,16 @@ class SSDirectionView : public QFrame {
 		void changeDirectionName(QString name);
 
 	private:
-		void mousePressEvent(QMouseEvent* event);
-		QWidget* framesContainer;
-		QHBoxLayout* framesLayout;
-		QLineEdit* nameLineEdit;
-		QList<QGraphicsView*> frameViews;
-		QToolButton* addFrameButton;
-		QToolButton* removeFrameButton;
-		Spriteset* spriteset;
-		Spriteset::SSDirection* ssDirection;
-		int zoomFactor;
+		QWidget* m_framesContainer;
+		QHBoxLayout* m_framesLayout;
+		QLineEdit* m_nameLineEdit;
+		QList<QGraphicsView*> m_frameViews;
+		QToolButton* m_addFrameButton;
+		QToolButton* m_removeFrameButton;
+		Spriteset* m_spriteset;
+		Spriteset::SSDirection* m_direction;
+		int m_directionIndex;
+		int m_zoomFactor;
 
 };
 

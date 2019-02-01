@@ -11,29 +11,28 @@
 
 ProjectPropertiesDialog::ProjectPropertiesDialog(bool newFile, QSIProject* project, QWidget *parent) : QDialog(parent), ui(new Ui::ProjectPropertiesDialog) {
 	ui->setupUi(this);
-	this->isNew = newFile;
-	if(this->isNew) {
-		this->setWindowTitle("New Project");
+	m_isNew = newFile;
+	if(m_isNew) {
+		setWindowTitle("New Project");
 		ui->pathLineEdit->setEnabled(true);
 		ui->pathButton->setEnabled(true);
-		this->project = new QSIProject("", this);
+		m_project = new QSIProject("", this);
 	} else {
-		this->project = project;
+		m_project = project;
 		ui->pathLineEdit->setEnabled(false);
 		ui->pathButton->setEnabled(false);
 		if(!project) return;
 		ui->pathLineEdit->setText(project->getPath(false));
-		ui->nameLineEdit->setText(project->name);
-		ui->authorLineEdit->setText(project->author);
-		ui->reswLineEdit->setText(QString::number(project->width));
-		ui->reshLineEdit->setText(QString::number(project->height));
-		ui->summaryText->document()->setPlainText(project->summary);
-		ui->buildInLineEdit->setText(project->buildDir);
-		ui->entryScriptLineEdit->setText(project->script);
+		ui->nameLineEdit->setText(project->getName());
+		ui->authorLineEdit->setText(project->getAuthor());
+		ui->reswLineEdit->setText(QString::number(project->getWidth()));
+		ui->reshLineEdit->setText(QString::number(project->getHeight()));
+		ui->summaryText->document()->setPlainText(project->getSummary());
+		ui->buildInLineEdit->setText(project->getBuidlDir());
+		ui->entryScriptLineEdit->setText(project->getMainScript());
 		if(project->getCompiler() == "Vanilla") ui->compilerCB->setCurrentIndex(0);
 		else ui->compilerCB->setCurrentIndex(1);
 	}
-	if(this->project) this->project = new QSIProject(""); // just in case
 }
 
 ProjectPropertiesDialog::~ProjectPropertiesDialog() {
@@ -41,7 +40,7 @@ ProjectPropertiesDialog::~ProjectPropertiesDialog() {
 }
 
 QSIProject* ProjectPropertiesDialog::getProject() {
-	return this->project;
+	return m_project;
 }
 
 bool ProjectPropertiesDialog::writeSGMFile() {
@@ -56,16 +55,15 @@ void ProjectPropertiesDialog::on_resolutionCBox_currentTextChanged(const QString
 }
 
 void ProjectPropertiesDialog::on_pathButton_clicked() {
-	ui->pathLineEdit->setText(QFileDialog::getExistingDirectory(this->parentWidget(),"Choose project path"));
+	ui->pathLineEdit->setText(QFileDialog::getExistingDirectory(parentWidget(),"Choose project path"));
 }
 
 void ProjectPropertiesDialog::on_buttonBox_accepted() {
-	this->project->name = ui->nameLineEdit->text();
-	this->project->author = ui->authorLineEdit->text();
-	this->project->width = ui->reswLineEdit->text().toInt();
-	this->project->height = ui->reshLineEdit->text().toInt();
-	this->project->summary = ui->summaryText->document()->toPlainText();
-	this->project->script = ui->entryScriptLineEdit->text();
-	this->project->buildDir = ui->buildInLineEdit->text();
-	this->project->setCompiler(ui->compilerCB->currentText());
+	m_project->setName(ui->nameLineEdit->text());
+	m_project->setAuthor(ui->authorLineEdit->text());
+	m_project->setSize(ui->reswLineEdit->text().toInt(), ui->reshLineEdit->text().toInt());
+	m_project->setSummary(ui->summaryText->document()->toPlainText());
+	m_project->setMainScript(ui->entryScriptLineEdit->text());
+	m_project->setBuildDir(ui->buildInLineEdit->text());
+	m_project->setCompiler(ui->compilerCB->currentText());
 }

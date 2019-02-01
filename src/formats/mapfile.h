@@ -9,7 +9,7 @@
 
 class MapFile : public SphereFile {
 	Q_OBJECT
-
+	Q_ENUMS(ScriptType)
 	public:
 		MapFile(QObject *parent = nullptr);
 		void newMap();
@@ -18,18 +18,12 @@ class MapFile : public SphereFile {
 		bool mapOrigin();
 		void setParallax(bool is_parallax, float mult_x, float mult_y, float scrollspeed_x, float scrollspeed_y);
 		QRect* largestLayerRect();
-		QSize tileSize();
-		QSize mapSize();
+		QSize getTileSize();
+		Tileset* getTileset();
+		enum ScriptType { Entry, Exit, LeaveNorth, LeaveEast, LeaveSouth, LeaveWest };
 
-		QString tilesetFilename;
-		QString musicFilename;
-		QString scriptFilename;
-		QString entryScript; // JavaScript source, not filename
-		QString exitScript;
-		QString northScript;
-		QString eastScript;
-		QString southScript;
-		QString westScript;
+		QString getScript(ScriptType type);
+		void setScript(ScriptType type, QString text);
 
 		#pragma pack(push, 1)
 		typedef struct rmp_header {
@@ -48,7 +42,6 @@ class MapFile : public SphereFile {
 			uint8_t		repeating;
 			uint8_t		reserved[234];
 		}rmp_header;
-		rmp_header header;
 
 		typedef struct layer_header {
 			int16_t		width;
@@ -105,28 +98,38 @@ class MapFile : public SphereFile {
 			QString name;
 			layer_header header;
 			QList<uint16_t> tiles;
-			bool visible; // this is used by MapEditor and isn't saved to/loaded from the file
 		}layer;
 
 		QList<layer> getLayers();
 		layer* getLayer(int index);
 		int removeLayer(int index);
 		int numLayers();
+		QString getLayerName(int layer);
+		void setLayerName(int layer, QString name);
 
 		int getTileIndex(int l, int x, int y);
 		QList<entity> getEntities(int layer = -1);
 		entity* getEntity(int index);
-		Tileset* tileset;
-
-	signals:
-
-	public slots:
 
 	private:
-		QList<layer> layers;
-		QList<segment_struct> segments;
-		QList<entity> entities;
-		QList<zone> zones;
+		rmp_header m_header;
+		Tileset* m_tileset;
+		QString m_tilesetFilename;
+		QString m_musicFilename;
+		QString m_scriptFilename;
+
+		// map script files, JavaScript source not filename
+		QString m_entryScript;
+		QString m_exitScript;
+		QString m_northScript;
+		QString m_eastScript;
+		QString m_southScript;
+		QString m_westScript;
+
+		QList<layer> m_layers;
+		QList<segment_struct> m_segments;
+		QList<entity> m_entities;
+		QList<zone> m_zones;
 };
 
 #endif

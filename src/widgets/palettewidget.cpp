@@ -13,44 +13,44 @@
 #include "widgets/spriteset/spriteseteditor.h"
 
 PaletteWidget::PaletteWidget(SpritesetEditor *parent): QWidget(parent) {
-	this->installEventFilter(this);
-	this->paletteColors = QList<QColor>();
-	this->changePalette(hsl256_palette, 256);
+	installEventFilter(this);
+	m_paletteColors = QList<QColor>();
+	changePalette(hsl256_palette, 256);
 
-	this->rightClickMenu = new QMenu(this);
-	this->fileMenu = this->rightClickMenu->addMenu("File");
-	this->fileMenu->addAction("New");
-	this->fileMenu->addAction("Import...");
-	this->fileMenu->addAction("Export...");
+	m_rightClickMenu = new QMenu(this);
+	m_fileMenu = m_rightClickMenu->addMenu("File");
+	m_fileMenu->addAction("New");
+	m_fileMenu->addAction("Import...");
+	m_fileMenu->addAction("Export...");
 
-	this->defaultMenu = this->rightClickMenu->addMenu("Presets");
-	this->defaultMenu->addAction("DOS");
-	this->defaultMenu->addAction("HSL256");
-	this->defaultMenu->addAction("PLASMA");
-	this->defaultMenu->addAction("RGB332");
-	this->defaultMenu->addAction("VERGE");
-	this->defaultMenu->addAction("VISIBONE2");
+	m_defaultMenu = m_rightClickMenu->addMenu("Presets");
+	m_defaultMenu->addAction("DOS");
+	m_defaultMenu->addAction("HSL256");
+	m_defaultMenu->addAction("PLASMA");
+	m_defaultMenu->addAction("RGB332");
+	m_defaultMenu->addAction("VERGE");
+	m_defaultMenu->addAction("VISIBONE2");
 
-	this->rightClickMenu->addSeparator();
-	this->rightClickMenu->addAction("Insert before");
-	this->rightClickMenu->addAction("Insert after");
-	this->rightClickMenu->addAction("Replace");
-	this->rightClickMenu->addAction("Remove");
-	this->selectedIndex = 0;
+	m_rightClickMenu->addSeparator();
+	m_rightClickMenu->addAction("Insert before");
+	m_rightClickMenu->addAction("Insert after");
+	m_rightClickMenu->addAction("Replace");
+	m_rightClickMenu->addAction("Remove");
+	m_selectedIndex = 0;
 	parent->setMinimumSize(160,160);
-	this->repaint();
+	repaint();
 }
 
 PaletteWidget::~PaletteWidget() {
-	delete this->fileMenu;
-	delete this->defaultMenu;
-	delete this->rightClickMenu;
+	delete m_fileMenu;
+	delete m_defaultMenu;
+	delete m_rightClickMenu;
 }
 
 void PaletteWidget::changePalette(QColor palettearr[], int numColors) {
-	this->paletteColors.clear();
+	m_paletteColors.clear();
 	for(int c = 0; c < numColors; c++) {
-		this->paletteColors << palettearr[c];
+		m_paletteColors << palettearr[c];
 	}
 	repaint();
 }
@@ -58,12 +58,12 @@ void PaletteWidget::changePalette(QColor palettearr[], int numColors) {
 void PaletteWidget::importPalette(const QString path) {
 	QFile* pal = new QFile(path);
 	if(!pal->open(QIODevice::ReadOnly)) return;
-	this->paletteColors.clear();
+	m_paletteColors.clear();
 	char lineText[8];
 	QColor newCol;
 	while(pal->readLine(lineText, sizeof(lineText)) != -1) {
 		newCol = QColor(QString(lineText).replace("\n",""));
-		if(newCol.isValid()) this->paletteColors.append(QColor(lineText));
+		if(newCol.isValid()) m_paletteColors.append(QColor(lineText));
 	}
 	pal->close();
 	delete pal;
@@ -74,8 +74,8 @@ void PaletteWidget::exportPalette(QString path) {
 	if(QFileInfo(path).suffix() == "") path += ".qsipal";
 	QFile* pal = new QFile(path);
 	if(!pal->open((QIODevice::WriteOnly|QIODevice::Text))) return;
-	for(int i = 0; i < this->paletteColors.length(); i++ ) {
-		pal->write(this->paletteColors.at(i).name().toStdString().append("\n").c_str());
+	for(int i = 0; i < m_paletteColors.length(); i++ ) {
+		pal->write(m_paletteColors.at(i).name().toStdString().append("\n").c_str());
 	}
 	pal->close();
 	delete pal;
@@ -85,28 +85,27 @@ bool PaletteWidget::eventFilter(QObject* object, QEvent* event) {
 	(void)object;
 	switch(event->type()) {
 		case QEvent::MouseMove: {
-			this->mousePos = dynamic_cast<QMouseEvent*>(event)->pos();
+			m_mousePos = dynamic_cast<QMouseEvent*>(event)->pos();
 			break;
 		}
 		case QEvent::Paint: {
 			QPainter painter(this);
 			int x = 0;
 			int y = 0;
-			//painter.fillRect(this->rect(),Qt::black);
-			for(int c=0; c < this->paletteColors.length(); c++) {
-				if(x + this->squareSize > this->width()) {
+			for(int c=0; c < m_paletteColors.length(); c++) {
+				if(x + m_squareSize > width()) {
 					x = 0;
-					y += this->squareSize;
+					y += m_squareSize;
 				}
-				if(this->selectedIndex == c) {
-					painter.fillRect(QRect(x,y,this->squareSize,this->squareSize),Qt::black);
-					painter.fillRect(QRect(x+1,y+1,this->squareSize-2,this->squareSize-2),Qt::white);
-					painter.fillRect(QRect(x+2,y+2,this->squareSize-4,this->squareSize-4),Qt::black);
-					painter.fillRect(QRect(x+3,y+3,this->squareSize-6,this->squareSize-6),this->paletteColors.at(c));
+				if(m_selectedIndex == c) {
+					painter.fillRect(QRect(x,y,m_squareSize,m_squareSize),Qt::black);
+					painter.fillRect(QRect(x+1,y+1,m_squareSize-2,m_squareSize-2),Qt::white);
+					painter.fillRect(QRect(x+2,y+2,m_squareSize-4,m_squareSize-4),Qt::black);
+					painter.fillRect(QRect(x+3,y+3,m_squareSize-6,m_squareSize-6),m_paletteColors.at(c));
 				} else {
-					painter.fillRect(QRect(x,y,this->squareSize,this->squareSize),this->paletteColors.at(c));
+					painter.fillRect(QRect(x,y,m_squareSize,m_squareSize),m_paletteColors.at(c));
 				}
-				x+=this->squareSize;
+				x += m_squareSize;
 			}
 			break;
 		}
@@ -116,30 +115,30 @@ bool PaletteWidget::eventFilter(QObject* object, QEvent* event) {
 			QPoint pos = me->pos();
 
 			if(buttonPressed == (Qt::LeftButton|Qt::RightButton)) {
-				int numColors = this->paletteColors.length();
+				int numColors = m_paletteColors.length();
 				int x = 0;
 				int y = 0;
 				for(int c = 0; c < numColors; c++) {
-					if(x + this->squareSize > this->width()) {
+					if(x + m_squareSize > width()) {
 						x = 0;
-						y += this->squareSize;
+						y += m_squareSize;
 					}
-					if(x <= pos.x() && pos.x() <= x + this->squareSize
-					&& y <= pos.y() && pos.y() <= y + this->squareSize) {
-						this->selectedIndex = c;
-						this->repaint();
+					if(x <= pos.x() && pos.x() <= x + m_squareSize
+					&& y <= pos.y() && pos.y() <= y + m_squareSize) {
+						m_selectedIndex = c;
+						repaint();
 					}
-					x+= this->squareSize;
+					x+= m_squareSize;
 				}
 			}
 			if(buttonPressed == Qt::RightButton){
-				QAction* choice = this->rightClickMenu->exec(this->mapToGlobal(pos));
+				QAction* choice = m_rightClickMenu->exec(mapToGlobal(pos));
 				if(!choice) return true;
 				QString text = choice->text();
 				if(text == "New") {
-					this->selectedIndex = 0;
-					this->paletteColors.clear();
-					this->paletteColors << QColor();
+					m_selectedIndex = 0;
+					m_paletteColors.clear();
+					m_paletteColors << QColor();
 					repaint();
 				} else if(text == "Import...") {
 					QString importPath = QFileDialog::getOpenFileName(this, "Import Palette", QDir().absolutePath(),
@@ -150,37 +149,37 @@ bool PaletteWidget::eventFilter(QObject* object, QEvent* event) {
 						"QtSphere IDE palettes (*.qsipal);;All files (*.*)");
 					if(exportPath != "") exportPalette(exportPath);
 				} else if(text == "DOS") {
-					this->changePalette(dos_palette, 256);
+					changePalette(dos_palette, 256);
 				} else if(text == "VERGE") {
-					this->changePalette(verge_palette, 256);
+					changePalette(verge_palette, 256);
 				} else if(text == "PLASMA") {
-					this->changePalette(plasma_palette, 256);
+					changePalette(plasma_palette, 256);
 				} else if(text == "RGB332") {
-					this->changePalette(rgb332_palette, 256);
+					changePalette(rgb332_palette, 256);
 				} else if(text == "VISIBONE2") {
-					this->changePalette(visibone2_palette, 256);
+					changePalette(visibone2_palette, 256);
 				} else if(text == "HSL256") {
-					this->changePalette(hsl256_palette, 256);
+					changePalette(hsl256_palette, 256);
 				} else if(text == "Insert before") {
 					QColor newCol = QColorDialog::getColor(Qt::white,this);
 					if(newCol.isValid()) {
-						this->paletteColors.insert(this->selectedIndex++, newCol);
+						m_paletteColors.insert(m_selectedIndex++, newCol);
 						repaint();
 					}
 				} else if(text == "Insert after") {
 					QColor newCol = QColorDialog::getColor(Qt::white, this);
 					if(newCol.isValid()) {
-						this->paletteColors.insert(this->selectedIndex+1, newCol);
+						m_paletteColors.insert(m_selectedIndex+1, newCol);
 						repaint();
 					}
 				} else if(text == "Replace") {
 					QColor newCol = QColorDialog::getColor(Qt::white, this);
 					if(newCol.isValid()) {
-						this->paletteColors.replace(this->selectedIndex, newCol);
+						m_paletteColors.replace(m_selectedIndex, newCol);
 						repaint();
 					}
 				} else if(text == "Remove") {
-					this->paletteColors.removeAt(this->selectedIndex);
+					m_paletteColors.removeAt(m_selectedIndex);
 					repaint();
 				}
 			}

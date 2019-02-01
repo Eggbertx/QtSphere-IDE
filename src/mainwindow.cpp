@@ -41,12 +41,12 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	Q_ASSERT(!_instance);
 	_instance = this;
 	ui->setupUi(this);
-	this->setMenuBar(ui->menuBar);
+	setMenuBar(ui->menuBar);
 	ui->treeView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	this->statusLabel = new QLabel("Ready.");
-	ui->statusBar->addWidget(this->statusLabel);
-	ui->toolbarOpenButton->setIcon(this->style()->standardIcon(QStyle::SP_DialogOpenButton));
-	ui->toolbarSaveButton->setIcon(this->style()->standardIcon(QStyle::SP_DialogSaveButton));
+	m_statusLabel = new QLabel("Ready.");
+	ui->statusBar->addWidget(m_statusLabel);
+	ui->toolbarOpenButton->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+	ui->toolbarSaveButton->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
 	ui->centralWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 	ui->taskListTable->setContextMenuPolicy(Qt::CustomContextMenu);
 
@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	nextTabAction->setShortcut(Qt::CTRL|Qt::Key_PageDown);
 	connect(nextTabAction, SIGNAL(triggered()), this, SLOT(nextTab()));
 	connect(ui->menuFile, SIGNAL(aboutToShow()), this, SLOT(checkCloseProjectOption()));
-	this->addAction(nextTabAction);
+	addAction(nextTabAction);
 
 	/*
 	 * Move to the previous file tab (or to the last if we're at the first)
@@ -67,11 +67,11 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	QAction *prevTabAction = new QAction(this);
 	prevTabAction->setShortcut(Qt::CTRL|Qt::Key_PageUp);
 	connect(prevTabAction, SIGNAL(triggered()), this, SLOT(prevTab()));
-	this->addAction(prevTabAction);
+	addAction(prevTabAction);
 
 	// add new file drop-down "button" and copy the menu from the file menu
 	QToolButton* toolButton = new QToolButton();
-	toolButton->setIcon(this->style()->standardIcon(QStyle::SP_FileIcon));
+	toolButton->setIcon(style()->standardIcon(QStyle::SP_FileIcon));
 	toolButton->setToolTip("New file");
 	toolButton->setMenu(ui->menuNew);
 	toolButton->setPopupMode(QToolButton::InstantPopup);
@@ -80,15 +80,15 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	ui->mainToolBar->insertAction(ui->toolbarOpenButton,toolButtonAction);
 
 	ui->splitter->setStretchFactor(1,4);
-	ui->splitter->setSizes(QList<int>({200, this->width()-200}));
+	ui->splitter->setSizes(QList<int>({200, width()-200}));
 
-	this->project = new QSIProject("", this);
+	m_project = new QSIProject("", this);
 
-	this->soundPlayer = new SoundPlayer();
-	ui->mediaPlayerTab->layout()->addWidget(this->soundPlayer);
+	m_soundPlayer = new SoundPlayer();
+	ui->mediaPlayerTab->layout()->addWidget(m_soundPlayer);
 	ui->openFileTabs->addTab(new StartPage(ui->openFileTabs), "Start Page");
-	this->updateTreeView();
-	this->refreshRecentFiles();
+	updateTreeView();
+	refreshRecentFiles();
 }
 
 MainWindow::~MainWindow() {
@@ -96,11 +96,11 @@ MainWindow::~MainWindow() {
 	disconnect(this, SLOT(prevTab()));
 	disconnect(ui->menuFile, SIGNAL(aboutToShow()), this, SLOT(checkCloseProjectOption()));
 	delete ui;
-	delete this->soundPlayer;
-	delete this->project;
+	delete m_soundPlayer;
+	delete m_project;
 	QSettings settings;
-	settings.setValue("geometry", this->geometry());
-	settings.setValue("maximized", this->isMaximized());
+	settings.setValue("geometry", geometry());
+	settings.setValue("maximized", isMaximized());
 }
 
 MainWindow* MainWindow::instance() {
@@ -111,21 +111,21 @@ MainWindow* MainWindow::instance() {
 
 /*void MainWindow::addWidgetTab(QWidget* widget, QString tabname) {
 	widget->setObjectName(tabname + QString::number(ui->openFileTabs->count()));
-	this->openEditors.append(widget);
+	m_openEditors.append(widget);
 	ui->openFileTabs->insertTab(ui->openFileTabs->count(), widget, tabname);
 	ui->openFileTabs->setCurrentIndex(ui->openFileTabs->count()-1);
 }*/
 
 QString MainWindow::getStatus() {
-	return this->statusLabel->text();
+	return m_statusLabel->text();
 }
 
 void MainWindow::setStatus(QString status) {
-	this->statusLabel->setText(status);
+	m_statusLabel->setText(status);
 }
 
 QString MainWindow::getTheme() {
-	return this->theme;
+	return m_theme;
 }
 
 void MainWindow::setTheme(QString theme) {
@@ -143,7 +143,7 @@ void MainWindow::setTheme(QString theme) {
 		delete styleFile;
 	}
 	qApp->setStyleSheet(stylesheet);
-	this->theme = theme;
+	m_theme = theme;
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
@@ -155,8 +155,8 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 
 SphereEditor* MainWindow::getCurrentEditor() {
 	int currentTabIndex = ui->openFileTabs->currentIndex();
-	foreach (SphereEditor* editor, this->openEditors) {
-		if(editor->tabIndex == currentTabIndex)
+	foreach(SphereEditor* editor, m_openEditors) {
+		if(editor->getTabIndex() == currentTabIndex)
 			return editor;
 	}
 	return nullptr;
@@ -197,14 +197,15 @@ void MainWindow::saveCurrentTab() {
 		SpritesetEditor* currentEditor = dynamic_cast<SpritesetEditor*>(ui->openFileTabs->currentWidget());
 		QString saveFileName = QFileDialog::getSaveFileName(this,
 			"Save spriteset", "","Spriteset (*.rss);;All files (*)");
-		if(!currentEditor->spriteset->save(saveFileName)) {
-			errorBox("Failed saving file: " + currentEditor->spriteset->fileName());
+		Spriteset* editorSpriteset = currentEditor->getSpriteset();
+		if(!editorSpriteset->save(saveFileName)) {
+			errorBox("Failed saving file: " + editorSpriteset->fileName());
 		}
 	}
 }
 
 void MainWindow::updateTreeView() {
-	if(!this->projectLoaded || this->project->getPath(false) == "") {
+	if(!m_projectLoaded || m_project->getPath(false) == "") {
 		QStandardItemModel* blankTreeModel = new QStandardItemModel(0,0,ui->treeView);
 		QStandardItem* child = new QStandardItem("<No open project>");
 		blankTreeModel->appendRow(child);
@@ -212,12 +213,12 @@ void MainWindow::updateTreeView() {
 		return;
 	}
 	QFileSystemModel *model = new QFileSystemModel();
-	model->setRootPath(this->project->getPath(false));
+	model->setRootPath(m_project->getPath(false));
 	ui->treeView->setModel(model);
 	for (int i = 1; i < model->columnCount(); ++i)
 		ui->treeView->hideColumn(i);
-	ui->treeView->setRootIndex(model->index(this->project->getPath(false)));
-	this->setWindowTitle("QtSphereIDE " + QString(VERSION) + " - " + QDir(this->project->getPath(false)).dirName());
+	ui->treeView->setRootIndex(model->index(m_project->getPath(false)));
+	setWindowTitle("QtSphereIDE " + QString(VERSION) + " - " + QDir(m_project->getPath(false)).dirName());
 }
 
 void MainWindow::openFile(QString filename) {
@@ -225,8 +226,8 @@ void MainWindow::openFile(QString filename) {
 
 	if(filename == "") {
 		QString usePath = QString();
-		if(this->project && this->project->getPath(false) != "") {
-			usePath = this->project->getPath(false);
+		if(m_project && m_project->getPath(false) != "") {
+			usePath = m_project->getPath(false);
 		}
 		fn = QFileDialog::getOpenFileName(this,
 			"Open file", usePath,
@@ -258,54 +259,53 @@ void MainWindow::openFile(QString filename) {
 	if(fileExtension == "rmp") {
 		MapEditor* rmpEditor = new MapEditor(this);
 		if(rmpEditor->openFile(fi.filePath())) {
-			rmpEditor->tabIndex = ui->openFileTabs->insertTab(0,rmpEditor, fi.fileName());
+			rmpEditor->setTabIndex(ui->openFileTabs->insertTab(0,rmpEditor, fi.fileName()));
 			ui->openFileTabs->setTabToolTip(0, file->fileName());
 			ui->openFileTabs->setCurrentIndex(0);
-			this->openEditors.append(rmpEditor);
+			m_openEditors.append(rmpEditor);
 		} else {
 			return;
 		}
 	} else if(fileExtension == "rss") {
 		SpritesetEditor* ssView = new SpritesetEditor(this);
 		if(ssView->openFile(fi.filePath())) {
-			ssView->tabIndex = ui->openFileTabs->insertTab(0, ssView, fi.fileName());
+			ssView->setTabIndex(ui->openFileTabs->insertTab(0, ssView, fi.fileName()));
 			ui->openFileTabs->setTabToolTip(0, file->fileName());
 			ui->openFileTabs->setCurrentIndex(0);
-			this->openEditors.append(ssView);
+			m_openEditors.append(ssView);
 		}else {
 			errorBox("Failed loading spriteset: " + fn);
 			return;
 		}
 	} else if(audioList.indexOf(fileExtension) > -1) {
-		this->soundPlayer->load(fn);
+		m_soundPlayer->load(fn);
 	} else {
 		QByteArray bytes = file->readAll();
 		TextEditor* newTextEdit = new TextEditor(this);
-		newTextEdit->textEditorWidget->setText(bytes);
-		newTextEdit->tabIndex = ui->openFileTabs->insertTab(0, newTextEdit->textEditorWidget, fi.fileName());
-
+		newTextEdit->setText(bytes);
+		newTextEdit->setTabIndex(ui->openFileTabs->insertTab(0, static_cast<QTextEdit*>(newTextEdit), fi.fileName()));
 		ui->openFileTabs->setTabToolTip(0, file->fileName());
 		ui->openFileTabs->setCurrentIndex(0);
-		this->openEditors.append(newTextEdit);
+		m_openEditors.append(newTextEdit);
 	}
 }
 
 void MainWindow::openProject(QString filename) {
-	this->project = new QSIProject(filename, this);
-	this->projectLoaded = true;
+	m_project = new QSIProject(filename, this);
+	m_projectLoaded = true;
 	ui->menuProject->setEnabled(true);
-	this->updateTreeView();
+	updateTreeView();
 }
 
 void MainWindow::handleModifiedFiles() {
-	if(this->openEditors.count() == 0) return;
+	if(m_openEditors.count() == 0) return;
 	ModifiedFilesDialog mfd(this);
 	int num_modified = 0;
 	QList<QTextEdit *> openEditors = ui->openFileTabs->findChildren<QTextEdit *>();
 
 	for(int t = 0; t < openEditors.count(); t++) {
-		/* if(openEditors.at(t)->document()->toPlainText() != this->openEditors.at(t)->text) {
-			mfd.addModifiedItem(this->openEditors.at(t));
+		/* if(openEditors.at(t)->document()->toPlainText() != m_openEditors.at(t)->text) {
+			mfd.addModifiedItem(m_openEditors.at(t));
 			num_modified++;
 		}*/
 	}
@@ -337,7 +337,7 @@ void MainWindow::refreshRecentFiles() {
 		QAction* fileAction = ui->menuOpen_Recent->addAction(settings.value("file").toString());
 		connect(fileAction, &QAction::triggered,
 				this, [this,fileAction]() {
-					this->openFile(fileAction->text());
+					openFile(fileAction->text());
 				}
 		);
 	}
@@ -345,9 +345,9 @@ void MainWindow::refreshRecentFiles() {
 }
 
 void MainWindow::on_actionExit_triggered() {
-	this->handleModifiedFiles();
-	this->close(); // just temporary until I have a way to test if the currently open file has been modified
-	//if(handleModifiedFiles() > 0) this->close();
+	handleModifiedFiles();
+	close(); // just temporary until I have a way to test if the currently open file has been modified
+	//if(handleModifiedFiles() > 0) close();
 }
 
 void MainWindow::on_actionConfigure_QtSphere_IDE_triggered() {
@@ -357,40 +357,41 @@ void MainWindow::on_actionConfigure_QtSphere_IDE_triggered() {
 }
 
 void MainWindow::on_toolbarSaveButton_triggered() {
-	this->saveCurrentTab();
+	saveCurrentTab();
 }
 
 void MainWindow::on_toolbarOpenButton_triggered() {
-	this->openFile();
+	openFile();
 }
 
 void MainWindow::on_actionOpenFile_triggered() {
-	this->openFile();
+	openFile();
 }
 
 void MainWindow::on_openFileTabs_tabCloseRequested(int index) {
-	this->openEditors.removeAt(index);
+	m_openEditors.removeAt(index);
 	ui->openFileTabs->removeTab(index);
 }
 
 void MainWindow::on_actionUndo_triggered() {
-	SphereEditor* currentEditor = this->getCurrentEditor();
+	SphereEditor* currentEditor = getCurrentEditor();
 	if(currentEditor == nullptr) return;
+	currentEditor->undo();
 
-	switch (currentEditor->editorType()) {
-	case SphereEditor::TextEditor: {
-		TextEditor* editor = dynamic_cast<TextEditor*>(currentEditor);
-		editor->undo();
-		break;
-	}
-	default:
-		break;
-	}
-	//ui->openFileTabs->currentWidget()->findChildren<QTextEdit *>().at(0)->undo();
+//	switch (currentEditor->editorType()) {
+//	case SphereEditor::TextEditor: {
+//		TextEditor* editor = dynamic_cast<TextEditor*>(currentEditor);
+//		editor->undo();
+//		break;
+//	}
+//	default:
+//		break;
+//	}
+//	//ui->openFileTabs->currentWidget()->findChildren<QTextEdit *>().at(0)->undo();
 }
 
 void MainWindow::on_actionRedo_triggered() {
-	SphereEditor* currentEditor = this->getCurrentEditor();
+	SphereEditor* currentEditor = getCurrentEditor();
 	if(currentEditor != nullptr) {
 		qDebug() << "currentEditor type: " << currentEditor->editorType();
 		currentEditor->redo();
@@ -414,7 +415,7 @@ void MainWindow::on_newProject_triggered() {
 }
 
 void MainWindow::on_actionProject_Properties_triggered() {
-	ProjectPropertiesDialog propertiesDialog(false, this->project);
+	ProjectPropertiesDialog propertiesDialog(false, m_project);
 	propertiesDialog.exec();
 }
 
@@ -434,12 +435,11 @@ void MainWindow::prevTab() {
 
 
 void MainWindow::on_newPlainTextFile_triggered() {
-	//QTextEdit* newTextEdit = new QTextEdit(this);
 	TextEditor* newTextEdit = new TextEditor(this);
-	newTextEdit->setObjectName("textEdit" + QString::number(ui->openFileTabs->count()));
-	newTextEdit->tabIndex = ui->openFileTabs->insertTab(0, newTextEdit->textEditorWidget, "<Untitled>");
+	newTextEdit->SphereEditor::setObjectName("textEdit" + QString::number(ui->openFileTabs->count()));
+	newTextEdit->setTabIndex(ui->openFileTabs->insertTab(0, static_cast<QTextEdit*>(newTextEdit), "<Untitled>"));
 	ui->openFileTabs->setTabToolTip(0, "<Untitled>");
-	this->openEditors.append(newTextEdit);
+	m_openEditors.append(newTextEdit);
 	ui->openFileTabs->setCurrentIndex(0);
 }
 
@@ -466,11 +466,11 @@ void MainWindow::on_delTaskButton_clicked() {
 
 
 void MainWindow::on_actionOpenProject_triggered() {
-	this->openProject(QFileDialog::getExistingDirectory(this,"Choose project path"));
+	openProject(QFileDialog::getExistingDirectory(this,"Choose project path"));
 }
 
 void MainWindow::on_actionRefresh_triggered() {
-	this->openProject(this->project->getPath(false));
+	openProject(m_project->getPath(false));
 }
 
 void MainWindow::on_actionQSIGithub_triggered() {
@@ -482,15 +482,15 @@ void MainWindow::on_actionMSGithub_triggered() {
 }
 
 void MainWindow::on_treeView_doubleClicked(const QModelIndex &index) {
-	if(!this->projectLoaded) return;
+	if(!m_projectLoaded) return;
 	QFileSystemModel* model = dynamic_cast<QFileSystemModel*>(ui->treeView->model()); // new QFileSystemModel();
-	model->setRootPath(this->project->getPath(false));
+	model->setRootPath(m_project->getPath(false));
 	if(model->fileInfo(index).isFile())
-		this->openFile(model->filePath(index));
+		openFile(model->filePath(index));
 }
 
 void MainWindow::checkCloseProjectOption() {
-	if(!this->project || this->project->getPath(false) == "") ui->actionClose_Project->setEnabled(false);
+	if(!m_project || m_project->getPath(false) == "") ui->actionClose_Project->setEnabled(false);
 	else ui->actionClose_Project->setEnabled(true);
 }
 
@@ -504,24 +504,23 @@ void MainWindow::on_actionImage_to_Spriteset_triggered() {
 
 	ImportOptionsDialog* dialog = new ImportOptionsDialog(this);
 	if(dialog->exec() == QDialog::Accepted) {
-		Spriteset* imported = Spriteset::fromImage(
-			imagePath,dialog->getFrameSize(),
-			dialog->removeDuplicatesChecked(),
-			dialog->getTransparencyIn(),
-			dialog->getTransparencyOut()
+		bool success = false;
+		Spriteset* imported = Spriteset::fromImage(imagePath,dialog->getFrameSize(),
+			dialog->removeDuplicatesChecked(), dialog->getTransparencyIn(), dialog->getTransparencyOut(),
+			&success
 		);
-		if(!imported->valid) return;
+		if(!success) return;
 
 		SpritesetEditor* ssView = new SpritesetEditor(this);
 		ssView->attach(imported);
 		QFileInfo fi = QFileInfo(imagePath);
-		ssView->tabIndex = ui->openFileTabs->insertTab(0, ssView, fi.fileName());
+		ssView->setTabIndex(ui->openFileTabs->insertTab(0, ssView, fi.fileName()));
 		ui->openFileTabs->setCurrentIndex(0);
 	}
 }
 
 void MainWindow::on_actionSave_triggered() {
-	this->saveCurrentTab();
+	saveCurrentTab();
 }
 
 void MainWindow::on_actionStart_Page_triggered() {
@@ -561,21 +560,19 @@ void MainWindow::on_actionClearRecent_triggered() {
 	QSettings settings;
 	settings.remove("recentProjects");
 	settings.remove("recentFiles");
-	this->refreshRecentFiles();
+	refreshRecentFiles();
 }
 
 void MainWindow::on_actionClose_Project_triggered() {
-	//this->project = new QSIProject("", this);
-	delete this->project;
-	this->projectLoaded = false;
+	delete m_project;
+	m_projectLoaded = false;
 	ui->menuProject->setEnabled(false);
-	this->updateTreeView();
+	updateTreeView();
 }
 
 void MainWindow::on_actionClose_triggered() {
-	//this->project = new QSIProject("", this);
-	delete this->project;
-	this->projectLoaded = false;
+	delete m_project;
+	m_projectLoaded = false;
 	ui->menuProject->setEnabled(false);
-	this->updateTreeView();
+	updateTreeView();
 }

@@ -21,52 +21,52 @@
 
 MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEditor) {
 	ui->setupUi(this);
-	this->menuBar = new QToolBar();
-//	this->menuBar->setFixedHeight(32);
-	QActionGroup toolActions(this->menuBar);
+	m_menuBar = new QToolBar();
+//	m_menuBar->setFixedHeight(32);
+	QActionGroup toolActions(m_menuBar);
 	ui->layersTable->setContextMenuPolicy(Qt::CustomContextMenu);
-	this->layerMenu = new QMenu(this);
-	this->layerMenu->addAction("Insert layer");
-	this->layerMenu->addAction("Delete layer");
-	this->layerMenu->addAction("Duplicate layer");
-	this->layerMenu->addSeparator();
-	this->layerMenu->addAction("Toggle lock layer");
-	this->layerMenu->addAction("Properties", this, SLOT(layerPropertiesRequested(bool)));
+	m_layerMenu = new QMenu(this);
+	m_layerMenu->addAction("Insert layer");
+	m_layerMenu->addAction("Delete layer");
+	m_layerMenu->addAction("Duplicate layer");
+	m_layerMenu->addSeparator();
+	m_layerMenu->addAction("Toggle lock layer");
+	m_layerMenu->addAction("Properties", this, SLOT(layerPropertiesRequested(bool)));
 
-	this->pencilMenu = new QMenu(this);
-	this->pencilMenu->addActions(QList<QAction*>({
+	m_pencilMenu = new QMenu(this);
+	m_pencilMenu->addActions(QList<QAction*>({
 		new QAction(QIcon(":/icons/1x1grid.png"), "1x1"),
 		new QAction(QIcon(":/icons/3x3grid.png"), "3x3"),
 		new QAction(QIcon(":/icons/5x5grid.png"), "5x5")
 	}));
-	this->pencilMenu->setDefaultAction(this->pencilMenu->actions().at(0));
+	m_pencilMenu->setDefaultAction(m_pencilMenu->actions().at(0));
 
 	QToolButton* pencilMenuButton = new QToolButton();
 	pencilMenuButton->setText("Pencil");
 	pencilMenuButton->setIcon(QIcon(":/icons/pencil.png"));
-	pencilMenuButton->setMenu(this->pencilMenu);
+	pencilMenuButton->setMenu(m_pencilMenu);
 	pencilMenuButton->setPopupMode(QToolButton::MenuButtonPopup);
-	this->menuBar->addWidget(pencilMenuButton);
-	connect(this->pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
+	m_menuBar->addWidget(pencilMenuButton);
+	connect(m_pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
 
-	this->menuBar->addAction(QIcon(":/icons/linetool.png"), "Line");
-	this->menuBar->addAction(QIcon(":/icons/rectangletool.png"), "Rectangle");
-	this->menuBar->addAction(QIcon(":/icons/paintbucket.png"), "Fill layer");
-	this->menuBar->addAction(QIcon(":/icons/dropper.png"), "Select tile");
-	connect(this->menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
+	m_menuBar->addAction(QIcon(":/icons/linetool.png"), "Line");
+	m_menuBar->addAction(QIcon(":/icons/rectangletool.png"), "Rectangle");
+	m_menuBar->addAction(QIcon(":/icons/paintbucket.png"), "Fill layer");
+	m_menuBar->addAction(QIcon(":/icons/dropper.png"), "Select tile");
+	connect(m_menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
 
-	this->mapView = new MapView(ui->mapViewLayout->widget());
-	ui->mapViewLayout->addWidget(this->mapView);
-	ui->mapViewLayout->setMenuBar(this->menuBar);
-	this->mapView->setAlignment(Qt::AlignLeft|Qt::AlignTop);
-	this->mapView->setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
+	m_mapView = new MapView(ui->mapViewLayout->widget());
+	ui->mapViewLayout->addWidget(m_mapView);
+	ui->mapViewLayout->setMenuBar(m_menuBar);
+	m_mapView->setAlignment(Qt::AlignLeft|Qt::AlignTop);
+	m_mapView->setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
 
-	this->tilesetView = new WrappedGraphicsView();
-	this->tilesetLayout = new QVBoxLayout();
-	this->tilesetLayout->addWidget(tilesetView);
-	this->tilesetLayout->setMargin(0);
-	ui->tilesetBox->setLayout(tilesetLayout);
-	connect(this->tilesetView, SIGNAL(indexChanged(int)), this, SLOT(setTileIndex(int)));
+	m_tilesetView = new WrappedGraphicsView();
+	m_tilesetLayout = new QVBoxLayout();
+	m_tilesetLayout->addWidget(m_tilesetView);
+	m_tilesetLayout->setMargin(0);
+	ui->tilesetBox->setLayout(m_tilesetLayout);
+	connect(m_tilesetView, SIGNAL(indexChanged(int)), this, SLOT(setTileIndex(int)));
 
 	ui->layersTable->setColumnWidth(0,48);
 	ui->layersTable->setColumnWidth(2,24);
@@ -76,21 +76,21 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 }
 
 MapEditor::~MapEditor() {
-	disconnect(this->menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
-	disconnect(this->pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
-	disconnect(this->tilesetView, SIGNAL(indexChanged(int)), this, SLOT(setTileIndex(int)));
-	disconnect(this->layerMenu, SIGNAL(triggered(bool)), this, SLOT(layerPropertiesRequested(bool)));
+	disconnect(m_menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
+	disconnect(m_pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
+	disconnect(m_tilesetView, SIGNAL(indexChanged(int)), this, SLOT(setTileIndex(int)));
+	disconnect(m_layerMenu, SIGNAL(triggered(bool)), this, SLOT(layerPropertiesRequested(bool)));
 	delete ui;
-	delete this->mapView;
-	delete this->pencilMenu;
-	delete this->layerMenu;
-	delete this->menuBar;
-	delete this->tilesetView;
+	delete m_mapView;
+	delete m_pencilMenu;
+	delete m_layerMenu;
+	delete m_menuBar;
+	delete m_tilesetView;
 }
 
 bool MapEditor::openFile(QString filename) {
-	if(!this->mapView->openFile(filename)) return false;
-	return this->attach(this->mapView->attachedMap());
+	if(!m_mapView->openFile(filename)) return false;
+	return attach(m_mapView->attachedMap());
 }
 
 bool MapEditor::attach(MapFile* attachedMap) {
@@ -130,14 +130,16 @@ bool MapEditor::attach(MapFile* attachedMap) {
 		ui->entitiesTable->setColumnWidth(2,browseBtn->width());
 	}
 
-	int numTiles = attachedMap->tileset->numTiles();
+	int numTiles = attachedMap->getTileset()->numTiles();
+	Tileset* mapTileset = attachedMap->getTileset();
+
 	for(int i = 0; i < numTiles; i++) {
-		this->tilesetView->addPixmap(QPixmap::fromImage(attachedMap->tileset->getImage(i)));
+		m_tilesetView->addPixmap(QPixmap::fromImage(mapTileset->getImage(i)));
 	}
 
-	ui->tilesetBox->setTitle("Tiles (" + QString::number(attachedMap->tileset->header.num_tiles) + ")");
+	ui->tilesetBox->setTitle("Tiles (" + QString::number(mapTileset->numTiles()) + ")");
 	ui->layersTable->selectRow(0);
-	ui->mainSplitter->setSizes(QList<int>({this->width()-300, 300}));
+	ui->mainSplitter->setSizes(QList<int>({width()-300, 300}));
 	ui->tilesSplitter->setSizes(QList<int>({1,1}));
 	return true;
 }
@@ -147,7 +149,7 @@ void MapEditor::on_layersTable_cellClicked(int row, int column) {
 		case 0: {
 			QWidget* item = ui->layersTable->cellWidget(row,column);
 			QLabel* eyeLabel = dynamic_cast<QLabel*>(item);
-			if(this->mapView->toggleLayerVisible(row))
+			if(m_mapView->toggleLayerVisible(row))
 				eyeLabel->setPixmap(QPixmap(":/icons/eye.png"));
 			else
 				eyeLabel->setPixmap(QPixmap(":/icons/eye-closed.png"));
@@ -164,13 +166,13 @@ void MapEditor::on_layersTable_cellClicked(int row, int column) {
 void MapEditor::setPencilSize(QAction *size) {
 	QString actionText = size->text();
 	if(actionText == "1x1") {
-		this->mapView->setDrawSize(1);
+		m_mapView->setDrawSize(1);
 	} else if(actionText == "3x3") {
-		this->mapView->setDrawSize(3);
+		m_mapView->setDrawSize(3);
 	} else if(actionText == "5x5") {
-		this->mapView->setDrawSize(5);
+		m_mapView->setDrawSize(5);
 	}
-	this->pencilMenu->setDefaultAction(size);
+	m_pencilMenu->setDefaultAction(size);
 }
 
 void MapEditor::setCurrentTool(QAction* tool) {
@@ -178,16 +180,16 @@ void MapEditor::setCurrentTool(QAction* tool) {
 }
 
 void MapEditor::setTileIndex(int tile) {
-	this->mapView->setCurrentTile(tile);
+	m_mapView->setCurrentTile(tile);
 }
 
 void MapEditor::on_layersTable_customContextMenuRequested(const QPoint &pos) {
-	this->layerMenu->exec(ui->layersTable->mapToGlobal(pos));
+	m_layerMenu->exec(ui->layersTable->mapToGlobal(pos));
 }
 
 void MapEditor::layerPropertiesRequested(bool triggered) {
 	LayerPropertiesDialog lpd;
-	MapFile::layer* l = this->mapView->getLayer(ui->layersTable->currentRow());
+	MapFile::layer* l = m_mapView->getLayer(ui->layersTable->currentRow());
 	lpd.setName(l->name);
 	lpd.setSize(l->header.width,l->header.height);
 	lpd.setReflectiveEnabled(l->header.reflective);
@@ -200,5 +202,5 @@ void MapEditor::layerPropertiesRequested(bool triggered) {
 
 void MapEditor::on_layersTable_itemChanged(QTableWidgetItem *item) {
 	if(item->column() != 1) return;
-	this->mapView->getLayer(item->row())->name = item->text();
+	m_mapView->getLayer(item->row())->name = item->text();
 }

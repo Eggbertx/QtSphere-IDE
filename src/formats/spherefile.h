@@ -25,7 +25,7 @@ class SphereFile : public QObject {
 
 	protected:
 		QString readNextString();
-		QFile* file;
+		QFile* m_file;
 };
 
 #endif // SPHEREFILE_H

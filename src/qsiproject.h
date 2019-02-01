@@ -9,32 +9,51 @@ class QSIProject : public QObject {
 	Q_ENUMS(Compiler)
 	public:
 		explicit QSIProject(QString path, QObject *parent = nullptr);
+		QString getName();
+		void setName(QString name);
+		QString getAuthor();
+		void setAuthor(QString author);
+		int getWidth();
+		void setWidth(int width);
+		int getHeight();
+		void setHeight(int height);
+		void setSize(int width, int height);
+		int getAPILevel();
+		void setAPILevel(int level);
+		int getVersion();
+		void setVersion(int version);
+		QString getSaveID();
+		void setSaveID(QString id);
+		QString getSummary();
+		void setSummary(QString summary);
+		QString getBuidlDir();
+		void setBuildDir(QString dir);
+		QString getMainScript();
+		void setMainScript(QString path);
 		QString getPath(bool projectFile);
-		QString name;
-		QString author;
-		int width;
-		int height;
-		int apiLevel;
-		int version;
-		QString saveID;
-		QString summary;
-		QString buildDir;
-		QString script;
-		QIcon* getIcon();
+		void setPath(QString path, bool projectFile = false);
 		QString getCompiler();
-		void setCompiler(QString set);
+		void setCompiler(QString compiler);
+		QIcon* getIcon();
 		enum Compiler { Vanilla, Cell };
-	signals:
-
-	public slots:
 
 	private:
-		QString path;
-		QString projectPath;
-		QString compiler;
 		bool readSSProj(QFile* projectFile);
-		bool readCellscript(QFile *projectFile);
-		bool readSGM(QFile *projectFile);
+		bool readCellscript(QFile* projectFile);
+		bool readSGM(QFile* projectFile);
+		QString m_name;
+		QString m_author;
+		int m_width;
+		int m_height;
+		int m_apiLevel;
+		int m_version;
+		QString m_saveID;
+		QString m_summary;
+		QString m_buildDir;
+		QString m_script;
+		QString m_path;
+		QString m_projectPath;
+		QString m_compiler;
 };
 
 #endif // QSIPROJECT_H

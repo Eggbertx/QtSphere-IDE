@@ -30,9 +30,9 @@ class AnimatablePixmap : public QGraphicsView {
 		void setDelay(int index, int delay);
 		void setFrame(int index, PixmapFrame* frame);
 		PixmapFrame getFrame(int index);
-		QTimer* timer;
-		bool showTransparency;
-		QList<PixmapFrame*> frames;
+		QTimer* m_timer;
+		bool m_showTransparency;
+		QList<PixmapFrame*> m_frames;
 };
 
 #endif // PIXMAPFRAME_H

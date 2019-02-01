@@ -26,14 +26,14 @@ class ImportOptionsDialog : public QDialog {
 		void on_buttonBox_rejected();
 
 	private:
-		Ui::ImportOptionsDialog *ui;
 		void setButtonBackground(QPushButton *button, char* title);
 		void setButtonBackground(QPushButton* button, QColor background);
 		QColor getButtonBackground(QPushButton* button);
-		QSize frameSize;
-		QColor transparencyIn;
-		QColor transparencyOut;
-		bool removeDuplicates;
+		Ui::ImportOptionsDialog *ui;
+		QSize m_frameSize;
+		QColor m_transparencyIn;
+		QColor m_transparencyOut;
+		bool m_removeDuplicates;
 };
 
 #endif // IMPORTOPTIONSDIALOG_H

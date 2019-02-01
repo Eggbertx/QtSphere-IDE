@@ -17,11 +17,13 @@ public:
 	explicit SpritesetEditor(QWidget *parent = nullptr);
 	~SpritesetEditor();
 	void addDirection(QString name = "", int numFrames = 1);
-	void addDirection(Spriteset::SSDirection direction);
+	void attachDirection(int index);
 	bool openFile(QString filename);
+
 	bool attach(Spriteset* spriteset);
+	Spriteset* getSpriteset();
 	void newFile();
-	Spriteset* spriteset;
+
 
 private slots:
 	void showContextMenu(const QPoint &pos);
@@ -29,7 +31,8 @@ private slots:
 
 private:
 	Ui::SpritesetEditor *ui;
-	ImageChooser* images;
+	ImageChooser* m_images;
+	Spriteset* m_spriteset;
 };
 
 #endif // SPRITESETEDITOR_H

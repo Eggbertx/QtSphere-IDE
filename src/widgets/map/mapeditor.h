@@ -37,13 +37,13 @@ class MapEditor : public SphereEditor {
 
 	private:
 		Ui::MapEditor *ui;
-		int currentTool = MapEditor::Pencil;
-		MapView* mapView;
-		QVBoxLayout* tilesetLayout;
-		WrappedGraphicsView* tilesetView;
-		QToolBar* menuBar;
-		QMenu* pencilMenu;
-		QMenu* layerMenu;
+		int m_currentTool = MapEditor::Pencil;
+		MapView* m_mapView;
+		QVBoxLayout* m_tilesetLayout;
+		WrappedGraphicsView* m_tilesetView;
+		QToolBar* m_menuBar;
+		QMenu* m_pencilMenu;
+		QMenu* m_layerMenu;
 };
 
 #endif // MAPEDITOR_H

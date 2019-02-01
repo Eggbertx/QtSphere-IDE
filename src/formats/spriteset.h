@@ -11,7 +11,7 @@ class Spriteset : public SphereFile {
 	public:
 		explicit Spriteset(QObject *parent = nullptr);
 		~Spriteset() override;
-		static Spriteset* fromImage(QString filename, QSize frameSize, bool removeDuplicates, QColor inColor, QColor outColor);
+		static Spriteset* fromImage(QString filename, QSize frameSize, bool removeDuplicates, QColor inColor, QColor outColor, bool* success = nullptr);
 		static struct SSFrame {
 			uint16_t imageIndex;
 			uint16_t delay;
@@ -30,15 +30,27 @@ class Spriteset : public SphereFile {
 		void debugDump();
 		int frameWidth();
 		int frameHeight();
-		QList<SSDirection> directions;
+
 		QRect getBaseRect();
-		void addDirection(QString name, int numFrames);
-		void addDirection(QString name, QList<SSFrame> frames);
+		int numDirections();
+		void addDirection(SSDirection* direction);
+		SSDirection* addDirection(QString name, int numFrames);
+		SSDirection* addDirection(QString name, QList<SSFrame> frames);
 		void addDirection(QString name, SSFrame frame);
-		QList<QImage> images;
-		bool valid;
+		SSDirection* getDirection(int index);
+		void setDirectionName(int index, QString name);
+
+		int numImages();
+		QImage* getImage(int index);
+		void addImage(QImage image, bool mustBeUnique = false);
+		QList<QImage> getImages();
+		void setImages(QList<QImage> images);
+		int removeDuplicateImages();
+
+
+
 	private:
-		QString filename;
+		QString m_filename;
 		#pragma pack(push, 1)
 		typedef struct header_struct {
 			uint8_t signature[4];	// Must be ".rss"
@@ -53,8 +65,11 @@ class Spriteset : public SphereFile {
 			uint16_t base_y2;
 			uint8_t reserved[106];
 		}rss_header;
-		rss_header header;
+		rss_header m_header;
 		#pragma pack(pop)
+
+		QList<SSDirection> m_directions;
+		QList<QImage> m_images;
 
 };
 

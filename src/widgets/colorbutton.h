@@ -19,9 +19,9 @@ class ColorButton : public QToolButton {
 
 	private:
 		void updateIcon();
-		QSize pixmapSize;
-		QPixmap colorIcon;
-		QColor color;
+		QSize m_pixmapSize;
+		QPixmap m_colorIcon;
+		QColor m_color;
 };
 
 #endif // COLORBUTTON_H

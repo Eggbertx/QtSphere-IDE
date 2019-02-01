@@ -77,17 +77,18 @@ class MainWindow : public QMainWindow {
 		void on_actionClose_triggered();
 
 	private:
-		static MainWindow* _instance;
-		Ui::MainWindow *ui;
-		QString status;
-		QLabel* statusLabel;
-		bool projectLoaded;
-		QSIProject* project;
-		SoundPlayer* soundPlayer;
-		QList<SphereEditor *> openEditors;
-		QString theme;
 		void setupEditors();
 		void updateTreeView();
+		static MainWindow* _instance;
+		Ui::MainWindow *ui;
+		QString m_status;
+		QLabel* m_statusLabel;
+		bool m_projectLoaded;
+		QSIProject* m_project;
+		SoundPlayer* m_soundPlayer;
+		QList<SphereEditor *> m_openEditors;
+		QString m_theme;
+
 };
 
 #endif // MAINWINDOW_H

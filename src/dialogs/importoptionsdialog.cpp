@@ -10,8 +10,8 @@
 
 ImportOptionsDialog::ImportOptionsDialog(QWidget *parent): QDialog(parent), ui(new Ui::ImportOptionsDialog) {
 	ui->setupUi(this);
-	this->setButtonBackground(ui->colorInButton, Qt::magenta);
-	this->setButtonBackground(ui->colorOutButton, QColor(255,0,255,0));
+	setButtonBackground(ui->colorInButton, Qt::magenta);
+	setButtonBackground(ui->colorOutButton, QColor(255,0,255,0));
 }
 
 ImportOptionsDialog::~ImportOptionsDialog() {
@@ -19,28 +19,28 @@ ImportOptionsDialog::~ImportOptionsDialog() {
 }
 
 QSize ImportOptionsDialog::getFrameSize() {
-	return this->frameSize;
+	return m_frameSize;
 }
 
 QColor ImportOptionsDialog::getTransparencyIn() {
-	return this->transparencyIn;
+	return m_transparencyIn;
 }
 
 QColor ImportOptionsDialog::getTransparencyOut() {
-	return this->transparencyOut;
+	return m_transparencyOut;
 }
 
 bool ImportOptionsDialog::removeDuplicatesChecked() {
-	return this->removeDuplicates;
+	return m_removeDuplicates;
 }
 
 
 void ImportOptionsDialog::on_colorOutButton_clicked() {
-	this->setButtonBackground(ui->colorOutButton, "Color in");
+	setButtonBackground(ui->colorOutButton, "Color in");
 }
 
 void ImportOptionsDialog::on_colorInButton_clicked() {
-	this->setButtonBackground(ui->colorInButton, "Color in");
+	setButtonBackground(ui->colorInButton, "Color in");
 }
 
 void ImportOptionsDialog::setButtonBackground(QPushButton *button, char *title) {
@@ -48,7 +48,7 @@ void ImportOptionsDialog::setButtonBackground(QPushButton *button, char *title) 
 	QColor noChange = QColor(button->palette().color(QPalette::Button));
 	QColor newColor = qcd->getColor(noChange, this, title, QColorDialog::ShowAlphaChannel|QColorDialog::DontUseNativeDialog);
 	if(newColor.isValid())
-		this->setButtonBackground(button, newColor);
+		setButtonBackground(button, newColor);
 	delete qcd;
 }
 
@@ -61,13 +61,13 @@ void ImportOptionsDialog::setButtonBackground(QPushButton* button, QColor backgr
 }
 
 void ImportOptionsDialog::on_buttonBox_accepted() {
-	this->frameSize = QSize(ui->spriteWidth->value(), ui->spriteHeight->value());
-	this->transparencyIn = QColor(ui->colorInButton->palette().color(QPalette::Button));
-	this->transparencyOut = QColor(ui->colorOutButton->palette().color(QPalette::Button));
-	this->removeDuplicates = ui->noDupsCheckBox;
-	this->accept();
+	m_frameSize = QSize(ui->spriteWidth->value(), ui->spriteHeight->value());
+	m_transparencyIn = QColor(ui->colorInButton->palette().color(QPalette::Button));
+	m_transparencyOut = QColor(ui->colorOutButton->palette().color(QPalette::Button));
+	m_removeDuplicates = ui->noDupsCheckBox;
+	accept();
 }
 
 void ImportOptionsDialog::on_buttonBox_rejected() {
-	this->reject();
+	reject();
 }

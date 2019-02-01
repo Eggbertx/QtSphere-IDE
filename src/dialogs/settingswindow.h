@@ -15,7 +15,7 @@ class SettingsWindow : public QDialog {
 	public:
 		explicit SettingsWindow(QWidget *parent = 0);
 		~SettingsWindow();
-		QString legacyDir;
+
 
 	private slots:
 		void on_cancelButton_clicked();
@@ -30,9 +30,10 @@ class SettingsWindow : public QDialog {
 	private:
 		void saveSettings();
 		Ui::SettingsWindow *ui;
-		QString currentTheme;
-		QString newTheme;
-		QString mapCursorColor;
+		QString m_currentTheme;
+		QString m_newTheme;
+		QString m_mapCursorColor;
+		QString m_legacyDir;
 };
 
 #endif // SETTINGSWINDOW_H

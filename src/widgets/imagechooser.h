@@ -9,21 +9,23 @@
 class ImageChooser: public QWidget {
 	Q_OBJECT
 
-public:
-	explicit ImageChooser(bool showTransparency, QWidget *parent = 0);
-	~ImageChooser();
-	QList<QImage> getImages();
-	void setImages(QList<QImage> imglist);
-	void setImages(QImage imgarr[], int num);
-	int selectedIndex;
+	public:
+		explicit ImageChooser(bool showTransparency, QWidget *parent = nullptr);
+		~ImageChooser();
+		QList<QImage> getImages();
+		void setImages(QList<QImage> imglist);
+		void setImages(QImage imgarr[], int num);
 
-private:
-	bool eventFilter(QObject* object, QEvent* event);
-	QList<QImage> images;
-	QMenu* rightClickMenu;
-	QPoint mousePos;
-	bool showTransparency;
-	QPixmap alphabg;
+	protected:
+		bool eventFilter(QObject* object, QEvent* event);
+
+	private:
+		int m_selectedIndex;
+		QList<QImage> m_images;
+		QMenu* m_rightClickMenu;
+		QPoint m_mousePos;
+		bool m_showTransparency;
+		QPixmap m_alphaBG;
 
 };
 

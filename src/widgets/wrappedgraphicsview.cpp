@@ -7,37 +7,37 @@
 #include "widgets/wrappedgraphicsview.h"
 
 WrappedGraphicsView::WrappedGraphicsView(QWidget *parent): QGraphicsView(parent) {
-	this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	this->setAlignment(Qt::AlignTop|Qt::AlignLeft);
-	this->setBackgroundBrush(Qt::darkGray);
-	this->selectedIndex = 0;
-	this->wScene = new QGraphicsScene(this);
-	this->setScene(this->wScene);
-	this->tSize = QSize(0,0);
-	this->scaleMult = 1;
+	setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	setAlignment(Qt::AlignTop|Qt::AlignLeft);
+	setBackgroundBrush(Qt::darkGray);
+	m_selectedIndex = 0;
+	m_wScene = new QGraphicsScene(this);
+	setScene(m_wScene);
+	m_tSize = QSize(0,0);
+	m_scaleMult = 1;
 }
 
 void WrappedGraphicsView::resizeEvent(QResizeEvent* resize) {
-	this->arrangeItems();
+	arrangeItems();
 	resize->accept();
 }
 
 void WrappedGraphicsView::mouseReleaseEvent(QMouseEvent *event) {
-	int newIndex = this->indexAt(event->pos());
+	int newIndex = indexAt(event->pos());
 	if(newIndex > -1) {
-		if(this->selectedIndex != newIndex) emit this->indexChanged(newIndex);
-		this->selectedIndex = newIndex;
-		this->arrangeItems();
+		if(m_selectedIndex != newIndex) emit indexChanged(newIndex);
+		m_selectedIndex = newIndex;
+		arrangeItems();
 	}
 }
 
 int WrappedGraphicsView::indexAt(QPoint pos) {
 	int x = 0;
 	int y = 0;
-	int numPixmaps = this->pixmaps.length();
+	int numPixmaps = m_pixmaps.length();
 	for(int i = 0; i < numPixmaps; i++) {
-		QSize size = this->pixmaps.at(i).size();
-		if(x + size.width() > this->width()) {
+		QSize size = m_pixmaps.at(i).size();
+		if(x + size.width() > width()) {
 			x = 0;
 			y += size.height();
 		}
@@ -49,28 +49,28 @@ int WrappedGraphicsView::indexAt(QPoint pos) {
 }
 
 void WrappedGraphicsView::addPixmap(QPixmap pixmap) {
-	this->pixmaps.append(pixmap);
-	this->arrangeItems();
+	m_pixmaps.append(pixmap);
+	arrangeItems();
 }
 
 QSize WrappedGraphicsView::tileSize() {
-	return this->tSize;
+	return m_tSize;
 }
 
 void WrappedGraphicsView::setScaleFactor(int factor) {
 	if(factor < 1) return;
 
-	int oldFactor = this->scaleMult;
-	this->scaleMult = factor;
-	if(oldFactor != this->scaleMult) this->arrangeItems(this->width(),this->height());
+	int oldFactor = m_scaleMult;
+	m_scaleMult = factor;
+	if(oldFactor != m_scaleMult) arrangeItems(width(),height());
 }
 
 int WrappedGraphicsView::scaleFactor() {
-	return this->scaleMult;
+	return m_scaleMult;
 }
 
 int WrappedGraphicsView::arrangeItems(int width, int height) {
-	if(this->pixmaps.length() == 0) return 0;
+	if(m_pixmaps.length() == 0) return 0;
 	QSettings settings;
 	QColor cursorColor(settings.value("mapCursorColor","#0080FF").toString());
 	if(!cursorColor.isValid()) cursorColor = QColor(0,128,255,128);
@@ -79,30 +79,31 @@ int WrappedGraphicsView::arrangeItems(int width, int height) {
 	int y = 0;
 	int rows = 0;
 	if(width == -1 && height == -1) {
-		this->tSize = this->pixmaps.at(0).size();
+		m_tSize = m_pixmaps.at(0).size();
 	} else {
-		this->tSize = this->scene()->items().at(0)->boundingRect().size().toSize();
+//		m_tSize = scene()->items().at(0)->boundingRect().size().toSize();
+		m_tSize = m_wScene->items().at(0)->boundingRect().size().toSize();
 	}
 
-	int numItems = this->pixmaps.length();
-	this->wScene->clear();
+	int numItems = m_pixmaps.length();
+	m_wScene->clear();
 
 	for(int i = 0; i < numItems; i++) {
-		QGraphicsPixmapItem* pixmap = this->wScene->addPixmap(this->pixmaps.at(i));
-		pixmap->setScale(this->scaleMult);
-		if(x + tSize.width() > this->width()) {
+		QGraphicsPixmapItem* pixmap = m_wScene->addPixmap(m_pixmaps.at(i));
+		pixmap->setScale(m_scaleMult);
+		if(x + m_tSize.width() > this->width()) {
 			x = 0;
-			y += tSize.height();
+			y += m_tSize.height();
 		}
 
-		pixmap->setPos(x*this->scaleMult,y*this->scaleMult);
-		if(this->selectedIndex == i) {
-			QGraphicsRectItem* selectionBox = this->wScene->addRect(x,y,tSize.width()-1, tSize.height()-1);
+		pixmap->setPos(x*m_scaleMult,y*m_scaleMult);
+		if(m_selectedIndex == i) {
+			QGraphicsRectItem* selectionBox = m_wScene->addRect(x,y,m_tSize.width()-1, m_tSize.height()-1);
 			selectionBox->setBrush(cursorColor);
 			selectionBox->setZValue(1);
 		}
-		this->setSceneRect(0,0,x+tSize.width()*this->scaleMult,y+tSize.height()*this->scaleMult);
-		x += tSize.width();
+		setSceneRect(0,0,x+m_tSize.width()*m_scaleMult,y+m_tSize.height()*m_scaleMult);
+		x += m_tSize.width();
 	}
 	return rows;
 }

@@ -13,15 +13,18 @@
 #include "formats/spherefile.h"
 #include "dialogs/importoptionsdialog.h"
 
-Spriteset::Spriteset(QObject *parent) : SphereFile(parent) {}
-
-Spriteset::~Spriteset() {
-	delete this->file;
+Spriteset::Spriteset(QObject *parent) : SphereFile(parent) {
+	m_images = QList<QImage>();
+	m_directions = QList<SSDirection>();
 }
 
-Spriteset* Spriteset::fromImage(QString filename, QSize frameSize, bool removeDuplicates, QColor inColor, QColor outColor) {
+Spriteset::~Spriteset() {
+	delete m_file;
+}
+
+Spriteset* Spriteset::fromImage(QString filename, QSize frameSize, bool removeDuplicates, QColor inColor, QColor outColor, bool* success) {
 	Spriteset* newSS = new Spriteset();
-	newSS->valid = false;
+	bool valid = false;
 
 	QImage* importImg = new QImage(filename);
 
@@ -38,26 +41,20 @@ Spriteset* Spriteset::fromImage(QString filename, QSize frameSize, bool removeDu
 	}
 	newSS = new Spriteset();
 
-	newSS->images = QList<QImage>();
 	int numFramesX = importImg->width()/frameW;
 	int numFramesY = importImg->height()/frameH;
-
-	newSS->directions = QList<SSDirection>();
 
 	for(int y = 0; y < numFramesY; y++) {
 		for(int x = 0; x < numFramesX; x++) {
 			QImage image = importImg->copy(x*frameW,y*frameH,frameW,frameH);
-
-			if((removeDuplicates && !newSS->images.contains(image)) || !removeDuplicates) {
-				newSS->images.append(QImage(image));
-			}
+			newSS->addImage(QImage(image), removeDuplicates);
 		}
 	}
 
 	rss_header header;
 	memcpy(header.signature, ".rss", 4);
 	header.version = 3;
-	header.num_images = newSS->images.size();
+	header.num_images = newSS->numImages();
 	header.frame_width = frameW;
 	header.frame_height = frameH;
 	header.num_directions = 4;
@@ -65,122 +62,118 @@ Spriteset* Spriteset::fromImage(QString filename, QSize frameSize, bool removeDu
 	header.base_y1 = 0;
 	header.base_x2 = 0;
 	header.base_y2 = 0;
-	newSS->header = header;
+	newSS->m_header = header;
 
 	newSS->addDirection("north", 3);
 	newSS->addDirection("east", 3);
 	newSS->addDirection("south", 3);
 	newSS->addDirection("west", 3);
-	newSS->valid = true;
+	if(success) *success = true;
 	return newSS;
 }
 
 
 void Spriteset::createNew() {
-	this->filename = "Untitled.rss";
+	m_filename = "Untitled.rss";
 }
 
 bool Spriteset::open(QString filename) {
-	this->filename = filename;
-	this->file = new QFile(this->filename);
+	m_filename = filename;
+	m_file = new QFile(m_filename);
 
-	if(!this->file->exists()) {
+	if(!m_file->exists()) {
 		errorBox("The spriteset " + filename + " doesn't exist!");
 		return false;
 	}
-	if(!this->file->open(QIODevice::ReadOnly)) {
+	if(!m_file->open(QIODevice::ReadOnly)) {
 		errorBox("Failed loading spriteset " + filename);
-		this->file->close();
+		m_file->close();
 		return false;
 	}
-	readFile(this->file, &this->header, sizeof(header));
-	if (memcmp(header.signature, ".rss", 4) != 0) {
+	readFile(m_file, &m_header, sizeof(m_header));
+	if (memcmp(m_header.signature, ".rss", 4) != 0) {
 		errorBox("Error: " + QString(filename) + " is not a valid spriteset!");
-		this->file->close();
+		m_file->close();
 		return false;
 	}
 
-	switch(header.version) {
+	switch(m_header.version) {
 	case 1:
 	case 2:
 		errorBox("v1 and v2 spritesets are not currently supported.");
-		this->file->close();
+		m_file->close();
 		return false;
 	case 3: {
-		this->images = QList<QImage>();
-		for(int i = 0; i < header.num_images; i++) {
-			int num_img_bytes = this->header.frame_width*header.frame_height*4;
+		for(int i = 0; i < m_header.num_images; i++) {
+			int num_img_bytes = m_header.frame_width*m_header.frame_height*4;
 			unsigned char* image_bytes = new unsigned char[num_img_bytes];
 
-			readFile(this->file, image_bytes, num_img_bytes);
+			readFile(m_file, image_bytes, num_img_bytes);
 
-			this->images.append(QImage(
-				image_bytes,
-				header.frame_width, header.frame_height,
+			m_images.append(QImage(image_bytes,
+				m_header.frame_width, m_header.frame_height,
 				QImage::Format_RGBA8888
-			).copy(0,0,header.frame_width,header.frame_height));
+			).copy(0,0,m_header.frame_width,m_header.frame_height));
 		}
 
-		this->directions = QList<SSDirection>();
-		for(int d = 0; d < header.num_directions; d++) {
+		for(int d = 0; d < m_header.num_directions; d++) {
 			SSDirection direction = SSDirection();
 			uint16_t num_frames;
-			readFile(this->file, &num_frames, sizeof(num_frames));
+			readFile(m_file, &num_frames, sizeof(num_frames));
 
 			//QFile::skip() is apparently a relatively new method
 			char* dump6 = (char*)malloc(6);
-			readFile(this->file, dump6, 6);
+			readFile(m_file, dump6, 6);
 			free(dump6);
 
 			uint16_t str_length;
-			readFile(this->file, &str_length, sizeof(str_length));
+			readFile(m_file, &str_length, sizeof(str_length));
 
 			const uint16_t str_length_const = str_length; // because MSVC loves to be cantankerous with non-constant array indices
 			char* direction_name = new char[str_length_const];
-			readFile(this->file, direction_name, str_length);
+			readFile(m_file, direction_name, str_length);
 			direction.name = QString(direction_name);
 
 			direction.frames = QList<SSFrame>();
 			for(int f = 0; f < num_frames;f++) {
 				SSFrame frame = SSFrame();
-				readFile(this->file, &frame, sizeof(frame));
+				readFile(m_file, &frame, sizeof(frame));
 				direction.frames.append(frame);
 			}
 
-			this->directions.append(direction);
+			m_directions.append(direction);
 		}
 		break;
 	}
 	default:
-		errorBox("Invalid spriteset version: " + QString::number(this->header.version));
-		this->file->close();
+		errorBox("Invalid spriteset version: " + QString::number(m_header.version));
+		m_file->close();
 		return false;
 	}
-	this->file->close();
-	delete this->file;
+	m_file->close();
+	delete m_file;
 	return true;
 }
 
 bool Spriteset::save(QString filename) {
 	QFile* outFile = new QFile(filename);
-	memset(&this->header.reserved[0], 0, sizeof(this->header.reserved));
+	memset(&m_header.reserved[0], 0, sizeof(m_header.reserved));
 
-	writeFile(outFile, &this->header, sizeof(this->header));
+	writeFile(outFile, &m_header, sizeof(m_header));
 
-	switch(this->header.version) {
+	switch(m_header.version) {
 	case 1:
 	case 2:
-		//this shouldn't technically be possible
 		errorBox("v1 and v2 spritesets are not currently supported.");
 		outFile->close();
 		return false;
 	case 3: {
-		foreach(QImage image, this->images) {
+		foreach(QImage image, m_images) {
 			QByteArray* bytes = imageBytes(&image);
 			writeFile(outFile, bytes->data(), bytes->length());
 		}
 
-		foreach(SSDirection direction, this->directions) {
+		foreach(SSDirection direction, m_directions) {
 			int16_t num_frames = direction.frames.length();
 			writeFile(outFile, &num_frames, sizeof(num_frames));
 			memset(&direction.reserved[0], 0, sizeof(direction.reserved));
@@ -202,8 +195,7 @@ bool Spriteset::save(QString filename) {
 		break;
 	}
 	default:
-		//this shouldn't technically be possible
-		errorBox("Invalid spriteset version: " + QString::number(this->header.version));
+		errorBox("Invalid spriteset version: " + QString::number(m_header.version));
 		outFile->close();
 		return false;
 	}
@@ -212,26 +204,35 @@ bool Spriteset::save(QString filename) {
 
 void Spriteset::debugDump() {
 	qDebug().nospace() <<
-		"Spriteset information for \"" << this->filename << "\"\n" <<
-		"Version: " << this->header.version << "\n" <<
-		"No. images: " << this->header.num_images << "\n" <<
-		"Frame width: " << this->header.frame_width << "\n" <<
-		"Frame height: " << this->header.frame_height << "\n" <<
-		"No. directions: " << this->header.num_directions << "\n" <<
-		"Base Upper left: {" << this->header.base_x1 << "," << this->header.base_y1 << "}\n" <<
-		"Base Lower right: {" << this->header.base_x2 << "," << this->header.base_y2 << "}\n";
+		"Spriteset information for \"" << m_filename << "\"\n" <<
+		"Version: " << m_header.version << "\n" <<
+		"No. images: " << m_header.num_images << "\n" <<
+		"Frame width: " << m_header.frame_width << "\n" <<
+		"Frame height: " << m_header.frame_height << "\n" <<
+		"No. directions: " << m_header.num_directions << "\n" <<
+		"Base Upper left: {" << m_header.base_x1 << "," << m_header.base_y1 << "}\n" <<
+		"Base Lower right: {" << m_header.base_x2 << "," << m_header.base_y2 << "}\n";
 	QString dumpName = "";
-	for(int d = 0; d < this->directions.length(); d++) {
-		dumpName += this->directions.at(d).name;
-		if(d < this->directions.length() - 1) dumpName += ",";
+	for(int d = 0; d < m_directions.length(); d++) {
+		dumpName += m_directions.at(d).name;
+		if(d < m_directions.length() - 1) dumpName += ",";
 	}
 	qDebug().nospace() << dumpName;
-	for(int f = 0; f < this->images.length(); f++) {
-		this->images.at(f).save("dump_sprite" + QString::number(f) + ".png","PNG");
+	for(int f = 0; f < m_images.length(); f++) {
+		m_images.at(f).save("dump_sprite" + QString::number(f) + ".png","PNG");
 	}
 }
 
-void Spriteset::addDirection(QString name, int numFrames) {
+int Spriteset::numDirections() {
+	return m_header.num_directions;
+}
+
+void Spriteset::addDirection(Spriteset::SSDirection* direction) {
+	m_directions.append(*direction);
+	m_header.num_directions++;
+}
+
+Spriteset::SSDirection* Spriteset::addDirection(QString name, int numFrames) {
 	QList<SSFrame> frames;
 	for(int f = 0; f < numFrames; f++) {
 		SSFrame frame = SSFrame();
@@ -239,19 +240,58 @@ void Spriteset::addDirection(QString name, int numFrames) {
 		frame.imageIndex = 0;
 		frames.append(frame);
 	}
-	this->addDirection(name, frames);
+	return addDirection(name, frames);
 }
 
-void Spriteset::addDirection(QString name, QList<Spriteset::SSFrame> frames) {
+Spriteset::SSDirection* Spriteset::addDirection(QString name, QList<Spriteset::SSFrame> frames) {
 	SSDirection newDirection = SSDirection();
 	newDirection.name = (const char*)name.toStdString().c_str();
 
 	newDirection.frames = frames;
-	this->directions.append(newDirection);
+	m_directions.append(newDirection);
+	m_header.num_directions++;
+	return &m_directions.last();
 }
 
 void Spriteset::addDirection(QString name, Spriteset::SSFrame frame) {
 	QList<SSFrame> frames;
 	frames.append(frame);
-	this->addDirection(name, frames);
+	addDirection(name, frames);
+}
+
+Spriteset::SSDirection* Spriteset::getDirection(int index) {
+	if(index > numDirections()) return nullptr;
+	return &m_directions[index];
+}
+
+void Spriteset::setDirectionName(int index, QString name) {
+	if(index > numDirections()) return;
+	m_directions[index].name = name;
+}
+
+int Spriteset::numImages() {
+	return m_header.num_images;
+}
+
+QImage* Spriteset::getImage(int index) {
+	if(m_images.size() > index) return &m_images[index];
+	return nullptr;
+}
+
+void Spriteset::addImage(QImage image, bool mustBeUnique) {
+	if((mustBeUnique && !m_images.contains(image)) || !mustBeUnique) {
+		m_images.append(image);
+	}
+}
+
+QList<QImage> Spriteset::getImages() {
+	return m_images;
+}
+
+void Spriteset::setImages(QList<QImage> images) {
+	m_images = images;
+}
+
+int Spriteset::removeDuplicateImages() {
+
 }

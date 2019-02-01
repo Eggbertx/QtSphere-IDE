@@ -28,14 +28,15 @@ class StartPage : public QWidget {
 
 	private:
 		Ui::StartPage *ui;
-		QString baseInfoHTML;
-		QList<QSIProject*> gameList;
-		QSIProject* currentProject;
+		QString m_baseInfoHTML;
+		QList<QSIProject*> m_gameList;
+		QSIProject* m_currentProject;
+
 		// Right click menu and options
-		QMenu* rightClickMenu;
-		QAction* startGameAction;
-		QAction* loadProjectAction;
-		QAction* openProjectDirAction;
+		QMenu* m_rightClickMenu;
+		QAction* m_startGameAction;
+		QAction* m_loadProjectAction;
+		QAction* m_openProjectDirAction;
 };
 
 #endif // STARTPAGE_H

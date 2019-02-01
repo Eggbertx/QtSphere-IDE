@@ -42,20 +42,20 @@ class MapView : public QGraphicsView {
 		QGraphicsItemGroup* createPointer(int size);
 		QRect pointerRect(bool tiles);
 		void drawTile(int index);
-		QGraphicsScene* mapScene;
+		QGraphicsScene* m_mapScene;
 		typedef struct rmp_layer {
 			QList<QGraphicsPixmapItem*> tiles;
 			int width;
 			int height;
 		}rmp_layer;
 //		QList<rmp_layer> layers;
-		MapFile* mapFile;
-		int drawSize = 1;
-		QGraphicsItemGroup* pointerGroup;
-		QPoint pointerPosition;
-		QString mapStatusFormat;
-		bool drawing = false;
-		int currentTile = 0;
+		MapFile* m_mapFile;
+		int m_drawSize = 1;
+		QGraphicsItemGroup* m_pointerGroup;
+		QPoint m_pointerPosition;
+		QString m_mapStatusFormat;
+		bool m_drawing = false;
+		int m_currentTile = 0;
 
 };
 

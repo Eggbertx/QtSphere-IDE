@@ -6,7 +6,7 @@
 SphereFile::SphereFile(QObject *parent) {}
 
 SphereFile::~SphereFile() {
-	//delete this->file;
+	//delete m_file;
 }
 
 void SphereFile::createNew() {}
@@ -22,25 +22,24 @@ bool SphereFile::save(QString filename) {
 }
 
 QString SphereFile::fileName() {
-	if(this->file) return this->file->fileName();
+	if(m_file) return m_file->fileName();
 	return "";
-	//return this->file->fileName();
 }
 
 QString SphereFile::getBaseName() {
-	return QFileInfo(this->file->fileName()).baseName();
+	return QFileInfo(m_file->fileName()).baseName();
 }
 
 // read string with no null terminator from file
 QString SphereFile::readNextString() {
 	uint16_t string_length;
-	this->file->read(reinterpret_cast<char*>(&string_length), 2);
+	m_file->read(reinterpret_cast<char*>(&string_length), 2);
 
 	if(string_length == 0) return "";
 	QString string_str;
 	for(int c = 0; c < string_length; c++) {
 		char cc;
-		this->file->read(&cc, 1);
+		m_file->read(&cc, 1);
 		string_str += cc;
 	}
 	return string_str;

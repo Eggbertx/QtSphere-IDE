@@ -22,13 +22,13 @@ class EntityEditDialog : public QDialog {
 
 	private:
 		Ui::EntityEditDialog* ui;
-		MapFile* map;
-		bool attached;
-		QString onCreateScript;
-		QString onDestroyScript;
-		QString onTouchScript;
-		QString onTalkScript;
-		QString onGenerateCommandsScript;
+		MapFile* m_map;
+		bool m_attached;
+		QString m_onCreateScript;
+		QString m_onDestroyScript;
+		QString m_onTouchScript;
+		QString m_onTalkScript;
+		QString m_onGenerateCommandsScript;
 };
 
 #endif // ENTITYEDITDIALOG_H

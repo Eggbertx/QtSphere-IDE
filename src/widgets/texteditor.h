@@ -4,12 +4,9 @@
 #include <QTextEdit>
 #include "widgets/sphereeditor.h"
 
-class TextEditor: public SphereEditor {
+class TextEditor: public SphereEditor, public QTextEdit {
 	public:
 		TextEditor(QWidget* parent = nullptr);
-		QTextEdit* textEditorWidget;
-		void undo();
-		void redo();
 
 	private:
 

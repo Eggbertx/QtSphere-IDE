@@ -11,15 +11,17 @@ class SphereEditor : public QWidget {
 		explicit SphereEditor(QWidget* parent = nullptr);
 		void undo();
 		void redo();
-		int tabIndex;
 		enum Type { None, SpritesetEditor, TextEditor };
 		Type editorType();
+		int getTabIndex();
+		void setTabIndex(int index);
+
 	public slots:
 
 	protected:
-		QUndoStack* undoStack;
-		Type type;
-
+		QUndoStack* m_undoStack;
+		Type m_type;
+		int m_tabIndex;
 };
 
 #endif // SPHEREEDITOR_H

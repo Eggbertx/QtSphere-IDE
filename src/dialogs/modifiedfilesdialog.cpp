@@ -12,13 +12,13 @@ ModifiedFilesDialog::~ModifiedFilesDialog() {
 }
 
 void ModifiedFilesDialog::on_cancelButton_clicked() {
-	this->result = 0;
-	this->close();
+	m_result = 0;
+	close();
 }
 
 void ModifiedFilesDialog::on_discardAllButton_2_clicked() {
-	this->result = 1;
-	this->close();
+	m_result = 1;
+	close();
 }
 
 void ModifiedFilesDialog::addModifiedItem(SphereFile *item) {
@@ -29,10 +29,10 @@ void ModifiedFilesDialog::addModifiedItem(SphereFile *item) {
 }
 
 void ModifiedFilesDialog::on_saveAllButton_clicked() {
-	this->result = 2;
-	this->close();
+	m_result = 2;
+	close();
 }
 
 int ModifiedFilesDialog::getResult() {
-	return this->result;
+	return m_result;
 }

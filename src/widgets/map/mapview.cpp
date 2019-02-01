@@ -13,118 +13,122 @@
 #include "widgets/map/mapview.h"
 
 MapView::MapView(QWidget *parent) : QGraphicsView(parent) {
-	this->mapStatusFormat = "Map tile: (%1, %2) Pixel: (%3, %4)";
-	this->mapScene = new QGraphicsScene(this);
-	this->setMouseTracking(true);
-	this->mapFile = new MapFile(this);
-	this->setScene(this->mapScene);
-	this->pointerGroup = new QGraphicsItemGroup();
-	this->mapScene->addItem(this->pointerGroup);
+	m_mapStatusFormat = "Map tile: (%1, %2) Pixel: (%3, %4)";
+	m_mapScene = new QGraphicsScene(this);
+	setMouseTracking(true);
+	m_mapFile = new MapFile(this);
+	setScene(m_mapScene);
+	m_pointerGroup = new QGraphicsItemGroup();
+	m_mapScene->addItem(m_pointerGroup);
 }
 
 MapView::~MapView() {
-	delete this->mapFile;
-	delete this->mapScene;
+	delete m_mapFile;
+	delete m_mapScene;
 }
 
 bool MapView::attachMap(MapFile* map) {
-	QList<MapFile::layer> layers = this->mapFile->getLayers();
+	QList<MapFile::layer> layers = m_mapFile->getLayers();
 	int numLayers = layers.length();
+	Tileset* mapTileset = map->getTileset();
+	QSize tileSize = mapTileset->getTileSize();
 	for(int l = numLayers; l > 0; l--) {
 		int i = numLayers - l;
 		MapFile::layer cur_layer = layers.at(i);
 
 		for(int t = 0; t < cur_layer.tiles.length(); t++) {
 			uint16_t cur_tile = cur_layer.tiles.at(t);
-			QGraphicsPixmapItem* tilePixmap = this->mapScene->addPixmap(QPixmap::fromImage(map->tileset->getImage(cur_tile)));
+			QGraphicsPixmapItem* tilePixmap = m_mapScene->addPixmap(QPixmap::fromImage(mapTileset->getImage(cur_tile)));
 
 			int x = t % cur_layer.header.width;
 			int y = (t - x) / cur_layer.header.width;
-			tilePixmap->setPos(x * map->tileset->header.tile_width,y * map->tileset->header.tile_height);
+
+			tilePixmap->setPos(x * tileSize.width(),y * tileSize.height());
 		}
 	}
 
-	this->mapFile = map;
-	this->setDrawSize(1);
+	m_mapFile = map;
+	setDrawSize(1);
 	return true;
 }
 
 bool MapView::openFile(QString filename) {
-	if(!this->mapFile->open(filename)) return false;
-	return this->attachMap(this->mapFile);
+	if(!m_mapFile->open(filename)) return false;
+	return attachMap(m_mapFile);
 }
 
 MapFile *MapView::attachedMap() {
-	return this->mapFile;
+	return m_mapFile;
 }
 
 QPoint MapView::widgetToMapPos(QPoint pos) {
-	return this->widgetToMapPos(pos.x(), pos.y());
+	return widgetToMapPos(pos.x(), pos.y());
 }
 
 QPoint MapView::widgetToMapPos(int x, int y) {
-	if(!this->mapFile) return QPoint(-1, -1);
-	QSize tileSize = this->mapFile->tileSize();
+	if(!m_mapFile) return QPoint(-1, -1);
+	QSize tileSize = m_mapFile->getTileSize();
 	return QPoint(floor(x/tileSize.width()), floor(y/tileSize.height()));
 }
 
 QPoint MapView::mapToWidgetPos(QPoint pos) {
-	return this->widgetToMapPos(pos.x(), pos.y());
+	return widgetToMapPos(pos.x(), pos.y());
 }
 
 QPoint MapView::mapToWidgetPos(int x, int y) {
-	if(!this->mapFile) return QPoint(-1, -1);
-	QSize tileSize = this->mapFile->tileSize();
+	if(!m_mapFile) return QPoint(-1, -1);
+	QSize tileSize = m_mapFile->getTileSize();
 	return QPoint(x*tileSize.width(), y*tileSize.height());
 }
 
 void MapView::setDrawSize(int size) {
-	this->createPointer(size);
-	this->drawSize = size;
+	createPointer(size);
+	m_drawSize = size;
 }
 
 int MapView::getDrawSize() {
-	return this->drawSize;
+	return m_drawSize;
 }
 
 void MapView::setCurrentTile(int tile) {
-	this->currentTile = tile;
+	m_currentTile = tile;
 }
 
 MapFile::layer* MapView::getLayer(int index) {
-	return this->mapFile->getLayer(index);
+	return m_mapFile->getLayer(index);
 }
 
 void MapView::setLayerVisible(int layer, bool visible) {
-	MapFile::layer* l = this->mapFile->getLayer(layer);
+	MapFile::layer* l = m_mapFile->getLayer(layer);
 	if(l != nullptr) {
-		l->visible = visible;
+//		l->visible = visible;
 	}
 }
 
 bool MapView::toggleLayerVisible(int layer) {
-	MapFile::layer* l = this->mapFile->getLayer(layer);
+	MapFile::layer* l = m_mapFile->getLayer(layer);
 	if(l != nullptr) {
-		l->visible = !l->visible;
-		return l->visible;
+//		l->visible = !l->visible;
+//		return l->visible;
 	}
 	return false;
 }
 
 void MapView::drawTile(int index) {
-	int tileWidth = this->mapFile->tileSize().width();
-	int tileHeight = this->mapFile->tileSize().height();
-	QRect pRect = this->pointerRect(true);
+	int tileWidth = m_mapFile->getTileSize().width();
+	int tileHeight = m_mapFile->getTileSize().height();
+	QRect pRect = pointerRect(true);
+	Tileset* mapTileset = m_mapFile->getTileset();
 
 	for(int rY = pRect.y(); rY < pRect.bottom()+1; rY++) {
 		for(int rX = pRect.x(); rX < pRect.right()+1; rX++) {
 			int sceneX = rX * tileWidth;
 			int sceneY = rY * tileHeight;
-			QList<QGraphicsItem*> mouseItems = this->items(sceneX,sceneY);
+			QList<QGraphicsItem*> mouseItems = items(sceneX,sceneY);
 			foreach(QGraphicsItem* item, mouseItems) {
 				if(item->type() != QGraphicsPixmapItem::Type) continue;
 				QGraphicsPixmapItem* tile = reinterpret_cast<QGraphicsPixmapItem*>(item);
-				tile->setPixmap(QPixmap::fromImage(this->mapFile->tileset->getImage(index)));
+				tile->setPixmap(QPixmap::fromImage(mapTileset->getImage(index)));
 				break;
 			}
 		}
@@ -132,63 +136,63 @@ void MapView::drawTile(int index) {
 }
 
 void MapView::mouseMoveEvent(QMouseEvent* event) {
-	QRect mapRect = *this->mapFile->largestLayerRect();
-	QSize tileSize = this->mapFile->tileSize();
+	QRect mapRect = *m_mapFile->largestLayerRect();
+	QSize tileSize = m_mapFile->getTileSize();
 	QRect widgetRect(0,0,
 		mapRect.width() * tileSize.width(),
 		mapRect.height() * tileSize.height()
 	);
 
 	if(widgetRect.contains(event->pos())) {
-		this->pointerGroup->show();
+		m_pointerGroup->show();
 	} else {
 		MainWindow::instance()->setStatus("Ready");
-		this->pointerGroup->hide();
+		m_pointerGroup->hide();
 		return;
 	}
 
-	QPoint tilePos = this->widgetToMapPos(
-		event->pos().x() + this->horizontalScrollBar()->value()-1,
-		event->pos().y() + this->verticalScrollBar()->value()-1
+	QPoint tilePos = widgetToMapPos(
+		event->pos().x() + horizontalScrollBar()->value()-1,
+		event->pos().y() + verticalScrollBar()->value()-1
 	);
-	QPoint pointerUL = this->mapToWidgetPos(
-		tilePos.x()-floor(this->drawSize/2),
-		tilePos.y()-floor(this->drawSize/2)
+	QPoint pointerUL = mapToWidgetPos(
+		tilePos.x()-floor(m_drawSize/2),
+		tilePos.y()-floor(m_drawSize/2)
 	);
-	MainWindow::instance()->setStatus(this->mapStatusFormat.arg(
+	MainWindow::instance()->setStatus(m_mapStatusFormat.arg(
 		QString::number(tilePos.x()),QString::number(tilePos.y()),
 		QString::number(event->pos().x()), QString::number(event->pos().y())
 	));
-	this->pointerGroup->setPos(pointerUL);
+	m_pointerGroup->setPos(pointerUL);
 
-	if(this->drawing) {
-		this->drawTile(this->currentTile);
+	if(m_drawing) {
+		drawTile(m_currentTile);
 	}
-	this->setSceneRect(widgetRect);
+	setSceneRect(widgetRect);
 }
 
 void MapView::mousePressEvent(QMouseEvent* event) {
 	if(event->button() == Qt::LeftButton) {
-		this->drawing = true;
-		this->drawTile(this->currentTile);
+		m_drawing = true;
+		drawTile(m_currentTile);
 	}
 }
 
 void MapView::mouseReleaseEvent(QMouseEvent *event) {
-	this->drawing = false;
+	m_drawing = false;
 }
 
 void MapView::leaveEvent(QEvent *event) {
-	this->pointerGroup->hide();
-	this->drawing = false;
+	m_pointerGroup->hide();
+	m_drawing = false;
 	MainWindow::instance()->setStatus("Ready");
 }
 
 QGraphicsItemGroup* MapView::createPointer(int size) {
 	QSettings settings;
-	this->mapScene->removeItem(this->pointerGroup);
+	m_mapScene->removeItem(m_pointerGroup);
 	QGraphicsItemGroup* pointerGroup = new QGraphicsItemGroup();
-	QSize rectSize = this->mapFile->tileSize();
+	QSize rectSize = m_mapFile->getTileSize();
 	QColor cursorColor(settings.value("mapCursorColor","#0080FF").toString());
 	if(!cursorColor.isValid()) cursorColor = QColor(0,128,255,128);
 
@@ -200,27 +204,27 @@ QGraphicsItemGroup* MapView::createPointer(int size) {
 			pointerGroup->addToGroup(ri);
 		}
 	}
-	this->pointerGroup = pointerGroup;
-	this->mapScene->addItem(this->pointerGroup);
+	m_pointerGroup = pointerGroup;
+	m_mapScene->addItem(m_pointerGroup);
 	return pointerGroup;
 }
 
 QRect MapView::pointerRect(bool tiles) {
-	int rX = this->pointerGroup->x();
-	int rY = this->pointerGroup->y();
+	int rX = m_pointerGroup->x();
+	int rY = m_pointerGroup->y();
 	if(tiles) {
-		QPoint tilePos = this->widgetToMapPos(
-			rX + this->horizontalScrollBar()->value(),
-			rY + this->verticalScrollBar()->value()
+		QPoint tilePos = widgetToMapPos(
+			rX + horizontalScrollBar()->value(),
+			rY + verticalScrollBar()->value()
 		);
 		rX = tilePos.x();
 		rY = tilePos.y();
 	}
 
-	QSize rSize = QSize(this->drawSize, this->drawSize);
+	QSize rSize = QSize(m_drawSize, m_drawSize);
 	if(!tiles) {
-		rSize.setWidth(rSize.width() * this->mapFile->tileSize().width());
-		rSize.setHeight(rSize.height() * this->mapFile->tileSize().height());
+		rSize.setWidth(rSize.width() * m_mapFile->getTileSize().width());
+		rSize.setHeight(rSize.height() * m_mapFile->getTileSize().height());
 	}
 	return QRect(rX, rY, rSize.width(), rSize.height());
 }

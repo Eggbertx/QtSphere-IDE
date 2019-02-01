@@ -25,7 +25,7 @@ class ModifiedFilesDialog : public QDialog {
 
 	private:
 		Ui::ModifiedFilesDialog *ui;
-		int result; // 0 == cancel, 1 = discard all, 2 = save all
+		int m_result; // 0 == cancel, 1 = discard all, 2 = save all
 
 };
 

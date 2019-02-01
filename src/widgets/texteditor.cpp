@@ -2,18 +2,9 @@
 #include <QTextEdit>
 #include "widgets/texteditor.h"
 
-TextEditor::TextEditor(QWidget *parent): SphereEditor(parent) {
-	this->type = SphereEditor::TextEditor;
-	this->textEditorWidget = new QTextEdit(parent);
-	QFont font("Monospace", 10);
-	font.setFixedPitch(true);
-	this->textEditorWidget->setFont(font);
-}
-
-void TextEditor::undo() {
-	this->textEditorWidget->undo();
-}
-
-void TextEditor::redo() {
-	this->textEditorWidget->redo();
+TextEditor::TextEditor(QWidget *parent): SphereEditor(parent), QTextEdit (parent) {
+	m_type = SphereEditor::TextEditor;
+	QFont textFont("Monospace", 10);
+	textFont.setFixedPitch(true);
+	this->QTextEdit::setFont(textFont);
 }

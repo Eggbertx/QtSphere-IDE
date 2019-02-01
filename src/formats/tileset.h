@@ -17,6 +17,7 @@ class Tileset : public SphereFile {
 		void setDelay(int index);
 		QImage getImage(int index);
 		int numTiles();
+		QSize getTileSize();
 
 		#pragma pack(push, 1)
 		typedef struct rts_header {
@@ -42,22 +43,19 @@ class Tileset : public SphereFile {
 			uint8_t		reserved[22];
 		}tile_info;
 		#pragma pack(pop)
-		rts_header header;
 
 		typedef struct tile {
 			int index;
 			QImage image;
 			tile_info info;
 		}tile;
+
 		QList<QImage> getTileImages();
 		QList<tile> getTiles();
 
-	signals:
-
-	public slots:
-
 	private:
-		QList<tile> tiles;
+		rts_header m_header;
+		QList<tile> m_tiles;
 };
 
 #endif // TILESET_H

@@ -5,35 +5,35 @@
 #include "widgets/colorbutton.h"
 
 ColorButton::ColorButton(QWidget *parent,QColor color): QToolButton(parent) {
-	this->color = color;
-	int metricSize = this->style()->pixelMetric(QStyle::PM_ButtonIconSize);
-	this->pixmapSize = QSize(metricSize*2,metricSize);
-	this->updateIcon();
+	m_color = color;
+	int metricSize = style()->pixelMetric(QStyle::PM_ButtonIconSize);
+	m_pixmapSize = QSize(metricSize*2,metricSize);
+	updateIcon();
 }
 
 void ColorButton::setColor(QColor color) {
-	this->color = color;
-	this->updateIcon();
+	m_color = color;
+	updateIcon();
 }
 
 QColor ColorButton::getColor() {
-	return this->color;
+	return m_color;
 }
 
 void ColorButton::mouseReleaseEvent(QMouseEvent* e) {
 	if(e->button() != Qt::LeftButton) return;
-	QColor newCol = QColorDialog::getColor(this->color);
-	this->setDown(false);
-	if(this->color == newCol || !newCol.isValid()) return;
-	this->color = newCol;
-	emit this->colorChanged(this->color);
-	this->updateIcon();
+	QColor newCol = QColorDialog::getColor(m_color);
+	setDown(false);
+	if(m_color == newCol || !newCol.isValid()) return;
+	m_color = newCol;
+	emit colorChanged(m_color);
+	updateIcon();
 }
 
 
 void ColorButton::updateIcon() {
-	this->colorIcon = QPixmap(this->pixmapSize);
-	this->colorIcon.fill(QColor(this->color));
-	this->setIconSize(this->pixmapSize);
-	this->setIcon(this->colorIcon);
+	m_colorIcon = QPixmap(m_pixmapSize);
+	m_colorIcon.fill(QColor(m_color));
+	setIconSize(m_pixmapSize);
+	setIcon(m_colorIcon);
 }

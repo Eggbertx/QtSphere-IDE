@@ -25,11 +25,11 @@ class WrappedGraphicsView : public QGraphicsView {
 
 	private:
 		int arrangeItems(int width = -1, int height = -1);
-		int selectedIndex;
-		QSize tSize;
-		int scaleMult;
-		QGraphicsScene* wScene;
-		QList<QPixmap> pixmaps;
+		int m_selectedIndex;
+		QSize m_tSize;
+		int m_scaleMult;
+		QGraphicsScene* m_wScene;
+		QList<QPixmap> m_pixmaps;
 };
 
 #endif // WRAPPEDGRAPHICSVIEW_H

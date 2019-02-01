@@ -80,19 +80,19 @@ void LayerPropertiesDialog::on_parallaxChk_stateChanged(int arg1) {
 }
 
 void LayerPropertiesDialog::on_horizontalParallaxSlider_valueChanged(int value) {
-	this->updateSliderIndicator(ui->horizontalParallaxSlider, ui->horizontalParallaxIndicator);
+	updateSliderIndicator(ui->horizontalParallaxSlider, ui->horizontalParallaxIndicator);
 }
 
 void LayerPropertiesDialog::on_verticalParallaxSlider_valueChanged(int value) {
-	this->updateSliderIndicator(ui->verticalParallaxSlider, ui->verticalParallaxIndicator);
+	updateSliderIndicator(ui->verticalParallaxSlider, ui->verticalParallaxIndicator);
 }
 
 void LayerPropertiesDialog::on_horizontalAsSlider_valueChanged(int value) {
-	this->updateSliderIndicator(ui->horizontalAsSlider, ui->horizontalAsIndicator);
+	updateSliderIndicator(ui->horizontalAsSlider, ui->horizontalAsIndicator);
 }
 
 void LayerPropertiesDialog::on_verticalAsSlider_valueChanged(int value) {
-	this->updateSliderIndicator(ui->verticalAsSlider, ui->verticalAsIndicator);
+	updateSliderIndicator(ui->verticalAsSlider, ui->verticalAsIndicator);
 }
 
 void LayerPropertiesDialog::updateSliderIndicator(QSlider* slider, QLabel* indicator) {
