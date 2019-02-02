@@ -1,0 +1,1 @@
+legacyconfig-24x24.png and legacyengine-24x24.png come from Sphere 1.5's config.exe and engine.exe respectively by Chad Austin

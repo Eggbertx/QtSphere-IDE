@@ -8,7 +8,9 @@ class QSIProject : public QObject {
 	Q_OBJECT
 	Q_ENUMS(Compiler)
 	public:
-		explicit QSIProject(QString path, QObject *parent = nullptr);
+		explicit QSIProject(QObject *parent = nullptr);
+		bool open(QString path);
+
 		QString getName();
 		void setName(QString name);
 		QString getAuthor();

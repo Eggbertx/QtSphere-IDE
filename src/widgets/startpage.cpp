@@ -62,13 +62,13 @@ void StartPage::refreshGameList() {
 
 		int numDirs = dirs.length();
 		for(int d = 0; d < numDirs; d++) {
-			QSIProject* qp = new QSIProject(dirs.at(d).absoluteFilePath());
-			if(qp->getName() == "") {
-				qp->setName(dirs.at(d).fileName());
-				qp->setWidth(-1);
-				qp->setWidth(-1);
+			QSIProject* project = new QSIProject();
+			if(project->open(dirs.at(d).absoluteFilePath())) {
+				project->setName(dirs.at(d).fileName());
+				project->setWidth(-1);
+				project->setWidth(-1);
+				m_gameList << project;
 			}
-			m_gameList << qp;
 		}
 	}
 	settings.endArray();
@@ -116,6 +116,7 @@ void StartPage::on_projectIcons_customContextMenuRequested(const QPoint &pos) {
 
 void StartPage::on_projectIcons_itemActivated(QListWidgetItem *item) {
 	MainWindow::instance()->openProject(m_gameList.at(ui->projectIcons->currentRow())->getPath(true));
+	emit projectLoaded(m_currentProject);
 }
 
 void StartPage::on_projectIcons_itemSelectionChanged() {

@@ -15,6 +15,8 @@
         <file>rectangletool.png</file>
         <file>gears.png</file>
         <file>map-person.png</file>
+        <file>legacyconfig-24x24.png</file>
+        <file>legacyengine-24x24.png</file>
     </qresource>
     <qresource prefix="/text">
         <file>dark.qss</file>

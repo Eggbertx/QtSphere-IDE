@@ -16,7 +16,7 @@ ProjectPropertiesDialog::ProjectPropertiesDialog(bool newFile, QSIProject* proje
 		setWindowTitle("New Project");
 		ui->pathLineEdit->setEnabled(true);
 		ui->pathButton->setEnabled(true);
-		m_project = new QSIProject("", this);
+		m_project = new QSIProject(this);
 	} else {
 		m_project = project;
 		ui->pathLineEdit->setEnabled(false);

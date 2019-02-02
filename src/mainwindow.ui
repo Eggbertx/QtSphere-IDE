@@ -434,6 +434,7 @@
    <addaction name="separator"/>
    <addaction name="toolbarPlayGame"/>
    <addaction name="toolbarProjectProperties"/>
+   <addaction name="actionLegacyConfig"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionClose_Project">
@@ -659,6 +660,9 @@
    </property>
   </action>
   <action name="toolbarPlayGame">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/qsires.qrc">
      <normaloff>:/icons/sphere-icon.png</normaloff>:/icons/sphere-icon.png</iconset>
@@ -674,6 +678,9 @@
    </property>
   </action>
   <action name="toolbarProjectProperties">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="res/qsires.qrc">
      <normaloff>:/icons/gears.png</normaloff>:/icons/gears.png</iconset>
@@ -761,6 +768,21 @@
   <action name="action8x">
    <property name="text">
     <string>8x</string>
+   </property>
+  </action>
+  <action name="actionLegacyConfig">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="res/qsires.qrc">
+     <normaloff>:/icons/legacyconfig-24x24.png</normaloff>:/icons/legacyconfig-24x24.png</iconset>
+   </property>
+   <property name="text">
+    <string>Configure</string>
+   </property>
+   <property name="toolTip">
+    <string>Run legacy config.exe (only available for legacy engine)</string>
    </property>
   </action>
  </widget>

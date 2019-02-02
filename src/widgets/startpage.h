@@ -26,6 +26,9 @@ class StartPage : public QWidget {
 		void on_projectIcons_itemActivated(QListWidgetItem *item);
 		void on_projectIcons_itemSelectionChanged();
 
+	signals:
+		void projectLoaded(QSIProject* project);
+
 	private:
 		Ui::StartPage *ui;
 		QString m_baseInfoHTML;

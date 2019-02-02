@@ -1,13 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
-#include <QTextEdit>
 #include <QFileSystemModel>
 #include <QLabel>
+#include <QMainWindow>
+#include <QProcess>
 #include <QWidget>
-#include <QVariant>
-#include <QComboBox>
 
 #include "widgets/sphereeditor.h"
 #include "formats/spherefile.h"
@@ -32,6 +30,8 @@ class MainWindow : public QMainWindow {
 		void setTheme(QString theme = "default");
 		void openFile(QString filename = "");
 		void openProject(QString fileName);
+		void setCurrentProject(QSIProject* project = nullptr);
+		void closeProject();
 		void saveCurrentTab();
 		void prepareForImage();
 		void prepareForMap();
@@ -39,14 +39,18 @@ class MainWindow : public QMainWindow {
 		void prepareForSpriteset();
 		void handleModifiedFiles();
 		void refreshRecentFiles();
-		void closeEvent(QCloseEvent* event);
 		SphereEditor* getCurrentEditor();
+		void setEngine(QString which);
 		static MainWindow* instance();
+
+	protected:
+		void closeEvent(QCloseEvent* event);
 
 	private slots:
 		void nextTab();
 		void prevTab();
 		void checkCloseProjectOption();
+		void onProjectLoaded(QSIProject* project);
 		void on_actionAbout_triggered();
 		void on_actionExit_triggered();
 		void on_actionConfigure_QtSphere_IDE_triggered();
@@ -75,13 +79,17 @@ class MainWindow : public QMainWindow {
 		void on_actionClearRecent_triggered();
 		void on_actionClose_Project_triggered();
 		void on_actionClose_triggered();
+		void on_toolbarPlayGame_triggered();
+		void on_actionLegacyConfig_triggered();
 
 	private:
 		void setupEditors();
 		void updateTreeView();
+		bool validEngineDirCheck();
 		static MainWindow* _instance;
 		Ui::MainWindow *ui;
 		QString m_status;
+		StartPage* m_startPage;
 		QLabel* m_statusLabel;
 		bool m_projectLoaded;
 		QSIProject* m_project;

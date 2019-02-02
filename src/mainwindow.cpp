@@ -82,22 +82,28 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	ui->splitter->setStretchFactor(1,4);
 	ui->splitter->setSizes(QList<int>({200, width()-200}));
 
-	m_project = new QSIProject("", this);
+	m_project = new QSIProject(this);
 
 	m_soundPlayer = new SoundPlayer();
 	ui->mediaPlayerTab->layout()->addWidget(m_soundPlayer);
-	ui->openFileTabs->addTab(new StartPage(ui->openFileTabs), "Start Page");
+	m_startPage = new StartPage(ui->openFileTabs);
+	connect(m_startPage, SIGNAL(projectLoaded(QSIProject*)), this, SLOT(onProjectLoaded(QSIProject*)));
+	ui->openFileTabs->addTab(m_startPage, "Start Page");
+	QSettings settings;
 	updateTreeView();
 	refreshRecentFiles();
+	setEngine(settings.value("whichEngine", "minisphere").toString());
 }
 
 MainWindow::~MainWindow() {
 	disconnect(this, SLOT(nextTab()));
 	disconnect(this, SLOT(prevTab()));
 	disconnect(ui->menuFile, SIGNAL(aboutToShow()), this, SLOT(checkCloseProjectOption()));
+	disconnect(m_startPage, SIGNAL(projectLoaded(QSIProject*)), this, SLOT(onProjectLoaded(QSIProject*)));
 	delete ui;
 	delete m_soundPlayer;
 	delete m_project;
+	delete m_startPage;
 	QSettings settings;
 	settings.setValue("geometry", geometry());
 	settings.setValue("maximized", isMaximized());
@@ -108,13 +114,6 @@ MainWindow* MainWindow::instance() {
 		_instance = new MainWindow;
 	return _instance;
 }
-
-/*void MainWindow::addWidgetTab(QWidget* widget, QString tabname) {
-	widget->setObjectName(tabname + QString::number(ui->openFileTabs->count()));
-	m_openEditors.append(widget);
-	ui->openFileTabs->insertTab(ui->openFileTabs->count(), widget, tabname);
-	ui->openFileTabs->setCurrentIndex(ui->openFileTabs->count()-1);
-}*/
 
 QString MainWindow::getStatus() {
 	return m_statusLabel->text();
@@ -160,6 +159,16 @@ SphereEditor* MainWindow::getCurrentEditor() {
 			return editor;
 	}
 	return nullptr;
+}
+
+void MainWindow::setEngine(QString which) {
+	if(which == "legacy") {
+		ui->actionLegacyConfig->setEnabled(true);
+		ui->toolbarPlayGame->setIcon(QIcon(":/icons/legacyengine-24x24.png"));
+	} else  {
+		ui->actionLegacyConfig->setEnabled(false);
+		ui->toolbarPlayGame->setIcon(QIcon(":/icons/sphere-icon.png"));
+	}
 }
 
 void MainWindow::on_actionAbout_triggered() {
@@ -291,9 +300,32 @@ void MainWindow::openFile(QString filename) {
 }
 
 void MainWindow::openProject(QString filename) {
-	m_project = new QSIProject(filename, this);
-	m_projectLoaded = true;
-	ui->menuProject->setEnabled(true);
+	m_projectLoaded = m_project->open(filename);
+	if(m_projectLoaded) {
+		ui->menuProject->setEnabled(true);
+		ui->toolbarPlayGame->setEnabled(true);
+		ui->toolbarProjectProperties->setEnabled(true);
+		updateTreeView();
+	}
+}
+
+void MainWindow::setCurrentProject(QSIProject* project) {
+	m_project = project;
+	if(m_project != nullptr) {
+		ui->menuProject->setEnabled(true);
+		ui->toolbarPlayGame->setEnabled(true);
+		ui->toolbarProjectProperties->setEnabled(true);
+		m_projectLoaded = true;
+		updateTreeView();
+	}
+}
+
+void MainWindow::closeProject() {
+	delete m_project;
+	m_projectLoaded = false;
+	ui->menuProject->setEnabled(false);
+	ui->toolbarPlayGame->setEnabled(false);
+	ui->toolbarProjectProperties->setEnabled(false);
 	updateTreeView();
 }
 
@@ -494,6 +526,10 @@ void MainWindow::checkCloseProjectOption() {
 	else ui->actionClose_Project->setEnabled(true);
 }
 
+void MainWindow::onProjectLoaded(QSIProject* project) {
+	setCurrentProject(project);
+}
+
 void MainWindow::on_actionImage_to_Spriteset_triggered() {
 	QString imagePath = QFileDialog::getOpenFileName(this,
 		"Import image", "",
@@ -528,12 +564,11 @@ void MainWindow::on_actionStart_Page_triggered() {
 	for(int t = 0; t < numTabs; t++) {
 		if(QString(ui->openFileTabs->widget(t)->metaObject()->className()) == "StartPage") return;
 	}
-	ui->openFileTabs->addTab(new StartPage(ui->openFileTabs), "Start Page");
+	ui->openFileTabs->addTab(m_startPage, "Start Page");
 }
 
 void MainWindow::on_taskListTable_customContextMenuRequested(const QPoint &pos) {
 	QMenu* contextMenu = new QMenu();
-
 	contextMenu->addAction("Load task list...");
 	contextMenu->addAction("Save task list");
 	contextMenu->addAction("Save task list as...");
@@ -564,15 +599,56 @@ void MainWindow::on_actionClearRecent_triggered() {
 }
 
 void MainWindow::on_actionClose_Project_triggered() {
-	delete m_project;
-	m_projectLoaded = false;
-	ui->menuProject->setEnabled(false);
-	updateTreeView();
+	closeProject();
 }
 
 void MainWindow::on_actionClose_triggered() {
-	delete m_project;
-	m_projectLoaded = false;
-	ui->menuProject->setEnabled(false);
-	updateTreeView();
+	closeProject();
+}
+
+void MainWindow::on_toolbarPlayGame_triggered() {
+	QSettings settings;
+	QString engineDir = settings.value("engineDir").toString();
+	QString whichEngine = settings.value("whichEngine", "minisphere").toString();
+
+	if(!validEngineDirCheck()) return;
+#if defined(Q_OS_UNIX)
+	if(whichEngine == "legacy") {
+		QProcess::startDetached("wine", QStringList({"./engine.exe", "-game", m_project->getBuidlDir()}), engineDir);
+	} else {
+		QProcess::startDetached("minisphere", QStringList(m_project->getBuidlDir()), engineDir);
+	}
+#elif defined(Q_OS_WINDOWS)
+	if(whichEngine == "legacy") {
+		QProcess::startDetached("engine.exe", QStringList({"-game", m_project->getBuidlDir()}), engineDir);
+	} else {
+		QProcess::startDetached("minisphere", QStringList(m_project->getBuidlDir()), engineDir);
+	}
+#endif
+}
+
+bool MainWindow::validEngineDirCheck() {
+	QSettings settings;
+	QString engineDir = settings.value("engineDir").toString();
+	if(engineDir == "") {
+		errorBox("Engine directory must be set if the legacy engine is being used.");
+		return false;
+	}
+	if(!QFile::exists(engineDir)) {
+		errorBox("Engine directory set in QtSphereIDE settings does not exist.");
+		return false;
+	}
+	return true;
+}
+
+void MainWindow::on_actionLegacyConfig_triggered() {
+	QSettings settings;
+
+	if(settings.value("whichEngine", "minisphere").toString() == "legacy") {
+	#if defined(Q_OS_UNIX)
+
+	#elif defiend(Q_OS_WINDOWS)
+
+	#endif
+	}
 }

@@ -1,6 +1,7 @@
 #ifndef SETTINGSWINDOW_H
 #define SETTINGSWINDOW_H
 
+#include <QAbstractButton>
 #include <QDialog>
 #include "mainwindow.h"
 
@@ -16,16 +17,20 @@ class SettingsWindow : public QDialog {
 		explicit SettingsWindow(QWidget *parent = 0);
 		~SettingsWindow();
 
-
 	private slots:
-		void on_cancelButton_clicked();
-		void on_legacyDir_btn_clicked();
+		void onOk();
+		void onApply();
+		void onCancel();
+//		void on_cancelButton_clicked();
+		void on_minisphereDir_btn_clicked();
+		void on_legacySphereDir_btn_clicked();
 		void on_themeCombo_currentIndexChanged(const QString &newtext);
-		void on_okButton_clicked();
-		void on_applyButton_clicked();
+//		void on_okButton_clicked();
+//		void on_applyButton_clicked();
 		void on_addDirButton_clicked();
 		void on_removeDirButton_clicked();
 		void mapCursorColChanged(QColor color);
+
 
 	private:
 		void saveSettings();
@@ -33,7 +38,8 @@ class SettingsWindow : public QDialog {
 		QString m_currentTheme;
 		QString m_newTheme;
 		QString m_mapCursorColor;
-		QString m_legacyDir;
+		QString m_minisphereDir;
+		QString m_legacySphereDir;
 };
 
 #endif // SETTINGSWINDOW_H

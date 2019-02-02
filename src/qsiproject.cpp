@@ -11,13 +11,16 @@
 #include "qsiproject.h"
 #include "util.h"
 
-QSIProject::QSIProject(QString path, QObject *parent) : QObject(parent) {
-	if(path == "") return;
+QSIProject::QSIProject(QObject *parent) : QObject(parent) {
+	m_path = "";
+}
+
+bool QSIProject::open(QString path) {
 	m_path = path;
 	QFileInfo fileInfo(m_path);
 	if(!fileInfo.exists()) {
 		errorBox("Project file " + m_path + " doesn't exist!");
-		return;
+		return false;
 	}
 	bool found = false;
 	if(fileInfo.isDir()) {
@@ -55,7 +58,7 @@ QSIProject::QSIProject(QString path, QObject *parent) : QObject(parent) {
 		m_path = fileInfo.dir().path();
 		found = true;
 	}
-	if(!found) return;
+	if(!found) return false;
 	QFile* projectFile = new QFile(m_projectPath);
 	if(!projectFile->open(QFile::ReadOnly|QFile::Text)) {
 		errorBox("Error reading " + fileInfo.fileName() + ": " + projectFile->errorString());
@@ -76,6 +79,7 @@ QSIProject::QSIProject(QString path, QObject *parent) : QObject(parent) {
 
 	projectFile->close();
 	delete projectFile;
+	return true;
 }
 
 QString QSIProject::getName() {
@@ -197,7 +201,7 @@ bool QSIProject::readSSProj(QFile* projectFile) {
 		else if(key == "buildDir") m_buildDir = m_path + "/" + value;
 		else if(key == "compiler") {
 			if(value == "Cell") m_compiler = QSIProject::Cell;
-			m_compiler = value;
+			else m_compiler = QSIProject::Vanilla;
 		}
 		else if(key == "description") m_summary = value;
 		else if(key == "mainScript") m_script = value;
@@ -273,6 +277,7 @@ bool QSIProject::readSGM(QFile *projectFile) {
 		else if(key == "screen+height") m_height = value.toInt();
 		else if(key == "script") m_script = value;
 	}
+	m_buildDir = getPath(false);
 	m_compiler = QSIProject::Vanilla;
 	return true;
 }
