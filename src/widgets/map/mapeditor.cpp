@@ -149,7 +149,7 @@ void MapEditor::on_layersTable_cellClicked(int row, int column) {
 		case 0: {
 			QWidget* item = ui->layersTable->cellWidget(row,column);
 			QLabel* eyeLabel = dynamic_cast<QLabel*>(item);
-			if(m_mapView->toggleLayerVisible(row))
+			if(m_mapView->toggleLayerVisible(ui->layersTable->rowCount()-row-1))
 				eyeLabel->setPixmap(QPixmap(":/icons/eye.png"));
 			else
 				eyeLabel->setPixmap(QPixmap(":/icons/eye-closed.png"));

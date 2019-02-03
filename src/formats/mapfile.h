@@ -106,6 +106,8 @@ class MapFile : public SphereFile {
 		int numLayers();
 		QString getLayerName(int layer);
 		void setLayerName(int layer, QString name);
+		bool isLayerVisible(int layer);
+		void setLayerVisible(int layer, bool visible);
 
 		int getTileIndex(int l, int x, int y);
 		QList<entity> getEntities(int layer = -1);

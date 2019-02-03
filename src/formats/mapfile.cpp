@@ -222,6 +222,18 @@ int MapFile::numLayers() {
 	return m_layers.length();
 }
 
+bool MapFile::isLayerVisible(int layer) {
+	if(m_header.num_layers <= layer) return false;
+	return (m_layers[layer].header.flags & 1) == 0;
+}
+
+void MapFile::setLayerVisible(int layer, bool visible) {
+	if(m_header.num_layers <= layer) return;
+	if(isLayerVisible(layer) != visible) {
+		m_layers[layer].header.flags ^= 1;
+	}
+}
+
 int MapFile::getTileIndex(int l, int x, int y) {
 	if(l >= m_layers.length()) return -1;
 	layer cur_layer = m_layers.at(l);

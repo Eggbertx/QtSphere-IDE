@@ -44,6 +44,11 @@ bool MapView::attachMap(MapFile* map) {
 			int y = (t - x) / cur_layer.header.width;
 
 			tilePixmap->setPos(x * tileSize.width(),y * tileSize.height());
+			mapTile* tile = new mapTile;
+			tile->pixmap = tilePixmap;
+			tile->tileIndex = cur_tile;
+			tile->layer = numLayers - l;
+			m_tiles << tile;
 		}
 	}
 
@@ -99,19 +104,22 @@ MapFile::layer* MapView::getLayer(int index) {
 }
 
 void MapView::setLayerVisible(int layer, bool visible) {
-	MapFile::layer* l = m_mapFile->getLayer(layer);
-	if(l != nullptr) {
-//		l->visible = visible;
+	m_mapFile->setLayerVisible(layer, visible);
+	qDebug() << visible;
+	foreach(mapTile* tile, m_tiles) {
+		if(tile->layer == layer) tile->pixmap->setVisible(visible);
 	}
 }
 
 bool MapView::toggleLayerVisible(int layer) {
-	MapFile::layer* l = m_mapFile->getLayer(layer);
-	if(l != nullptr) {
-//		l->visible = !l->visible;
-//		return l->visible;
+	bool visible = m_mapFile->isLayerVisible(layer);
+	m_mapFile->setLayerVisible(layer, !visible);
+	qDebug() << "layer" << layer;
+	foreach(mapTile* tile, m_tiles) {
+		qDebug() << "tile layer" << tile->layer;
+		if(tile->layer == layer) tile->pixmap->setVisible(!visible);
 	}
-	return false;
+	return !visible;
 }
 
 void MapView::drawTile(int index) {
