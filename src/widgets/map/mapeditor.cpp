@@ -104,7 +104,10 @@ bool MapEditor::attach(MapFile* attachedMap) {
 
 		QLabel* eyeLabel = new QLabel();
 		eyeLabel->setToolTip("Toggle layer visibility");
-		eyeLabel->setPixmap(QPixmap(":/icons/eye.png"));
+		if(attachedMap->isLayerVisible(i))
+			eyeLabel->setPixmap(QPixmap(":/icons/eye.png"));
+		else
+			eyeLabel->setPixmap(QPixmap(":/icons/eye-closed.png"));
 		eyeLabel->setAlignment(Qt::AlignCenter);
 		ui->layersTable->setCellWidget(l-1,0,eyeLabel);
 		ui->layersTable->setItem(l-1,1, new QTableWidgetItem(cur_layer.name));

@@ -35,7 +35,7 @@ bool MapView::attachMap(MapFile* map) {
 	for(int l = numLayers; l > 0; l--) {
 		int i = numLayers - l;
 		MapFile::layer cur_layer = layers.at(i);
-
+		bool visible = m_mapFile->isLayerVisible(numLayers-l);
 		for(int t = 0; t < cur_layer.tiles.length(); t++) {
 			uint16_t cur_tile = cur_layer.tiles.at(t);
 			QGraphicsPixmapItem* tilePixmap = m_mapScene->addPixmap(QPixmap::fromImage(mapTileset->getImage(cur_tile)));
@@ -44,6 +44,8 @@ bool MapView::attachMap(MapFile* map) {
 			int y = (t - x) / cur_layer.header.width;
 
 			tilePixmap->setPos(x * tileSize.width(),y * tileSize.height());
+			tilePixmap->setVisible(visible);
+
 			mapTile* tile = new mapTile;
 			tile->pixmap = tilePixmap;
 			tile->tileIndex = cur_tile;
@@ -105,7 +107,6 @@ MapFile::layer* MapView::getLayer(int index) {
 
 void MapView::setLayerVisible(int layer, bool visible) {
 	m_mapFile->setLayerVisible(layer, visible);
-	qDebug() << visible;
 	foreach(mapTile* tile, m_tiles) {
 		if(tile->layer == layer) tile->pixmap->setVisible(visible);
 	}
@@ -114,11 +115,10 @@ void MapView::setLayerVisible(int layer, bool visible) {
 bool MapView::toggleLayerVisible(int layer) {
 	bool visible = m_mapFile->isLayerVisible(layer);
 	m_mapFile->setLayerVisible(layer, !visible);
-	qDebug() << "layer" << layer;
 	foreach(mapTile* tile, m_tiles) {
-		qDebug() << "tile layer" << tile->layer;
 		if(tile->layer == layer) tile->pixmap->setVisible(!visible);
 	}
+
 	return !visible;
 }
 
