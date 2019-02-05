@@ -1,7 +1,6 @@
 #include <QBitmap>
 #include <QBuffer>
 #include <QByteArray>
-#include <QDebug>
 #include <QImage>
 #include <QPainter>
 #include <QPixmap>
@@ -203,21 +202,22 @@ bool Spriteset::save(QString filename) {
 }
 
 void Spriteset::debugDump() {
-	qDebug().nospace() <<
-		"Spriteset information for \"" << m_filename << "\"\n" <<
-		"Version: " << m_header.version << "\n" <<
-		"No. images: " << m_header.num_images << "\n" <<
-		"Frame width: " << m_header.frame_width << "\n" <<
-		"Frame height: " << m_header.frame_height << "\n" <<
-		"No. directions: " << m_header.num_directions << "\n" <<
-		"Base Upper left: {" << m_header.base_x1 << "," << m_header.base_y1 << "}\n" <<
-		"Base Lower right: {" << m_header.base_x2 << "," << m_header.base_y2 << "}\n";
+	qDebug("Spriteset information for \"%s\":\n"
+		"Version: %d\n"
+		"No. images: %d\n"
+		"Frame size: %dx%d\n"
+		"No. directions: %d\n"
+		"Base upper left: {%d,%d}\n"
+		"Base lower right: {%d,%d}",
+		m_filename.toStdString().c_str(), m_header.version, m_header.num_images, m_header.frame_width, m_header.frame_height,
+		m_header.num_directions, m_header.base_x1, m_header.base_y1, m_header.base_x2, m_header.base_y2);
+
 	QString dumpName = "";
 	for(int d = 0; d < m_directions.length(); d++) {
 		dumpName += m_directions.at(d).name;
 		if(d < m_directions.length() - 1) dumpName += ",";
 	}
-	qDebug().nospace() << dumpName;
+
 	for(int f = 0; f < m_images.length(); f++) {
 		m_images.at(f).save("dump_sprite" + QString::number(f) + ".png","PNG");
 	}

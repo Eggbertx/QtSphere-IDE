@@ -1,7 +1,6 @@
 #ifndef UTIL_H
 #define UTIL_H
 
-#include <QDebug>
 #include <QFile>
 #include <QMessageBox>
 #include <QRegExp>

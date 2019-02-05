@@ -1,4 +1,3 @@
-#include <QDebug>
 #include <QLineEdit>
 #include <QPlainTextEdit>
 #include <QComboBox>

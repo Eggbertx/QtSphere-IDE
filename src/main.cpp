@@ -8,8 +8,7 @@
 int main(int argc, char *argv[]) {
 	Q_INIT_RESOURCE(qsires);
 	QApplication a(argc, argv);
-	qDebug().nospace() << "Starting QtSphere IDE v" << VERSION;
-
+	qInfo("Starting QtSphere IDE v%s", VERSION);
 	a.setOrganizationName("Spherical");
 	a.setOrganizationDomain("spheredev.org");
 	a.setApplicationName("QtSphere IDE");

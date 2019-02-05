@@ -1,4 +1,3 @@
-#include <QDebug>
 #include <QGraphicsItemGroup>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -39,18 +38,12 @@ bool MapView::attachMap(MapFile* map) {
 		for(int t = 0; t < cur_layer.tiles.length(); t++) {
 			uint16_t cur_tile = cur_layer.tiles.at(t);
 			QGraphicsPixmapItem* tilePixmap = m_mapScene->addPixmap(QPixmap::fromImage(mapTileset->getImage(cur_tile)));
-
+			tilePixmap->setShapeMode(QGraphicsPixmapItem::BoundingRectShape);
 			int x = t % cur_layer.header.width;
 			int y = (t - x) / cur_layer.header.width;
-
 			tilePixmap->setPos(x * tileSize.width(),y * tileSize.height());
+			tilePixmap->setZValue(cur_layer.index);
 			tilePixmap->setVisible(visible);
-
-			mapTile* tile = new mapTile;
-			tile->pixmap = tilePixmap;
-			tile->tileIndex = cur_tile;
-			tile->layer = numLayers - l;
-			m_tiles << tile;
 		}
 	}
 
@@ -107,18 +100,25 @@ MapFile::layer* MapView::getLayer(int index) {
 
 void MapView::setLayerVisible(int layer, bool visible) {
 	m_mapFile->setLayerVisible(layer, visible);
-	foreach(mapTile* tile, m_tiles) {
-		if(tile->layer == layer) tile->pixmap->setVisible(visible);
+	foreach(QGraphicsItem* item, m_mapScene->items()) {
+		if(item->zValue() == layer) item->setVisible(visible);
 	}
+}
+
+void MapView::setCurrentLayer(int layer) {
+	m_currentLayer = layer;
+}
+
+int MapView::getCurrentLayer() {
+	return m_currentLayer;
 }
 
 bool MapView::toggleLayerVisible(int layer) {
 	bool visible = m_mapFile->isLayerVisible(layer);
 	m_mapFile->setLayerVisible(layer, !visible);
-	foreach(mapTile* tile, m_tiles) {
-		if(tile->layer == layer) tile->pixmap->setVisible(!visible);
+	foreach(QGraphicsItem* item, m_mapScene->items()) {
+		if(item->zValue() == layer) item->setVisible(!visible);
 	}
-
 	return !visible;
 }
 
@@ -128,13 +128,13 @@ void MapView::drawTile(int index) {
 	QRect pRect = pointerRect(true);
 	Tileset* mapTileset = m_mapFile->getTileset();
 
-	for(int rY = pRect.y(); rY < pRect.bottom()+1; rY++) {
-		for(int rX = pRect.x(); rX < pRect.right()+1; rX++) {
+	for(int rY = pRect.y(); rY <= pRect.bottom(); rY++) {
+		for(int rX = pRect.x(); rX <= pRect.right(); rX++) {
 			int sceneX = rX * tileWidth;
 			int sceneY = rY * tileHeight;
 			QList<QGraphicsItem*> mouseItems = items(sceneX,sceneY);
 			foreach(QGraphicsItem* item, mouseItems) {
-				if(item->type() != QGraphicsPixmapItem::Type) continue;
+				if(item->type() != QGraphicsPixmapItem::Type || item->zValue() != m_currentLayer) continue;
 				QGraphicsPixmapItem* tile = reinterpret_cast<QGraphicsPixmapItem*>(item);
 				tile->setPixmap(QPixmap::fromImage(mapTileset->getImage(index)));
 				break;
@@ -212,6 +212,7 @@ QGraphicsItemGroup* MapView::createPointer(int size) {
 			pointerGroup->addToGroup(ri);
 		}
 	}
+	pointerGroup->setZValue(256);
 	m_pointerGroup = pointerGroup;
 	m_mapScene->addItem(m_pointerGroup);
 	return pointerGroup;

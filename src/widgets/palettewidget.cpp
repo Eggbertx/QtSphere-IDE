@@ -1,5 +1,4 @@
 #include <QWidget>
-#include <QDebug>
 #include <QColor>
 #include <QColorDialog>
 #include <QFileDialog>

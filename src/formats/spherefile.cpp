@@ -1,4 +1,3 @@
-#include <QDebug>
 #include <QFileInfo>
 #include "formats/spherefile.h"
 

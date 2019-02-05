@@ -19,6 +19,8 @@ class MapView : public QGraphicsView {
 		bool attachMap(MapFile* map);
 		MapFile::layer *getLayer(int index);
 		void setLayerVisible(int layer, bool visible);
+		void setCurrentLayer(int layer);
+		int getCurrentLayer();
 		bool toggleLayerVisible(int layer);
 		QPoint widgetToMapPos(QPoint pos);
 		QPoint widgetToMapPos(int x, int y);
@@ -44,12 +46,6 @@ class MapView : public QGraphicsView {
 		void drawTile(int index);
 
 		QGraphicsScene* m_mapScene;
-		typedef struct mapTile {
-			QGraphicsPixmapItem* pixmap;
-			int tileIndex;
-			int layer;
-		}mapTile;
-		QList<mapTile*> m_tiles;
 		MapFile* m_mapFile;
 		int m_drawSize = 1;
 		QGraphicsItemGroup* m_pointerGroup;
@@ -57,7 +53,7 @@ class MapView : public QGraphicsView {
 		QString m_mapStatusFormat;
 		bool m_drawing = false;
 		int m_currentTile = 0;
-
+		int m_currentLayer = 0;
 };
 
 #endif // MAPVIEW_H

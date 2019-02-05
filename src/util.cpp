@@ -1,6 +1,5 @@
 #include <QApplication>
 #include <QMessageBox>
-#include <QDebug>
 #include <QApplication>
 #include <QDataStream>
 #include <QFile>

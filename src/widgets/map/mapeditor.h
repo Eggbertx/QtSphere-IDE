@@ -4,6 +4,7 @@
 #include <QGraphicsScene>
 #include <QTableWidgetItem>
 #include <QToolBar>
+#include <QToolButton>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -28,6 +29,7 @@ class MapEditor : public SphereEditor {
 
 	private slots:
 		void on_layersTable_cellClicked(int row, int column);
+		void onPencilClick();
 		void setPencilSize(QAction* size);
 		void setCurrentTool(QAction* tool);
 		void setTileIndex(int tile);
@@ -35,13 +37,15 @@ class MapEditor : public SphereEditor {
 		void layerPropertiesRequested(bool triggered);
 		void on_layersTable_itemChanged(QTableWidgetItem* item);
 
+		void on_layersTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
+
 	private:
 		Ui::MapEditor *ui;
 		int m_currentTool = MapEditor::Pencil;
-		MapView* m_mapView;
-		QVBoxLayout* m_tilesetLayout;
-		WrappedGraphicsView* m_tilesetView;
+//		QVBoxLayout* m_tilesetLayout;
+//		WrappedGraphicsView* m_tilesetView;
 		QToolBar* m_menuBar;
+		QToolButton* m_pencilMenuButton;
 		QMenu* m_pencilMenu;
 		QMenu* m_layerMenu;
 };

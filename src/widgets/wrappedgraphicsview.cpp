@@ -1,4 +1,3 @@
-#include <QDebug>
 #include <QEvent>
 #include <QGraphicsPixmapItem>
 #include <QResizeEvent>

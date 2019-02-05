@@ -1,5 +1,4 @@
 #include <QByteArray>
-#include <QDebug>
 #include <QDesktopServices>
 #include <QDir>
 #include <QList>

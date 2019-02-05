@@ -1,4 +1,3 @@
-#include <QDebug>
 #include <QDesktopServices>
 #include <QFile>
 

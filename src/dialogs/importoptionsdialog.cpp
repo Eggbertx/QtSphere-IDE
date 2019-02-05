@@ -1,5 +1,4 @@
 #include <QColorDialog>
-#include <QDebug>
 #include <QPushButton>
 #include <QPalette>
 #include <QSize>

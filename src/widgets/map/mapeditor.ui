@@ -39,6 +39,13 @@
        <property name="spacing">
         <number>0</number>
        </property>
+       <item>
+        <widget class="MapView" name="mapView">
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QSplitter" name="tilesSplitter">
@@ -49,6 +56,27 @@
        <property name="title">
         <string>Tiles</string>
        </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="WrappedGraphicsView" name="tilesetView">
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
@@ -206,6 +234,18 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MapView</class>
+   <extends>QGraphicsView</extends>
+   <header>widgets/map/mapview.h</header>
+  </customwidget>
+  <customwidget>
+   <class>WrappedGraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header>widgets/wrappedgraphicsview.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
