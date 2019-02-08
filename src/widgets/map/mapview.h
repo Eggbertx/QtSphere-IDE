@@ -17,15 +17,19 @@ class MapView : public QGraphicsView {
 		bool openFile(QString filename);
 		MapFile* attachedMap();
 		bool attachMap(MapFile* map);
+
 		MapFile::layer *getLayer(int index);
 		void setLayerVisible(int layer, bool visible);
 		void setCurrentLayer(int layer);
 		int getCurrentLayer();
 		bool toggleLayerVisible(int layer);
+		void deleteLayer(int layer);
+
 		QPoint widgetToMapPos(QPoint pos);
 		QPoint widgetToMapPos(int x, int y);
 		QPoint mapToWidgetPos(QPoint pos);
 		QPoint mapToWidgetPos(int x, int y);
+
 		void setDrawSize(int size);
 		int getDrawSize();
 		void setCurrentTile(int tile);

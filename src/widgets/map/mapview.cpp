@@ -122,6 +122,12 @@ bool MapView::toggleLayerVisible(int layer) {
 	return !visible;
 }
 
+void MapView::deleteLayer(int layer) {
+	foreach (QGraphicsItem* item, m_mapScene->items()) {
+		if(item->zValue() == layer) m_mapScene->removeItem(item);
+	}
+}
+
 void MapView::drawTile(int index) {
 	int tileWidth = m_mapFile->getTileSize().width();
 	int tileHeight = m_mapFile->getTileSize().height();

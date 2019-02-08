@@ -37,8 +37,6 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	}));
 	m_pencilMenu->setDefaultAction(m_pencilMenu->actions().at(0));
 
-//	QAction* pencilAction = m_menuBar->addAction(QIcon(":/icons/pencil.png"), "Pencil");
-//	pencilAction->setMenu(m_pencilMenu);
 	m_pencilMenuButton = new QToolButton();
 	m_pencilMenuButton->setText("Pencil");
 	m_pencilMenuButton->setIcon(QIcon(":/icons/pencil.png"));
@@ -53,7 +51,6 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	m_menuBar->addAction(QIcon(":/icons/rectangletool.png"), "Rectangle");
 	m_menuBar->addAction(QIcon(":/icons/paintbucket.png"), "Fill layer");
 	m_menuBar->addAction(QIcon(":/icons/dropper.png"), "Select tile");
-//	connect(m_menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
 
 	ui->mapViewLayout->setMenuBar(m_menuBar);
 	ui->mapView->setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
@@ -152,8 +149,10 @@ void MapEditor::on_layersTable_cellClicked(int row, int column) {
 		}
 		break;
 		case 2: {
-			if(ui->layersTable->rowCount() > 1)
+			if(ui->layersTable->rowCount() > 1) {
+				ui->mapView->deleteLayer(ui->layersTable->rowCount()-row-1);
 				ui->layersTable->removeRow(row);
+			}
 		}
 		break;
 	}
