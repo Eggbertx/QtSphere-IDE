@@ -36,9 +36,13 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Se
 	ui->minisphereDir_txt->setText(settings.value("minisphereDir").toString());
 	ui->legacySphereDir_txt->setText(settings.value("legacySphereDir").toString());
 	m_mapCursorColor = settings.value("mapCursorColor", "#0080ff").toString();
+	m_gridColor = settings.value("gridColor", "#000000").toString();
 	QColor col(m_mapCursorColor);
 	if(col.isValid()) ui->mapCursorCol_btn->setColor(col);
+	col.setNamedColor(m_gridColor);
+	if(col.isValid()) ui->gridColor_btn->setColor(col);
 	connect(ui->mapCursorCol_btn,SIGNAL(colorChanged(QColor)),this,SLOT(mapCursorColChanged(QColor)));
+	connect(ui->gridColor_btn, SIGNAL(colorChanged(QColor)), this, SLOT(gridColorChanged(QColor)));
 	connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(onOk()));
 	connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(onApply()));
 	connect(ui->buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(onCancel()));
@@ -46,6 +50,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Se
 
 SettingsWindow::~SettingsWindow() {
 	disconnect(ui->mapCursorCol_btn,SIGNAL(colorChanged(QColor)),this,SLOT(mapCursorColChanged(QColor)));
+	disconnect(ui->gridColor_btn, SIGNAL(colorChanged(QColor)), this, SLOT(gridColorChanged(QColor)));
 	disconnect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(onOk()));
 	disconnect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(onApply()));
 	disconnect(ui->buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(onCancel()));
@@ -107,6 +112,7 @@ void SettingsWindow::saveSettings() {
 	settings.setValue("minisphereDir", ui->minisphereDir_txt->text());
 	settings.setValue("legacySphereDir", ui->legacySphereDir_txt->text());
 	settings.setValue("mapCursorColor", m_mapCursorColor);
+	settings.setValue("gridColor", m_gridColor);
 }
 
 void SettingsWindow::on_addDirButton_clicked() {
@@ -122,6 +128,10 @@ void SettingsWindow::on_removeDirButton_clicked() {
 
 void SettingsWindow::mapCursorColChanged(QColor color) {
 	m_mapCursorColor = color.name();
+}
+
+void SettingsWindow::gridColorChanged(QColor color) {
+	m_gridColor = color.name();
 }
 
 

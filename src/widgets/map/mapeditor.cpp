@@ -30,27 +30,29 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	m_layerMenu->addAction("Properties", this, SLOT(layerPropertiesRequested(bool)));
 
 	m_pencilMenu = new QMenu(this);
-	m_pencilMenu->addActions(QList<QAction*>({
-		new QAction(QIcon(":/icons/1x1grid.png"), "1x1"),
-		new QAction(QIcon(":/icons/3x3grid.png"), "3x3"),
-		new QAction(QIcon(":/icons/5x5grid.png"), "5x5")
-	}));
-	m_pencilMenu->setDefaultAction(m_pencilMenu->actions().at(0));
-
-	m_pencilMenuButton = new QToolButton();
-	m_pencilMenuButton->setText("Pencil");
-	m_pencilMenuButton->setIcon(QIcon(":/icons/pencil.png"));
-	m_pencilMenuButton->setMenu(m_pencilMenu);
-	m_pencilMenuButton->setPopupMode(QToolButton::MenuButtonPopup);
-	m_menuBar->addWidget(m_pencilMenuButton);
-
-	connect(m_pencilMenuButton, SIGNAL(released()), this, SLOT(onPencilClick()));
+	m_pencil1 = m_pencilMenu->addAction(QIcon(":/icons/1x1grid.png"), "1x1");
+	m_pencil3 = m_pencilMenu->addAction(QIcon(":/icons/3x3grid.png"), "3x3");
+	m_pencil5 = m_pencilMenu->addAction(QIcon(":/icons/5x5grid.png"), "5x5");
+	m_pencilMenu->setDefaultAction(m_pencil1);
 	connect(m_pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
 
-	m_menuBar->addAction(QIcon(":/icons/linetool.png"), "Line");
-	m_menuBar->addAction(QIcon(":/icons/rectangletool.png"), "Rectangle");
-	m_menuBar->addAction(QIcon(":/icons/paintbucket.png"), "Fill layer");
-	m_menuBar->addAction(QIcon(":/icons/dropper.png"), "Select tile");
+	m_pencilTool = m_menuBar->addAction(QIcon(":/icons/pencil.png"), "Pencil");
+	m_pencilTool->setMenu(m_pencilMenu);
+	m_pencilTool->setCheckable(true);
+	m_pencilTool->setChecked(true);
+	m_lineTool = m_menuBar->addAction(QIcon(":/icons/linetool.png"), "Line");
+	m_lineTool->setCheckable(true);
+	m_rectTool = m_menuBar->addAction(QIcon(":/icons/rectangletool.png"), "Rectangle");
+	m_rectTool->setCheckable(true);
+	m_fillTool = m_menuBar->addAction(QIcon(":/icons/paintbucket.png"), "Fill layer");
+	m_fillTool->setCheckable(true);
+	m_dropperTool = m_menuBar->addAction(QIcon(":/icons/dropper.png"), "Select tile");
+	m_dropperTool->setCheckable(true);
+	m_menuBar->addSeparator();
+	m_gridTool = m_menuBar->addAction(QIcon(":/icons/togglegrid.png"), "Show/Hide grid");
+	m_gridTool->setCheckable(true);
+	connect(m_menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
+
 
 	ui->mapViewLayout->setMenuBar(m_menuBar);
 	ui->mapView->setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
@@ -66,13 +68,11 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 
 MapEditor::~MapEditor() {
 	disconnect(m_menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
-	disconnect(m_pencilMenuButton, SIGNAL(triggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
 	disconnect(m_pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
 	disconnect(ui->tilesetView, SIGNAL(indexChanged(int)), this, SLOT(setTileIndex(int)));
 	disconnect(this, SLOT(layerPropertiesRequested(bool)));
 	delete ui;
 	delete m_pencilMenu;
-	delete m_pencilMenuButton;
 	delete m_layerMenu;
 	delete m_menuBar;
 }
@@ -158,36 +158,43 @@ void MapEditor::on_layersTable_cellClicked(int row, int column) {
 	}
 }
 
-void MapEditor::onPencilClick() {
-	foreach (QAction* tool, m_menuBar->actions()) {
-		tool->setCheckable(true);
-		tool->setChecked(false);
-	}
-	m_pencilMenuButton->setCheckable(true);
-	m_pencilMenuButton->setChecked(true);
-}
-
 void MapEditor::setPencilSize(QAction *size) {
-	QString actionText = size->text();
-	if(actionText == "1x1") {
-		ui->mapView->setDrawSize(1);
-	} else if(actionText == "3x3") {
-		ui->mapView->setDrawSize(3);
-	} else if(actionText == "5x5") {
-		ui->mapView->setDrawSize(5);
-	}
+	qDebug("text: %s\n", size->text().toStdString().c_str());
+	if(size == m_pencil1) ui->mapView->setDrawSize(1);
+	else if(size == m_pencil3) ui->mapView->setDrawSize(3);
+	else if(size == m_pencil5) ui->mapView->setDrawSize(5);
+
 	m_pencilMenu->setDefaultAction(size);
 }
 
 void MapEditor::setCurrentTool(QAction* tool) {
-	foreach(QAction* action, m_menuBar->actions()) {
-		action->setCheckable(true);
-		action->setChecked(false);
+	if(tool == m_pencil1 || tool == m_pencil3 || tool == m_pencil5) return;
+	m_pencilTool->setChecked(false);
+	m_lineTool->setChecked(false);
+	m_rectTool->setChecked(false);
+	m_fillTool->setChecked(false);
+	m_dropperTool->setChecked(false);
+
+	if(tool == m_gridTool) {
+		ui->mapView->setGridVisible(m_gridTool->isChecked());
+		return;
 	}
-	tool->setChecked(true);
-//	tool->setCheckable(true);
-//	tool->setChecked(true);
-	//	qDebug() << tool->text();
+	if(tool == m_pencilTool) {
+		ui->mapView->setCurrentTool(MapEditor::Pencil);
+		m_pencilTool->setChecked(true);
+	} else if(tool == m_lineTool) {
+		ui->mapView->setCurrentTool(MapEditor::Line);
+		m_lineTool->setChecked(true);
+	} else if(tool == m_rectTool) {
+		ui->mapView->setCurrentTool(MapEditor::Rectangle);
+		m_rectTool->setChecked(true);
+	} else if(tool == m_fillTool) {
+		ui->mapView->setCurrentTool(MapEditor::Fill);
+		m_fillTool->setChecked(true);
+	} else if(tool == m_dropperTool) {
+		ui->mapView->setCurrentTool(MapEditor::Select);
+		m_dropperTool->setChecked(true);
+	}
 }
 
 void MapEditor::setTileIndex(int tile) {
@@ -218,4 +225,8 @@ void MapEditor::on_layersTable_itemChanged(QTableWidgetItem *item) {
 
 void MapEditor::on_layersTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn) {
 	ui->mapView->setCurrentLayer(ui->layersTable->rowCount()-currentRow-1);
+}
+
+void MapEditor::createUndoActions() {
+
 }

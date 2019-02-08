@@ -19,6 +19,8 @@ MapView::MapView(QWidget *parent) : QGraphicsView(parent) {
 	setScene(m_mapScene);
 	m_pointerGroup = new QGraphicsItemGroup();
 	m_mapScene->addItem(m_pointerGroup);
+	m_gridGroup = new QGraphicsItemGroup();
+	m_gridGroup->setVisible(false);
 }
 
 MapView::~MapView() {
@@ -48,7 +50,10 @@ bool MapView::attachMap(MapFile* map) {
 	}
 
 	m_mapFile = map;
+	m_pointerGroup = new QGraphicsItemGroup();
 	setDrawSize(1);
+	updateGrid();
+
 	return true;
 }
 
@@ -82,7 +87,7 @@ QPoint MapView::mapToWidgetPos(int x, int y) {
 }
 
 void MapView::setDrawSize(int size) {
-	createPointer(size);
+	updatePointer(size);
 	m_drawSize = size;
 }
 
@@ -94,6 +99,19 @@ void MapView::setCurrentTile(int tile) {
 	m_currentTile = tile;
 }
 
+void MapView::setCurrentTool(int tool) {
+
+}
+
+bool MapView::isGridVisible() {
+	return m_gridGroup->isVisible();
+}
+
+bool MapView::setGridVisible(bool visible) {
+	m_gridGroup->setVisible(visible);
+	m_gridVisible = visible;
+}
+
 MapFile::layer* MapView::getLayer(int index) {
 	return m_mapFile->getLayer(index);
 }
@@ -101,7 +119,9 @@ MapFile::layer* MapView::getLayer(int index) {
 void MapView::setLayerVisible(int layer, bool visible) {
 	m_mapFile->setLayerVisible(layer, visible);
 	foreach(QGraphicsItem* item, m_mapScene->items()) {
-		if(item->zValue() == layer) item->setVisible(visible);
+		if(item->zValue() == layer && item->type() != QGraphicsItemGroup::Type) {
+			item->setVisible(visible);
+		}
 	}
 }
 
@@ -116,14 +136,12 @@ int MapView::getCurrentLayer() {
 bool MapView::toggleLayerVisible(int layer) {
 	bool visible = m_mapFile->isLayerVisible(layer);
 	m_mapFile->setLayerVisible(layer, !visible);
-	foreach(QGraphicsItem* item, m_mapScene->items()) {
-		if(item->zValue() == layer) item->setVisible(!visible);
-	}
+	setLayerVisible(layer, !visible);
 	return !visible;
 }
 
 void MapView::deleteLayer(int layer) {
-	foreach (QGraphicsItem* item, m_mapScene->items()) {
+	foreach(QGraphicsItem* item, m_mapScene->items()) {
 		if(item->zValue() == layer) m_mapScene->removeItem(item);
 	}
 }
@@ -194,34 +212,67 @@ void MapView::mousePressEvent(QMouseEvent* event) {
 
 void MapView::mouseReleaseEvent(QMouseEvent *event) {
 	m_drawing = false;
+	(void)event;
 }
 
 void MapView::leaveEvent(QEvent *event) {
 	m_pointerGroup->hide();
 	m_drawing = false;
 	MainWindow::instance()->setStatus("Ready");
+	(void)event;
 }
 
-QGraphicsItemGroup* MapView::createPointer(int size) {
+void MapView::updatePointer(int size) {
 	QSettings settings;
-	m_mapScene->removeItem(m_pointerGroup);
-	QGraphicsItemGroup* pointerGroup = new QGraphicsItemGroup();
+	delete m_pointerGroup;
+	m_pointerGroup = new QGraphicsItemGroup();
+
 	QSize rectSize = m_mapFile->getTileSize();
 	QColor cursorColor(settings.value("mapCursorColor","#0080FF").toString());
-	if(!cursorColor.isValid()) cursorColor = QColor(0,128,255,128);
-
+	if(!cursorColor.isValid()) cursorColor.setRgb(0,128,255,128);
 	cursorColor.setAlpha(128);
+
 	for(int y = 0; y < size; y++) {
 		for(int x = 0; x < size; x++) {
 			QGraphicsRectItem* ri = new QGraphicsRectItem(x*rectSize.width(),y*rectSize.height(),rectSize.width(),rectSize.height());
 			ri->setBrush(cursorColor);
-			pointerGroup->addToGroup(ri);
+			m_pointerGroup->addToGroup(ri);
 		}
 	}
-	pointerGroup->setZValue(256);
-	m_pointerGroup = pointerGroup;
+	m_pointerGroup->setZValue(257);
 	m_mapScene->addItem(m_pointerGroup);
-	return pointerGroup;
+}
+
+void MapView::updateGrid() {
+	QSettings settings;
+	delete m_gridGroup;
+	m_gridGroup = new QGraphicsItemGroup();
+	QColor gridColor(settings.value("gridColor","#000000").toString());
+	if(!gridColor.isValid()) gridColor.setNamedColor("#000000");
+
+	QSizeF mapSize = this->sceneRect().size();
+	qreal mapWidth = mapSize.width();
+	qreal mapHeight = mapSize.height();
+
+	QSize gridSize = m_mapFile->getTileSize();
+	int gridWidth = gridSize.width();
+	int gridHeight = gridSize.height();
+
+	for(int y = gridHeight; y < mapHeight; y += gridHeight) {
+		QGraphicsLineItem* line = new QGraphicsLineItem(0, y, m_mapScene->width(), y);
+		line->setPen(gridColor);
+		m_gridGroup->addToGroup(line);
+	}
+	for(int x = gridWidth; x < mapWidth; x += gridWidth) {
+		QGraphicsLineItem* line = new QGraphicsLineItem(x, 0, x, mapHeight);
+		line->setPen(gridColor);
+		m_gridGroup->addToGroup(line);
+	}
+
+
+	m_gridGroup->setVisible(m_gridVisible);
+	m_mapScene->addItem(m_gridGroup);
+	m_gridGroup->setZValue(256);
 }
 
 QRect MapView::pointerRect(bool tiles) {

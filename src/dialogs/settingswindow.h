@@ -21,15 +21,13 @@ class SettingsWindow : public QDialog {
 		void onOk();
 		void onApply();
 		void onCancel();
-//		void on_cancelButton_clicked();
 		void on_minisphereDir_btn_clicked();
 		void on_legacySphereDir_btn_clicked();
 		void on_themeCombo_currentIndexChanged(const QString &newtext);
-//		void on_okButton_clicked();
-//		void on_applyButton_clicked();
 		void on_addDirButton_clicked();
 		void on_removeDirButton_clicked();
 		void mapCursorColChanged(QColor color);
+		void gridColorChanged(QColor color);
 
 
 	private:
@@ -38,6 +36,7 @@ class SettingsWindow : public QDialog {
 		QString m_currentTheme;
 		QString m_newTheme;
 		QString m_mapCursorColor;
+		QString m_gridColor;
 		QString m_minisphereDir;
 		QString m_legacySphereDir;
 };

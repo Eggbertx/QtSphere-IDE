@@ -34,7 +34,9 @@ class MapView : public QGraphicsView {
 		int getDrawSize();
 		void setCurrentTile(int tile);
 
-	signals:
+		void setCurrentTool(int tool);
+		bool setGridVisible(bool visible);
+		bool isGridVisible();
 
 	public slots:
 
@@ -45,13 +47,16 @@ class MapView : public QGraphicsView {
 		void leaveEvent(QEvent *event) override;
 
 	private:
-		QGraphicsItemGroup* createPointer(int size);
+		void updatePointer(int size);
+		void updateGrid();
 		QRect pointerRect(bool tiles);
 		void drawTile(int index);
 
 		QGraphicsScene* m_mapScene;
 		MapFile* m_mapFile;
 		int m_drawSize = 1;
+		QGraphicsItemGroup* m_gridGroup;
+		bool m_gridVisible;
 		QGraphicsItemGroup* m_pointerGroup;
 		QPoint m_pointerPosition;
 		QString m_mapStatusFormat;

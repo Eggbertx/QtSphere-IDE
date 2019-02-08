@@ -35,14 +35,55 @@
    <property name="sizeConstraint">
     <enum>QLayout::SetNoConstraint</enum>
    </property>
-   <item row="3" column="0">
-    <widget class="QLabel" name="sphereEngine_lbl">
+   <item row="1" column="2">
+    <layout class="QHBoxLayout" name="projectDirBtnsLayout">
+     <item>
+      <widget class="QToolButton" name="addDirButton">
+       <property name="text">
+        <string>+</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="removeDirButton">
+       <property name="text">
+        <string>-</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>650</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="legacySphereDir_lbl">
      <property name="text">
-      <string>Sphere engine</string>
+      <string>Legacy Sphere directory</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
+   <item row="7" column="2">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+     <property name="centerButtons">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2">
     <widget class="QComboBox" name="themeCombo">
      <item>
       <property name="text">
@@ -76,7 +117,48 @@
      </item>
     </widget>
    </item>
-   <item row="5" column="1">
+   <item row="0" column="0">
+    <widget class="QLabel" name="projectDirectories_lbl">
+     <property name="text">
+      <string>Project directories</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="miniSphereDir_lbl">
+     <property name="text">
+      <string>miniSphere directory</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Colors</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QListWidget" name="projectDirsList">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="sortingEnabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="sphereEngine_lbl">
+     <property name="text">
+      <string>Sphere engine</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="2">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QLineEdit" name="legacySphereDir_txt"/>
@@ -90,7 +172,7 @@
      </item>
     </layout>
    </item>
-   <item row="4" column="1">
+   <item row="4" column="2">
     <layout class="QHBoxLayout" name="engineDirLayout">
      <property name="spacing">
       <number>0</number>
@@ -107,28 +189,14 @@
      </item>
     </layout>
    </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="legacySphereDir_lbl">
+   <item row="2" column="0">
+    <widget class="QLabel" name="theme_lbl">
      <property name="text">
-      <string>Legacy Sphere directory</string>
+      <string>Theme</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="miniSphereDir_lbl">
-     <property name="text">
-      <string>miniSphere directory</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="projectDirectories_lbl">
-     <property name="text">
-      <string>Project directories</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
+   <item row="3" column="2">
     <widget class="QComboBox" name="whichEngine_combo">
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If the legacy engine is chosen on a non-Windows OS and WINE is available, it will be used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -145,83 +213,46 @@
      </item>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="theme_lbl">
-     <property name="text">
-      <string>Theme</string>
+   <item row="6" column="2">
+    <layout class="QGridLayout" name="colorsLayout">
+     <property name="horizontalSpacing">
+      <number>6</number>
      </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <widget class="ColorButton" name="mapCursorCol_btn">
-     <property name="text">
-      <string/>
-     </property>
-     <property name="arrowType">
-      <enum>Qt::NoArrow</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <layout class="QHBoxLayout" name="projectDirBtnsLayout">
-     <item>
-      <widget class="QToolButton" name="addDirButton">
+     <item row="1" column="0">
+      <widget class="ColorButton" name="mapCursorCol_btn">
        <property name="text">
-        <string>+</string>
+        <string/>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QToolButton" name="removeDirButton">
+     <item row="0" column="0">
+      <widget class="QLabel" name="mapCursor_lbl">
        <property name="text">
-        <string>-</string>
+        <string>Map cursor</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+     <item row="0" column="1">
+      <widget class="QLabel" name="gridColor_lbl">
+       <property name="text">
+        <string>Grid color</string>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>650</width>
-         <height>20</height>
-        </size>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
-      </spacer>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="ColorButton" name="gridColor_btn">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
      </item>
     </layout>
-   </item>
-   <item row="0" column="1">
-    <widget class="QListWidget" name="projectDirsList">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="sortingEnabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Map cursor color</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="1">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-     <property name="centerButtons">
-      <bool>false</bool>
-     </property>
-    </widget>
    </item>
   </layout>
  </widget>
