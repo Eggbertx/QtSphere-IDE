@@ -53,7 +53,6 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	m_gridTool->setCheckable(true);
 	connect(m_menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
 
-
 	ui->mapViewLayout->setMenuBar(m_menuBar);
 	ui->mapView->setBackgroundBrush(QBrush(Qt::darkGray, Qt::SolidPattern));
 
@@ -79,10 +78,11 @@ MapEditor::~MapEditor() {
 
 bool MapEditor::openFile(QString filename) {
 	if(!ui->mapView->openFile(filename)) return false;
-	else attach(ui->mapView->attachedMap());
+	attach(ui->mapView->attachedMap());
+	return true;
 }
 
-bool MapEditor::attach(MapFile* attachedMap) {
+void MapEditor::attach(MapFile* attachedMap) {
 	QList<MapFile::layer> layers = attachedMap->getLayers();
 	int numLayers = layers.length();
 	ui->layersTable->clear();
@@ -124,17 +124,15 @@ bool MapEditor::attach(MapFile* attachedMap) {
 
 	int numTiles = attachedMap->getTileset()->numTiles();
 	Tileset* mapTileset = attachedMap->getTileset();
-
 	for(int i = 0; i < numTiles; i++) {
 		ui->tilesetView->addPixmap(QPixmap::fromImage(mapTileset->getImage(i)));
-
 	}
 
 	ui->tilesetBox->setTitle("Tiles (" + QString::number(mapTileset->numTiles()) + ")");
 	ui->layersTable->selectRow(0);
 	ui->mainSplitter->setSizes(QList<int>({width()-300, 300}));
 	ui->tilesSplitter->setSizes(QList<int>({1,1}));
-	return true;
+
 }
 
 void MapEditor::on_layersTable_cellClicked(int row, int column) {
@@ -159,11 +157,9 @@ void MapEditor::on_layersTable_cellClicked(int row, int column) {
 }
 
 void MapEditor::setPencilSize(QAction *size) {
-	qDebug("text: %s\n", size->text().toStdString().c_str());
 	if(size == m_pencil1) ui->mapView->setDrawSize(1);
 	else if(size == m_pencil3) ui->mapView->setDrawSize(3);
 	else if(size == m_pencil5) ui->mapView->setDrawSize(5);
-
 	m_pencilMenu->setDefaultAction(size);
 }
 
@@ -214,7 +210,6 @@ void MapEditor::layerPropertiesRequested(bool triggered) {
 	lpd.setParallax(l->header.parallax_x,l->header.parallax_y);
 	lpd.setAutoScrolling(l->header.scrolling_x,l->header.scrolling_y);
 	if(lpd.exec() == QDialog::Rejected) return;
-
 	ui->layersTable->item(ui->layersTable->currentRow(),1)->setText(lpd.getName());
 }
 

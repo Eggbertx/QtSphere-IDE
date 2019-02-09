@@ -293,5 +293,5 @@ void Spriteset::setImages(QList<QImage> images) {
 }
 
 int Spriteset::removeDuplicateImages() {
-
+	return 0;
 }

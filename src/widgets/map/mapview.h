@@ -35,7 +35,7 @@ class MapView : public QGraphicsView {
 		void setCurrentTile(int tile);
 
 		void setCurrentTool(int tool);
-		bool setGridVisible(bool visible);
+		void setGridVisible(bool visible);
 		bool isGridVisible();
 
 	public slots:

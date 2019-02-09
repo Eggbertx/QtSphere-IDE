@@ -24,7 +24,7 @@ class MapEditor : public SphereEditor {
 		explicit MapEditor(QWidget *parent = nullptr);
 		~MapEditor();
 		bool openFile(QString filename);
-		bool attach(MapFile* attachedMap);
+		void attach(MapFile* attachedMap);
 		enum Tools { Pencil, Line, Rectangle, Fill, Select };
 
 	private slots:

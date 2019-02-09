@@ -1,3 +1,4 @@
+#include <QDebug>
 #include <QGraphicsItemGroup>
 #include <QGraphicsScene>
 #include <QGraphicsView>
@@ -20,6 +21,7 @@ MapView::MapView(QWidget *parent) : QGraphicsView(parent) {
 	m_pointerGroup = new QGraphicsItemGroup();
 	m_mapScene->addItem(m_pointerGroup);
 	m_gridGroup = new QGraphicsItemGroup();
+	m_gridVisible = false;
 	m_gridGroup->setVisible(false);
 }
 
@@ -53,7 +55,6 @@ bool MapView::attachMap(MapFile* map) {
 	m_pointerGroup = new QGraphicsItemGroup();
 	setDrawSize(1);
 	updateGrid();
-
 	return true;
 }
 
@@ -107,7 +108,7 @@ bool MapView::isGridVisible() {
 	return m_gridGroup->isVisible();
 }
 
-bool MapView::setGridVisible(bool visible) {
+void MapView::setGridVisible(bool visible) {
 	m_gridGroup->setVisible(visible);
 	m_gridVisible = visible;
 }
