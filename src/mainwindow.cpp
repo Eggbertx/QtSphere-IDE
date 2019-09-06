@@ -165,7 +165,7 @@ void MainWindow::setEngine(QString which) {
 	if(which == "legacy") {
 		ui->actionLegacyConfig->setEnabled(true);
 		ui->toolbarPlayGame->setIcon(QIcon(":/icons/legacyengine-24x24.png"));
-	} else  {
+	} else {
 		ui->actionLegacyConfig->setEnabled(false);
 		ui->toolbarPlayGame->setIcon(QIcon(":/icons/sphere-icon.png"));
 	}
@@ -608,28 +608,30 @@ void MainWindow::on_actionClose_triggered() {
 
 void MainWindow::on_toolbarPlayGame_triggered() {
 	QSettings settings;
-	QString engineDir = settings.value("engineDir").toString();
+	QString minisphereDir = QDir(settings.value("minisphereDir").toString()).path();
+	QString legacySphereDir = QDir(settings.value("legacySphereDir").toString()).path();
 	QString whichEngine = settings.value("whichEngine", "minisphere").toString();
 
 	if(!validEngineDirCheck()) return;
 #if defined(Q_OS_UNIX)
 	if(whichEngine == "legacy") {
-		QProcess::startDetached("wine", QStringList({"./engine.exe", "-game", m_project->getBuidlDir()}), engineDir);
+		QProcess::startDetached("wine", QStringList({"./engine.exe", "-game", m_project->getBuidlDir()}), legacySphereDir);
 	} else {
-		QProcess::startDetached("minisphere", QStringList(m_project->getBuidlDir()), engineDir);
+		qDebug("Build dir: %s\n", m_project->getBuidlDir().toStdString().c_str());
+		QProcess::startDetached("minisphere", QStringList(m_project->getBuidlDir()), minisphereDir);
 	}
-#elif defined(Q_OS_WINDOWS)
+#elif defined(Q_OS_WIN)
 	if(whichEngine == "legacy") {
-		QProcess::startDetached("engine.exe", QStringList({"-game", m_project->getBuidlDir()}), engineDir);
+		QProcess::startDetached("engine.exe", QStringList({"-game", m_project->getBuidlDir()}), legacySphereDir);
 	} else {
-		QProcess::startDetached("minisphere", QStringList(m_project->getBuidlDir()), engineDir);
+		QProcess::startDetached("minisphere", QStringList({"."}), m_project->getBuidlDir());
 	}
 #endif
 }
 
 bool MainWindow::validEngineDirCheck() {
 	QSettings settings;
-	QString engineDir = settings.value("engineDir").toString();
+	QString engineDir = settings.value("legacySphereDir").toString();
 	if(engineDir == "") {
 		errorBox("Engine directory must be set if the legacy engine is being used.");
 		return false;
@@ -643,12 +645,13 @@ bool MainWindow::validEngineDirCheck() {
 
 void MainWindow::on_actionLegacyConfig_triggered() {
 	QSettings settings;
+	if(settings.value("whichEngine", "minisphere").toString() != "legacy") return;
+	if(!validEngineDirCheck()) return;
+	QDir engineDir = QDir(settings.value("legacySphereDir").toString());
 
-	if(settings.value("whichEngine", "minisphere").toString() == "legacy") {
-	#if defined(Q_OS_UNIX)
-
-	#elif defiend(Q_OS_WINDOWS)
-
-	#endif
-	}
+#if defined(Q_OS_UNIX)
+	QProcess::startDetached("wine", QStringList({engineDir.filePath("config.exe")}));
+#elif defined(Q_OS_WIN)
+	QProcess::startDetached("\"" + engineDir.filePath("config.exe") + "\"", {}, engineDir.path());
+#endif
 }

@@ -1,8 +1,9 @@
 #ifndef SPHEREEDITOR_H
 #define SPHEREEDITOR_H
 
-#include <QWidget>
+#include <QAction>
 #include <QUndoStack>
+#include <QWidget>
 
 class SphereEditor : public QWidget {
 	Q_OBJECT
@@ -20,6 +21,8 @@ class SphereEditor : public QWidget {
 
 	protected:
 		QUndoStack* m_undoStack;
+		QAction* m_undoAction;
+		QAction* m_redoAction;
 		Type m_type;
 		int m_tabIndex;
 };

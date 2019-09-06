@@ -25,7 +25,7 @@ bool QSIProject::open(QString path) {
 	bool found = false;
 	if(fileInfo.isDir()) {
 		// get list of files in project dir, prioritizing .ssproj over game.sgm
-		QStringList filters({"*.ssproj", "Cellscript.mjs", "Cellscript.js", "game.sgm"});
+        QStringList filters({"*.ssproj", "Cellscript.js", "Cellscript.mjs", "game.sgm"});
 		QDir projectDir = QDir(m_path);
 		QFileInfoList infoList = projectDir.entryInfoList(filters,QDir::Files|QDir::NoDotAndDotDot);
 
@@ -75,6 +75,7 @@ bool QSIProject::open(QString path) {
 		readCellscript(projectFile);
 	} else if(suffix == "sgm") {
 		readSGM(projectFile);
+        m_buildDir = fileInfo.dir().path();
 	}
 
 	projectFile->close();
@@ -277,7 +278,6 @@ bool QSIProject::readSGM(QFile *projectFile) {
 		else if(key == "screen+height") m_height = value.toInt();
 		else if(key == "script") m_script = value;
 	}
-	m_buildDir = getPath(false);
 	m_compiler = QSIProject::Vanilla;
 	return true;
 }

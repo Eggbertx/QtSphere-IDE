@@ -6,6 +6,10 @@ SphereEditor::SphereEditor(QWidget* parent): QWidget(parent) {
 	m_type = SphereEditor::None;
 	m_tabIndex = -1;
 	m_undoStack = new QUndoStack(this);
+	m_undoAction = new QAction("&Undo");
+	m_undoAction->setShortcuts(QKeySequence::Undo);
+	m_redoAction = new QAction("&Redo");
+	m_redoAction->setShortcuts(QKeySequence::Redo);
 }
 
 void SphereEditor::undo() {

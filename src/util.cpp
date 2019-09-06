@@ -61,7 +61,7 @@ int readFile(QFile* file, void* into, int size) {
 	return file->read((char*)into, size);
 }
 
-int writeFile(QFile *file, void *from, int size) {
+int writeFile(QFile *file, const void *from, int size) {
 	if(size < 1) return true;
 	if(!file->isOpen()) {
 		if(!file->open(QIODevice::WriteOnly)) {
@@ -69,7 +69,7 @@ int writeFile(QFile *file, void *from, int size) {
 			return false;
 		}
 	}
-	int numBytes = file->write(reinterpret_cast<char*>(from), size);
+    int numBytes = file->write(reinterpret_cast<const char*>(from), size);
 	file->flush();
 	return numBytes;
 }
@@ -115,4 +115,8 @@ QList<QImage> getUniqueImages(QList<QImage> list) {
 			uniqueImages.append(image);
 	}
 	return uniqueImages;
+}
+
+const char* toString(QString str) {
+    return str.toStdString().c_str();
 }

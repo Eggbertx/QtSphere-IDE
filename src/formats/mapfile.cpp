@@ -127,7 +127,7 @@ bool MapFile::open(QString filename) {
 
 	m_tileset = new Tileset(this);
 	if(m_tilesetFilename == "") {
-		m_tileset->readBytes(m_file->readAll());
+		if(!m_tileset->readBytes(m_file->readAll())) return false;
 	} else {
 		QFileInfo fi(fileName());
 		m_tileset->open(fi.dir().absoluteFilePath(m_tilesetFilename));

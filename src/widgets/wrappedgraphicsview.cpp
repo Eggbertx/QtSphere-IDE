@@ -17,7 +17,7 @@ WrappedGraphicsView::WrappedGraphicsView(QWidget *parent): QGraphicsView(parent)
 }
 
 void WrappedGraphicsView::resizeEvent(QResizeEvent* resize) {
-	arrangeItems();
+    arrangeItems();
 	resize->accept();
 }
 
@@ -49,7 +49,7 @@ int WrappedGraphicsView::indexAt(QPoint pos) {
 
 void WrappedGraphicsView::addPixmap(QPixmap pixmap) {
 	m_pixmaps.append(pixmap);
-	arrangeItems();
+    //arrangeItems();
 }
 
 QSize WrappedGraphicsView::tileSize() {
@@ -85,6 +85,7 @@ int WrappedGraphicsView::arrangeItems(int width, int height) {
 	}
 
 	int numItems = m_pixmaps.length();
+    qDebug("numItems: %d\n", numItems);
 	m_wScene->clear();
 
 	for(int i = 0; i < numItems; i++) {

@@ -21,7 +21,7 @@ bool SphereFile::save(QString filename) {
 }
 
 QString SphereFile::fileName() {
-	if(m_file) return m_file->fileName();
+    if(m_file != nullptr) return m_file->fileName();
 	return "";
 }
 

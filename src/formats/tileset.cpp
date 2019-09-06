@@ -50,7 +50,7 @@ bool Tileset::open(QString filename) {
 
 	m_file = new QFile(filename);
 	if(!m_file->open(QIODevice::ReadOnly)) {
-		errorBox("ERROR: Could not read file " + filename + ": " + m_file->errorString());
+		errorBox("ERROR: Could not open file " + filename + ": " + m_file->errorString());
 		return false;
 	}
 	return readBytes(m_file->readAll());

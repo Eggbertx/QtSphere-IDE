@@ -63,6 +63,7 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	ui->layersTable->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
 	ui->entitiesTable->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
 	ui->mainSplitter->setStretchFactor(0,1);
+	createUndoActions();
 }
 
 MapEditor::~MapEditor() {
@@ -223,5 +224,13 @@ void MapEditor::on_layersTable_currentCellChanged(int currentRow, int currentCol
 }
 
 void MapEditor::createUndoActions() {
-
+	m_drawTiles = new QAction("Draw tiles");
+	m_rectTool = new QAction("Draw rectangle");
+	m_fillTiles = new QAction("Fill area");
+	m_hideLayer = new QAction("Hide layer");
+	m_showLayer = new QAction("Show layer");
+	m_deleteLayer = new QAction("Delete layer");
+	m_addLayer = new QAction("Add layer");
+	m_renameLayer = new QAction("Rename layer");
+	m_changeLayerProperties = new QAction("Change layer properties");
 }

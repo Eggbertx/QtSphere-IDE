@@ -179,10 +179,9 @@ bool Spriteset::save(QString filename) {
 			writeFile(outFile, direction.reserved, sizeof(direction.reserved));
 
 			uint16_t str_length = direction.name.length() + 1;
-			char* direction_name = const_cast<char*>(direction.name.toStdString().c_str());
 
 			writeFile(outFile, &str_length, sizeof(str_length));
-			writeFile(outFile, direction_name, str_length);
+            writeFile(outFile, toString(direction.name), str_length);
 
 			foreach (SSFrame frame, direction.frames) {
 				writeFile(outFile, &frame.imageIndex, sizeof(frame.imageIndex));
@@ -209,7 +208,7 @@ void Spriteset::debugDump() {
 		"No. directions: %d\n"
 		"Base upper left: {%d,%d}\n"
 		"Base lower right: {%d,%d}",
-		m_filename.toStdString().c_str(), m_header.version, m_header.num_images, m_header.frame_width, m_header.frame_height,
+        toString(m_filename), m_header.version, m_header.num_images, m_header.frame_width, m_header.frame_height,
 		m_header.num_directions, m_header.base_x1, m_header.base_y1, m_header.base_x2, m_header.base_y2);
 
 	QString dumpName = "";
@@ -245,7 +244,7 @@ Spriteset::SSDirection* Spriteset::addDirection(QString name, int numFrames) {
 
 Spriteset::SSDirection* Spriteset::addDirection(QString name, QList<Spriteset::SSFrame> frames) {
 	SSDirection newDirection = SSDirection();
-	newDirection.name = (const char*)name.toStdString().c_str();
+    newDirection.name = toString(name);
 
 	newDirection.frames = frames;
 	m_directions.append(newDirection);
