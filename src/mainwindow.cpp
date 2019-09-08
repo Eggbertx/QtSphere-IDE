@@ -19,15 +19,15 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "qsiproject.h"
 #include "util.h"
 #include "dialogs/aboutdialog.h"
 #include "dialogs/importoptionsdialog.h"
+#include "dialogs/modifiedfilesdialog.h"
 #include "dialogs/projectpropertiesdialog.h"
 #include "dialogs/settingswindow.h"
 #include "formats/mapfile.h"
 #include "formats/spriteset.h"
-#include "dialogs/modifiedfilesdialog.h"
-#include "qsiproject.h"
 #include "widgets/soundplayer.h"
 #include "widgets/map/mapeditor.h"
 #include "widgets/sphereeditor.h"
@@ -82,6 +82,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	ui->splitter->setStretchFactor(1,4);
 	ui->splitter->setSizes(QList<int>({200, width()-200}));
 
+	m_newMapDialog = new NewMapDialog(m_project, this);
 	m_project = new QSIProject(this);
 
 	m_soundPlayer = new SoundPlayer();
@@ -101,8 +102,9 @@ MainWindow::~MainWindow() {
 	disconnect(ui->menuFile, SIGNAL(aboutToShow()), this, SLOT(checkCloseProjectOption()));
 	disconnect(m_startPage, SIGNAL(projectLoaded(QSIProject*)), this, SLOT(onProjectLoaded(QSIProject*)));
 	delete ui;
-	delete m_soundPlayer;
+	delete m_newMapDialog;
 	delete m_project;
+	delete m_soundPlayer;
 	delete m_startPage;
 	QSettings settings;
 	settings.setValue("geometry", geometry());
@@ -286,6 +288,9 @@ void MainWindow::openFile(QString filename) {
 			errorBox("Failed loading spriteset: " + fn);
 			return;
 		}
+	} else if(fileExtension == "rts") {
+		m_newMapDialog->setTilesetPath(fn);
+		m_newMapDialog->open();
 	} else if(audioList.indexOf(fileExtension) > -1) {
 		m_soundPlayer->load(fn);
 	} else {
@@ -654,4 +659,9 @@ void MainWindow::on_actionLegacyConfig_triggered() {
 #elif defined(Q_OS_WIN)
 	QProcess::startDetached("\"" + engineDir.filePath("config.exe") + "\"", {}, engineDir.path());
 #endif
+}
+
+void MainWindow::on_newMap_triggered() {
+	NewMapDialog* dialog = new NewMapDialog(m_project, this);
+	dialog->open();
 }

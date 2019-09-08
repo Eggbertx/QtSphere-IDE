@@ -7,10 +7,11 @@
 #include <QProcess>
 #include <QWidget>
 
-#include "widgets/sphereeditor.h"
-#include "formats/spherefile.h"
 #include "qsiproject.h"
+#include "dialogs/newmapdialog.h"
+#include "formats/spherefile.h"
 #include "widgets/soundplayer.h"
+#include "widgets/sphereeditor.h"
 #include "widgets/startpage.h"
 
 namespace Ui {
@@ -81,6 +82,7 @@ class MainWindow : public QMainWindow {
 		void on_actionClose_triggered();
 		void on_toolbarPlayGame_triggered();
 		void on_actionLegacyConfig_triggered();
+		void on_newMap_triggered();
 
 	private:
 		void setupEditors();
@@ -96,6 +98,7 @@ class MainWindow : public QMainWindow {
 		SoundPlayer* m_soundPlayer;
 		QList<SphereEditor *> m_openEditors;
 		QString m_theme;
+		NewMapDialog* m_newMapDialog;
 
 };
 

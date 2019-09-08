@@ -13,6 +13,7 @@ OBJECTS_DIR=temp_files
 MOC_DIR=temp_files
 
 SOURCES += \
+	dialogs/newmapdialog.cpp \
 	main.cpp\
 	mainwindow.cpp \
 	dialogs/aboutdialog.cpp \
@@ -44,6 +45,7 @@ SOURCES += \
 	commands/mapdrawcommand.cpp
 
 HEADERS += \
+	dialogs/newmapdialog.h \
 	mainwindow.h \
 	dialogs/aboutdialog.h \
 	util.h \
@@ -74,6 +76,7 @@ HEADERS += \
 	commands/mapdrawcommand.h
 
 FORMS += \
+	dialogs/newmapdialog.ui \
 	mainwindow.ui \
 	dialogs/aboutdialog.ui \
 	dialogs/modifiedfilesdialog.ui \

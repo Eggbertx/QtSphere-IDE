@@ -301,7 +301,6 @@
      <addaction name="newPlainTextFile"/>
      <addaction name="newMap"/>
      <addaction name="actionSpriteset"/>
-     <addaction name="newTileset"/>
      <addaction name="newFont"/>
      <addaction name="newWindowstyle"/>
     </widget>
@@ -604,11 +603,6 @@
   <action name="newMap">
    <property name="text">
     <string>Map</string>
-   </property>
-  </action>
-  <action name="newTileset">
-   <property name="text">
-    <string>Tileset</string>
    </property>
   </action>
   <action name="newFont">
