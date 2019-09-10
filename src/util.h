@@ -1,11 +1,11 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include <QEvent>
 #include <QFile>
 #include <QMessageBox>
 #include <QRegExp>
 #include <QTextCharFormat>
-#include <QEvent>
 
 int handleModifiedFiles();
 
@@ -29,6 +29,8 @@ void replaceColor(QImage* imgIn, QColor colorIn, QColor colorOut);
 
 QList<QImage> getUniqueImages(QList<QImage> list);
 
-const char *toString(QString str);
+inline const char* toString(QString str) {
+	return str.toStdString().c_str();
+}
 
 #endif // UTIL_H

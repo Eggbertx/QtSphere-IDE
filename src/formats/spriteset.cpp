@@ -244,8 +244,7 @@ Spriteset::SSDirection* Spriteset::addDirection(QString name, int numFrames) {
 
 Spriteset::SSDirection* Spriteset::addDirection(QString name, QList<Spriteset::SSFrame> frames) {
 	SSDirection newDirection = SSDirection();
-    newDirection.name = toString(name);
-
+	newDirection.name = name;
 	newDirection.frames = frames;
 	m_directions.append(newDirection);
 	m_header.num_directions++;

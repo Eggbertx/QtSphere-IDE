@@ -315,23 +315,18 @@ void MainWindow::openProject(QString filename) {
 }
 
 void MainWindow::setCurrentProject(QSIProject* project) {
-	m_project = project;
-	if(m_project != nullptr) {
-		ui->menuProject->setEnabled(true);
-		ui->toolbarPlayGame->setEnabled(true);
-		ui->toolbarProjectProperties->setEnabled(true);
-		m_projectLoaded = true;
-		updateTreeView();
-	}
+	m_projectLoaded = project != nullptr;
+	ui->menuProject->setEnabled(m_projectLoaded);
+	ui->toolbarPlayGame->setEnabled(m_projectLoaded);
+	ui->toolbarProjectProperties->setEnabled(m_projectLoaded);
+	if(m_projectLoaded)
+		m_project = project;
+
+	updateTreeView();
 }
 
 void MainWindow::closeProject() {
-	delete m_project;
-	m_projectLoaded = false;
-	ui->menuProject->setEnabled(false);
-	ui->toolbarPlayGame->setEnabled(false);
-	ui->toolbarProjectProperties->setEnabled(false);
-	updateTreeView();
+	setCurrentProject(nullptr);
 }
 
 void MainWindow::handleModifiedFiles() {
@@ -532,7 +527,7 @@ void MainWindow::checkCloseProjectOption() {
 }
 
 void MainWindow::onProjectLoaded(QSIProject* project) {
-	setCurrentProject(project);
+	//setCurrentProject(project);
 }
 
 void MainWindow::on_actionImage_to_Spriteset_triggered() {

@@ -116,7 +116,3 @@ QList<QImage> getUniqueImages(QList<QImage> list) {
 	}
 	return uniqueImages;
 }
-
-const char* toString(QString str) {
-    return str.toStdString().c_str();
-}
