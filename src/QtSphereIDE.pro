@@ -13,6 +13,7 @@ OBJECTS_DIR=temp_files
 MOC_DIR=temp_files
 
 SOURCES += \
+	palette_presets.cpp \
 	dialogs/newmapdialog.cpp \
 	main.cpp\
 	mainwindow.cpp \
@@ -45,6 +46,7 @@ SOURCES += \
 	commands/mapdrawcommand.cpp
 
 HEADERS += \
+	palette_presets.h \
 	dialogs/newmapdialog.h \
 	mainwindow.h \
 	dialogs/aboutdialog.h \

@@ -617,7 +617,6 @@ void MainWindow::on_toolbarPlayGame_triggered() {
 	if(whichEngine == "legacy") {
 		QProcess::startDetached("wine", QStringList({"./engine.exe", "-game", m_project->getBuidlDir()}), legacySphereDir);
 	} else {
-		qDebug("Build dir: %s\n", m_project->getBuidlDir().toStdString().c_str());
 		QProcess::startDetached("minisphere", QStringList(m_project->getBuidlDir()), minisphereDir);
 	}
 #elif defined(Q_OS_WIN)

@@ -2,6 +2,7 @@
 #define QSIPROJECT_H
 
 #include <QFile>
+#include <QIcon>
 #include <QObject>
 
 class QSIProject : public QObject {
@@ -36,7 +37,7 @@ class QSIProject : public QObject {
 		void setPath(QString path, bool projectFile = false);
 		QString getCompiler();
 		void setCompiler(QString compiler);
-		QIcon* getIcon();
+		QIcon getIcon();
 		enum Compiler { Vanilla, Cell };
 
 	private:

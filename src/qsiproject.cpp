@@ -178,8 +178,12 @@ void QSIProject::setPath(QString path, bool projectFile) {
 	else m_path = path;
 }
 
-QIcon* QSIProject::getIcon() {
-	return nullptr;
+QIcon QSIProject::getIcon() {
+	QFileInfo icon_fi = QFileInfo(QDir(m_path), "icon.png");
+	if(icon_fi.exists()) {
+		return QIcon(icon_fi.canonicalFilePath());
+	}
+	return QIcon(":/icons/sphere-icon.png");
 }
 
 QString QSIProject::getCompiler() {

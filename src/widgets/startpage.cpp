@@ -71,9 +71,9 @@ void StartPage::refreshGameList() {
 		}
 	}
 	settings.endArray();
-	int listSize = m_gameList.length();
-	for(int m = 0; m < listSize; m++) {
-		QListWidgetItem* item = new QListWidgetItem(QIcon(":/icons/sphere-icon.png"), m_gameList.at(m)->getName());
+
+	foreach (QSIProject* project, m_gameList) {
+		QListWidgetItem* item = new QListWidgetItem(project->getIcon(), project->getName());
 		item->setTextAlignment(Qt::AlignCenter);
 		item->setSizeHint(QSize(150,80));
 		ui->projectIcons->addItem(item);

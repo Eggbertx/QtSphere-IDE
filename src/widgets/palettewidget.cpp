@@ -10,11 +10,12 @@
 #include <QPaintEvent>
 #include "palettewidget.h"
 #include "widgets/spriteset/spriteseteditor.h"
+#include "palette_presets.h"
 
 PaletteWidget::PaletteWidget(SpritesetEditor *parent): QWidget(parent) {
 	installEventFilter(this);
 	m_paletteColors = QList<QColor>();
-	changePalette(hsl256_palette, 256);
+	changePalette(hsl256_palette);
 
 	m_rightClickMenu = new QMenu(this);
 	m_fileMenu = m_rightClickMenu->addMenu("File");
@@ -23,8 +24,10 @@ PaletteWidget::PaletteWidget(SpritesetEditor *parent): QWidget(parent) {
 	m_fileMenu->addAction("Export...");
 
 	m_defaultMenu = m_rightClickMenu->addMenu("Presets");
+	m_defaultMenu->addAction("Commodore 64");
 	m_defaultMenu->addAction("DOS");
 	m_defaultMenu->addAction("HSL256");
+	m_defaultMenu->addAction("NES");
 	m_defaultMenu->addAction("PLASMA");
 	m_defaultMenu->addAction("RGB332");
 	m_defaultMenu->addAction("VERGE");
@@ -46,10 +49,10 @@ PaletteWidget::~PaletteWidget() {
 	delete m_rightClickMenu;
 }
 
-void PaletteWidget::changePalette(QColor palettearr[], int numColors) {
+void PaletteWidget::changePalette(QList<QColor> palette) {
 	m_paletteColors.clear();
-	for(int c = 0; c < numColors; c++) {
-		m_paletteColors << palettearr[c];
+	foreach(QColor color, palette) {
+		m_paletteColors << color;
 	}
 	repaint();
 }
@@ -147,18 +150,22 @@ bool PaletteWidget::eventFilter(QObject* object, QEvent* event) {
 					QString exportPath = QFileDialog::getSaveFileName(this, "Export Palette", QDir().absolutePath(),
 						"QtSphere IDE palettes (*.qsipal);;All files (*.*)");
 					if(exportPath != "") exportPalette(exportPath);
+				} else if(text == "Commodore 64") {
+					changePalette(c64_palette);
 				} else if(text == "DOS") {
-					changePalette(dos_palette, 256);
+					changePalette(dos_palette);
+				} else if(text == "NES") {
+					changePalette(nes_palette);
 				} else if(text == "VERGE") {
-					changePalette(verge_palette, 256);
+					changePalette(verge_palette);
 				} else if(text == "PLASMA") {
-					changePalette(plasma_palette, 256);
+					changePalette(plasma_palette);
 				} else if(text == "RGB332") {
-					changePalette(rgb332_palette, 256);
+					changePalette(rgb332_palette);
 				} else if(text == "VISIBONE2") {
-					changePalette(visibone2_palette, 256);
+					changePalette(visibone2_palette);
 				} else if(text == "HSL256") {
-					changePalette(hsl256_palette, 256);
+					changePalette(hsl256_palette);
 				} else if(text == "Insert before") {
 					QColor newCol = QColorDialog::getColor(Qt::white,this);
 					if(newCol.isValid()) {
