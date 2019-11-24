@@ -7,12 +7,10 @@ VERSION = 0.8.1
 DEFINES += QT_DEPRECATED_WARNINGS TARGET=\\\"$$TARGET\\\" VERSION=\\\"$$VERSION\\\"
 QMAKE_LFLAGS += -no-pie
 
-UI_DIR=temp_files
 DESTDIR=build
-OBJECTS_DIR=temp_files
-MOC_DIR=temp_files
 
 SOURCES += \
+	formats/spherefont.cpp \
 	palette_presets.cpp \
 	dialogs/newmapdialog.cpp \
 	main.cpp\
@@ -26,6 +24,7 @@ SOURCES += \
 	qsiproject.cpp \
 	dialogs/projectpropertiesdialog.cpp \
 	formats/spriteset.cpp \
+	widgets/fonteditor.cpp \
 	widgets/spriteset/spriteseteditor.cpp \
 	widgets/palettewidget.cpp \
 	widgets/imagechooser.cpp \
@@ -46,6 +45,7 @@ SOURCES += \
 	commands/mapdrawcommand.cpp
 
 HEADERS += \
+	formats/spherefont.h \
 	palette_presets.h \
 	dialogs/newmapdialog.h \
 	mainwindow.h \
@@ -58,6 +58,7 @@ HEADERS += \
 	qsiproject.h \
 	dialogs/projectpropertiesdialog.h \
 	formats/spriteset.h \
+	widgets/fonteditor.h \
 	widgets/spriteset/spriteseteditor.h \
 	widgets/palettewidget.h \
 	widgets/imagechooser.h \
@@ -84,6 +85,7 @@ FORMS += \
 	dialogs/modifiedfilesdialog.ui \
 	dialogs/settingswindow.ui \
 	dialogs/projectpropertiesdialog.ui \
+	widgets/fonteditor.ui \
 	widgets/spriteset/spriteseteditor.ui \
 	widgets/drawingwidget.ui \
 	widgets/soundplayer.ui \

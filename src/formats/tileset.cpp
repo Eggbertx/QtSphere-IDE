@@ -46,6 +46,7 @@ bool Tileset::readBytes(QByteArray arr) {
 }
 
 bool Tileset::open(QString filename) {
+	SphereFile::open(filename);
 	QByteArray arr;
 
 	m_file = new QFile(filename);
@@ -57,6 +58,7 @@ bool Tileset::open(QString filename) {
 }
 
 bool Tileset::save(QString filename) {
+	SphereFile::save(filename);
 	return true;
 }
 

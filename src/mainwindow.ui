@@ -282,7 +282,7 @@
      <x>0</x>
      <y>0</y>
      <width>936</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -310,6 +310,7 @@
      </property>
      <addaction name="actionTiled_map_to_Sphere_map"/>
      <addaction name="actionImage_to_Spriteset"/>
+     <addaction name="actionSystem_font_to_Sphere_font"/>
     </widget>
     <widget class="QMenu" name="menuOpen_Recent">
      <property name="title">
@@ -777,6 +778,11 @@
    </property>
    <property name="toolTip">
     <string>Run legacy config.exe (only available for legacy engine)</string>
+   </property>
+  </action>
+  <action name="actionSystem_font_to_Sphere_font">
+   <property name="text">
+    <string>System font to Sphere font</string>
    </property>
   </action>
  </widget>

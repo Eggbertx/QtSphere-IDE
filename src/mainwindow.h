@@ -83,6 +83,7 @@ class MainWindow : public QMainWindow {
 		void on_toolbarPlayGame_triggered();
 		void on_actionLegacyConfig_triggered();
 		void on_newMap_triggered();
+		void on_actionSystem_font_to_Sphere_font_triggered();
 
 	private:
 		void setupEditors();

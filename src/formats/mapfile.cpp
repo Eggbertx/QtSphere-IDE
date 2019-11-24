@@ -1,4 +1,5 @@
 #include <QByteArray>
+#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -21,8 +22,7 @@ bool MapFile::open(QString filename) {
 		return false;
 	}
 
-	m_file->read(reinterpret_cast<char*>(&m_header), sizeof(m_header));
-
+	readFile(m_file, &m_header, sizeof(m_header));
 	if(memcmp(m_header.signature, ".rmp", 4) != 0) {
 		errorBox("Error: '" + filename + "' is not a valid map file (invalid signature)!");
 		m_file->close();
@@ -122,11 +122,14 @@ bool MapFile::open(QString filename) {
 		m_file->read(reinterpret_cast<char*>(&cur_zone.layer), sizeof(cur_zone.layer));
 		m_file->read(reinterpret_cast<char*>(&cur_zone.reactivation_delay), sizeof(cur_zone.reactivation_delay));
 		cur_zone.function = readNextString();
+		qDebug() << cur_zone.function;
+		//qDebug("cur_zone.function: %s\n// end", cur_zone.function.toStdString().c_str());
 		m_zones.append(cur_zone);
 	}
 
 	m_tileset = new Tileset(this);
 	if(m_tilesetFilename == "") {
+		qDebug("Position: %d\n", m_file->pos());
 		if(!m_tileset->readBytes(m_file->readAll())) return false;
 	} else {
 		QFileInfo fi(fileName());

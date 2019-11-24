@@ -1,21 +1,9 @@
-#include <QApplication>
-#include <QProcess>
-#include <QColorDialog>
-#include <QFileDialog>
-#include <QMenu>
 #include <QCloseEvent>
-#include <QTime>
 #include <QDesktopServices>
-#include <QDir>
-#include <QLayout>
-#include <QDirIterator>
-#include <QTextStream>
-#include <QToolButton>
-#include <QWidgetAction>
-#include <QStandardItemModel>
-#include <QTreeView>
-#include <QKeySequence>
+#include <QFileDialog>
 #include <QSettings>
+#include <QStandardItemModel>
+#include <QWidgetAction>
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -27,6 +15,7 @@
 #include "dialogs/projectpropertiesdialog.h"
 #include "dialogs/settingswindow.h"
 #include "formats/mapfile.h"
+#include "formats/spherefont.h"
 #include "formats/spriteset.h"
 #include "widgets/soundplayer.h"
 #include "widgets/map/mapeditor.h"
@@ -267,7 +256,9 @@ void MainWindow::openFile(QString filename) {
 	}
 	QFileInfo fi = QFileInfo(fn);
 	QString fileExtension = fi.suffix();
-	if(fileExtension == "rmp") {
+	if(fileExtension == "rfn") {
+
+	} else if(fileExtension == "rmp") {
 		MapEditor* rmpEditor = new MapEditor(this);
 		if(rmpEditor->openFile(fi.filePath())) {
 			rmpEditor->setTabIndex(ui->openFileTabs->insertTab(0,rmpEditor, fi.fileName()));
@@ -658,4 +649,9 @@ void MainWindow::on_actionLegacyConfig_triggered() {
 void MainWindow::on_newMap_triggered() {
 	NewMapDialog* dialog = new NewMapDialog(m_project, this);
 	dialog->open();
+}
+
+void MainWindow::on_actionSystem_font_to_Sphere_font_triggered() {
+	SphereFont* rfn = SphereFont::fromSystemFont(this);
+	if(!rfn) return; // either the QFontDialog or the QColorDialog was cancelled.
 }

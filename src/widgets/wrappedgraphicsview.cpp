@@ -85,7 +85,6 @@ int WrappedGraphicsView::arrangeItems(int width, int height) {
 	}
 
 	int numItems = m_pixmaps.length();
-    qDebug("numItems: %d\n", numItems);
 	m_wScene->clear();
 
 	for(int i = 0; i < numItems; i++) {

@@ -1,8 +1,6 @@
-build/
+build*
 src/QtSphereIDE.pro.user*
-temp_files/
 .qmake.stash
-Makefile*
-qrc_qsires.cpp
-**/*.bak
+*.bak
+*.autosave
 .vscode/
