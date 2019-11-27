@@ -76,7 +76,8 @@ int writeFile(QFile *file, const void *from, int size) {
 
 void skipBytes(QFile* file, const int numBytes) {
 	uint8_t* dump = new uint8_t[numBytes];
-	file->read((char*)dump, numBytes);
+	readFile(file, dump, numBytes);
+	delete[] dump;
 }
 
 void replaceColor(QImage *imgIn, QColor colorIn, QColor colorOut) {

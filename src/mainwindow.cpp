@@ -646,7 +646,7 @@ void MainWindow::on_actionLegacyConfig_triggered() {
 	QDir engineDir = QDir(settings.value("legacySphereDir").toString());
 
 #if defined(Q_OS_UNIX)
-	QProcess::startDetached("wine", QStringList({engineDir.filePath("config.exe")}));
+	QProcess::startDetached("wine", QStringList({"./config.exe"}), engineDir.path());
 #elif defined(Q_OS_WIN)
 	QProcess::startDetached("\"" + engineDir.filePath("config.exe") + "\"", {}, engineDir.path());
 #endif
