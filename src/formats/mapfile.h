@@ -10,10 +10,12 @@
 class MapFile : public SphereFile {
 	Q_OBJECT
 	Q_ENUMS(ScriptType)
+	Q_ENUMS(EntityDirection)
 	public:
 		MapFile(QObject *parent = nullptr);
+		~MapFile() override;
 		void newMap();
-		bool open(QString filename) override;
+		bool open(QString filename, QFile::OpenMode flags = QIODevice::ReadOnly) override;
 		bool save(QString filename) override;
         bool openTiledMap(QString filename = "");
 		bool mapOrigin();
@@ -22,6 +24,7 @@ class MapFile : public SphereFile {
 		QSize getTileSize();
 		Tileset* getTileset();
 		enum ScriptType { Entry, Exit, LeaveNorth, LeaveEast, LeaveSouth, LeaveWest };
+		enum EntityDirection { North, Northeast, East, Southeast, South, Southwest, West, Northwest };
 
 		QString getScript(ScriptType type);
 		void setScript(ScriptType type, QString text);
@@ -117,7 +120,7 @@ class MapFile : public SphereFile {
 		entity* getEntity(int index);
 
 	private:
-		void resetHeader();
+		void reset();
 		rmp_header m_header;
 		Tileset* m_tileset;
 		QString m_tilesetFilename;

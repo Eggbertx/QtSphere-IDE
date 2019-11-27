@@ -10,7 +10,6 @@ class Spriteset : public SphereFile {
 	Q_OBJECT
 	public:
 		explicit Spriteset(QObject *parent = nullptr);
-		~Spriteset() override;
 		static Spriteset* fromImage(QString filename, QSize frameSize, bool removeDuplicates, QColor inColor, QColor outColor, bool* success = nullptr);
 		static struct SSFrame {
 			uint16_t imageIndex;
@@ -25,7 +24,7 @@ class Spriteset : public SphereFile {
 		}direction_struct;
 
 		void createNew() override;
-		bool open(QString filename) override;
+		bool open(QString filename, QFile::OpenMode flags = QIODevice::ReadOnly);
 		bool save(QString filename) override;
 		void debugDump();
 		int frameWidth();

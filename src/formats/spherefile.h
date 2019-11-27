@@ -12,7 +12,9 @@ class SphereFile : public QObject {
 		explicit SphereFile(QObject *parent = nullptr);
 		~SphereFile();
 		virtual bool save(QString filename);
-		virtual bool open(QString filename);
+		virtual bool open(QString filename, QIODevice::OpenMode flags);
+		bool isOpen();
+		void close();
 		virtual void createNew();
 		QString fileExtension();
 		QString fileName();
@@ -26,7 +28,7 @@ class SphereFile : public QObject {
 	protected:
 		QString readNextString();
 		QFile* m_file;
-        QString m_filename;
+		QString m_filename;
 };
 
 #endif // SPHEREFILE_H

@@ -17,10 +17,6 @@ Spriteset::Spriteset(QObject *parent) : SphereFile(parent) {
 	m_directions = QList<SSDirection>();
 }
 
-Spriteset::~Spriteset() {
-	delete m_file;
-}
-
 Spriteset* Spriteset::fromImage(QString filename, QSize frameSize, bool removeDuplicates, QColor inColor, QColor outColor, bool* success) {
 	Spriteset* newSS = new Spriteset();
 	bool valid = false;
@@ -76,23 +72,20 @@ void Spriteset::createNew() {
 	m_filename = "Untitled.rss";
 }
 
-bool Spriteset::open(QString filename) {
-	m_filename = filename;
-	m_file = new QFile(m_filename);
-
-	if(!m_file->exists()) {
-		errorBox("The spriteset " + filename + " doesn't exist!");
+bool Spriteset::open(QString filename, QIODevice::OpenMode flags) {
+	if(!SphereFile::open(filename, flags)) {
+		errorBox("Failed loading spriteset " + filename);
+		close();
 		return false;
 	}
-	if(!m_file->open(QIODevice::ReadOnly)) {
-		errorBox("Failed loading spriteset " + filename);
-		m_file->close();
+	if(!m_file->exists()) {
+		errorBox("The spriteset " + filename + " doesn't exist!");
 		return false;
 	}
 	readFile(m_file, &m_header, sizeof(m_header));
 	if (memcmp(m_header.signature, ".rss", 4) != 0) {
 		errorBox("Error: " + QString(filename) + " is not a valid spriteset!");
-		m_file->close();
+		close();
 		return false;
 	}
 
@@ -100,7 +93,7 @@ bool Spriteset::open(QString filename) {
 	case 1:
 	case 2:
 		errorBox("v1 and v2 spritesets are not currently supported.");
-		m_file->close();
+		close();
 		return false;
 	case 3: {
 		for(int i = 0; i < m_header.num_images; i++) {
@@ -146,11 +139,9 @@ bool Spriteset::open(QString filename) {
 	}
 	default:
 		errorBox("Invalid spriteset version: " + QString::number(m_header.version));
-		m_file->close();
+		close();
 		return false;
 	}
-	m_file->close();
-	delete m_file;
 	return true;
 }
 

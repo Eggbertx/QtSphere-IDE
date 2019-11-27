@@ -45,12 +45,8 @@ bool Tileset::readBytes(QByteArray arr) {
 	return true;
 }
 
-bool Tileset::open(QString filename) {
-	SphereFile::open(filename);
-	QByteArray arr;
-
-	m_file = new QFile(filename);
-	if(!m_file->open(QIODevice::ReadOnly)) {
+bool Tileset::open(QString filename, QIODevice::OpenMode flags) {
+	if(!SphereFile::open(filename, flags)) {
 		errorBox("ERROR: Could not open file " + filename + ": " + m_file->errorString());
 		return false;
 	}

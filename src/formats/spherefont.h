@@ -6,7 +6,7 @@
 class SphereFont : public SphereFile {
 	public:
 		explicit SphereFont(QObject *parent = nullptr);
-		bool open(QString filename) override;
+		bool open(QString filename, QFile::OpenMode flags = QIODevice::ReadOnly) override;
 		bool save(QString filename) override;
 		static SphereFont* fromSystemFont(QWidget* parent = nullptr);
 		QImage getTextImage(QString text = nullptr);

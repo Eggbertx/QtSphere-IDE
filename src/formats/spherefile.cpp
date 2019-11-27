@@ -1,18 +1,34 @@
 #include <QFileInfo>
 #include "formats/spherefile.h"
 
-
-SphereFile::SphereFile(QObject *parent) {}
+SphereFile::SphereFile(QObject* parent): QObject(parent) {
+	m_file = nullptr;
+}
 
 SphereFile::~SphereFile() {
-	//delete m_file;
+	if(isOpen())
+		close();
 }
 
 void SphereFile::createNew() {}
 
-bool SphereFile::open(QString filename) {
+bool SphereFile::open(QString filename, QFile::OpenMode flags) {
+	if(m_file == nullptr) m_file = new QFile(filename);
+	else m_file->setFileName(filename);
 	m_filename = filename;
-	return true;
+	return m_file->open(flags);
+}
+
+bool SphereFile::isOpen() {
+	return (m_file != nullptr && m_file->isOpen());
+}
+
+void SphereFile::close() {
+	if(m_file != nullptr) {
+		if(m_file->isOpen()) m_file->close();
+		delete m_file;
+	}
+	m_filename = "";
 }
 
 bool SphereFile::save(QString filename) {
@@ -30,6 +46,7 @@ QString SphereFile::getBaseName() {
 
 // read string with no null terminator from file
 QString SphereFile::readNextString() {
+	if(!isOpen()) return "";
 	uint16_t string_length;
 	m_file->read(reinterpret_cast<char*>(&string_length), 2);
 

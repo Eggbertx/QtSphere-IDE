@@ -13,25 +13,24 @@ SphereFont::SphereFont(QObject* parent) : SphereFile(parent)  {
 	m_charImages.reserve(256);
 }
 
-bool SphereFont::open(QString filename) {
-	m_file = new QFile(filename);
-	if(!m_file->open(QIODevice::ReadOnly)) {
+bool SphereFont::open(QString filename, QIODevice::OpenMode flags) {
+	if(!SphereFile::open(filename, flags)) {
 		errorBox("ERROR: Could not read file '" + filename + "': " + m_file->errorString());
-		m_file->close();
+		close();
 		return false;
 	}
 	readFile(m_file, &m_header, sizeof(m_header));
 
 	if(memcmp(m_header.signature, ".rfn", 4) != 0) {
 		errorBox("Error: '" + filename + "' is not a valid Sphere font file (invalid signature)!");
-		m_file->close();
+		close();
 		return false;
 	}
 
 	switch(m_header.version) {
 	case 1:
 		errorBox("Error: v1 Sphere fonts are not supported yet.");
-		m_file->close();
+		close();
 		return false;
 	case 2:
 		for(int c = 0; c < m_header.num_chars; c++) {
@@ -43,32 +42,32 @@ bool SphereFont::open(QString filename) {
 		break;
 	default:
 		errorBox("Error: '" + filename + "' is not a valid Sphere font file (invalid version)!");
-		m_file->close();
+		close();
 		return false;
 	}
 
-	m_file->close();
+	close();
 	return true;
 }
 
 bool SphereFont::save(QString filename) {
-    //memcpy(m_header.signature, ".rss", 4);
+	//memcpy(m_header.signature, ".rss", 4);
 
 	QByteArray ba;
-    QFile* fontFile = new QFile(filename);
-    writeFile(fontFile, &m_header, sizeof(m_header));
+	QFile* fontFile = new QFile(filename);
+	writeFile(fontFile, &m_header, sizeof(m_header));
 
 
 	for(int i = 0; i < m_header.num_chars; i++) {
-        QImage frameImage = m_charImages.at(i).convertToFormat(QImage::Format_RGBA8888);
-        rfn_frame frame;
-        frame.width = frameImage.width();
-        frame.height = frameImage.height();
-        writeFile(fontFile, &frame, sizeof(frame));
+		QImage frameImage = m_charImages.at(i).convertToFormat(QImage::Format_RGBA8888);
+		rfn_frame frame;
+		frame.width = frameImage.width();
+		frame.height = frameImage.height();
+		writeFile(fontFile, &frame, sizeof(frame));
 
-        QByteArray* bytes = imageBytes(&frameImage);
-        char* pixels = bytes->data();
-        writeFile(fontFile, bytes->data(), bytes->length());
+		QByteArray* bytes = imageBytes(&frameImage);
+		char* pixels = bytes->data();
+		writeFile(fontFile, bytes->data(), bytes->length());
 	}
 
 	return true;
@@ -86,24 +85,24 @@ SphereFont* SphereFont::fromSystemFont(QWidget* parent) {
 	if(fontColor == nullptr) return rfn; // user cancelled
 
 	rfn = new SphereFont(parent);
-    rfn_header header;
+	rfn_header header;
 
-    memcpy(header.signature, ".rfn", 4);
-    header.version = 2;
-    header.num_chars = 256;
-    rfn->m_header = header;
+	memcpy(header.signature, ".rfn", 4);
+	header.version = 2;
+	header.num_chars = 256;
+	rfn->m_header = header;
 
 	QFontMetrics fm(baseFont);
-    QString str = "";
-    QSize asciiSize;
+	QString str = "";
+	QSize asciiSize;
 	QPainter* painter = new QPainter();
 
 	for(int i = 0; i < 256; i++) {
-        ushort ch = i;
-        if(i < 32 || i == 127)
-            str = "";
-        else
-            str = QString::fromUtf16(&ch, 1);
+		ushort ch = i;
+		if(i < 32 || i == 127)
+			str = "";
+		else
+			str = QString::fromUtf16(&ch, 1);
 
 		asciiSize = fm.size(Qt::TextSingleLine, str.toStdString().c_str());
 		if(asciiSize.width() < 1) asciiSize.setWidth(4);
@@ -120,13 +119,13 @@ SphereFont* SphereFont::fromSystemFont(QWidget* parent) {
 		painter->drawText(0, 0, asciiSize.width(), asciiSize.height(), Qt::AlignCenter, str.toStdString().c_str());
 		painter->end();
 
-        rfn->setCharImage(i, canvas);
+		rfn->setCharImage(i, canvas);
 	}
 
 	delete painter;
 
-    QString filename = QFileDialog::getSaveFileName(nullptr, "Save script", "","Sphere font (*.rfn;;All files (*)");
-    rfn->save(filename);
+	QString filename = QFileDialog::getSaveFileName(nullptr, "Save script", "","Sphere font (*.rfn;;All files (*)");
+	rfn->save(filename);
 	return rfn;
 }
 
@@ -136,11 +135,11 @@ QImage SphereFont::getTextImage(QString text) {
 	QString str = "";
 	if(text == nullptr) {
 		for(int i = 0; i < 256; i++) {
-            ushort ch = i;
-            if(i < 32 || i == 127)
-                str = "";
-            else
-                str += QString::fromUtf16(&ch, 1);
+			ushort ch = i;
+			if(i < 32 || i == 127)
+				str = "";
+			else
+				str += QString::fromUtf16(&ch, 1);
 		}
 	} else str = text;
 	QList<int> ascii_vals;
@@ -164,5 +163,5 @@ QImage SphereFont::getTextImage(QString text) {
 }
 
 void SphereFont::setCharImage(int c, QImage image) {
-    m_charImages.insert(c, image.copy(0,0,image.width(),image.height()));
+	m_charImages.insert(c, image.copy(0,0,image.width(),image.height()));
 }

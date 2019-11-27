@@ -14,39 +14,44 @@
 #include "util.h"
 
 MapFile::MapFile(QObject *parent) : SphereFile(parent) {
-
+	m_tileset = nullptr;
 }
 
-bool MapFile::open(QString filename) {
-	m_file = new QFile(filename);
+MapFile::~MapFile() {
+	if(m_tileset != nullptr) {
+		if(m_tileset->isOpen()) m_tileset->close();
+		delete m_tileset;
+	}
+	close();
+}
 
-	if(!m_file->open(QIODevice::ReadOnly)) {
+bool MapFile::open(QString filename, QIODevice::OpenMode flags) {
+	reset();
+	if(!SphereFile::open(filename, flags)) {
 		errorBox("ERROR: Could not read file '" + filename + "': " + m_file->errorString());
-		m_file->close();
+		close();
 		return false;
 	}
 
 	readFile(m_file, &m_header, sizeof(m_header));
 	if(memcmp(m_header.signature, ".rmp", 4) != 0) {
 		errorBox("Error: '" + filename + "' is not a valid map file (invalid signature)!");
-		m_file->close();
+		close();
 		return false;
 	}
 	if(m_header.version != 1) {
 		errorBox("Error: '" + filename + "' is not a valid map file (version != 1)!");
-		m_file->close();
+		close();
 		return false;
 	}
 	if(m_header.num_strings != 3 && m_header.num_strings != 5 && m_header.num_strings != 9) {
 		errorBox("Error: '" + filename + "' is not a valid map file (invalid strings field)!");
-		m_file->close();
+		close();
 		return false;
 	}
-
 	m_tilesetFilename = readNextString();
 	m_musicFilename = readNextString();
 	m_scriptFilename = readNextString();
-
 	if(m_header.num_strings > 3) {
 		m_entryScript = readNextString();
 		m_exitScript = readNextString();
@@ -61,8 +66,7 @@ bool MapFile::open(QString filename) {
 	for(int l = 0; l < m_header.num_layers; l++) {
 		layer cur_layer;
 		cur_layer.index = l;
-
-		m_file->read(reinterpret_cast<char*>(&cur_layer.header), sizeof(cur_layer.header));
+		readFile(m_file, &cur_layer.header, sizeof(cur_layer.header));
 		cur_layer.name = readNextString();
 
 		int num_bytes = cur_layer.header.width * cur_layer.header.height;
@@ -138,7 +142,6 @@ bool MapFile::open(QString filename) {
 		QFileInfo fi(fileName());
 		m_tileset->open(fi.dir().absoluteFilePath(m_tilesetFilename));
 	}
-	m_file->close();
 	return true;
 }
 
@@ -336,6 +339,35 @@ MapFile::entity* MapFile::getEntity(int index) {
 	return &m_entities[index];
 }
 
-void MapFile::resetHeader() {
-
+void MapFile::reset() {
+	m_header.signature[0] = '.';
+	m_header.signature[1] = 'r';
+	m_header.signature[2] = 'm';
+	m_header.signature[3] = 'p';
+	m_header.version = 1;
+	m_header.num_layers = 0;
+	m_header.num_entities = 0;
+	m_header.start_x = 0;
+	m_header.start_y = 0;
+	m_header.start_layer = 0;
+	m_header.start_direction = MapFile::South;
+	m_header.num_strings = 0;
+	m_header.num_zones = 0;
+	m_musicFilename = "";
+	m_tilesetFilename = "";
+	if(m_tileset != nullptr) {
+		m_tileset->close();
+		delete m_tileset;
+	}
+	m_scriptFilename = "";
+	m_entryScript = "";
+	m_exitScript = "";
+	m_northScript = "";
+	m_eastScript = "";
+	m_southScript = "";
+	m_westScript = "";
+	m_layers.clear();
+	m_segments.clear();
+	m_entities.clear();
+	m_zones.clear();
 }
