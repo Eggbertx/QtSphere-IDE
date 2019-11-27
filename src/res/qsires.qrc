@@ -18,6 +18,7 @@
         <file>legacyconfig-24x24.png</file>
         <file>legacyengine-24x24.png</file>
         <file>togglegrid.png</file>
+        <file>show_spritesets.png</file>
     </qresource>
     <qresource prefix="/text">
         <file>dark.qss</file>

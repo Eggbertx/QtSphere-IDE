@@ -12,7 +12,7 @@
 #include "mainwindow.h"
 #include "widgets/map/mapview.h"
 
-MapView::MapView(QWidget *parent) : QGraphicsView(parent) {
+MapView::MapView(QWidget* parent) : QGraphicsView(parent) {
 	m_mapStatusFormat = "Map tile: (%1, %2) Pixel: (%3, %4)";
 	m_mapScene = new QGraphicsScene(this);
 	setMouseTracking(true);
@@ -211,16 +211,16 @@ void MapView::mousePressEvent(QMouseEvent* event) {
 	}
 }
 
-void MapView::mouseReleaseEvent(QMouseEvent *event) {
+void MapView::mouseReleaseEvent(QMouseEvent* event) {
 	m_drawing = false;
-	(void)event;
+	event->accept();
 }
 
-void MapView::leaveEvent(QEvent *event) {
+void MapView::leaveEvent(QEvent* event) {
 	m_pointerGroup->hide();
 	m_drawing = false;
 	MainWindow::instance()->setStatus("Ready");
-	(void)event;
+	event->accept();
 }
 
 void MapView::updatePointer(int size) {

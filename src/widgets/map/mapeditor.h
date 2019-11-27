@@ -54,6 +54,7 @@ class MapEditor : public SphereEditor {
 		QAction* m_dropperTool;
 		int m_currentTool = MapEditor::Pencil;
 		QAction* m_gridTool;
+		QAction* m_showSpritesetsTool;
 
 		// QActions for the undo stack
 		QAction* m_drawTiles;

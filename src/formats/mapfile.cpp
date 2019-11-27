@@ -72,7 +72,7 @@ bool MapFile::open(QString filename, QIODevice::OpenMode flags) {
 		int num_bytes = cur_layer.header.width * cur_layer.header.height;
 		for(int b = 0; b < num_bytes; b++) {
 			uint16_t tile_index;
-			m_file->read(reinterpret_cast<char*>(&tile_index), 2);
+			readFile(m_file, &tile_index, 2);
 			cur_layer.tiles.append(tile_index);
 		}
 		m_layers.append(cur_layer);
@@ -80,20 +80,20 @@ bool MapFile::open(QString filename, QIODevice::OpenMode flags) {
 		for(int s = 0; s < cur_layer.header.num_segments; s++) {
 			obs_segment segment;
 			segment.layer = l;
-			m_file->read(reinterpret_cast<char*>(&segment.x1), sizeof(segment.x1));
-			m_file->read(reinterpret_cast<char*>(&segment.x2), sizeof(segment.x2));
-			m_file->read(reinterpret_cast<char*>(&segment.y1), sizeof(segment.y1));
-			m_file->read(reinterpret_cast<char*>(&segment.y2), sizeof(segment.y2));
+			readFile(m_file, &segment.x1, sizeof(segment.x1));
+			readFile(m_file, &segment.x2, sizeof(segment.x2));
+			readFile(m_file, &segment.y1, sizeof(segment.y1));
+			readFile(m_file, &segment.y2, sizeof(segment.y2));
 			m_segments.append(segment);
 		}
 	}
 
 	for(int e = 0; e < m_header.num_entities; e++) {
 		entity cur_entity;
-		m_file->read(reinterpret_cast<char*>(&cur_entity.x), sizeof(cur_entity.x));
-		m_file->read(reinterpret_cast<char*>(&cur_entity.y), sizeof(cur_entity.y));
-		m_file->read(reinterpret_cast<char*>(&cur_entity.layer), sizeof(cur_entity.layer));
-		m_file->read(reinterpret_cast<char*>(&cur_entity.type), sizeof(cur_entity.type));
+		readFile(m_file, &cur_entity.x, sizeof(cur_entity.x));
+		readFile(m_file, &cur_entity.y, sizeof(cur_entity.y));
+		readFile(m_file, &cur_entity.layer, sizeof(cur_entity.layer));
+		readFile(m_file, &cur_entity.type, sizeof(cur_entity.type));
 
 		skipBytes(m_file, 8);
 		if(cur_entity.type > 2) {
@@ -103,7 +103,7 @@ bool MapFile::open(QString filename, QIODevice::OpenMode flags) {
 		case 1: {
 			cur_entity.name = readNextString();
 			cur_entity.spriteset = readNextString();
-			m_file->read(reinterpret_cast<char*>(&cur_entity.num_scripts), sizeof(cur_entity.num_scripts));
+			readFile(m_file, &cur_entity.num_scripts, sizeof (cur_entity.num_scripts));
 			cur_entity.on_create = readNextString();
 			cur_entity.on_destroy = readNextString();
 			cur_entity.on_activate_touch = readNextString();
@@ -123,12 +123,12 @@ bool MapFile::open(QString filename, QIODevice::OpenMode flags) {
 	}
 	for(int z = 0; z < m_header.num_zones; z++) {
 		zone cur_zone;
-		m_file->read(reinterpret_cast<char*>(&cur_zone.x1), sizeof(cur_zone.x1));
-		m_file->read(reinterpret_cast<char*>(&cur_zone.x2), sizeof(cur_zone.x2));
-		m_file->read(reinterpret_cast<char*>(&cur_zone.y1), sizeof(cur_zone.y1));
-		m_file->read(reinterpret_cast<char*>(&cur_zone.y2), sizeof(cur_zone.y2));
-		m_file->read(reinterpret_cast<char*>(&cur_zone.layer), sizeof(cur_zone.layer));
-		m_file->read(reinterpret_cast<char*>(&cur_zone.reactivation_delay), sizeof(cur_zone.reactivation_delay));
+		readFile(m_file, &cur_zone.x1, sizeof(cur_zone.x1));
+		readFile(m_file, &cur_zone.x2, sizeof(cur_zone.x2));
+		readFile(m_file, &cur_zone.y1, sizeof(cur_zone.y1));
+		readFile(m_file, &cur_zone.y2, sizeof(cur_zone.y2));
+		readFile(m_file, &cur_zone.layer, sizeof(cur_zone.layer));
+		readFile(m_file, &cur_zone.reactivation_delay, sizeof(cur_zone.reactivation_delay));
 		cur_zone.function = readNextString();
 		//qDebug("cur_zone.function: %s\n// end", cur_zone.function.toStdString().c_str());
 		m_zones.append(cur_zone);

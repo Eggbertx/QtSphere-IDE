@@ -1,5 +1,6 @@
 #include <QFileInfo>
 #include "formats/spherefile.h"
+#include "util.h"
 
 SphereFile::SphereFile(QObject* parent): QObject(parent) {
 	m_file = nullptr;
@@ -49,10 +50,11 @@ QString SphereFile::readNextString() {
 	if(!isOpen()) return "";
 	uint16_t string_length;
 	m_file->read(reinterpret_cast<char*>(&string_length), 2);
-
 	if(string_length == 0) return "";
-	char* str = (char*)malloc(string_length);
+
+	char* str = reinterpret_cast<char*>(malloc(string_length));
 	m_file->read(str, string_length);
 	QString string_str = QString(str);
+	string_str.truncate(string_length); // There's probably a better/safer way, but this works (for now)
 	return string_str;
 }

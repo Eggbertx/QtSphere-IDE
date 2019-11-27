@@ -51,6 +51,8 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	m_menuBar->addSeparator();
 	m_gridTool = m_menuBar->addAction(QIcon(":/icons/togglegrid.png"), "Show/Hide grid");
 	m_gridTool->setCheckable(true);
+	m_showSpritesetsTool = m_menuBar->addAction(QIcon(":/icons/show_spritesets.png"), "Show/hide spritesets (not yet implemented)");
+	m_showSpritesetsTool->setCheckable(true);
 	connect(m_menuBar, SIGNAL(actionTriggered(QAction*)), this, SLOT(setCurrentTool(QAction*)));
 
 	ui->mapViewLayout->setMenuBar(m_menuBar);
@@ -165,17 +167,20 @@ void MapEditor::setPencilSize(QAction *size) {
 }
 
 void MapEditor::setCurrentTool(QAction* tool) {
-	if(tool == m_pencil1 || tool == m_pencil3 || tool == m_pencil5) return;
+	if(tool == m_gridTool) {
+		ui->mapView->setGridVisible(m_gridTool->isChecked());
+		return;
+	} else if(tool == m_showSpritesetsTool) {
+		return;
+	}
+
 	m_pencilTool->setChecked(false);
 	m_lineTool->setChecked(false);
 	m_rectTool->setChecked(false);
 	m_fillTool->setChecked(false);
 	m_dropperTool->setChecked(false);
+	if(tool == m_pencil1 || tool == m_pencil3 || tool == m_pencil5) m_pencilTool->setChecked(true);
 
-	if(tool == m_gridTool) {
-		ui->mapView->setGridVisible(m_gridTool->isChecked());
-		return;
-	}
 	if(tool == m_pencilTool) {
 		ui->mapView->setCurrentTool(MapEditor::Pencil);
 		m_pencilTool->setChecked(true);
