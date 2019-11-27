@@ -88,6 +88,7 @@ class MainWindow : public QMainWindow {
 		void on_actionProject_Explorer_triggered();
 		void on_actionProject_Task_List_triggered();
 		void on_actionSound_Test_triggered();
+		void on_actionTiled_map_to_Sphere_map_triggered();
 
 	private:
 		void setupEditors();

@@ -673,3 +673,8 @@ void MainWindow::on_actionProject_Task_List_triggered() {
 void MainWindow::on_actionSound_Test_triggered() {
 	ui->sideBar->setCurrentIndex(2);
 }
+
+void MainWindow::on_actionTiled_map_to_Sphere_map_triggered() {
+	MapFile map(this);
+	bool success = map.openTiledMap();
+}

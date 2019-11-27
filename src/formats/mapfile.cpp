@@ -1,9 +1,13 @@
 #include <QByteArray>
+#include <QDebug>
 #include <QDir>
 #include <QFile>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QRect>
+#include <QXmlStreamReader>
 #include <stdio.h>
+
 #include "formats/spherefile.h"
 #include "formats/mapfile.h"
 #include "formats/tileset.h"
@@ -144,6 +148,66 @@ bool MapFile::save(QString filename) {
 	return success;
 }
 
+bool MapFile::openTiledMap(QString filename) {
+	bool success = false;
+	QXmlStreamReader* xmlReader = nullptr;
+	QFile* mapFile = nullptr;
+	if(filename == "") {
+		filename = QFileDialog::getOpenFileName(nullptr, "Open file", "",
+			"Tiled XML map files (*.tmx *.xml *.json);;"
+			"All files (*.*)"
+		);
+		if(filename == "") return success;
+	}
+
+	int mapType = -1;
+	if(filename.endsWith("tmx", Qt::CaseInsensitive) || filename.endsWith("xml", Qt::CaseInsensitive)) {
+		mapType = 0;
+	} else if(filename.endsWith("json", Qt::CaseInsensitive)) {
+		mapType = 1;
+	} else {
+		errorBox("This doesn't appear to be a Tiled map (must have a .tmx, .xml, or .json extension)");
+		return false;
+	}
+	mapFile = new QFile(filename);
+	if(!mapFile->open(QFile::ReadOnly)) {
+		errorBox("Failed to open Tiled map (" + filename + "):" + mapFile->errorString());
+		goto cleanup;
+	}
+
+	switch(mapType) {
+	case 0:
+		xmlReader = new QXmlStreamReader(mapFile->readAll());
+		if(!xmlReader->readNextStartElement() || xmlReader->name() != "map") {
+			errorBox("Failed read valid XML from map file.");
+			goto cleanup;
+		}
+		QXmlStreamAttributes attributes = xmlReader->attributes();
+		bool ok;
+		int width = attributes.value("width").toInt(&ok);
+		int height = attributes.value("height").toInt(&ok);
+		if(!ok) {
+			errorBox("Error getting map size");
+			goto cleanup;
+		}
+		resizeAllLayers(width, height);
+
+		foreach(QXmlStreamAttribute attribute, attributes) {
+			QStringRef name = attribute.name();
+			QStringRef value = attribute.value();
+			qDebug() << name << ":" << value;
+		}
+	}
+cleanup:
+	if(mapFile != nullptr && mapFile->isOpen()) {
+		mapFile->close();
+		delete mapFile;
+	}
+	if(xmlReader != nullptr)
+		delete xmlReader;
+	return success;
+}
+
 QRect* MapFile::largestLayerRect() {
 	int largestWidth = 0;
 	int largestHeight = 0;
@@ -180,7 +244,7 @@ QString MapFile::getScript(MapFile::ScriptType type) {
 		case MapFile::LeaveWest:
 			return m_westScript;
 	}
-    return "";
+	return "";
 }
 
 void MapFile::setScript(MapFile::ScriptType type, QString text) {
@@ -218,6 +282,18 @@ MapFile::layer* MapFile::getLayer(int index) {
 int MapFile::removeLayer(int index) {
 	m_layers.removeAt(index);
 	return m_layers.length();
+}
+
+void MapFile::resizeAllLayers(int width, int height) {
+	m_header.num_layers = numLayers();
+	foreach (layer curLayer, m_layers) {
+		if(width > 0) curLayer.header.width = width;
+		if(width > 0) curLayer.header.height = height;
+	}
+}
+
+void MapFile::resizeAllLayers(QSize size) {
+	resizeAllLayers(size.width(), size.height());
 }
 
 int MapFile::numLayers() {
@@ -258,4 +334,8 @@ QList<MapFile::entity> MapFile::getEntities(int layer) {
 MapFile::entity* MapFile::getEntity(int index) {
 	if(index > m_entities.length()) return nullptr;
 	return &m_entities[index];
+}
+
+void MapFile::resetHeader() {
+
 }

@@ -15,6 +15,7 @@ class MapFile : public SphereFile {
 		void newMap();
 		bool open(QString filename) override;
 		bool save(QString filename) override;
+        bool openTiledMap(QString filename = "");
 		bool mapOrigin();
 		void setParallax(bool is_parallax, float mult_x, float mult_y, float scrollspeed_x, float scrollspeed_y);
 		QRect* largestLayerRect();
@@ -103,6 +104,8 @@ class MapFile : public SphereFile {
 		QList<layer> getLayers();
 		layer* getLayer(int index);
 		int removeLayer(int index);
+		void resizeAllLayers(int width, int height);
+		void resizeAllLayers(QSize size);
 		int numLayers();
 		QString getLayerName(int layer);
 		void setLayerName(int layer, QString name);
@@ -114,6 +117,7 @@ class MapFile : public SphereFile {
 		entity* getEntity(int index);
 
 	private:
+		void resetHeader();
 		rmp_header m_header;
 		Tileset* m_tileset;
 		QString m_tilesetFilename;
