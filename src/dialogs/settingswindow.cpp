@@ -46,6 +46,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Se
 	connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(onOk()));
 	connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(onApply()));
 	connect(ui->buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(onCancel()));
+	ui->browseDirButton->setIcon(style()->standardIcon(QStyle::SP_DirIcon));
 }
 
 SettingsWindow::~SettingsWindow() {
@@ -134,4 +135,11 @@ void SettingsWindow::gridColorChanged(QColor color) {
 	m_gridColor = color.name();
 }
 
-
+void SettingsWindow::on_browseDirButton_clicked() {
+	int row = ui->projectDirsList->currentRow();
+	if(row < 0) return;
+	QString dir = QFileDialog::getExistingDirectory(this, "Open Directory");
+	if(dir != "") {
+		ui->projectDirsList->item(row)->setText(dir);
+	}
+}

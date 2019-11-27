@@ -39,6 +39,9 @@
     <layout class="QHBoxLayout" name="projectDirBtnsLayout">
      <item>
       <widget class="QToolButton" name="addDirButton">
+       <property name="toolTip">
+        <string>Add project directory</string>
+       </property>
        <property name="text">
         <string>+</string>
        </property>
@@ -46,8 +49,21 @@
      </item>
      <item>
       <widget class="QToolButton" name="removeDirButton">
+       <property name="toolTip">
+        <string>Remove selected project directory</string>
+       </property>
        <property name="text">
         <string>-</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="browseDirButton">
+       <property name="toolTip">
+        <string>Browse for selected project directory</string>
+       </property>
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>

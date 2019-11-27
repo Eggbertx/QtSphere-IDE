@@ -28,7 +28,7 @@ class SettingsWindow : public QDialog {
 		void on_removeDirButton_clicked();
 		void mapCursorColChanged(QColor color);
 		void gridColorChanged(QColor color);
-
+		void on_browseDirButton_clicked();
 
 	private:
 		void saveSettings();
