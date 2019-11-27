@@ -33,7 +33,7 @@ QString SphereFile::readNextString() {
 	uint16_t string_length;
 	m_file->read(reinterpret_cast<char*>(&string_length), 2);
 
-	if(string_length == 0) return "honk";
+	if(string_length == 0) return "";
 	char* str = (char*)malloc(string_length);
 	m_file->read(str, string_length);
 	QString string_str = QString(str);

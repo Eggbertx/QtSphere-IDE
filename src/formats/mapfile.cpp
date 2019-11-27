@@ -1,5 +1,4 @@
 #include <QByteArray>
-#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -19,6 +18,7 @@ bool MapFile::open(QString filename) {
 
 	if(!m_file->open(QIODevice::ReadOnly)) {
 		errorBox("ERROR: Could not read file '" + filename + "': " + m_file->errorString());
+		m_file->close();
 		return false;
 	}
 
@@ -122,14 +122,13 @@ bool MapFile::open(QString filename) {
 		m_file->read(reinterpret_cast<char*>(&cur_zone.layer), sizeof(cur_zone.layer));
 		m_file->read(reinterpret_cast<char*>(&cur_zone.reactivation_delay), sizeof(cur_zone.reactivation_delay));
 		cur_zone.function = readNextString();
-		qDebug() << cur_zone.function;
 		//qDebug("cur_zone.function: %s\n// end", cur_zone.function.toStdString().c_str());
 		m_zones.append(cur_zone);
 	}
 
 	m_tileset = new Tileset(this);
 	if(m_tilesetFilename == "") {
-		qDebug("Position: %d\n", m_file->pos());
+		// qDebug("Position: %d\n", m_file->pos());
 		if(!m_tileset->readBytes(m_file->readAll())) return false;
 	} else {
 		QFileInfo fi(fileName());
@@ -181,6 +180,7 @@ QString MapFile::getScript(MapFile::ScriptType type) {
 		case MapFile::LeaveWest:
 			return m_westScript;
 	}
+    return "";
 }
 
 void MapFile::setScript(MapFile::ScriptType type, QString text) {

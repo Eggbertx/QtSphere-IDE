@@ -9,7 +9,6 @@
 #include "ui_mainwindow.h"
 #include "qsiproject.h"
 #include "util.h"
-#include "dialogs/aboutdialog.h"
 #include "dialogs/importoptionsdialog.h"
 #include "dialogs/modifiedfilesdialog.h"
 #include "dialogs/projectpropertiesdialog.h"
@@ -75,7 +74,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	m_project = new QSIProject(this);
 
 	m_soundPlayer = new SoundPlayer();
-	ui->mediaPlayerTab->layout()->addWidget(m_soundPlayer);
+	ui->soundPlayerTab->layout()->addWidget(m_soundPlayer);
 	m_startPage = new StartPage(ui->openFileTabs);
 	connect(m_startPage, SIGNAL(projectLoaded(QSIProject*)), this, SLOT(onProjectLoaded(QSIProject*)));
 	ui->openFileTabs->addTab(m_startPage, "Start Page");
@@ -162,9 +161,16 @@ void MainWindow::setEngine(QString which) {
 	}
 }
 
+void MainWindow::on_actionAbout_Qt_triggered() {
+	QMessageBox::aboutQt(this);
+}
+
 void MainWindow::on_actionAbout_triggered() {
-	AboutDialog aboutDialog;
-	aboutDialog.exec();
+	QMessageBox::about(this, "About QtSphere IDE",
+		"QtSphere IDE v" VERSION "<br />"
+		"Copyright 2019 by <a href=\"https://github.com/eggbertx\">Eggbertx</a><br /><br />"
+		"See <a href=\"https://github.com/Eggbertx/QtSphere-IDE/blob/master/LICENSE.txt\">LICENSE.txt</a> for more information."
+	);
 }
 
 void MainWindow::saveCurrentTab() {
@@ -654,4 +660,16 @@ void MainWindow::on_newMap_triggered() {
 void MainWindow::on_actionSystem_font_to_Sphere_font_triggered() {
 	SphereFont* rfn = SphereFont::fromSystemFont(this);
 	if(!rfn) return; // either the QFontDialog or the QColorDialog was cancelled.
+}
+
+void MainWindow::on_actionProject_Explorer_triggered() {
+	ui->sideBar->setCurrentIndex(0);
+}
+
+void MainWindow::on_actionProject_Task_List_triggered() {
+	ui->sideBar->setCurrentIndex(1);
+}
+
+void MainWindow::on_actionSound_Test_triggered() {
+	ui->sideBar->setCurrentIndex(2);
 }

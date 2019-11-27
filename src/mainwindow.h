@@ -53,6 +53,7 @@ class MainWindow : public QMainWindow {
 		void checkCloseProjectOption();
 		void onProjectLoaded(QSIProject* project);
 		void on_actionAbout_triggered();
+		void on_actionAbout_Qt_triggered();
 		void on_actionExit_triggered();
 		void on_actionConfigure_QtSphere_IDE_triggered();
 		void on_toolbarSaveButton_triggered();
@@ -84,6 +85,9 @@ class MainWindow : public QMainWindow {
 		void on_actionLegacyConfig_triggered();
 		void on_newMap_triggered();
 		void on_actionSystem_font_to_Sphere_font_triggered();
+		void on_actionProject_Explorer_triggered();
+		void on_actionProject_Task_List_triggered();
+		void on_actionSound_Test_triggered();
 
 	private:
 		void setupEditors();
@@ -100,7 +104,6 @@ class MainWindow : public QMainWindow {
 		QList<SphereEditor *> m_openEditors;
 		QString m_theme;
 		NewMapDialog* m_newMapDialog;
-
 };
 
 #endif // MAINWINDOW_H

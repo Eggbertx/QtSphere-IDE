@@ -3,7 +3,7 @@ QT += core gui multimedia
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = QtSphereIDE
 TEMPLATE = app
-VERSION = 0.8.1
+VERSION = 0.9
 DEFINES += QT_DEPRECATED_WARNINGS TARGET=\\\"$$TARGET\\\" VERSION=\\\"$$VERSION\\\"
 QMAKE_LFLAGS += -no-pie
 
@@ -15,7 +15,6 @@ SOURCES += \
 	dialogs/newmapdialog.cpp \
 	main.cpp\
 	mainwindow.cpp \
-	dialogs/aboutdialog.cpp \
 	util.cpp \
 	dialogs/modifiedfilesdialog.cpp \
 	dialogs/settingswindow.cpp \
@@ -25,6 +24,8 @@ SOURCES += \
 	dialogs/projectpropertiesdialog.cpp \
 	formats/spriteset.cpp \
 	widgets/fonteditor.cpp \
+	widgets/maintabbar.cpp \
+	widgets/maintabwidget.cpp \
 	widgets/spriteset/spriteseteditor.cpp \
 	widgets/palettewidget.cpp \
 	widgets/imagechooser.cpp \
@@ -49,7 +50,6 @@ HEADERS += \
 	palette_presets.h \
 	dialogs/newmapdialog.h \
 	mainwindow.h \
-	dialogs/aboutdialog.h \
 	util.h \
 	dialogs/modifiedfilesdialog.h \
 	dialogs/settingswindow.h \
@@ -59,6 +59,8 @@ HEADERS += \
 	dialogs/projectpropertiesdialog.h \
 	formats/spriteset.h \
 	widgets/fonteditor.h \
+	widgets/maintabbar.h \
+	widgets/maintabwidget.h \
 	widgets/spriteset/spriteseteditor.h \
 	widgets/palettewidget.h \
 	widgets/imagechooser.h \
@@ -81,7 +83,6 @@ HEADERS += \
 FORMS += \
 	dialogs/newmapdialog.ui \
 	mainwindow.ui \
-	dialogs/aboutdialog.ui \
 	dialogs/modifiedfilesdialog.ui \
 	dialogs/settingswindow.ui \
 	dialogs/projectpropertiesdialog.ui \
