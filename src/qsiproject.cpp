@@ -1,3 +1,4 @@
+#include <QDebug>
 #include <QFile>
 #include <QDir>
 #include <QFileInfo>
@@ -11,76 +12,97 @@
 #include "qsiproject.h"
 #include "util.h"
 
+#define QUOTE_REGEX "\"|'|`"
+
 QSIProject::QSIProject(QObject *parent) : QObject(parent) {
-	m_path = "";
+	m_projectDir = "";
+	m_projectFilePath = "";
+	m_projectFileFormat = QSIProject::UnknownProjectType;
+}
+
+QSIProject::~QSIProject() {
+
 }
 
 bool QSIProject::open(QString path) {
-	m_path = path;
-	QFileInfo fileInfo(m_path);
+	m_projectDir = path;
+	QFileInfo fileInfo(m_projectDir);
 	if(!fileInfo.exists()) {
-		errorBox("Project file " + m_path + " doesn't exist!");
+		errorBox("Project file " + m_projectDir + " doesn't exist!");
 		return false;
 	}
-	bool found = false;
+
 	if(fileInfo.isDir()) {
-		// get list of files in project dir, prioritizing .ssproj over game.sgm
-        QStringList filters({"*.ssproj", "Cellscript.js", "Cellscript.mjs", "game.sgm"});
-		QDir projectDir = QDir(m_path);
-		QFileInfoList infoList = projectDir.entryInfoList(filters,QDir::Files|QDir::NoDotAndDotDot);
+		QStringList filters({"*.ssproj", "Cellscript.js", "Cellscript.mjs", "Cellscript.cjs", "game.sgm"});
+		QFileInfoList infoList = QDir(m_projectDir).entryInfoList(filters,QDir::Files|QDir::NoDotAndDotDot);
 
-		bool foundSSProj = false;
-
-		// first search for a .ssproj file
+		// look for *.ssproj, Cellscript.js, Cellscript.mjs, Cellscript.cjs, and game.sgm, in that order
 		for(int f = 0; f < infoList.length(); f++) {
 			QFileInfo fi = infoList.at(f);
-			if(!foundSSProj && fi.suffix() == "ssproj") {
-				m_projectPath = fi.filePath();
-				fileInfo = fi;
-				found = true;
-			}
-		}
-		foreach(QFileInfo fi, infoList) {
-			if(fi.suffix() == "ssproj") {
-				foundSSProj = true;
-			} else if(!foundSSProj && (
-			fi.fileName() == "Cellscript.mjs"
-			|| fi.fileName() == "Cellscript.js"
-			|| fi.fileName() == "game.sgm")) {
-				m_projectPath = fi.filePath();
-				fileInfo = fi;
-				found = true;
+			m_projectFilePath = fi.filePath();
+			QString fileName = fi.fileName();
+			QString suffix = fi.suffix();
+			if(suffix == "ssproj") {
+				m_projectFileFormat = QSIProject::SSProject;
+				break;
+			} else if(fileName == "Cellscript.js") {
+				m_compiler = "Cell";
+				m_projectFileFormat = QSIProject::Cellscript_js;
+				break;
+			} else if(fileName == "Cellscript.mjs") {
+				m_compiler = "Cell";
+				m_projectFileFormat = QSIProject::Cellscript_mjs;
+				break;
+			} else if(fileName == "Cellscript.cjs") {
+				m_compiler = "Cell";
+				m_projectFileFormat = QSIProject::Cellscript_cjs;
+				break;
+			} else if(fileName == "game.sgm") {
+				m_projectFileFormat = QSIProject::SGM;
 				break;
 			}
 		}
 	} else {
-		m_projectPath = fileInfo.filePath();
-		m_path = fileInfo.dir().path();
-		found = true;
+		m_projectFilePath = fileInfo.filePath();
 	}
-	if(!found) return false;
-	QFile* projectFile = new QFile(m_projectPath);
-	if(!projectFile->open(QFile::ReadOnly|QFile::Text)) {
-		errorBox("Error reading " + fileInfo.fileName() + ": " + projectFile->errorString());
-		delete projectFile;
+	if(m_projectFilePath == "") {
+		// qDebug() << "No project in" << path;
+		return false;
 	}
-	QString suffix = fileInfo.suffix();
-	QString filename = fileInfo.fileName();
-	QTextStream stream(projectFile);
-
-
-	if(suffix == "ssproj") {
-		readSSProj(projectFile);
-	} else if(filename == "Cellscript.mjs" || filename == "Cellscript.js") {
-		readCellscript(projectFile);
-	} else if(suffix == "sgm") {
-		readSGM(projectFile);
-        m_buildDir = fileInfo.dir().path();
-	}
-
+	QFile* projectFile = new QFile(m_projectFilePath);
+	bool success = prepareProjectFile(projectFile);
 	projectFile->close();
 	delete projectFile;
-	return true;
+	return success;
+}
+
+bool QSIProject::save() {
+	m_projectFilePath = QDir(m_projectDir).absoluteFilePath(QDir(m_projectDir).dirName() + ".ssproj");
+	QFile* projectFile = new QFile(m_projectFilePath);
+	if(!projectFile->open(QFile::WriteOnly)) {
+		errorBox("Unable to open '" + m_projectFilePath + "': " + projectFile->errorString());
+		delete projectFile;
+		return false;
+	}
+	QString ssText;
+	QTextStream(&ssText) <<
+		"[.ssproj]\r\n" <<
+		"author=" << m_author << "\r\n" <<
+		"compiler=" << getCompiler() << "\r\n" <<
+		"description=" << m_summary << "\r\n" <<
+		"mainScript=" << m_script << "\r\n" <<
+		"name=" << m_name << "\r\n" <<
+		"screenHeight=" << m_height << "\r\n" <<
+		"screenWidth=" << m_width << "\r\n";
+
+
+	bool success = false;
+	if(projectFile->write(ssText.toLatin1()) > -1) {
+		m_projectFileFormat = QSIProject::SSProject;
+		success = true;
+	}
+	projectFile->close();
+	return success;
 }
 
 QString QSIProject::getName() {
@@ -89,6 +111,11 @@ QString QSIProject::getName() {
 
 void QSIProject::setName(QString name) {
 	m_name = name;
+}
+
+QString QSIProject::getResolutionString() {
+	QString resolution = "";
+	return resolution.sprintf("%dx%d", m_width, m_height);
 }
 
 QString QSIProject::getAuthor() {
@@ -169,41 +196,70 @@ void QSIProject::setMainScript(QString path) {
 }
 
 QString QSIProject::getPath(bool projectFile) {
-	if(projectFile) return m_projectPath;
-	return m_path;
+	if(projectFile) return m_projectFilePath;
+	return m_projectDir;
 }
 
 void QSIProject::setPath(QString path, bool projectFile) {
-	if(projectFile) m_projectPath = path;
-	else m_path = path;
+	if(projectFile) m_projectFilePath = path;
+	else m_projectDir = path;
 }
 
 QIcon QSIProject::getIcon() {
-	QFileInfo icon_fi = QFileInfo(QDir(m_path), "icon.png");
+	QFileInfo icon_fi = QFileInfo(QDir(m_projectDir), "icon.png");
 	if(icon_fi.exists()) {
 		return QIcon(icon_fi.canonicalFilePath());
 	}
 	return QIcon(":/icons/sphere-icon.png");
 }
 
+QSIProject::ProjectFileFormat QSIProject::getProjectFormat() {
+	return m_projectFileFormat;
+}
+
 QString QSIProject::getCompiler() {
-	return m_compiler;
+	if(m_compiler == QSIProject::Cell) return "Cell";
+	return "Vanilla";
 }
 
 void QSIProject::setCompiler(QString compiler) {
 	m_compiler = compiler;
 }
 
+bool QSIProject::prepareProjectFile(QFile* projectFile) {
+	if(projectFile == nullptr) return false;
+	if(!projectFile->isOpen()) {
+		if(!projectFile->open(QFile::ReadOnly)) {
+			errorBox("Unable to open project file in '" + m_projectFilePath + "'");
+			return false;
+		}
+	}
+	switch(m_projectFileFormat) {
+	case QSIProject::SSProject:
+		return readSSProj(projectFile);
+	case QSIProject::Cellscript_js:
+	case QSIProject::Cellscript_mjs:
+	case QSIProject::Cellscript_cjs:
+		return readCellscript(projectFile);
+	case QSIProject::SGM:
+		return readSGM(projectFile);
+	default:
+		// no project file in directory
+		return false;
+	}
+}
+
 bool QSIProject::readSSProj(QFile* projectFile) {
 	QTextStream stream(projectFile);
 	while(!stream.atEnd()) {
-		QString line = stream.readLine();
-		if(line == "[.ssproj]" || line == "") continue;
-		QString key = line.section("=", 0, 0);
-		QString value = line.section("=", 1);
+		QStringList arr = stream.readLine().split("=");
+		if(arr.length() != 2) continue;
+		QString key = arr.at(0);
+		QString value = arr.at(1);
 
 		if(key == "author") m_author = value;
-		else if(key == "buildDir") m_buildDir = m_path + "/" + value;
+
+		else if(key == "buildDir") m_buildDir = QDir(m_projectDir).absoluteFilePath(value);
 		else if(key == "compiler") {
 			if(value == "Cell") m_compiler = QSIProject::Cell;
 			else m_compiler = QSIProject::Vanilla;
@@ -217,54 +273,70 @@ bool QSIProject::readSSProj(QFile* projectFile) {
 	return true;
 }
 
+QString QSIProject::getCellscriptStringValue(QString cellscriptStr, QString key, QString defaultValue) {
+	QString value = defaultValue;
+	QString reStr = "(" + key + "):\\s*(" + QUOTE_REGEX + ")(.*)(" + QUOTE_REGEX + "),";
+	QRegularExpression re(reStr, QRegularExpression::OptimizeOnFirstUsageOption);
+	QStringList captureList = re.match(cellscriptStr).capturedTexts();
+	if(captureList.length() > 4)
+		value = captureList.at(3);
+
+	return value
+		.replace("\\'", "'")
+		.replace("\\\"", "\"")
+		.replace("\\`","`");
+}
+
+int QSIProject::getCellscriptIntValue(QString cellscriptStr, QString key, int defaultValue) {
+	int value = defaultValue;
+	QString reStr = "(" + key + "):\\s*(\\d+).*,";
+	QRegularExpression re(reStr, QRegularExpression::OptimizeOnFirstUsageOption);
+	QStringList captureList = re.match(cellscriptStr).capturedTexts();
+	if(captureList.length() >= 3) {
+		bool ok = false;
+		value = captureList.at(2).toInt(&ok);
+		if(!ok) value = defaultValue;
+	}
+	return value;
+}
+
 bool QSIProject::readCellscript(QFile* projectFile) {
 	QTextStream stream(projectFile);
 	QString text = stream.readAll();
+	m_name = getCellscriptStringValue(text, "name");
+	m_author = getCellscriptStringValue(text, "author");
+	m_version = getCellscriptIntValue(text, "version", 1);
+	m_apiLevel = getCellscriptIntValue(text, "apiLevel", 1);
+	m_saveID = getCellscriptStringValue(text, "saveID");
+	m_summary = getCellscriptStringValue(text, "summary");
+	m_script = getCellscriptStringValue(text, "main");
+	QStringList resolution = getCellscriptStringValue(text, "resolution").split("x");
 	bool ok = false;
-	QRegularExpression nameRe("name[(\\s*=\\s*):\\s\"']*(.*)[\"']+", QRegularExpression::OptimizeOnFirstUsageOption);
-	QStringList captureList = nameRe.match(text).capturedTexts();
-	if(captureList.length() > 1) m_name = captureList.at(1);
-	else m_name = "";
-	m_name = m_name.replace("\\\"", "\"").replace("\\'","'");
-
-	QRegularExpression authorRe("author[(\\s*=\\s*):\\s\"']*(.*)[\"']+", QRegularExpression::OptimizeOnFirstUsageOption);
-	captureList = authorRe.match(text).capturedTexts();
-	if(captureList.length() > 1) m_author = captureList.at(1);
-	else m_author = "";
-	m_author = m_author.replace("\\\"", "\"").replace("\\'","'");
-
-	QRegularExpression apiRe("apiLevel[(\\s*=\\s*):\\s\"']*(\\d+)", QRegularExpression::OptimizeOnFirstUsageOption);
-	captureList = apiRe.match(text).capturedTexts();
-	if(captureList.length() > 1) m_apiLevel = captureList.at(1).toInt(&ok);
-	if(!ok) m_apiLevel = 12;
-
-	QRegularExpression versionRe("version[(\\s*=\\s*):\\s\"']*(\\d+)", QRegularExpression::OptimizeOnFirstUsageOption);
-	captureList = versionRe.match(text).capturedTexts();
-	if(captureList.length() > 1) m_version = captureList.at(1).toInt(&ok);
-	if(!ok) m_version = 2;
-
-	QRegularExpression saveIDRe("saveID[(\\s*=\\s*):\\s\"']*(.*)[\"']+", QRegularExpression::OptimizeOnFirstUsageOption);
-	captureList = saveIDRe.match(text).capturedTexts();
-	if(captureList.length() > 1) m_saveID = captureList.at(1);
-	else m_saveID = "";
-
-	QRegularExpression summaryRe("summary[(\\s*=\\s*):\\s\"']*(.*)[\"']+", QRegularExpression::OptimizeOnFirstUsageOption);
-	captureList = summaryRe.match(text).capturedTexts();
-	if(captureList.length() > 1) m_summary = captureList.at(1);
-	else m_summary = "";
-	m_summary = m_summary.replace("\\\"", "\"").replace("\\'","'");
-
-	QRegularExpression resolutionRe("resolution[(\\s*=\\s*):\\s\"']*(.*)[\"']+", QRegularExpression::OptimizeOnFirstUsageOption);
-	QStringList resolutionList = resolutionRe.match(text).capturedTexts();
-	if(resolutionList.length() > 1) {
-		m_width = resolutionList.at(1).split("x").at(0).toInt(&ok);
-		if(!ok) m_width = 320;
-		m_height = resolutionList.at(1).split("x").at(1).toInt(&ok);
-		if(!ok) m_height = 240;
-	} else {
-		m_width = 320;
-		m_height = 240;
+	if(resolution.length() != 2) {
+		m_width = -1;
+		m_height = -1;
+		return true;
 	}
+	m_width = resolution.at(0).toInt(&ok);
+	if(!ok) m_width = -1;
+	m_height = resolution.at(1).toInt(&ok);
+	if(!ok) m_height = -1;
+
+	if(m_width < 0 || m_height < 0) {
+		qDebug() << m_name << "has an invalid resolution:" << resolution.at(0) << "x" << resolution.at(1);
+	}
+	m_compiler = QSIProject::Cell;
+
+	/*qDebug().nospace().noquote() <<
+		"Project: " << m_name << "\n" <<
+		"Author: " << m_author << "\n" <<
+		"Version: " << m_version << "\n" <<
+		"API Level: " << m_apiLevel << "\n" <<
+		"Save ID: " << m_saveID << "\n" <<
+		"Summary: " << m_summary << "\n" <<
+		"Resolution: " << m_width << "x" << m_height << "\n" <<
+		"Main script: " << m_script << "\n";*/
+	m_buildDir = QFileInfo(*projectFile).dir().absoluteFilePath("dist/");
 	return true;
 }
 
@@ -279,9 +351,10 @@ bool QSIProject::readSGM(QFile *projectFile) {
 		else if(key == "author") m_author = value;
 		else if(key == "description") m_summary = value;
 		else if(key == "screen_width") m_width = value.toInt();
-		else if(key == "screen+height") m_height = value.toInt();
+		else if(key == "screen_height") m_height = value.toInt();
 		else if(key == "script") m_script = value;
 	}
 	m_compiler = QSIProject::Vanilla;
+	m_buildDir = QFileInfo(*projectFile).dir().path();
 	return true;
 }

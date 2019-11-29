@@ -33,11 +33,12 @@ StartPage::StartPage(QWidget *parent) : QWidget(parent), ui(new Ui::StartPage) {
 	m_openProjectDirAction = m_rightClickMenu->addAction("Open project directory");
 	m_rightClickMenu->addSeparator();
 	m_rightClickMenu->addAction("Refresh game list");
-
+	connect(m_rightClickMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_startGame(QAction*)));
 	refreshGameList();
 }
 
 StartPage::~StartPage() {
+	disconnect(m_rightClickMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_startGame(QAction*)));
 	delete ui;
 }
 
@@ -63,9 +64,9 @@ void StartPage::refreshGameList() {
 		for(int d = 0; d < numDirs; d++) {
 			QSIProject* project = new QSIProject();
 			if(project->open(dirs.at(d).absoluteFilePath())) {
-				project->setName(dirs.at(d).fileName());
+				/*project->setName(dirs.at(d).fileName());
 				project->setWidth(-1);
-				project->setWidth(-1);
+				project->setWidth(-1);*/
 				m_gameList << project;
 			}
 		}
@@ -94,7 +95,7 @@ void StartPage::on_projectIcons_customContextMenuRequested(const QPoint &pos) {
 	QListWidgetItem* selected = ui->projectIcons->itemAt(pos);
 
 	bool actionsEnabled = (selected != nullptr);
-	m_startGameAction->setEnabled(false);
+	//m_startGameAction->setEnabled(false);
 	m_loadProjectAction->setEnabled(actionsEnabled);
 	m_openProjectDirAction->setEnabled(actionsEnabled);
 
@@ -116,6 +117,8 @@ void StartPage::on_projectIcons_customContextMenuRequested(const QPoint &pos) {
 void StartPage::on_projectIcons_itemActivated(QListWidgetItem *item) {
 	MainWindow::instance()->openProject(m_gameList.at(ui->projectIcons->currentRow())->getPath(true));
 	emit projectLoaded(m_currentProject);
+	if(m_currentProject->getProjectFormat() != QSIProject::SSProject)
+		m_currentProject->save();
 }
 
 void StartPage::on_projectIcons_itemSelectionChanged() {
@@ -124,15 +127,19 @@ void StartPage::on_projectIcons_itemSelectionChanged() {
 	m_currentProject = m_gameList.at(currentRow);
 	if(m_currentProject == nullptr) return;
 
-	QString displayResolution = "";
+	/*QString displayResolution = "";
 	if(m_currentProject->getWidth() > 0 && m_currentProject->getHeight() > 0) {
 		displayResolution = QString::number(m_currentProject->getWidth()) + "x" + QString::number(m_currentProject->getHeight());
-	}
+	}*/
 	setGameInfoText(
 		m_currentProject->getName(),
 		m_currentProject->getAuthor(),
-		displayResolution,
+		m_currentProject->getResolutionString(),
 		m_currentProject->getPath(false),
 		m_currentProject->getSummary()
 	);
+}
+
+void StartPage::on_startGame(QAction* action) {
+	emit gameStarted(m_currentProject->getBuidlDir());
 }

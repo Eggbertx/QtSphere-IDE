@@ -14,7 +14,6 @@ class ProjectPropertiesDialog : public QDialog {
 		explicit ProjectPropertiesDialog(bool newFile = false, QSIProject* project = 0, QWidget *parent = 0);
 		~ProjectPropertiesDialog();
 		QSIProject* getProject();
-		bool writeSGMFile();
 
 	private slots:
 		void on_resolutionCBox_currentTextChanged(const QString &newText);

@@ -29,7 +29,7 @@ ProjectPropertiesDialog::ProjectPropertiesDialog(bool newFile, QSIProject* proje
 		ui->summaryText->document()->setPlainText(project->getSummary());
 		ui->buildInLineEdit->setText(project->getBuidlDir());
 		ui->entryScriptLineEdit->setText(project->getMainScript());
-		if(project->getCompiler() == "Vanilla") ui->compilerCB->setCurrentIndex(0);
+		if(project->getCompiler() == "Cell") ui->compilerCB->setCurrentIndex(0);
 		else ui->compilerCB->setCurrentIndex(1);
 	}
 }
@@ -40,10 +40,6 @@ ProjectPropertiesDialog::~ProjectPropertiesDialog() {
 
 QSIProject* ProjectPropertiesDialog::getProject() {
 	return m_project;
-}
-
-bool ProjectPropertiesDialog::writeSGMFile() {
-	return true;
 }
 
 void ProjectPropertiesDialog::on_resolutionCBox_currentTextChanged(const QString &newText) {
@@ -65,4 +61,5 @@ void ProjectPropertiesDialog::on_buttonBox_accepted() {
 	m_project->setMainScript(ui->entryScriptLineEdit->text());
 	m_project->setBuildDir(ui->buildInLineEdit->text());
 	m_project->setCompiler(ui->compilerCB->currentText());
+	m_project->save();
 }

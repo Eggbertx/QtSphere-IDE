@@ -105,6 +105,11 @@ MainWindow* MainWindow::instance() {
 	return _instance;
 }
 
+int MainWindow::openProjectProperties(bool newFile, QSIProject* project, QWidget* parent) {
+	ProjectPropertiesDialog propertiesDialog(newFile, project, parent);
+	return propertiesDialog.exec();
+}
+
 QString MainWindow::getStatus() {
 	return m_statusLabel->text();
 }
@@ -153,9 +158,11 @@ SphereEditor* MainWindow::getCurrentEditor() {
 
 void MainWindow::setEngine(QString which) {
 	if(which == "legacy") {
+		ui->actionConfigure_Engine->setEnabled(true);
 		ui->actionLegacyConfig->setEnabled(true);
 		ui->toolbarPlayGame->setIcon(QIcon(":/icons/legacyengine-24x24.png"));
 	} else {
+		ui->actionConfigure_Engine->setEnabled(false);
 		ui->actionLegacyConfig->setEnabled(false);
 		ui->toolbarPlayGame->setIcon(QIcon(":/icons/sphere-icon.png"));
 	}
@@ -428,8 +435,8 @@ void MainWindow::on_actionRedo_triggered() {
 }
 
 void MainWindow::on_toolbarProjectProperties_triggered() {
-	ProjectPropertiesDialog propertiesDialog;
-	propertiesDialog.exec();
+	if(openProjectProperties(false, m_project) == QDialog::Accepted)
+		m_project->save();
 }
 
 void MainWindow::on_newProject_triggered() {
@@ -444,8 +451,8 @@ void MainWindow::on_newProject_triggered() {
 }
 
 void MainWindow::on_actionProject_Properties_triggered() {
-	ProjectPropertiesDialog propertiesDialog(false, m_project);
-	propertiesDialog.exec();
+	if(openProjectProperties(false, m_project, this) == QDialog::Accepted)
+		m_project->save();
 }
 
 void MainWindow::nextTab() {
@@ -524,7 +531,7 @@ void MainWindow::checkCloseProjectOption() {
 }
 
 void MainWindow::onProjectLoaded(QSIProject* project) {
-	//setCurrentProject(project);
+	setCurrentProject(project);
 }
 
 void MainWindow::on_actionImage_to_Spriteset_triggered() {
@@ -604,25 +611,7 @@ void MainWindow::on_actionClose_triggered() {
 }
 
 void MainWindow::on_toolbarPlayGame_triggered() {
-	QSettings settings;
-	QString minisphereDir = QDir(settings.value("minisphereDir").toString()).path();
-	QString legacySphereDir = QDir(settings.value("legacySphereDir").toString()).path();
-	QString whichEngine = settings.value("whichEngine", "minisphere").toString();
-
-	if(!validEngineDirCheck()) return;
-#if defined(Q_OS_UNIX)
-	if(whichEngine == "legacy") {
-		QProcess::startDetached("wine", QStringList({"./engine.exe", "-game", m_project->getBuidlDir()}), legacySphereDir);
-	} else {
-		QProcess::startDetached("minisphere", QStringList(m_project->getBuidlDir()), minisphereDir);
-	}
-#elif defined(Q_OS_WIN)
-	if(whichEngine == "legacy") {
-		QProcess::startDetached("engine.exe", QStringList({"-game", m_project->getBuidlDir()}), legacySphereDir);
-	} else {
-		QProcess::startDetached("minisphere", QStringList({"."}), m_project->getBuidlDir());
-	}
-#endif
+	playGame(m_project->getBuidlDir());
 }
 
 bool MainWindow::validEngineDirCheck() {
@@ -639,7 +628,29 @@ bool MainWindow::validEngineDirCheck() {
 	return true;
 }
 
-void MainWindow::on_actionLegacyConfig_triggered() {
+void MainWindow::playGame(QString gameDir) {
+	QSettings settings;
+	QString minisphereDir = QDir(settings.value("minisphereDir").toString()).path();
+	QString legacySphereDir = QDir(settings.value("legacySphereDir").toString()).path();
+	QString whichEngine = settings.value("whichEngine", "minisphere").toString();
+
+	if(!validEngineDirCheck()) return;
+#if defined(Q_OS_UNIX)
+	if(whichEngine == "legacy") {
+		QProcess::startDetached("wine", QStringList({"./engine.exe", "-game", gameDir}), legacySphereDir);
+	} else {
+		QProcess::startDetached("minisphere", QStringList(gameDir), minisphereDir);
+	}
+#elif defined(Q_OS_WIN)
+	if(whichEngine == "legacy") {
+		QProcess::startDetached("engine.exe", QStringList({"-game", gameDir}), legacySphereDir);
+	} else {
+		QProcess::startDetached("minisphere", QStringList({"."}), gameDir);
+	}
+#endif
+}
+
+void MainWindow::configureSphere() {
 	QSettings settings;
 	if(settings.value("whichEngine", "minisphere").toString() != "legacy") return;
 	if(!validEngineDirCheck()) return;
@@ -650,6 +661,10 @@ void MainWindow::on_actionLegacyConfig_triggered() {
 #elif defined(Q_OS_WIN)
 	QProcess::startDetached("\"" + engineDir.filePath("config.exe") + "\"", {}, engineDir.path());
 #endif
+}
+
+void MainWindow::on_actionLegacyConfig_triggered() {
+	configureSphere();
 }
 
 void MainWindow::on_newMap_triggered() {

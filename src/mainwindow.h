@@ -43,6 +43,7 @@ class MainWindow : public QMainWindow {
 		SphereEditor* getCurrentEditor();
 		void setEngine(QString which);
 		static MainWindow* instance();
+		int openProjectProperties(bool newFile = false, QSIProject* project = nullptr, QWidget *parent = nullptr);
 
 	protected:
 		void closeEvent(QCloseEvent* event);
@@ -94,6 +95,9 @@ class MainWindow : public QMainWindow {
 		void setupEditors();
 		void updateTreeView();
 		bool validEngineDirCheck();
+		void playGame(QString gameDir);
+		void configureSphere();
+
 		static MainWindow* _instance;
 		Ui::MainWindow *ui;
 		QString m_status;

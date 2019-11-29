@@ -4,18 +4,26 @@
 #include <QFile>
 #include <QIcon>
 #include <QObject>
+#include <QTextStream>
 
 class QSIProject : public QObject {
 	Q_OBJECT
 	Q_ENUMS(Compiler)
-	public:
-		explicit QSIProject(QObject *parent = nullptr);
-		bool open(QString path);
+	Q_ENUMS(ProjectFileFormat)
 
+	public:
+		enum Compiler { Vanilla, Cell };
+		enum ProjectFileFormat { UnknownProjectType = -1, SSProject, Cellscript_js, Cellscript_mjs, Cellscript_cjs, SGM };
+		explicit QSIProject(QObject *parent = nullptr);
+		~QSIProject();
+
+		bool open(QString path);
+		bool save();
 		QString getName();
 		void setName(QString name);
 		QString getAuthor();
 		void setAuthor(QString author);
+		QString getResolutionString();
 		int getWidth();
 		void setWidth(int width);
 		int getHeight();
@@ -38,9 +46,12 @@ class QSIProject : public QObject {
 		QString getCompiler();
 		void setCompiler(QString compiler);
 		QIcon getIcon();
-		enum Compiler { Vanilla, Cell };
+		ProjectFileFormat getProjectFormat();
 
 	private:
+		QString getCellscriptStringValue(QString cellscriptStr, QString key, QString defaultValue = "");
+		int getCellscriptIntValue(QString cellscriptStr, QString key, int defaultValue = -1);
+		bool prepareProjectFile(QFile* projectFile);
 		bool readSSProj(QFile* projectFile);
 		bool readCellscript(QFile* projectFile);
 		bool readSGM(QFile* projectFile);
@@ -50,12 +61,13 @@ class QSIProject : public QObject {
 		int m_height;
 		int m_apiLevel;
 		int m_version;
+		ProjectFileFormat m_projectFileFormat;
+		QString m_projectFilePath;
 		QString m_saveID;
 		QString m_summary;
 		QString m_buildDir;
 		QString m_script;
-		QString m_path;
-		QString m_projectPath;
+		QString m_projectDir;
 		QString m_compiler;
 };
 

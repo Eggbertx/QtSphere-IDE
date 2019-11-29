@@ -25,9 +25,11 @@ class StartPage : public QWidget {
 		void on_projectIcons_customContextMenuRequested(const QPoint &pos);
 		void on_projectIcons_itemActivated(QListWidgetItem *item);
 		void on_projectIcons_itemSelectionChanged();
+		void on_startGame(QAction* action);
 
 	signals:
 		void projectLoaded(QSIProject* project);
+		void gameStarted(QString gameDir);
 
 	private:
 		Ui::StartPage *ui;
