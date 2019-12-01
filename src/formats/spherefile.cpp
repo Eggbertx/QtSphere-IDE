@@ -58,3 +58,10 @@ QString SphereFile::readNextString() {
 	string_str.truncate(string_length); // There's probably a better/safer way, but this works (for now)
 	return string_str;
 }
+
+void SphereFile::addString(QString str) {
+	if(!isOpen()) return;
+	uint16_t string_length = str.length();
+	m_file->write(reinterpret_cast<char*>(string_length), 2);
+	m_file->write(str.toStdString().c_str(), string_length);
+}

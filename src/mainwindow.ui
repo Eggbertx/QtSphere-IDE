@@ -279,7 +279,7 @@
      <x>0</x>
      <y>0</y>
      <width>936</width>
-     <height>22</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
@@ -436,6 +436,7 @@
    <addaction name="toolbarPlayGame"/>
    <addaction name="toolbarProjectProperties"/>
    <addaction name="actionLegacyConfig"/>
+   <addaction name="separator"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionClose_Project">

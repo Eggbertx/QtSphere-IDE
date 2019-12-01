@@ -8,11 +8,9 @@
 
 class QSIProject : public QObject {
 	Q_OBJECT
-	Q_ENUMS(Compiler)
 	Q_ENUMS(ProjectFileFormat)
 
 	public:
-		enum Compiler { Vanilla, Cell };
 		enum ProjectFileFormat { UnknownProjectType = -1, SSProject, Cellscript_js, Cellscript_mjs, Cellscript_cjs, SGM };
 		explicit QSIProject(QObject *parent = nullptr);
 		~QSIProject();
@@ -37,7 +35,7 @@ class QSIProject : public QObject {
 		void setSaveID(QString id);
 		QString getSummary();
 		void setSummary(QString summary);
-		QString getBuidlDir();
+		QString getBuildDir();
 		void setBuildDir(QString dir);
 		QString getMainScript();
 		void setMainScript(QString path);

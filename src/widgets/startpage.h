@@ -32,6 +32,7 @@ class StartPage : public QWidget {
 		void gameStarted(QString gameDir);
 
 	private:
+		static bool gameSortHelper(QSIProject* a, QSIProject* b);
 		Ui::StartPage *ui;
 		QString m_baseInfoHTML;
 		QList<QSIProject*> m_gameList;

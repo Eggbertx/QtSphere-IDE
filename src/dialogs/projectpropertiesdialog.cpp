@@ -27,7 +27,7 @@ ProjectPropertiesDialog::ProjectPropertiesDialog(bool newFile, QSIProject* proje
 		ui->reswLineEdit->setText(QString::number(project->getWidth()));
 		ui->reshLineEdit->setText(QString::number(project->getHeight()));
 		ui->summaryText->document()->setPlainText(project->getSummary());
-		ui->buildInLineEdit->setText(project->getBuidlDir());
+		ui->buildInLineEdit->setText(project->getBuildDir());
 		ui->entryScriptLineEdit->setText(project->getMainScript());
 		if(project->getCompiler() == "Cell") ui->compilerCB->setCurrentIndex(0);
 		else ui->compilerCB->setCurrentIndex(1);

@@ -18,6 +18,7 @@ QSIProject::QSIProject(QObject *parent) : QObject(parent) {
 	m_projectDir = "";
 	m_projectFilePath = "";
 	m_projectFileFormat = QSIProject::UnknownProjectType;
+	m_buildDir = "";
 }
 
 QSIProject::~QSIProject() {
@@ -66,7 +67,6 @@ bool QSIProject::open(QString path) {
 		m_projectFilePath = fileInfo.filePath();
 	}
 	if(m_projectFilePath == "") {
-		// qDebug() << "No project in" << path;
 		return false;
 	}
 	QFile* projectFile = new QFile(m_projectFilePath);
@@ -91,7 +91,7 @@ bool QSIProject::save() {
 		"compiler=" << getCompiler() << "\r\n" <<
 		"description=" << m_summary << "\r\n" <<
 		"mainScript=" << m_script << "\r\n" <<
-		"name=" << m_name << "\r\n" <<
+		"name=" << getName() << "\r\n" <<
 		"screenHeight=" << m_height << "\r\n" <<
 		"screenWidth=" << m_width << "\r\n";
 
@@ -106,6 +106,7 @@ bool QSIProject::save() {
 }
 
 QString QSIProject::getName() {
+	if(m_name == "") return QFileInfo(m_projectDir).baseName();
 	return m_name;
 }
 
@@ -179,7 +180,8 @@ void QSIProject::setSummary(QString summary) {
 	m_summary = summary;
 }
 
-QString QSIProject::getBuidlDir() {
+QString QSIProject::getBuildDir() {
+	if(m_compiler == "Vanilla") return getPath(false);
 	return m_buildDir;
 }
 
@@ -218,8 +220,7 @@ QSIProject::ProjectFileFormat QSIProject::getProjectFormat() {
 }
 
 QString QSIProject::getCompiler() {
-	if(m_compiler == QSIProject::Cell) return "Cell";
-	return "Vanilla";
+	return m_compiler;
 }
 
 void QSIProject::setCompiler(QString compiler) {
@@ -258,11 +259,9 @@ bool QSIProject::readSSProj(QFile* projectFile) {
 		QString value = arr.at(1);
 
 		if(key == "author") m_author = value;
-
 		else if(key == "buildDir") m_buildDir = QDir(m_projectDir).absoluteFilePath(value);
 		else if(key == "compiler") {
-			if(value == "Cell") m_compiler = QSIProject::Cell;
-			else m_compiler = QSIProject::Vanilla;
+			m_compiler = value;
 		}
 		else if(key == "description") m_summary = value;
 		else if(key == "mainScript") m_script = value;
@@ -325,7 +324,7 @@ bool QSIProject::readCellscript(QFile* projectFile) {
 	if(m_width < 0 || m_height < 0) {
 		qDebug() << m_name << "has an invalid resolution:" << resolution.at(0) << "x" << resolution.at(1);
 	}
-	m_compiler = QSIProject::Cell;
+	m_compiler = "Cell";
 
 	/*qDebug().nospace().noquote() <<
 		"Project: " << m_name << "\n" <<
@@ -354,7 +353,7 @@ bool QSIProject::readSGM(QFile *projectFile) {
 		else if(key == "screen_height") m_height = value.toInt();
 		else if(key == "script") m_script = value;
 	}
-	m_compiler = QSIProject::Vanilla;
+	m_compiler = "Vanilla";
 	m_buildDir = QFileInfo(*projectFile).dir().path();
 	return true;
 }

@@ -78,6 +78,15 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	m_startPage = new StartPage(ui->openFileTabs);
 	connect(m_startPage, SIGNAL(projectLoaded(QSIProject*)), this, SLOT(onProjectLoaded(QSIProject*)));
 	ui->openFileTabs->addTab(m_startPage, "Start Page");
+
+	m_engineSelector = new QComboBox(ui->mainToolBar);
+	m_engineSelector->addItem("miniSphere");
+	m_engineSelector->addItem("Sphere 1.x");
+	m_engineSelectorAction = new QWidgetAction(ui->mainToolBar);
+	m_engineSelectorAction->setDefaultWidget(m_engineSelector);
+	ui->mainToolBar->addAction(m_engineSelectorAction);
+	connect(m_engineSelector, SIGNAL(activated(int)), this, SLOT(onEngineDropdownChanged(int)));
+
 	QSettings settings;
 	updateTreeView();
 	refreshRecentFiles();
@@ -89,7 +98,10 @@ MainWindow::~MainWindow() {
 	disconnect(this, SLOT(prevTab()));
 	disconnect(ui->menuFile, SIGNAL(aboutToShow()), this, SLOT(checkCloseProjectOption()));
 	disconnect(m_startPage, SIGNAL(projectLoaded(QSIProject*)), this, SLOT(onProjectLoaded(QSIProject*)));
+	disconnect(m_engineSelector, SIGNAL(activated(int)), this, SLOT(onEngineDropdownChanged(int)));
 	delete ui;
+	delete m_engineSelector;
+	delete m_engineSelectorAction;
 	delete m_newMapDialog;
 	delete m_project;
 	delete m_soundPlayer;
@@ -158,10 +170,12 @@ SphereEditor* MainWindow::getCurrentEditor() {
 
 void MainWindow::setEngine(QString which) {
 	if(which == "legacy") {
+		m_engineSelector->setCurrentIndex(1);
 		ui->actionConfigure_Engine->setEnabled(true);
 		ui->actionLegacyConfig->setEnabled(true);
 		ui->toolbarPlayGame->setIcon(QIcon(":/icons/legacyengine-24x24.png"));
 	} else {
+		m_engineSelector->setCurrentIndex(0);
 		ui->actionConfigure_Engine->setEnabled(false);
 		ui->actionLegacyConfig->setEnabled(false);
 		ui->toolbarPlayGame->setIcon(QIcon(":/icons/sphere-icon.png"));
@@ -314,8 +328,13 @@ void MainWindow::openProject(QString filename) {
 		ui->menuProject->setEnabled(true);
 		ui->toolbarPlayGame->setEnabled(true);
 		ui->toolbarProjectProperties->setEnabled(true);
+		ui->actionRun_Cell->setEnabled(m_project->getCompiler() == "Cell");
 		updateTreeView();
+	} else {
+		// qDebug() << filename << "not loaded.";
 	}
+
+	//ui->actionRun_Cell->setEnabled(false);
 }
 
 void MainWindow::setCurrentProject(QSIProject* project) {
@@ -405,6 +424,8 @@ void MainWindow::on_actionOpenFile_triggered() {
 }
 
 void MainWindow::on_openFileTabs_tabCloseRequested(int index) {
+	SphereEditor* editor = m_openEditors.at(index);
+
 	m_openEditors.removeAt(index);
 	ui->openFileTabs->removeTab(index);
 }
@@ -534,6 +555,20 @@ void MainWindow::onProjectLoaded(QSIProject* project) {
 	setCurrentProject(project);
 }
 
+void MainWindow::onEngineDropdownChanged(int index) {
+	QSettings settings;
+	switch (index) {
+	case 0:
+		setEngine("minisphere");
+		settings.setValue("whichEngine", "minisphere");
+		break;
+	case 1:
+		setEngine("legacy");
+		settings.setValue("whichEngine", "legacy");
+		break;
+	}
+}
+
 void MainWindow::on_actionImage_to_Spriteset_triggered() {
 	QString imagePath = QFileDialog::getOpenFileName(this,
 		"Import image", "",
@@ -611,7 +646,7 @@ void MainWindow::on_actionClose_triggered() {
 }
 
 void MainWindow::on_toolbarPlayGame_triggered() {
-	playGame(m_project->getBuidlDir());
+	playGame(m_project->getBuildDir());
 }
 
 bool MainWindow::validEngineDirCheck() {
@@ -634,6 +669,8 @@ void MainWindow::playGame(QString gameDir) {
 	QString legacySphereDir = QDir(settings.value("legacySphereDir").toString()).path();
 	QString whichEngine = settings.value("whichEngine", "minisphere").toString();
 
+	QDir engineDir = QDir(settings.value("legacySphereDir").toString());
+
 	if(!validEngineDirCheck()) return;
 #if defined(Q_OS_UNIX)
 	if(whichEngine == "legacy") {
@@ -643,7 +680,12 @@ void MainWindow::playGame(QString gameDir) {
 	}
 #elif defined(Q_OS_WIN)
 	if(whichEngine == "legacy") {
-		QProcess::startDetached("engine.exe", QStringList({"-game", gameDir}), legacySphereDir);
+		//QProcess::startDetached("engine.exe", QStringList({"-game", gameDir}), legacySphereDir);
+		QProcess::startDetached(
+			"\"" + engineDir.filePath("engine.exe") + "\"",
+			QStringList({"-game", gameDir}),
+			engineDir.path()
+		);
 	} else {
 		QProcess::startDetached("minisphere", QStringList({"."}), gameDir);
 	}

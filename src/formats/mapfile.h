@@ -11,13 +11,14 @@ class MapFile : public SphereFile {
 	Q_OBJECT
 	Q_ENUMS(ScriptType)
 	Q_ENUMS(EntityDirection)
+	Q_ENUMS(TiledMapFormat)
 	public:
 		MapFile(QObject *parent = nullptr);
 		~MapFile() override;
 		void newMap();
 		bool open(QString filename, QFile::OpenMode flags = QIODevice::ReadOnly) override;
+		bool openTiledMap(QString filename = "");
 		bool save(QString filename) override;
-        bool openTiledMap(QString filename = "");
 		bool mapOrigin();
 		void setParallax(bool is_parallax, float mult_x, float mult_y, float scrollspeed_x, float scrollspeed_y);
 		QRect* largestLayerRect();
@@ -25,6 +26,7 @@ class MapFile : public SphereFile {
 		Tileset* getTileset();
 		enum ScriptType { Entry, Exit, LeaveNorth, LeaveEast, LeaveSouth, LeaveWest };
 		enum EntityDirection { North, Northeast, East, Southeast, South, Southwest, West, Northwest };
+		enum TiledMapFormat { TiledUnknownFormat = -1, TiledTMX, TiledJSON };
 
 		QString getScript(ScriptType type);
 		void setScript(ScriptType type, QString text);

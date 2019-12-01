@@ -1,11 +1,13 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QComboBox>
 #include <QFileSystemModel>
 #include <QLabel>
 #include <QMainWindow>
 #include <QProcess>
 #include <QWidget>
+#include <QWidgetAction>
 
 #include "qsiproject.h"
 #include "dialogs/newmapdialog.h"
@@ -44,6 +46,7 @@ class MainWindow : public QMainWindow {
 		void setEngine(QString which);
 		static MainWindow* instance();
 		int openProjectProperties(bool newFile = false, QSIProject* project = nullptr, QWidget *parent = nullptr);
+		void playGame(QString gameDir);
 
 	protected:
 		void closeEvent(QCloseEvent* event);
@@ -53,6 +56,7 @@ class MainWindow : public QMainWindow {
 		void prevTab();
 		void checkCloseProjectOption();
 		void onProjectLoaded(QSIProject* project);
+		void onEngineDropdownChanged(int index);
 		void on_actionAbout_triggered();
 		void on_actionAbout_Qt_triggered();
 		void on_actionExit_triggered();
@@ -95,13 +99,14 @@ class MainWindow : public QMainWindow {
 		void setupEditors();
 		void updateTreeView();
 		bool validEngineDirCheck();
-		void playGame(QString gameDir);
 		void configureSphere();
 
 		static MainWindow* _instance;
 		Ui::MainWindow *ui;
 		QString m_status;
 		StartPage* m_startPage;
+		QComboBox* m_engineSelector;
+		QWidgetAction* m_engineSelectorAction;
 		QLabel* m_statusLabel;
 		bool m_projectLoaded;
 		QSIProject* m_project;

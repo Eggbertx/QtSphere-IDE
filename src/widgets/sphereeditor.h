@@ -16,7 +16,7 @@ class SphereEditor : public QWidget {
 		Type editorType();
 		int getTabIndex();
 		void setTabIndex(int index);
-
+		virtual void closeFile();
 	public slots:
 
 	protected:

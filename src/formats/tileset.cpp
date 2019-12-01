@@ -1,5 +1,8 @@
 #include <QByteArray>
 #include <QDataStream>
+#include <QFileDialog>
+#include <QXmlStreamReader>
+
 #include "formats/spherefile.h"
 #include "formats/tileset.h"
 #include "util.h"
@@ -51,6 +54,70 @@ bool Tileset::open(QString filename, QIODevice::OpenMode flags) {
 		return false;
 	}
 	return readBytes(m_file->readAll());
+}
+
+bool Tileset::openTiledTileset(QString filename) {
+	bool success = false;
+	QXmlStreamReader* xmlReader = nullptr;
+	QFile* tilesetFile = nullptr;
+	QXmlStreamAttributes attributes;
+	QString sourceImage;
+	int sourceWidth = -1;
+	int sourceHeight = -1;
+
+	if(filename == "") {
+		filename = QFileDialog::getOpenFileName(nullptr, "Open file", "",
+			"Tiled XML map files (*.tmx *.xml *.json);;"
+			"All files (*.*)"
+		);
+		if(filename == "") return success;
+	}
+	tilesetFile = new QFile(filename);
+	if(!tilesetFile->open(QFile::ReadOnly)) {
+		errorBox("Failed to open Tiled map (" + filename + "):" + tilesetFile->errorString());
+		goto cleanup;
+	}
+
+	xmlReader = new QXmlStreamReader(tilesetFile->readAll());
+	if(!xmlReader->readNextStartElement() || xmlReader->name() != "tileset") {
+		errorBox("Failed to read valid XML from tileset file.");
+		goto cleanup;
+	}
+
+	attributes = xmlReader->attributes();
+	bool ok;
+	m_header.tile_width = attributes.value("tilewidth").toInt(&ok);
+	if(!ok) m_header.tile_width = 0;
+	m_header.tile_height = attributes.value("tileheight").toInt(&ok);
+	if(!ok) m_header.tile_height = 0;
+	if(m_header.tile_width == 0 | m_header.tile_height == 0) {
+		errorBox("Error getting Tiled tile size.");
+		goto cleanup;
+	}
+	if(!xmlReader->readNextStartElement() || xmlReader->name() != "image") {
+		errorBox("Failed to get Tiled tileset source image.");
+		goto cleanup;
+	}
+	attributes = xmlReader->attributes();
+	sourceImage = attributes.value("source").toString();
+	sourceWidth = attributes.value("width").toInt(&ok);
+	if(!ok) sourceWidth = -1;
+	sourceHeight = attributes.value("height").toInt(&ok);
+	if(!ok) sourceHeight = -1;
+	if(sourceWidth < 0 || sourceHeight < 0) {
+		errorBox("Error getting Tiled source image size");
+		goto cleanup;
+	}
+
+
+cleanup:
+	if(tilesetFile != nullptr) {
+		tilesetFile->close();
+		delete tilesetFile;
+	}
+	if(xmlReader != nullptr)
+		delete xmlReader;
+	return success;
 }
 
 bool Tileset::save(QString filename) {

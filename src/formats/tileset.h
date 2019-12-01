@@ -9,6 +9,7 @@ class Tileset : public SphereFile {
 	public:
 		explicit Tileset(QObject *parent = nullptr);
 		bool open(QString filename, QFile::OpenMode flags = QIODevice::ReadOnly) override;
+		bool openTiledTileset(QString filename = "");
 		bool save(QString filename) override;
 		bool readBytes(QByteArray arr);
 

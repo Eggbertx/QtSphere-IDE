@@ -163,11 +163,11 @@ bool MapFile::openTiledMap(QString filename) {
 		if(filename == "") return success;
 	}
 
-	int mapType = -1;
+	int mapType = MapFile::TiledUnknownFormat;
 	if(filename.endsWith("tmx", Qt::CaseInsensitive) || filename.endsWith("xml", Qt::CaseInsensitive)) {
-		mapType = 0;
+		mapType = MapFile::TiledTMX;
 	} else if(filename.endsWith("json", Qt::CaseInsensitive)) {
-		mapType = 1;
+		mapType = MapFile::TiledJSON;
 	} else {
 		errorBox("This doesn't appear to be a Tiled map (must have a .tmx, .xml, or .json extension)");
 		return false;
@@ -179,7 +179,7 @@ bool MapFile::openTiledMap(QString filename) {
 	}
 
 	switch(mapType) {
-	case 0:
+	case MapFile::TiledTMX:
 		xmlReader = new QXmlStreamReader(mapFile->readAll());
 		if(!xmlReader->readNextStartElement() || xmlReader->name() != "map") {
 			errorBox("Failed read valid XML from map file.");
@@ -188,9 +188,12 @@ bool MapFile::openTiledMap(QString filename) {
 		QXmlStreamAttributes attributes = xmlReader->attributes();
 		bool ok;
 		int width = attributes.value("width").toInt(&ok);
+		if(!ok) width = -1;
 		int height = attributes.value("height").toInt(&ok);
-		if(!ok) {
-			errorBox("Error getting map size");
+		if(!ok) height = -1;
+
+		if(width < 0 || height < 0) {
+			errorBox("Error getting Tiled map size");
 			goto cleanup;
 		}
 		resizeAllLayers(width, height);

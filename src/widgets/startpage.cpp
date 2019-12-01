@@ -9,6 +9,7 @@
 #include <QSettings>
 #include <QStringList>
 #include <QTextEdit>
+#include <algorithm>
 
 #include "widgets/startpage.h"
 #include "ui_startpage.h"
@@ -27,23 +28,40 @@ StartPage::StartPage(QWidget *parent) : QWidget(parent), ui(new Ui::StartPage) {
 	ui->projectIcons->setContextMenuPolicy(Qt::CustomContextMenu);
 	m_rightClickMenu = new QMenu(ui->projectIcons);
 
-
+	m_currentProject = nullptr;
 	m_startGameAction = m_rightClickMenu->addAction("Start game");
 	m_loadProjectAction = m_rightClickMenu->addAction("Load project");
 	m_openProjectDirAction = m_rightClickMenu->addAction("Open project directory");
 	m_rightClickMenu->addSeparator();
 	m_rightClickMenu->addAction("Refresh game list");
-	connect(m_rightClickMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_startGame(QAction*)));
 	refreshGameList();
 }
 
 StartPage::~StartPage() {
-	disconnect(m_rightClickMenu, SIGNAL(triggered(QAction*)), this, SLOT(on_startGame(QAction*)));
+	delete m_rightClickMenu;
+	delete m_currentProject;
 	delete ui;
 }
 
 QString StartPage::getGameInfoText() {
 	return ui->gameInfoText->toHtml();
+}
+
+bool StartPage::gameSortHelper(QSIProject* a, QSIProject* b) {
+	if(a == nullptr || b == nullptr)
+		return true;
+	QString aName = a->getName().toLower();
+	QString bName = b->getName().toLower();
+	if(aName.length() == 0) {
+		qDebug() << a->getPath(true);
+		qDebug() << a->getSummary();
+		return true;
+	}
+	if(bName.length() == 0) {
+		//qDebug() << b->getSummary();
+		return false;
+	}
+	return a->getName().toLower().at(0) < b->getName().toLower().at(0);
 }
 
 void StartPage::refreshGameList() {
@@ -64,16 +82,14 @@ void StartPage::refreshGameList() {
 		for(int d = 0; d < numDirs; d++) {
 			QSIProject* project = new QSIProject();
 			if(project->open(dirs.at(d).absoluteFilePath())) {
-				/*project->setName(dirs.at(d).fileName());
-				project->setWidth(-1);
-				project->setWidth(-1);*/
 				m_gameList << project;
 			}
 		}
 	}
 	settings.endArray();
 
-	foreach (QSIProject* project, m_gameList) {
+	std::sort(m_gameList.begin(), m_gameList.end(), gameSortHelper);
+	foreach(QSIProject* project, m_gameList) {
 		QListWidgetItem* item = new QListWidgetItem(project->getIcon(), project->getName());
 		item->setTextAlignment(Qt::AlignCenter);
 		item->setSizeHint(QSize(150,80));
@@ -95,20 +111,20 @@ void StartPage::on_projectIcons_customContextMenuRequested(const QPoint &pos) {
 	QListWidgetItem* selected = ui->projectIcons->itemAt(pos);
 
 	bool actionsEnabled = (selected != nullptr);
-	//m_startGameAction->setEnabled(false);
+	m_startGameAction->setEnabled(actionsEnabled);
 	m_loadProjectAction->setEnabled(actionsEnabled);
 	m_openProjectDirAction->setEnabled(actionsEnabled);
 
 	QAction* choice = m_rightClickMenu->exec(ui->projectIcons->mapToGlobal(pos));
 
-	if(!choice || !m_currentProject) return;
+	if(!choice) return;
 	QString text = choice->text();
-	if(text == "Start game") {
-
-	} else if(text == "Load project")  {
+	if(text == "Start game" && m_currentProject != nullptr) {
+		MainWindow::instance()->playGame(m_currentProject->getBuildDir());
+	} else if(text == "Load project" && m_currentProject != nullptr)  {
 		MainWindow::instance()->openProject(m_gameList.at(ui->projectIcons->currentRow())->getPath(true));
-	} else if(text == "Open project directory") {
-		QDesktopServices::openUrl(QUrl(m_currentProject->getPath(false)).path());
+	} else if(text == "Open project directory" && m_currentProject != nullptr) {
+		QDesktopServices::openUrl(QUrl::fromLocalFile(m_currentProject->getPath(false)));
 	} else if(text == "Refresh game list") {
 		refreshGameList();
 	}
@@ -141,5 +157,5 @@ void StartPage::on_projectIcons_itemSelectionChanged() {
 }
 
 void StartPage::on_startGame(QAction* action) {
-	emit gameStarted(m_currentProject->getBuidlDir());
+	emit gameStarted(m_currentProject->getBuildDir());
 }

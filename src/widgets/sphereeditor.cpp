@@ -31,3 +31,7 @@ int SphereEditor::getTabIndex() {
 void SphereEditor::setTabIndex(int index) {
 	m_tabIndex = index;
 }
+
+void SphereEditor::closeFile() {
+
+}
