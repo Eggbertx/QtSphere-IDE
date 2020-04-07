@@ -425,9 +425,10 @@ void MainWindow::on_actionOpenFile_triggered() {
 
 void MainWindow::on_openFileTabs_tabCloseRequested(int index) {
 	SphereEditor* editor = m_openEditors.at(index);
-
+	if(editor != nullptr) editor->closeFile();
 	m_openEditors.removeAt(index);
 	ui->openFileTabs->removeTab(index);
+	delete editor;
 }
 
 void MainWindow::on_actionUndo_triggered() {
@@ -464,7 +465,10 @@ void MainWindow::on_newProject_triggered() {
 	ProjectPropertiesDialog propertiesDialog(true);
 	if(propertiesDialog.exec() == QDialog::Accepted) {
 		QDir newDir = QDir(propertiesDialog.getProject()->getPath(false));
-		if(newDir.exists() || !newDir.mkpath("")) {
+		QString dirName = newDir.dirName();
+		newDir.cdUp();
+		qDebug() << newDir.absolutePath();
+		if(!newDir.mkpath(dirName)) {
 			errorBox("Error creating new project.");
 			return;
 		}

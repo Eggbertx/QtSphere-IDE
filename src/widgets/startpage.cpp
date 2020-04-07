@@ -39,7 +39,6 @@ StartPage::StartPage(QWidget *parent) : QWidget(parent), ui(new Ui::StartPage) {
 
 StartPage::~StartPage() {
 	delete m_rightClickMenu;
-	delete m_currentProject;
 	delete ui;
 }
 
@@ -52,15 +51,9 @@ bool StartPage::gameSortHelper(QSIProject* a, QSIProject* b) {
 		return true;
 	QString aName = a->getName().toLower();
 	QString bName = b->getName().toLower();
-	if(aName.length() == 0) {
-		qDebug() << a->getPath(true);
-		qDebug() << a->getSummary();
-		return true;
-	}
-	if(bName.length() == 0) {
-		//qDebug() << b->getSummary();
-		return false;
-	}
+	if(aName.length() == 0) return true;
+	if(bName.length() == 0) return false;
+
 	return a->getName().toLower().at(0) < b->getName().toLower().at(0);
 }
 

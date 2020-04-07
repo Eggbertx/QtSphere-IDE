@@ -12,7 +12,7 @@ A cross-platform IDE for the [Sphere game engine](http://spheredev.org)
 	* It may or may not come standard for the Windows and macOS Qt package.
 
 ## Compilation
-Building this in Qt Creator will make things a lot easier and more convenient. When you open the QtSphereIDE.pro project file in Qt Creator and it takes you to the .user project creation screen, while it isn't required, setting the build directories to the repository root will make things cleaner. You can ignore the warnings.
+Building this in Qt Creator will make things a lot easier and more convenient.
 
 If you want to build it from a terminal, just do:
 

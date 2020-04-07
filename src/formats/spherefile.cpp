@@ -7,8 +7,9 @@ SphereFile::SphereFile(QObject* parent): QObject(parent) {
 }
 
 SphereFile::~SphereFile() {
-	if(isOpen())
-		close();
+	close();
+	if(m_file != nullptr)
+		delete m_file;
 }
 
 void SphereFile::createNew() {}
@@ -25,10 +26,8 @@ bool SphereFile::isOpen() {
 }
 
 void SphereFile::close() {
-	if(m_file != nullptr) {
-		if(m_file->isOpen()) m_file->close();
-		delete m_file;
-	}
+	if(isOpen())
+		m_file->close();
 	m_filename = "";
 }
 

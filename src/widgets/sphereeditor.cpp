@@ -10,6 +10,14 @@ SphereEditor::SphereEditor(QWidget* parent): QWidget(parent) {
 	m_undoAction->setShortcuts(QKeySequence::Undo);
 	m_redoAction = new QAction("&Redo");
 	m_redoAction->setShortcuts(QKeySequence::Redo);
+	m_attachedFile = nullptr;
+}
+
+SphereEditor::~SphereEditor() {
+	close();
+	delete m_undoStack;
+	delete m_undoAction;
+	delete m_redoAction;
 }
 
 void SphereEditor::undo() {
@@ -33,5 +41,5 @@ void SphereEditor::setTabIndex(int index) {
 }
 
 void SphereEditor::closeFile() {
-
+	if(m_attachedFile != nullptr) m_attachedFile->close();
 }

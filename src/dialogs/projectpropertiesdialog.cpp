@@ -54,6 +54,7 @@ void ProjectPropertiesDialog::on_pathButton_clicked() {
 }
 
 void ProjectPropertiesDialog::on_buttonBox_accepted() {
+	m_project->setPath(ui->pathLineEdit->text(), false);
 	m_project->setName(ui->nameLineEdit->text());
 	m_project->setAuthor(ui->authorLineEdit->text());
 	m_project->setSize(ui->reswLineEdit->text().toInt(), ui->reshLineEdit->text().toInt());
