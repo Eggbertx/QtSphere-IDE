@@ -11,7 +11,14 @@ class QSIProject : public QObject {
 	Q_ENUMS(ProjectFileFormat)
 
 	public:
-		enum ProjectFileFormat { UnknownProjectType = -1, SSProject, Cellscript_js, Cellscript_mjs, Cellscript_cjs, SGM };
+		enum ProjectFileFormat {
+			UnknownProjectType = -1,
+			SSProject,
+			Cellscript_js,
+			Cellscript_mjs,
+			Cellscript_cjs,
+			SGM
+		};
 		explicit QSIProject(QObject *parent = nullptr);
 		~QSIProject();
 

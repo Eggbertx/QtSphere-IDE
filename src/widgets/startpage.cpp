@@ -42,10 +42,6 @@ StartPage::~StartPage() {
 	delete ui;
 }
 
-QString StartPage::getGameInfoText() {
-	return ui->gameInfoText->toHtml();
-}
-
 bool StartPage::gameSortHelper(QSIProject* a, QSIProject* b) {
 	if(a == nullptr || b == nullptr)
 		return true;
@@ -55,6 +51,17 @@ bool StartPage::gameSortHelper(QSIProject* a, QSIProject* b) {
 	if(bName.length() == 0) return false;
 
 	return a->getName().toLower().at(0) < b->getName().toLower().at(0);
+}
+
+QString StartPage::getGameInfoText() {
+	return ui->gameInfoText->toHtml();
+}
+
+void StartPage::loadProject(QSIProject* project) {
+	MainWindow::instance()->openProject(project->getPath(true));
+	emit projectLoaded(m_currentProject);
+	if(m_currentProject->getProjectFormat() != QSIProject::SSProject)
+		m_currentProject->save();
 }
 
 void StartPage::refreshGameList() {
@@ -115,7 +122,7 @@ void StartPage::on_projectIcons_customContextMenuRequested(const QPoint &pos) {
 	if(text == "Start game" && m_currentProject != nullptr) {
 		MainWindow::instance()->playGame(m_currentProject->getBuildDir());
 	} else if(text == "Load project" && m_currentProject != nullptr)  {
-		MainWindow::instance()->openProject(m_gameList.at(ui->projectIcons->currentRow())->getPath(true));
+		loadProject(m_gameList.at(ui->projectIcons->currentRow()));
 	} else if(text == "Open project directory" && m_currentProject != nullptr) {
 		QDesktopServices::openUrl(QUrl::fromLocalFile(m_currentProject->getPath(false)));
 	} else if(text == "Refresh game list") {
@@ -124,10 +131,7 @@ void StartPage::on_projectIcons_customContextMenuRequested(const QPoint &pos) {
 }
 
 void StartPage::on_projectIcons_itemActivated(QListWidgetItem *item) {
-	MainWindow::instance()->openProject(m_gameList.at(ui->projectIcons->currentRow())->getPath(true));
-	emit projectLoaded(m_currentProject);
-	if(m_currentProject->getProjectFormat() != QSIProject::SSProject)
-		m_currentProject->save();
+	loadProject(m_gameList.at(ui->projectIcons->currentRow()));
 }
 
 void StartPage::on_projectIcons_itemSelectionChanged() {

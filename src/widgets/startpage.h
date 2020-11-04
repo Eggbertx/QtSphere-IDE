@@ -18,6 +18,7 @@ class StartPage : public QWidget {
 		explicit StartPage(QWidget *parent = nullptr);
 		~StartPage();
 		QString getGameInfoText();
+		void loadProject(QSIProject* project);
 		void refreshGameList();
 		void setGameInfoText(QString name, QString author, QString resolution, QString path, QString description);
 
