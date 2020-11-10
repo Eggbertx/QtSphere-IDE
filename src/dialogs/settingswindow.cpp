@@ -75,12 +75,16 @@ void SettingsWindow::onCancel() {
 }
 
 void SettingsWindow::on_minisphereDir_btn_clicked() {
-	m_minisphereDir = QFileDialog::getExistingDirectory(this, "Open Directory");
+	QString _m_minisphereDir = QFileDialog::getExistingDirectory(this, "Open Directory");
+	if(_m_minisphereDir == "") return;
+	m_minisphereDir = _m_minisphereDir;
 	ui->minisphereDir_txt->setText(m_minisphereDir);
 }
 
 void SettingsWindow::on_legacySphereDir_btn_clicked() {
-	m_legacySphereDir = QFileDialog::getExistingDirectory(this, "Open Directory");
+	QString _m_legacySphereDir = QFileDialog::getExistingDirectory(this, "Open Directory", m_legacySphereDir);
+	if(_m_legacySphereDir == "") return;
+	m_legacySphereDir = _m_legacySphereDir;
 	ui->legacySphereDir_txt->setText(m_legacySphereDir);
 }
 
@@ -143,3 +147,4 @@ void SettingsWindow::on_browseDirButton_clicked() {
 		ui->projectDirsList->item(row)->setText(dir);
 	}
 }
+
