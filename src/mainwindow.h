@@ -112,7 +112,6 @@ class MainWindow : public QMainWindow {
 		bool m_projectLoaded;
 		QSIProject* m_project;
 		SoundPlayer* m_soundPlayer;
-		QList<SphereEditor *> m_openEditors;
 		QString m_theme;
 		QSITaskList* m_taskList;
 		NewMapDialog* m_newMapDialog;

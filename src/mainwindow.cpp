@@ -164,11 +164,8 @@ void MainWindow::closeEvent(QCloseEvent* event) {
 
 SphereEditor* MainWindow::getCurrentEditor() {
 	int currentTabIndex = ui->openFileTabs->currentIndex();
-	foreach(SphereEditor* editor, m_openEditors) {
-		if(editor->getTabIndex() == currentTabIndex)
-			return editor;
-	}
-	return nullptr;
+	if(ui->openFileTabs->count() <= currentTabIndex) return nullptr;
+	return static_cast<SphereEditor*>(ui->openFileTabs->widget(currentTabIndex));
 }
 
 void MainWindow::setEngine(QString which) {
@@ -294,7 +291,6 @@ void MainWindow::openFile(QString filename) {
 			rmpEditor->setTabIndex(ui->openFileTabs->insertTab(0,rmpEditor, fi.fileName()));
 			ui->openFileTabs->setTabToolTip(0, file->fileName());
 			ui->openFileTabs->setCurrentIndex(0);
-			m_openEditors.append(rmpEditor);
 		} else {
 			return;
 		}
@@ -304,7 +300,6 @@ void MainWindow::openFile(QString filename) {
 			ssView->setTabIndex(ui->openFileTabs->insertTab(0, ssView, fi.fileName()));
 			ui->openFileTabs->setTabToolTip(0, file->fileName());
 			ui->openFileTabs->setCurrentIndex(0);
-			m_openEditors.append(ssView);
 		}else {
 			errorBox("Failed loading spriteset: " + fn);
 			return;
@@ -321,7 +316,6 @@ void MainWindow::openFile(QString filename) {
 		newTextEdit->setTabIndex(ui->openFileTabs->insertTab(0, static_cast<QTextEdit*>(newTextEdit), fi.fileName()));
 		ui->openFileTabs->setTabToolTip(0, file->fileName());
 		ui->openFileTabs->setCurrentIndex(0);
-		m_openEditors.append(newTextEdit);
 	}
 }
 
@@ -356,7 +350,7 @@ void MainWindow::closeProject() {
 }
 
 void MainWindow::handleModifiedFiles() {
-	if(m_openEditors.count() == 0) return;
+	if(ui->openFileTabs->count() == 0) return;
 	ModifiedFilesDialog mfd(this);
 	int num_modified = 0;
 	QList<QTextEdit *> openEditors = ui->openFileTabs->findChildren<QTextEdit *>();
@@ -427,11 +421,15 @@ void MainWindow::on_actionOpenFile_triggered() {
 }
 
 void MainWindow::on_openFileTabs_tabCloseRequested(int index) {
-	SphereEditor* editor = m_openEditors.at(index);
-	if(editor != nullptr) editor->closeFile();
-	m_openEditors.removeAt(index);
+	SphereEditor* editor = dynamic_cast<SphereEditor*>(ui->openFileTabs->widget(index));
+	if(editor && editor->editorType() != SphereEditor::None) {
+		editor->closeFile();
+	}
 	ui->openFileTabs->removeTab(index);
 	delete editor;
+	if(ui->openFileTabs->count() == 0) {
+		ui->openFileTabs->addTab(m_startPage, "Start Page");
+	}
 }
 
 void MainWindow::on_actionUndo_triggered() {
@@ -503,7 +501,6 @@ void MainWindow::on_newPlainTextFile_triggered() {
 	newTextEdit->SphereEditor::setObjectName("textEdit" + QString::number(ui->openFileTabs->count()));
 	newTextEdit->setTabIndex(ui->openFileTabs->insertTab(0, static_cast<QTextEdit*>(newTextEdit), "<Untitled>"));
 	ui->openFileTabs->setTabToolTip(0, "<Untitled>");
-	m_openEditors.append(newTextEdit);
 	ui->openFileTabs->setCurrentIndex(0);
 }
 
