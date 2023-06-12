@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Name=QtSphere IDE
-Comment=A cross-platform IDE for the miniSphere game engine
+Comment=A cross-platform IDE for the neoSphere game engine
 Exec=./build/QtSphereIDE
 MimeType=application/x-sphere-spk;application/x-sphere-sgm;application/x-sphere-s2gm;
 Icon=./src/res/icon.png
