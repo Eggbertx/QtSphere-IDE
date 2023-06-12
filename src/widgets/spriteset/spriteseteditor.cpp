@@ -34,7 +34,7 @@ SpritesetEditor::SpritesetEditor(QWidget *parent): SphereEditor(parent), ui(new 
 	ui->palette->setWidget(pw);
 	ui->palette->setAlignment(Qt::AlignTop|Qt::AlignLeft);
 	QPalette pal = palette();
-	pal.setColor(QPalette::Background, QColor(40,40,40));
+	pal.setColor(QPalette::Window, QColor(40,40,40));
 
 	m_spriteset = new Spriteset(this);
 	m_images = new ImageChooser(true, this);

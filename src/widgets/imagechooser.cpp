@@ -16,7 +16,7 @@ ImageChooser::ImageChooser(bool showTransparency, QWidget *parent): QWidget(pare
 	m_alphaBG = QPixmap::fromImage(QImage(":/icons/transparency-bg.png"));
 	m_images = QList<QImage>();
 	QPalette pal = palette();
-	pal.setColor(QPalette::Background, Qt::black);
+	pal.setColor(QPalette::Window, Qt::black);
 	setAutoFillBackground(true);
 	setPalette(pal);
 	m_rightClickMenu = new QMenu(this);

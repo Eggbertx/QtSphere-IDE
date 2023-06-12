@@ -116,7 +116,7 @@ void QSIProject::setName(QString name) {
 
 QString QSIProject::getResolutionString() {
 	QString resolution = "";
-	return resolution.sprintf("%dx%d", m_width, m_height);
+	return resolution.asprintf("%dx%d", m_width, m_height);
 }
 
 QString QSIProject::getAuthor() {
@@ -275,7 +275,7 @@ bool QSIProject::readSSProj(QFile* projectFile) {
 QString QSIProject::getCellscriptStringValue(QString cellscriptStr, QString key, QString defaultValue) {
 	QString value = defaultValue;
 	QString reStr = "(" + key + "):\\s*(" + QUOTE_REGEX + ")(.*)(" + QUOTE_REGEX + "),";
-	QRegularExpression re(reStr, QRegularExpression::OptimizeOnFirstUsageOption);
+	QRegularExpression re(reStr, QRegularExpression::NoPatternOption);
 	QStringList captureList = re.match(cellscriptStr).capturedTexts();
 	if(captureList.length() > 4)
 		value = captureList.at(3);
@@ -289,7 +289,7 @@ QString QSIProject::getCellscriptStringValue(QString cellscriptStr, QString key,
 int QSIProject::getCellscriptIntValue(QString cellscriptStr, QString key, int defaultValue) {
 	int value = defaultValue;
 	QString reStr = "(" + key + "):\\s*(\\d+).*,";
-	QRegularExpression re(reStr, QRegularExpression::OptimizeOnFirstUsageOption);
+	QRegularExpression re(reStr, QRegularExpression::NoPatternOption);
 	QStringList captureList = re.match(cellscriptStr).capturedTexts();
 	if(captureList.length() >= 3) {
 		bool ok = false;

@@ -79,7 +79,7 @@ bool Tileset::openTiledTileset(QString filename) {
 	}
 
 	xmlReader = new QXmlStreamReader(tilesetFile->readAll());
-	if(!xmlReader->readNextStartElement() || xmlReader->name() != "tileset") {
+	if(!xmlReader->readNextStartElement() || xmlReader->name().compare("tileset")) {
 		errorBox("Failed to read valid XML from tileset file.");
 		goto cleanup;
 	}
@@ -94,7 +94,7 @@ bool Tileset::openTiledTileset(QString filename) {
 		errorBox("Error getting Tiled tile size.");
 		goto cleanup;
 	}
-	if(!xmlReader->readNextStartElement() || xmlReader->name() != "image") {
+	if(!xmlReader->readNextStartElement() || xmlReader->name().toString() != "image") {
 		errorBox("Failed to get Tiled tileset source image.");
 		goto cleanup;
 	}

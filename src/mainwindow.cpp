@@ -37,6 +37,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	ui->toolbarSaveButton->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
 	ui->centralWidget->setContextMenuPolicy(Qt::CustomContextMenu);
 	ui->taskListTable->setContextMenuPolicy(Qt::CustomContextMenu);
+	ui->openTaskListButton->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+	ui->saveTaskListButton->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
 
 	/*
 	 * move to the next file tab (or to the first if we're at the end)
@@ -87,6 +89,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	ui->mainToolBar->addAction(m_engineSelectorAction);
 	connect(m_engineSelector, SIGNAL(activated(int)), this, SLOT(onEngineDropdownChanged(int)));
 
+	m_taskList = new QSITaskList(ui->taskListTable);
 	QSettings settings;
 	updateTreeView();
 	refreshRecentFiles();
@@ -214,7 +217,7 @@ void MainWindow::saveCurrentTab() {
 			return;
 		}
 		QTextStream out(&saveFile);
-		out.setCodec("UTF-8");
+        // out.setCodec("UTF-8");
 		out << currentEditor->document()->toPlainText();
 		ui->openFileTabs->setTabText(ui->openFileTabs->currentIndex(), fi.fileName());
 		ui->openFileTabs->setTabToolTip(ui->openFileTabs->currentIndex(), fi.filePath());
@@ -612,7 +615,8 @@ void MainWindow::on_actionStart_Page_triggered() {
 
 void MainWindow::on_taskListTable_customContextMenuRequested(const QPoint &pos) {
 	QMenu* contextMenu = new QMenu();
-	contextMenu->addAction("Load task list...");
+	contextMenu->addAction("Open task list...");
+	contextMenu->addAction("Import task list...");
 	contextMenu->addAction("Save task list");
 	contextMenu->addAction("Save task list as...");
 	QWidget* child = ui->taskListTable->childAt(pos);
@@ -620,12 +624,12 @@ void MainWindow::on_taskListTable_customContextMenuRequested(const QPoint &pos) 
 		QAction* result = contextMenu->exec(child->mapToGlobal(pos));
 		if(result == nullptr) return;
 		QString text = result->text();
-		if(text == "Load task list...") {
+		if(text == "Open task list...") {
 
 		} else if(text == "Save task list") {
-
+			m_taskList->saveList(false);
 		} else if(text == "Save task list as...") {
-
+			m_taskList->saveList(true);
 		}
 	}
 }

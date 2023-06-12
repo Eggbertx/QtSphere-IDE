@@ -1,6 +1,5 @@
-QT += core gui multimedia xml
+QT += core gui widgets multimedia xml widgets
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = QtSphereIDE
 TEMPLATE = app
 VERSION = 0.9
@@ -10,6 +9,7 @@ QMAKE_LFLAGS += -no-pie
 DESTDIR=build
 
 SOURCES += \
+	formats/qsitasklist.cpp \
 	formats/spherefont.cpp \
 	palette_presets.cpp \
 	dialogs/newmapdialog.cpp \
@@ -46,6 +46,7 @@ SOURCES += \
 	commands/mapdrawcommand.cpp
 
 HEADERS += \
+	formats/qsitasklist.h \
 	formats/spherefont.h \
 	palette_presets.h \
 	dialogs/newmapdialog.h \

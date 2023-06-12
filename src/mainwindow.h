@@ -15,6 +15,7 @@
 #include "widgets/soundplayer.h"
 #include "widgets/sphereeditor.h"
 #include "widgets/startpage.h"
+#include "formats/qsitasklist.h"
 
 namespace Ui {
 	class MainWindow;
@@ -113,6 +114,7 @@ class MainWindow : public QMainWindow {
 		SoundPlayer* m_soundPlayer;
 		QList<SphereEditor *> m_openEditors;
 		QString m_theme;
+		QSITaskList* m_taskList;
 		NewMapDialog* m_newMapDialog;
 };
 

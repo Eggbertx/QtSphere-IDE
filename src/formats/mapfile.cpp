@@ -181,7 +181,7 @@ bool MapFile::openTiledMap(QString filename) {
 	switch(mapType) {
 	case MapFile::TiledTMX:
 		xmlReader = new QXmlStreamReader(mapFile->readAll());
-		if(!xmlReader->readNextStartElement() || xmlReader->name() != "map") {
+		if(!xmlReader->readNextStartElement() || xmlReader->name().toString() != "map") {
 			errorBox("Failed read valid XML from map file.");
 			goto cleanup;
 		}
@@ -199,8 +199,9 @@ bool MapFile::openTiledMap(QString filename) {
 		resizeAllLayers(width, height);
 
 		foreach(QXmlStreamAttribute attribute, attributes) {
-			QStringRef name = attribute.name();
-			QStringRef value = attribute.value();
+
+            QStringView name = attribute.name();
+            QStringView value = attribute.value();
 			qDebug() << name << ":" << value;
 		}
 	}

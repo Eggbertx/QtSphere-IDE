@@ -4,7 +4,6 @@
 #include <QToolButton>
 #include "widgets/soundplayer.h"
 #include "ui_soundplayer.h"
-#include "mainwindow.h"
 
 SoundPlayer::SoundPlayer(QWidget *parent): QWidget(parent), ui(new Ui::SoundPlayer) {
 	ui->setupUi(this);
@@ -23,7 +22,7 @@ SoundPlayer::SoundPlayer(QWidget *parent): QWidget(parent), ui(new Ui::SoundPlay
 void SoundPlayer::load(QString file) {
 	QFileInfo fi = QFileInfo(file);
 	m_mediaPlayer->stop();
-	m_mediaPlayer->setMedia(QUrl::fromLocalFile(file));
+    m_mediaPlayer->setSource(QUrl::fromLocalFile(file));
 	m_audioDuration = m_mediaPlayer->duration();
 	ui->seekSlider->setEnabled(true);
 	ui->seekSlider->setMinimum(0);
@@ -52,18 +51,18 @@ SoundPlayer::~SoundPlayer() {
 }
 
 void SoundPlayer::on_playToggleBtn_clicked() {
-	switch(m_mediaPlayer->state()) {
-		case QMediaPlayer::StoppedState: {
-			m_mediaPlayer->setPosition(0);
-			m_mediaPlayer->play();
-			break;
-		}
-		case QMediaPlayer::PlayingState:
-			m_mediaPlayer->pause();
-			break;
-		case QMediaPlayer::PausedState:
-			m_mediaPlayer->play();
-			break;
+	switch(m_mediaPlayer->playbackState()) {
+	case QMediaPlayer::StoppedState: {
+		m_mediaPlayer->setPosition(0);
+		m_mediaPlayer->play();
+		break;
+	}
+	case QMediaPlayer::PlayingState:
+		m_mediaPlayer->pause();
+		break;
+	case QMediaPlayer::PausedState:
+		m_mediaPlayer->play();
+		break;
 	}
 }
 
@@ -86,20 +85,20 @@ void SoundPlayer::audioPositionChanged(qint64 position) {
 	if(!ui->seekSlider->isSliderDown()) ui->seekSlider->setSliderPosition(percent);
 }
 
-void SoundPlayer::audioStateChanged(QMediaPlayer::State state) {
+void SoundPlayer::audioStateChanged(QMediaPlayer::PlaybackState state) {
 	switch(state) {
-		case QMediaPlayer::PlayingState:
-			ui->playToggleBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
-			break;
-		case QMediaPlayer::PausedState:
-			ui->playToggleBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-			break;
-		case QMediaPlayer::StoppedState: {
-			ui->playToggleBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-			if(m_mediaPlayer->position() == m_audioDuration && m_loopingAudio) {
-				m_mediaPlayer->play();
-			} else ui->seekSlider->setSliderPosition(0);
-			break;
+	case QMediaPlayer::PlayingState:
+		ui->playToggleBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
+		break;
+	case QMediaPlayer::PausedState:
+		ui->playToggleBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+		break;
+	case QMediaPlayer::StoppedState: {
+		ui->playToggleBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
+		if(m_mediaPlayer->position() == m_audioDuration && m_loopingAudio) {
+			m_mediaPlayer->play();
+		} else ui->seekSlider->setSliderPosition(0);
+		break;
 		}
 	}
 }

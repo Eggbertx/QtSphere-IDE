@@ -4,7 +4,7 @@
 #include <QEvent>
 #include <QFile>
 #include <QMessageBox>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTextCharFormat>
 
 int handleModifiedFiles();

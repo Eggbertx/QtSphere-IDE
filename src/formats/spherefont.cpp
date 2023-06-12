@@ -4,8 +4,8 @@
 #include <QFontDialog>
 #include <QFontMetrics>
 #include <QPainter>
-#include <QTextEncoder>
-#include <QTextDecoder>
+//#include <QTextEncoder>
+//#include <QTextDecoder>
 #include "util.h"
 #include "formats/spherefont.h"
 

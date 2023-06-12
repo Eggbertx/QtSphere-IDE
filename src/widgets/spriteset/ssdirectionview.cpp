@@ -27,7 +27,7 @@ SSDirectionView::SSDirectionView(Spriteset* spriteset, int index, QWidget* paren
 
 	QHBoxLayout* dirLayout = new QHBoxLayout();
 	dirLayout->setSpacing(0);
-	dirLayout->setMargin(0);
+	dirLayout->setContentsMargins(0, 0, 0, 0);
 	setLayout(dirLayout);
 
 	m_nameLineEdit = new QLineEdit();
@@ -39,7 +39,7 @@ SSDirectionView::SSDirectionView(Spriteset* spriteset, int index, QWidget* paren
 	m_framesContainer = new QWidget();
 	m_framesLayout = new QHBoxLayout();
 	m_framesLayout->setSpacing(1);
-	m_framesLayout->setMargin(2);
+	m_framesLayout->setContentsMargins(2, 2, 2, 2);
 	m_framesContainer->setLayout(m_framesLayout);
 
 	m_frameViews = QList<QGraphicsView*>();

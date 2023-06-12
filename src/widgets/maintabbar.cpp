@@ -5,7 +5,7 @@ MainTabBar::MainTabBar(QWidget *parent): QTabBar(parent) {
 }
 
 void MainTabBar::mouseReleaseEvent(QMouseEvent* event) {
-	if(event->button() == Qt::MidButton) {
+	if(event->button() == Qt::MiddleButton) {
 		int index = tabAt(event->pos());
 		if(index > -1)
 			emit tabCloseRequested(index);

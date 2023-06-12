@@ -19,7 +19,7 @@ class SoundPlayer : public QWidget {
 		void stop();
 
 	private slots:
-		void audioStateChanged(QMediaPlayer::State state);
+		void audioStateChanged(QMediaPlayer::PlaybackState state);
 		void audioPositionChanged(qint64 position);
 		void audioDurationChanged(qint64 duration);
 		void on_playToggleBtn_clicked();

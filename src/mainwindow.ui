@@ -125,9 +125,16 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
-            <widget class="QLabel" name="taskListLabel">
+            <widget class="QToolButton" name="newTaskButton">
              <property name="text">
-              <string>Task List</string>
+              <string>+</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="delTaskButton">
+             <property name="text">
+              <string>-</string>
              </property>
             </widget>
            </item>
@@ -145,16 +152,22 @@
             </spacer>
            </item>
            <item>
-            <widget class="QToolButton" name="newTaskButton">
+            <widget class="QToolButton" name="openTaskListButton">
+             <property name="toolTip">
+              <string>Open task list</string>
+             </property>
              <property name="text">
-              <string>+</string>
+              <string>Open</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QToolButton" name="delTaskButton">
+            <widget class="QToolButton" name="saveTaskListButton">
+             <property name="toolTip">
+              <string>Save task list</string>
+             </property>
              <property name="text">
-              <string>-</string>
+              <string>Save</string>
              </property>
             </widget>
            </item>
@@ -279,7 +292,7 @@
      <x>0</x>
      <y>0</y>
      <width>936</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
