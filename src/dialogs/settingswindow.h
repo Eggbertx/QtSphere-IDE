@@ -21,7 +21,7 @@ class SettingsWindow : public QDialog {
 		void onOk();
 		void onApply();
 		void onCancel();
-		void on_minisphereDir_btn_clicked();
+		void on_neosphereDir_btn_clicked();
 		void on_legacySphereDir_btn_clicked();
 		void on_themeCombo_currentIndexChanged(const QString &newtext);
 		void on_addDirButton_clicked();
@@ -37,7 +37,7 @@ class SettingsWindow : public QDialog {
 		QString m_newTheme;
 		QString m_mapCursorColor;
 		QString m_gridColor;
-		QString m_minisphereDir;
+		QString m_neosphereDir;
 		QString m_legacySphereDir;
 };
 

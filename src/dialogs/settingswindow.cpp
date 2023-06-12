@@ -15,7 +15,7 @@
 
 SettingsWindow::SettingsWindow(QWidget *parent) : QDialog(parent), ui(new Ui::SettingsWindow) {
 	ui->setupUi(this);
-	ui->minisphereDir_btn->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
+	ui->neosphereDir_btn->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
 	ui->legacySphereDir_btn->setIcon(style()->standardIcon(QStyle::SP_DialogOpenButton));
 	m_currentTheme = MainWindow::instance()->getTheme();
 	m_newTheme = m_currentTheme;
@@ -28,12 +28,12 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Se
 		ui->projectDirsList->addItem(item);
 	}
 	settings.endArray();
-	if(settings.value("whichEngine", "minisphere") == "legacy") {
+	if(settings.value("whichEngine", "neosphere") == "legacy") {
 		ui->whichEngine_combo->setCurrentIndex(1);
 	} else {
 		ui->whichEngine_combo->setCurrentIndex(0);
 	}
-	ui->minisphereDir_txt->setText(settings.value("minisphereDir").toString());
+	ui->neosphereDir_txt->setText(settings.value("neosphereDir").toString());
 	ui->legacySphereDir_txt->setText(settings.value("legacySphereDir").toString());
 	m_mapCursorColor = settings.value("mapCursorColor", "#0080ff").toString();
 	m_gridColor = settings.value("gridColor", "#000000").toString();
@@ -74,11 +74,11 @@ void SettingsWindow::onCancel() {
 	reject();
 }
 
-void SettingsWindow::on_minisphereDir_btn_clicked() {
-	QString _m_minisphereDir = QFileDialog::getExistingDirectory(this, "Open Directory");
-	if(_m_minisphereDir == "") return;
-	m_minisphereDir = _m_minisphereDir;
-	ui->minisphereDir_txt->setText(m_minisphereDir);
+void SettingsWindow::on_neosphereDir_btn_clicked() {
+	QString _m_neosphereDir = QFileDialog::getExistingDirectory(this, "Open Directory");
+	if(_m_neosphereDir == "") return;
+	m_neosphereDir = _m_neosphereDir;
+	ui->neosphereDir_txt->setText(m_neosphereDir);
 }
 
 void SettingsWindow::on_legacySphereDir_btn_clicked() {
@@ -111,10 +111,10 @@ void SettingsWindow::saveSettings() {
 	if(ui->whichEngine_combo->currentText() == "Use Sphere 1.x (legacy)") {
 		settings.setValue("whichEngine", "legacy");
 	} else {
-		settings.setValue("whichEngine", "minisphere");
+		settings.setValue("whichEngine", "neosphere");
 	}
 	MainWindow::instance()->setEngine(settings.value("whichEngine").toString());
-	settings.setValue("minisphereDir", ui->minisphereDir_txt->text());
+	settings.setValue("neosphereDir", ui->neosphereDir_txt->text());
 	settings.setValue("legacySphereDir", ui->legacySphereDir_txt->text());
 	settings.setValue("mapCursorColor", m_mapCursorColor);
 	settings.setValue("gridColor", m_gridColor);

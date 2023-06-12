@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	ui->openFileTabs->addTab(m_startPage, "Start Page");
 
 	m_engineSelector = new QComboBox(ui->mainToolBar);
-	m_engineSelector->addItem("miniSphere");
+	m_engineSelector->addItem("neoSphere");
 	m_engineSelector->addItem("Sphere 1.x");
 	m_engineSelectorAction = new QWidgetAction(ui->mainToolBar);
 	m_engineSelectorAction->setDefaultWidget(m_engineSelector);
@@ -93,7 +93,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	QSettings settings;
 	updateTreeView();
 	refreshRecentFiles();
-	setEngine(settings.value("whichEngine", "minisphere").toString());
+	setEngine(settings.value("whichEngine", "neosphere").toString());
 }
 
 MainWindow::~MainWindow() {
@@ -217,7 +217,7 @@ void MainWindow::saveCurrentTab() {
 			return;
 		}
 		QTextStream out(&saveFile);
-        // out.setCodec("UTF-8");
+		// out.setCodec("UTF-8");
 		out << currentEditor->document()->toPlainText();
 		ui->openFileTabs->setTabText(ui->openFileTabs->currentIndex(), fi.fileName());
 		ui->openFileTabs->setTabToolTip(ui->openFileTabs->currentIndex(), fi.filePath());
@@ -542,7 +542,7 @@ void MainWindow::on_actionQSIGithub_triggered() {
 }
 
 void MainWindow::on_actionMSGithub_triggered() {
-	QDesktopServices::openUrl(QUrl("https://github.com/fatcerberus/miniSphere"));
+	QDesktopServices::openUrl(QUrl("https://github.com/fatcerberus/neosphere"));
 }
 
 void MainWindow::on_treeView_doubleClicked(const QModelIndex &index) {
@@ -566,8 +566,8 @@ void MainWindow::onEngineDropdownChanged(int index) {
 	QSettings settings;
 	switch (index) {
 	case 0:
-		setEngine("minisphere");
-		settings.setValue("whichEngine", "minisphere");
+		setEngine("neosphere");
+		settings.setValue("whichEngine", "neosphere");
 		break;
 	case 1:
 		setEngine("legacy");
@@ -673,9 +673,9 @@ bool MainWindow::validEngineDirCheck() {
 
 void MainWindow::playGame(QString gameDir) {
 	QSettings settings;
-	QString minisphereDir = QDir(settings.value("minisphereDir").toString()).path();
+	QString neosphereDir = QDir(settings.value("neosphereDir").toString()).path();
 	QString legacySphereDir = QDir(settings.value("legacySphereDir").toString()).path();
-	QString whichEngine = settings.value("whichEngine", "minisphere").toString();
+	QString whichEngine = settings.value("whichEngine", "neosphere").toString();
 
 	QDir engineDir = QDir(settings.value("legacySphereDir").toString());
 
@@ -684,7 +684,7 @@ void MainWindow::playGame(QString gameDir) {
 	if(whichEngine == "legacy") {
 		QProcess::startDetached("wine", QStringList({"./engine.exe", "-game", gameDir}), legacySphereDir);
 	} else {
-		QProcess::startDetached("minisphere", QStringList(gameDir), minisphereDir);
+		QProcess::startDetached("neosphere", QStringList(gameDir), neosphereDir);
 	}
 #elif defined(Q_OS_WIN)
 	if(whichEngine == "legacy") {
@@ -695,14 +695,14 @@ void MainWindow::playGame(QString gameDir) {
 			engineDir.path()
 		);
 	} else {
-		QProcess::startDetached("minisphere", QStringList({"."}), gameDir);
+		QProcess::startDetached("neosphere", QStringList({"."}), gameDir);
 	}
 #endif
 }
 
 void MainWindow::configureSphere() {
 	QSettings settings;
-	if(settings.value("whichEngine", "minisphere").toString() != "legacy") return;
+	if(settings.value("whichEngine", "neosphere").toString() != "legacy") return;
 	if(!validEngineDirCheck()) return;
 	QDir engineDir = QDir(settings.value("legacySphereDir").toString());
 
