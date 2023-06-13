@@ -11,12 +11,17 @@ SoundPlayer::SoundPlayer(QWidget *parent): QWidget(parent), ui(new Ui::SoundPlay
 	ui->playToggleBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 	ui->stopBtn->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
 	ui->repeatBtn->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
-	connect(m_mediaPlayer, SIGNAL(stateChanged(QMediaPlayer::State)),
-			this, SLOT(audioStateChanged(QMediaPlayer::State)));
-	connect(m_mediaPlayer, SIGNAL(positionChanged(qint64)),
-			this, SLOT(audioPositionChanged(qint64)));
-	connect(m_mediaPlayer, SIGNAL(durationChanged(qint64)),
-			this, SLOT(audioDurationChanged(qint64)));
+
+	connect(m_mediaPlayer, &QMediaPlayer::playbackStateChanged, this, &SoundPlayer::audioStateChanged);
+	connect(m_mediaPlayer, &QMediaPlayer::positionChanged, this, &SoundPlayer::audioPositionChanged);
+	connect(m_mediaPlayer, &QMediaPlayer::durationChanged, this, &SoundPlayer::audioDurationChanged);
+}
+
+SoundPlayer::~SoundPlayer() {
+	disconnect(m_mediaPlayer, &QMediaPlayer::playbackStateChanged, this, &SoundPlayer::audioStateChanged);
+	disconnect(m_mediaPlayer, &QMediaPlayer::positionChanged, this, &SoundPlayer::audioPositionChanged);
+	connect(m_mediaPlayer, &QMediaPlayer::durationChanged, this, &SoundPlayer::audioDurationChanged);
+	delete ui;
 }
 
 void SoundPlayer::load(QString file) {
@@ -38,16 +43,6 @@ void SoundPlayer::play() {
 
 void SoundPlayer::stop() {
 	m_mediaPlayer->stop();
-}
-
-SoundPlayer::~SoundPlayer() {
-	disconnect(m_mediaPlayer, SIGNAL(stateChanged(QMediaPlayer::State)),
-				this, SLOT(audioStateChanged(QMediaPlayer::State)));
-	disconnect(m_mediaPlayer, SIGNAL(positionChanged(qint64)),
-				this, SLOT(audioPositionChanged(qint64)));
-	disconnect(m_mediaPlayer, SIGNAL(durationChanged(qint64)),
-				this, SLOT(audioDurationChanged(qint64)));
-	delete ui;
 }
 
 void SoundPlayer::on_playToggleBtn_clicked() {
