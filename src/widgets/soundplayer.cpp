@@ -20,7 +20,7 @@ SoundPlayer::SoundPlayer(QWidget *parent): QWidget(parent), ui(new Ui::SoundPlay
 SoundPlayer::~SoundPlayer() {
 	disconnect(m_mediaPlayer, &QMediaPlayer::playbackStateChanged, this, &SoundPlayer::audioStateChanged);
 	disconnect(m_mediaPlayer, &QMediaPlayer::positionChanged, this, &SoundPlayer::audioPositionChanged);
-	connect(m_mediaPlayer, &QMediaPlayer::durationChanged, this, &SoundPlayer::audioDurationChanged);
+	disconnect(m_mediaPlayer, &QMediaPlayer::durationChanged, this, &SoundPlayer::audioDurationChanged);
 	delete ui;
 }
 
