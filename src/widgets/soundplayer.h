@@ -22,10 +22,10 @@ class SoundPlayer : public QWidget {
 		void audioStateChanged(QMediaPlayer::PlaybackState state);
 		void audioPositionChanged(qint64 position);
 		void audioDurationChanged(qint64 duration);
-		void on_playToggleBtn_clicked();
-		void on_stopBtn_clicked();
-		void on_repeatBtn_clicked(bool checked);
-		void on_seekSlider_valueChanged(int value);
+		void onPlayButtonClicked();
+		void onStopButtonClicked();
+		void onRepeatButtonClicked(bool checked);
+		void onSeekSliderValueChanged(int value);
 
 	private:
 		Ui::SoundPlayer *ui;

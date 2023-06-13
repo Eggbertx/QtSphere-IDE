@@ -15,12 +15,20 @@ SoundPlayer::SoundPlayer(QWidget *parent): QWidget(parent), ui(new Ui::SoundPlay
 	connect(m_mediaPlayer, &QMediaPlayer::playbackStateChanged, this, &SoundPlayer::audioStateChanged);
 	connect(m_mediaPlayer, &QMediaPlayer::positionChanged, this, &SoundPlayer::audioPositionChanged);
 	connect(m_mediaPlayer, &QMediaPlayer::durationChanged, this, &SoundPlayer::audioDurationChanged);
+	connect(ui->playToggleBtn, &QToolButton::clicked, this, &SoundPlayer::onPlayButtonClicked);
+	connect(ui->stopBtn, &QToolButton::clicked, this, &SoundPlayer::onStopButtonClicked);
+	connect(ui->repeatBtn, &QToolButton::clicked, this, &SoundPlayer::onRepeatButtonClicked);
+	connect(ui->seekSlider, &QSlider::valueChanged, this, &SoundPlayer::onSeekSliderValueChanged);
 }
 
 SoundPlayer::~SoundPlayer() {
 	disconnect(m_mediaPlayer, &QMediaPlayer::playbackStateChanged, this, &SoundPlayer::audioStateChanged);
 	disconnect(m_mediaPlayer, &QMediaPlayer::positionChanged, this, &SoundPlayer::audioPositionChanged);
 	disconnect(m_mediaPlayer, &QMediaPlayer::durationChanged, this, &SoundPlayer::audioDurationChanged);
+	disconnect(ui->playToggleBtn, &QToolButton::clicked, this, &SoundPlayer::onPlayButtonClicked);
+	disconnect(ui->stopBtn, &QToolButton::clicked, this, &SoundPlayer::onStopButtonClicked);
+	disconnect(ui->repeatBtn, &QToolButton::clicked, this, &SoundPlayer::onRepeatButtonClicked);
+	disconnect(ui->seekSlider, &QSlider::valueChanged, this, &SoundPlayer::onSeekSliderValueChanged);
 	delete ui;
 }
 
@@ -45,7 +53,7 @@ void SoundPlayer::stop() {
 	m_mediaPlayer->stop();
 }
 
-void SoundPlayer::on_playToggleBtn_clicked() {
+void SoundPlayer::onPlayButtonClicked() {
 	switch(m_mediaPlayer->playbackState()) {
 	case QMediaPlayer::StoppedState: {
 		m_mediaPlayer->setPosition(0);
@@ -61,12 +69,12 @@ void SoundPlayer::on_playToggleBtn_clicked() {
 	}
 }
 
-void SoundPlayer::on_stopBtn_clicked() {
+void SoundPlayer::onStopButtonClicked() {
 	m_mediaPlayer->stop();
 	ui->playToggleBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 }
 
-void SoundPlayer::on_repeatBtn_clicked(bool checked) {
+void SoundPlayer::onRepeatButtonClicked(bool checked) {
 	m_loopingAudio = checked;
 }
 
@@ -98,7 +106,7 @@ void SoundPlayer::audioStateChanged(QMediaPlayer::PlaybackState state) {
 	}
 }
 
-void SoundPlayer::on_seekSlider_valueChanged(int value) {
+void SoundPlayer::onSeekSliderValueChanged(int value) {
 	if(!ui->seekSlider->isSliderDown()) return;
 	qint64 newPos = 0;
 	float floatPos = (float)value;
