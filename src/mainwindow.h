@@ -58,43 +58,55 @@ class MainWindow : public QMainWindow {
 		void checkCloseProjectOption();
 		void onProjectLoaded(QSIProject* project);
 		void onEngineDropdownChanged(int index);
-		void on_actionAbout_triggered();
-		void on_actionAbout_Qt_triggered();
-		void on_actionExit_triggered();
-		void on_actionConfigure_QtSphere_IDE_triggered();
-		void on_toolbarSaveButton_triggered();
-		void on_toolbarOpenButton_triggered();
-		void on_openFileTabs_tabCloseRequested(int index);
-		void on_actionUndo_triggered();
-		void on_actionRedo_triggered();
-		void on_toolbarProjectProperties_triggered();
-		void on_newProject_triggered();
-		void on_actionProject_Properties_triggered();
-		void on_newPlainTextFile_triggered();
-		void on_actionOpenProject_triggered();
-		void on_actionRefresh_triggered();
-		void on_newTaskButton_clicked();
-		void on_actionOpenFile_triggered();
-		void on_actionQSIGithub_triggered();
-		void on_actionMSGithub_triggered();
-		void on_treeView_doubleClicked(const QModelIndex &index);
-		void on_actionImage_to_Spriteset_triggered();
-		void on_actionSave_triggered();
-		void on_actionStart_Page_triggered();
-		void on_taskListTable_customContextMenuRequested(const QPoint &pos);
-		void on_delTaskButton_clicked();
-		void on_actionSpherical_community_triggered();
-		void on_actionClearRecent_triggered();
-		void on_actionClose_Project_triggered();
-		void on_actionClose_triggered();
-		void on_toolbarPlayGame_triggered();
-		void on_actionLegacyConfig_triggered();
-		void on_newMap_triggered();
-		void on_actionSystem_font_to_Sphere_font_triggered();
-		void on_actionProject_Explorer_triggered();
-		void on_actionProject_Task_List_triggered();
-		void on_actionSound_Test_triggered();
-		void on_actionTiled_map_to_Sphere_map_triggered();
+
+		// File menu actions
+		void onNewProjectActionTriggered();
+		void onNewPlainTextFileActionTriggered();
+		void onNewMapActionTriggered();
+		// TODO: New spriteset, font, and windowstyle actions
+		void onOpenProjectActionTriggered();
+		void onOpenFileTriggered();
+		void onClearRecentActionTriggered();
+		void onImportTiledMapTriggered();
+		void onImportImageToSpritesetTriggered();
+		void onImportSystemFontToSphereFontTriggered();
+		void onSaveTriggered();
+		void onExitActionTriggered();
+
+		// Edit menu actions
+		void onUndoActionTriggered();
+		void onRedoActionTriggered();
+		// TODO: Cut, copy, paste, select all
+
+		// View menu
+		void onStartPageActionTriggered();
+		void onProjectExplorerActionTriggered();
+		void onProjectTaskListActionTriggered();
+		void onSoundTestActionTriggered();
+
+		// Project menu
+		void onRefreshActionTriggered();
+		void onCloseProjectTriggered();
+		void onProjectPropertiesTriggered();
+
+		// Tools menu
+		void onConfigureQtSphereIDETriggered();
+
+		// Help menu
+		void onQtSphereIDEGithubActionTriggered();
+		void onNSGithubActionTriggered();
+		void onSphericalCommunityActionTriggered();
+		void onAboutQtActionTriggered();
+		void onAboutActionTriggered();
+
+		void onTabCloseRequested(int index);
+		void onNewTaskButtonClicked();
+		void onDeleteTaskButtonClicked();
+		void onTaskListTableContextMenuRequested(const QPoint &pos);
+		void onTreeViewDoubleClicked(const QModelIndex &index);
+		void onPlayGameTriggered();
+		void onLegacyConfigActionTriggered();
+
 
 	private:
 		void setupEditors();

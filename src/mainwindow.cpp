@@ -46,8 +46,8 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	 */
 	QAction *nextTabAction = new QAction(this);
 	nextTabAction->setShortcut(Qt::CTRL|Qt::Key_PageDown);
-	connect(nextTabAction, SIGNAL(triggered()), this, SLOT(nextTab()));
-	connect(ui->menuFile, SIGNAL(aboutToShow()), this, SLOT(checkCloseProjectOption()));
+	connect(nextTabAction, &QAction::triggered, this, &MainWindow::nextTab);
+	connect(ui->menuFile, &QMenu::aboutToShow, this, &MainWindow::checkCloseProjectOption);
 	addAction(nextTabAction);
 
 	/*
@@ -78,7 +78,7 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	m_soundPlayer = new SoundPlayer();
 	ui->soundPlayerTab->layout()->addWidget(m_soundPlayer);
 	m_startPage = new StartPage(ui->openFileTabs);
-	connect(m_startPage, SIGNAL(projectLoaded(QSIProject*)), this, SLOT(onProjectLoaded(QSIProject*)));
+	connect(m_startPage, &StartPage::projectLoaded, this, &MainWindow::onProjectLoaded);
 	ui->openFileTabs->addTab(m_startPage, "Start Page");
 
 	m_engineSelector = new QComboBox(ui->mainToolBar);
@@ -87,7 +87,59 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 	m_engineSelectorAction = new QWidgetAction(ui->mainToolBar);
 	m_engineSelectorAction->setDefaultWidget(m_engineSelector);
 	ui->mainToolBar->addAction(m_engineSelectorAction);
-	connect(m_engineSelector, SIGNAL(activated(int)), this, SLOT(onEngineDropdownChanged(int)));
+	connect(m_engineSelector, &QComboBox::activated, this, &MainWindow::onEngineDropdownChanged);
+
+	connect(ui->openFileTabs, &MainTabWidget::tabCloseRequested, this, &MainWindow::onTabCloseRequested);
+
+	// Connect menu actions
+	// File menu
+	connect(ui->newProject, &QAction::triggered, this, &MainWindow::onNewProjectActionTriggered);
+	connect(ui->newPlainTextFile, &QAction::triggered, this, &MainWindow::onNewPlainTextFileActionTriggered);
+	connect(ui->newMap, &QAction::triggered, this, &MainWindow::onNewMapActionTriggered);
+	connect(ui->actionExit, &QAction::triggered, this, &MainWindow::onExitActionTriggered);
+	connect(ui->actionOpenFile, &QAction::triggered, this, &MainWindow::onOpenFileTriggered);
+	connect(ui->actionOpenProject, &QAction::triggered, this, &MainWindow::onOpenProjectActionTriggered);
+	connect(ui->actionClose_Project, &QAction::triggered, this, &MainWindow::onCloseProjectTriggered);
+	connect(ui->actionClearRecent, &QAction::triggered, this, &MainWindow::onClearRecentActionTriggered);
+	connect(ui->actionTiled_map_to_Sphere_map, &QAction::triggered, this, &MainWindow::onImportTiledMapTriggered);
+	connect(ui->actionImage_to_Spriteset, &QAction::triggered, this, &MainWindow::onImportImageToSpritesetTriggered);
+	connect(ui->actionSystem_font_to_Sphere_font, &QAction::triggered, this, &MainWindow::onImportSystemFontToSphereFontTriggered);
+	connect(ui->actionSave, &QAction::triggered, this, &MainWindow::onSaveTriggered);
+	// Edit menu
+	// (TODO)
+
+	// View menu
+	connect(ui->actionStart_Page, &QAction::triggered, this, &MainWindow::onStartPageActionTriggered);
+	connect(ui->actionProject_Explorer, &QAction::triggered, this, &MainWindow::onProjectExplorerActionTriggered);
+	connect(ui->actionProject_Task_List, &QAction::triggered, this, &MainWindow::onProjectTaskListActionTriggered);
+	connect(ui->actionSound_Test, &QAction::triggered, this, &MainWindow::onSoundTestActionTriggered);
+
+	// Project menu
+	connect(ui->actionRefresh, &QAction::triggered, this, &MainWindow::onRefreshActionTriggered);
+	connect(ui->actionClose, &QAction::triggered, this, &MainWindow::onCloseProjectTriggered);
+	connect(ui->actionProject_Properties, &QAction::triggered, this, &MainWindow::onProjectPropertiesTriggered);
+
+	// Tools menu
+	connect(ui->actionConfigure_QtSphere_IDE, &QAction::triggered, this, &MainWindow::onConfigureQtSphereIDETriggered);
+
+	// Help menu
+	connect(ui->actionQSIGithub, &QAction::triggered, this, &MainWindow::onQtSphereIDEGithubActionTriggered);
+	connect(ui->actionNSGithub, &QAction::triggered, this, &MainWindow::onNSGithubActionTriggered);
+	connect(ui->actionSpherical_community, &QAction::triggered, this, &MainWindow::onSphericalCommunityActionTriggered);
+	connect(ui->actionAbout_Qt, &QAction::triggered, this, &MainWindow::onAboutQtActionTriggered);
+	connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::onAboutActionTriggered);
+
+	// Connect toolbar actions
+	connect(ui->toolbarOpenButton, &QAction::triggered, this, &MainWindow::onOpenFileTriggered);
+	connect(ui->toolbarSaveButton, &QAction::triggered, this, &MainWindow::onSaveTriggered);
+	connect(ui->toolbarPlayGame, &QAction::triggered, this, &MainWindow::onPlayGameTriggered);
+
+	// Misc slot connections
+	connect(ui->newTaskButton, &QToolButton::clicked, this, &MainWindow::onNewTaskButtonClicked);
+	connect(ui->delTaskButton, &QToolButton::clicked, this, &MainWindow::onDeleteTaskButtonClicked);
+	connect(ui->taskListTable, &QTableWidget::customContextMenuRequested, this, &MainWindow::onTaskListTableContextMenuRequested);
+	connect(ui->treeView, &QTreeView::doubleClicked, this, &MainWindow::onTreeViewDoubleClicked);
+	connect(ui->actionLegacyConfig, &QAction::triggered, this, &MainWindow::onLegacyConfigActionTriggered);
 
 	m_taskList = new QSITaskList(ui->taskListTable);
 	QSettings settings;
@@ -97,11 +149,59 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 }
 
 MainWindow::~MainWindow() {
+	// Disconnect menu actions
+	// File menu
+	disconnect(ui->newProject, &QAction::triggered, this, &MainWindow::onNewProjectActionTriggered);
+	disconnect(ui->newPlainTextFile, &QAction::triggered, this, &MainWindow::onNewPlainTextFileActionTriggered);
+	disconnect(this, SLOT(onOpenFileTriggered()));
+	disconnect(ui->actionOpenProject, &QAction::triggered, this, &MainWindow::onOpenProjectActionTriggered);
+	disconnect(this, SLOT(onCloseProjectTriggered()));
+	disconnect(ui->actionClearRecent, &QAction::triggered, this, &MainWindow::onClearRecentActionTriggered);
+	disconnect(ui->actionTiled_map_to_Sphere_map, &QAction::triggered, this, &MainWindow::onImportTiledMapTriggered);
+	disconnect(ui->actionImage_to_Spriteset, &QAction::triggered, this, &MainWindow::onImportImageToSpritesetTriggered);
+	disconnect(ui->actionSystem_font_to_Sphere_font, &QAction::triggered, this, &MainWindow::onImportSystemFontToSphereFontTriggered);
+	disconnect(this, SLOT(onSaveTriggered()));
+	disconnect(ui->actionExit, &QAction::triggered, this, &MainWindow::onExitActionTriggered);
+
+	// Edit menu
+	// TODO
+
+	// View menu
+	disconnect(ui->actionStart_Page, &QAction::triggered, this, &MainWindow::onStartPageActionTriggered);
+	disconnect(ui->actionProject_Explorer, &QAction::triggered, this, &MainWindow::onProjectExplorerActionTriggered);
+	disconnect(ui->actionProject_Task_List, &QAction::triggered, this, &MainWindow::onProjectTaskListActionTriggered);
+	disconnect(ui->actionSound_Test, &QAction::triggered, this, &MainWindow::onSoundTestActionTriggered);
+
+	// Project menu
+	disconnect(ui->actionRefresh, &QAction::triggered, this, &MainWindow::onRefreshActionTriggered);
+	disconnect(ui->actionProject_Properties, &QAction::triggered, this, &MainWindow::onProjectPropertiesTriggered);
+
+	// Tools menu
+	disconnect(ui->actionConfigure_QtSphere_IDE, &QAction::triggered, this, &MainWindow::onConfigureQtSphereIDETriggered);
+
+	// Help menu
+	disconnect(ui->actionQSIGithub, &QAction::triggered, this, &MainWindow::onQtSphereIDEGithubActionTriggered);
+	disconnect(ui->actionNSGithub, &QAction::triggered, this, &MainWindow::onNSGithubActionTriggered);
+	disconnect(ui->actionSpherical_community, &QAction::triggered, this, &MainWindow::onSphericalCommunityActionTriggered);
+	disconnect(ui->actionAbout_Qt, &QAction::triggered, this, &MainWindow::onAboutQtActionTriggered);
+	disconnect(ui->actionAbout, &QAction::triggered, this, &MainWindow::onAboutActionTriggered);
+
+	// Toolbar slots
+	disconnect(ui->toolbarPlayGame, &QAction::triggered, this, &MainWindow::onPlayGameTriggered);
+
+	// Misc slot disconnections
 	disconnect(this, SLOT(nextTab()));
 	disconnect(this, SLOT(prevTab()));
-	disconnect(ui->menuFile, SIGNAL(aboutToShow()), this, SLOT(checkCloseProjectOption()));
-	disconnect(m_startPage, SIGNAL(projectLoaded(QSIProject*)), this, SLOT(onProjectLoaded(QSIProject*)));
-	disconnect(m_engineSelector, SIGNAL(activated(int)), this, SLOT(onEngineDropdownChanged(int)));
+	disconnect(ui->menuFile, &QMenu::aboutToShow, this, &MainWindow::checkCloseProjectOption);
+	disconnect(m_startPage, &StartPage::projectLoaded, this, &MainWindow::onProjectLoaded);
+	disconnect(m_engineSelector, &QComboBox::activated, this, &MainWindow::onEngineDropdownChanged);
+	disconnect(ui->newTaskButton, &QToolButton::clicked, this, &MainWindow::onNewTaskButtonClicked);
+	disconnect(ui->delTaskButton, &QToolButton::clicked, this, &MainWindow::onDeleteTaskButtonClicked);
+	disconnect(ui->taskListTable, &QTableWidget::customContextMenuRequested, this, &MainWindow::onTaskListTableContextMenuRequested);
+	disconnect(ui->treeView, &QTreeView::doubleClicked, this, &MainWindow::onTreeViewDoubleClicked);
+	disconnect(ui->actionLegacyConfig, &QAction::triggered, this, &MainWindow::onLegacyConfigActionTriggered);
+
+
 	delete ui;
 	delete m_engineSelector;
 	delete m_engineSelectorAction;
@@ -182,11 +282,11 @@ void MainWindow::setEngine(QString which) {
 	}
 }
 
-void MainWindow::on_actionAbout_Qt_triggered() {
+void MainWindow::onAboutQtActionTriggered() {
 	QMessageBox::aboutQt(this);
 }
 
-void MainWindow::on_actionAbout_triggered() {
+void MainWindow::onAboutActionTriggered() {
 	QMessageBox::about(this, "About QtSphere IDE",
 		"QtSphere IDE v" VERSION "<br />"
 		"Copyright 2019 by <a href=\"https://github.com/eggbertx\">Eggbertx</a><br /><br />"
@@ -396,31 +496,23 @@ void MainWindow::refreshRecentFiles() {
 	settings.endArray();
 }
 
-void MainWindow::on_actionExit_triggered() {
+void MainWindow::onExitActionTriggered() {
 	handleModifiedFiles();
 	close(); // just temporary until I have a way to test if the currently open file has been modified
 	//if(handleModifiedFiles() > 0) close();
 }
 
-void MainWindow::on_actionConfigure_QtSphere_IDE_triggered() {
+void MainWindow::onConfigureQtSphereIDETriggered() {
 	SettingsWindow settingsWindow(this);
 	settingsWindow.setModal(true);
 	settingsWindow.exec();
 }
 
-void MainWindow::on_toolbarSaveButton_triggered() {
-	saveCurrentTab();
-}
-
-void MainWindow::on_toolbarOpenButton_triggered() {
+void MainWindow::onOpenFileTriggered() {
 	openFile();
 }
 
-void MainWindow::on_actionOpenFile_triggered() {
-	openFile();
-}
-
-void MainWindow::on_openFileTabs_tabCloseRequested(int index) {
+void MainWindow::onTabCloseRequested(int index) {
 	SphereEditor* editor = dynamic_cast<SphereEditor*>(ui->openFileTabs->widget(index));
 	if(editor && editor->editorType() != SphereEditor::None) {
 		editor->closeFile();
@@ -432,7 +524,7 @@ void MainWindow::on_openFileTabs_tabCloseRequested(int index) {
 	}
 }
 
-void MainWindow::on_actionUndo_triggered() {
+void MainWindow::onUndoActionTriggered() {
 	SphereEditor* currentEditor = getCurrentEditor();
 	if(currentEditor == nullptr) return;
 	currentEditor->undo();
@@ -449,7 +541,7 @@ void MainWindow::on_actionUndo_triggered() {
 //	//ui->openFileTabs->currentWidget()->findChildren<QTextEdit *>().at(0)->undo();
 }
 
-void MainWindow::on_actionRedo_triggered() {
+void MainWindow::onRedoActionTriggered() {
 	SphereEditor* currentEditor = getCurrentEditor();
 	if(currentEditor != nullptr) {
 		qDebug() << "currentEditor type: " << currentEditor->editorType();
@@ -457,12 +549,7 @@ void MainWindow::on_actionRedo_triggered() {
 	}
 }
 
-void MainWindow::on_toolbarProjectProperties_triggered() {
-	if(openProjectProperties(false, m_project) == QDialog::Accepted)
-		m_project->save();
-}
-
-void MainWindow::on_newProject_triggered() {
+void MainWindow::onNewProjectActionTriggered() {
 	ProjectPropertiesDialog propertiesDialog(true);
 	if(propertiesDialog.exec() == QDialog::Accepted) {
 		QDir newDir = QDir(propertiesDialog.getProject()->getPath(false));
@@ -476,7 +563,7 @@ void MainWindow::on_newProject_triggered() {
 	}
 }
 
-void MainWindow::on_actionProject_Properties_triggered() {
+void MainWindow::onProjectPropertiesTriggered() {
 	if(openProjectProperties(false, m_project, this) == QDialog::Accepted)
 		m_project->save();
 }
@@ -496,7 +583,7 @@ void MainWindow::prevTab() {
 }
 
 
-void MainWindow::on_newPlainTextFile_triggered() {
+void MainWindow::onNewPlainTextFileActionTriggered() {
 	TextEditor* newTextEdit = new TextEditor(this);
 	newTextEdit->SphereEditor::setObjectName("textEdit" + QString::number(ui->openFileTabs->count()));
 	newTextEdit->setTabIndex(ui->openFileTabs->insertTab(0, static_cast<QTextEdit*>(newTextEdit), "<Untitled>"));
@@ -504,7 +591,7 @@ void MainWindow::on_newPlainTextFile_triggered() {
 	ui->openFileTabs->setCurrentIndex(0);
 }
 
-void MainWindow::on_newTaskButton_clicked() {
+void MainWindow::onNewTaskButtonClicked() {
 	int rowCount = ui->taskListTable->rowCount();
 	ui->taskListTable->insertRow(rowCount);
 	QTableWidgetItem* h = new QTableWidgetItem("");
@@ -513,7 +600,7 @@ void MainWindow::on_newTaskButton_clicked() {
 	ui->delTaskButton->setEnabled(true);
 }
 
-void MainWindow::on_delTaskButton_clicked() {
+void MainWindow::onDeleteTaskButtonClicked() {
 	int rowCount = ui->taskListTable->rowCount();
 	QList<QTableWidgetItem*> selected = ui->taskListTable->selectedItems();
 	if(selected.length() == 0) ui->taskListTable->removeRow(rowCount - 1);
@@ -526,23 +613,23 @@ void MainWindow::on_delTaskButton_clicked() {
 }
 
 
-void MainWindow::on_actionOpenProject_triggered() {
+void MainWindow::onOpenProjectActionTriggered() {
 	openProject(QFileDialog::getExistingDirectory(this,"Choose project path"));
 }
 
-void MainWindow::on_actionRefresh_triggered() {
+void MainWindow::onRefreshActionTriggered() {
 	openProject(m_project->getPath(false));
 }
 
-void MainWindow::on_actionQSIGithub_triggered() {
+void MainWindow::onQtSphereIDEGithubActionTriggered() {
 	QDesktopServices::openUrl(QUrl("https://github.com/Eggbertx/QtSphere-IDE"));
 }
 
-void MainWindow::on_actionMSGithub_triggered() {
+void MainWindow::onNSGithubActionTriggered() {
 	QDesktopServices::openUrl(QUrl("https://github.com/fatcerberus/neosphere"));
 }
 
-void MainWindow::on_treeView_doubleClicked(const QModelIndex &index) {
+void MainWindow::onTreeViewDoubleClicked(const QModelIndex &index) {
 	if(!m_projectLoaded) return;
 	QFileSystemModel* model = dynamic_cast<QFileSystemModel*>(ui->treeView->model()); // new QFileSystemModel();
 	model->setRootPath(m_project->getPath(false));
@@ -573,7 +660,7 @@ void MainWindow::onEngineDropdownChanged(int index) {
 	}
 }
 
-void MainWindow::on_actionImage_to_Spriteset_triggered() {
+void MainWindow::onImportImageToSpritesetTriggered() {
 	QString imagePath = QFileDialog::getOpenFileName(this,
 		"Import image", "",
 		"Image files (*.bmp *.gif *.jpg *.jpeg *.png *.pbm *.pgm *.ppm *.xbm *.xpm);;"
@@ -598,19 +685,24 @@ void MainWindow::on_actionImage_to_Spriteset_triggered() {
 	}
 }
 
-void MainWindow::on_actionSave_triggered() {
+void MainWindow::onSaveTriggered() {
 	saveCurrentTab();
 }
 
-void MainWindow::on_actionStart_Page_triggered() {
+
+void MainWindow::onStartPageActionTriggered() {
 	int numTabs = ui->openFileTabs->count();
 	for(int t = 0; t < numTabs; t++) {
-		if(QString(ui->openFileTabs->widget(t)->metaObject()->className()) == "StartPage") return;
+		if(QString(ui->openFileTabs->widget(t)->metaObject()->className()) == "StartPage") {
+			ui->openFileTabs->setCurrentIndex(t);
+			return;
+		}
 	}
-	ui->openFileTabs->addTab(m_startPage, "Start Page");
+	int index = ui->openFileTabs->addTab(m_startPage, "Start Page");
+	ui->openFileTabs->setCurrentIndex(index);
 }
 
-void MainWindow::on_taskListTable_customContextMenuRequested(const QPoint &pos) {
+void MainWindow::onTaskListTableContextMenuRequested(const QPoint &pos) {
 	QMenu* contextMenu = new QMenu();
 	contextMenu->addAction("Open task list...");
 	contextMenu->addAction("Import task list...");
@@ -631,26 +723,23 @@ void MainWindow::on_taskListTable_customContextMenuRequested(const QPoint &pos) 
 	}
 }
 
-void MainWindow::on_actionSpherical_community_triggered() {
+void MainWindow::onSphericalCommunityActionTriggered() {
 	QDesktopServices::openUrl(QUrl("http://www.spheredev.org/"));
 }
 
-void MainWindow::on_actionClearRecent_triggered() {
+void MainWindow::onClearRecentActionTriggered() {
 	QSettings settings;
 	settings.remove("recentProjects");
 	settings.remove("recentFiles");
 	refreshRecentFiles();
 }
 
-void MainWindow::on_actionClose_Project_triggered() {
+void MainWindow::onCloseProjectTriggered() {
 	closeProject();
 }
 
-void MainWindow::on_actionClose_triggered() {
-	closeProject();
-}
 
-void MainWindow::on_toolbarPlayGame_triggered() {
+void MainWindow::onPlayGameTriggered() {
 	playGame(m_project->getBuildDir());
 }
 
@@ -710,33 +799,33 @@ void MainWindow::configureSphere() {
 #endif
 }
 
-void MainWindow::on_actionLegacyConfig_triggered() {
+void MainWindow::onLegacyConfigActionTriggered() {
 	configureSphere();
 }
 
-void MainWindow::on_newMap_triggered() {
+void MainWindow::onNewMapActionTriggered() {
 	NewMapDialog* dialog = new NewMapDialog(m_project, this);
 	dialog->open();
 }
 
-void MainWindow::on_actionSystem_font_to_Sphere_font_triggered() {
+void MainWindow::onImportSystemFontToSphereFontTriggered() {
 	SphereFont* rfn = SphereFont::fromSystemFont(this);
 	if(!rfn) return; // either the QFontDialog or the QColorDialog was cancelled.
 }
 
-void MainWindow::on_actionProject_Explorer_triggered() {
+void MainWindow::onProjectExplorerActionTriggered() {
 	ui->sideBar->setCurrentIndex(0);
 }
 
-void MainWindow::on_actionProject_Task_List_triggered() {
+void MainWindow::onProjectTaskListActionTriggered() {
 	ui->sideBar->setCurrentIndex(1);
 }
 
-void MainWindow::on_actionSound_Test_triggered() {
+void MainWindow::onSoundTestActionTriggered() {
 	ui->sideBar->setCurrentIndex(2);
 }
 
-void MainWindow::on_actionTiled_map_to_Sphere_map_triggered() {
+void MainWindow::onImportTiledMapTriggered() {
 	MapFile map(this);
 	bool success = map.openTiledMap();
 }
