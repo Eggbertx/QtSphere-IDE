@@ -91,6 +91,11 @@ MainWindow::MainWindow(QWidget *parent): QMainWindow(parent), ui(new Ui::MainWin
 
 	connect(ui->openFileTabs, &MainTabWidget::tabCloseRequested, this, &MainWindow::onTabCloseRequested);
 
+	m_fsModel = new QFileSystemModel();
+	m_emptyProjectModel = new QStandardItemModel(0,0,ui->treeView);
+	m_emptyProjectModel->appendRow(new QStandardItem("<No open project>"));
+
+
 	// Connect menu actions
 	// File menu
 	connect(ui->newProject, &QAction::triggered, this, &MainWindow::onNewProjectActionTriggered);
@@ -209,6 +214,8 @@ MainWindow::~MainWindow() {
 	delete m_project;
 	delete m_soundPlayer;
 	delete m_startPage;
+	delete m_emptyProjectModel;
+	delete m_fsModel;
 	QSettings settings;
 	settings.setValue("geometry", geometry());
 	settings.setValue("maximized", isMaximized());
@@ -333,18 +340,17 @@ void MainWindow::saveCurrentTab() {
 
 void MainWindow::updateTreeView() {
 	if(!m_projectLoaded || m_project->getPath(false) == "") {
-		QStandardItemModel* blankTreeModel = new QStandardItemModel(0,0,ui->treeView);
-		QStandardItem* child = new QStandardItem("<No open project>");
-		blankTreeModel->appendRow(child);
-		ui->treeView->setModel(blankTreeModel);
+		ui->treeView->setModel(m_emptyProjectModel);
 		return;
 	}
-	QFileSystemModel *model = new QFileSystemModel();
-	model->setRootPath(m_project->getPath(false));
-	ui->treeView->setModel(model);
-	for (int i = 1; i < model->columnCount(); ++i)
+	m_fsModel->setRootPath(m_project->getPath(false));
+
+	for (int i = 1; i < m_fsModel->columnCount(); ++i)
 		ui->treeView->hideColumn(i);
-	ui->treeView->setRootIndex(model->index(m_project->getPath(false)));
+	ui->treeView->setModel(m_fsModel);
+	ui->treeView->setRootIndex(m_fsModel->index(m_project->getPath(false)));
+	qDebug() << "Loading project:"  << m_project->getPath(false);
+	m_fsModel->setRootPath(m_project->getPath(false));
 	setWindowTitle("QtSphereIDE " + QString(VERSION) + " - " + QDir(m_project->getPath(false)).dirName());
 }
 
@@ -420,6 +426,7 @@ void MainWindow::openFile(QString filename) {
 }
 
 void MainWindow::openProject(QString filename) {
+	qDebug() << "MainWindow::openProject:" << filename;
 	m_projectLoaded = m_project->open(filename);
 	if(m_projectLoaded) {
 		ui->menuProject->setEnabled(true);
@@ -439,6 +446,7 @@ void MainWindow::setCurrentProject(QSIProject* project) {
 	ui->menuProject->setEnabled(m_projectLoaded);
 	ui->toolbarPlayGame->setEnabled(m_projectLoaded);
 	ui->toolbarProjectProperties->setEnabled(m_projectLoaded);
+	qDebug() << "MainWindow::setCurrentProject.getPath(false): " << project->getPath(false);
 	if(m_projectLoaded)
 		m_project = project;
 
@@ -631,10 +639,9 @@ void MainWindow::onNSGithubActionTriggered() {
 
 void MainWindow::onTreeViewDoubleClicked(const QModelIndex &index) {
 	if(!m_projectLoaded) return;
-	QFileSystemModel* model = dynamic_cast<QFileSystemModel*>(ui->treeView->model()); // new QFileSystemModel();
-	model->setRootPath(m_project->getPath(false));
-	if(model->fileInfo(index).isFile())
-		openFile(model->filePath(index));
+	m_fsModel->setRootPath(m_project->getPath(false));
+	if(m_fsModel->fileInfo(index).isFile())
+		openFile(m_fsModel->filePath(index));
 }
 
 void MainWindow::checkCloseProjectOption() {

@@ -3,6 +3,7 @@
 
 #include <QComboBox>
 #include <QFileSystemModel>
+#include <QStandardItemModel>
 #include <QLabel>
 #include <QMainWindow>
 #include <QProcess>
@@ -127,6 +128,8 @@ class MainWindow : public QMainWindow {
 		QString m_theme;
 		QSITaskList* m_taskList;
 		NewMapDialog* m_newMapDialog;
+		QFileSystemModel* m_fsModel;
+		QStandardItemModel* m_emptyProjectModel;
 };
 
 #endif // MAINWINDOW_H
