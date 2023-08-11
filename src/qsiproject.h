@@ -8,7 +8,6 @@
 
 class QSIProject : public QObject {
 	Q_OBJECT
-	Q_ENUMS(ProjectFileFormat)
 
 	public:
 		enum ProjectFileFormat {
@@ -19,6 +18,7 @@ class QSIProject : public QObject {
 			Cellscript_cjs,
 			SGM
 		};
+		Q_ENUM(ProjectFileFormat)
 		explicit QSIProject(QObject *parent = nullptr);
 		~QSIProject();
 
