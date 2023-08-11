@@ -27,7 +27,7 @@ public:
 
 private slots:
 	void showContextMenu(const QPoint &pos);
-	void on_animDirChoose_currentIndexChanged(int index);
+	void onAnimDirChooseCurrentIndexChanged(int index);
 
 private:
 	Ui::SpritesetEditor *ui;

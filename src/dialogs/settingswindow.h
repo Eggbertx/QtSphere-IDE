@@ -21,14 +21,15 @@ class SettingsWindow : public QDialog {
 		void onOk();
 		void onApply();
 		void onCancel();
-		void on_neosphereDir_btn_clicked();
-		void on_legacySphereDir_btn_clicked();
-		void on_themeCombo_currentIndexChanged(const QString &newtext);
-		void on_addDirButton_clicked();
-		void on_removeDirButton_clicked();
 		void mapCursorColChanged(QColor color);
 		void gridColorChanged(QColor color);
-		void on_browseDirButton_clicked();
+
+		void onNeosphereDirButtonClicked();
+		void onLegacySphereDirButtonClicked();
+		void onThemeComboCurrentTextChanged(const QString &newtext);
+		void onAddDirButtonClicked(); //
+		void onRemoveDirButtonClicked();
+		void onBrowseDirButtonClicked();
 
 	private:
 		void saveSettings();

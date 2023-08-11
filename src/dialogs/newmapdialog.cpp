@@ -8,9 +8,11 @@
 NewMapDialog::NewMapDialog(QSIProject* project, QWidget *parent): QDialog(parent), ui(new Ui::NewMapDialog) {
 	ui->setupUi(this);
 	m_project = project;
+	connect(ui->browse_btn, &QToolButton::clicked, this, &NewMapDialog::onBrowseButtonClicked);
 }
 
 NewMapDialog::~NewMapDialog() {
+	disconnect(ui->browse_btn, &QToolButton::clicked, this, &NewMapDialog::onBrowseButtonClicked);
 	delete ui;
 }
 
@@ -26,7 +28,7 @@ void NewMapDialog::setTilesetPath(QString path) {
 	ui->browse_txt->setText(path);
 }
 
-void NewMapDialog::on_browse_btn_clicked() {
+void NewMapDialog::onBrowseButtonClicked() {
 	QString fn;
 	QString usePath = "";
 	if(m_project && m_project->getPath(false) != "") {

@@ -32,9 +32,15 @@ ProjectPropertiesDialog::ProjectPropertiesDialog(bool newFile, QSIProject* proje
 		if(project->getCompiler() == "Cell") ui->compilerCB->setCurrentIndex(0);
 		else ui->compilerCB->setCurrentIndex(1);
 	}
+	connect(ui->resolutionCBox, &QComboBox::currentTextChanged, this, &ProjectPropertiesDialog::onResolutionCBoxCurrentTextChanged);
+	connect(ui->pathButton, &QToolButton::clicked, this, &ProjectPropertiesDialog::onPathButtonClicked);
+	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &ProjectPropertiesDialog::onButtonBoxAccepted);
 }
 
 ProjectPropertiesDialog::~ProjectPropertiesDialog() {
+	disconnect(ui->resolutionCBox, &QComboBox::currentTextChanged, this, &ProjectPropertiesDialog::onResolutionCBoxCurrentTextChanged);
+	disconnect(ui->pathButton, &QToolButton::clicked, this, &ProjectPropertiesDialog::onPathButtonClicked);
+	disconnect(ui->buttonBox, &QDialogButtonBox::accepted, this, &ProjectPropertiesDialog::onButtonBoxAccepted);
 	delete ui;
 }
 
@@ -42,18 +48,18 @@ QSIProject* ProjectPropertiesDialog::getProject() {
 	return m_project;
 }
 
-void ProjectPropertiesDialog::on_resolutionCBox_currentTextChanged(const QString &newText) {
+void ProjectPropertiesDialog::onResolutionCBoxCurrentTextChanged(const QString &newText) {
 	QStringList resArr = newText.split('x');
 	if(resArr.size() != 2) return;
 	ui->reswLineEdit->setText(resArr.at(0));
 	ui->reshLineEdit->setText(resArr.at(1));
 }
 
-void ProjectPropertiesDialog::on_pathButton_clicked() {
+void ProjectPropertiesDialog::onPathButtonClicked() {
 	ui->pathLineEdit->setText(QFileDialog::getExistingDirectory(parentWidget(),"Choose project path"));
 }
 
-void ProjectPropertiesDialog::on_buttonBox_accepted() {
+void ProjectPropertiesDialog::onButtonBoxAccepted() {
 	m_project->setPath(ui->pathLineEdit->text(), false);
 	m_project->setName(ui->nameLineEdit->text());
 	m_project->setAuthor(ui->authorLineEdit->text());

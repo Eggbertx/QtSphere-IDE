@@ -11,9 +11,17 @@ ImportOptionsDialog::ImportOptionsDialog(QWidget *parent): QDialog(parent), ui(n
 	ui->setupUi(this);
 	setButtonBackground(ui->colorInButton, Qt::magenta);
 	setButtonBackground(ui->colorOutButton, QColor(255,0,255,0));
+	connect(ui->colorOutButton, &QPushButton::clicked, this, &ImportOptionsDialog::onColorOutButtonClicked);
+	connect(ui->colorInButton, &QPushButton::clicked, this, &ImportOptionsDialog::onColorInButtonClicked);
+	connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &ImportOptionsDialog::onButtonBoxAccepted);
+	connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &ImportOptionsDialog::onButtonBoxRejected);
 }
 
 ImportOptionsDialog::~ImportOptionsDialog() {
+	disconnect(ui->colorOutButton, &QPushButton::clicked, this, &ImportOptionsDialog::onColorOutButtonClicked);
+	disconnect(ui->colorInButton, &QPushButton::clicked, this, &ImportOptionsDialog::onColorInButtonClicked);
+	disconnect(ui->buttonBox, &QDialogButtonBox::accepted, this, &ImportOptionsDialog::onButtonBoxAccepted);
+	disconnect(ui->buttonBox, &QDialogButtonBox::rejected, this, &ImportOptionsDialog::onButtonBoxRejected);
 	delete ui;
 }
 
@@ -34,11 +42,11 @@ bool ImportOptionsDialog::removeDuplicatesChecked() {
 }
 
 
-void ImportOptionsDialog::on_colorOutButton_clicked() {
+void ImportOptionsDialog::onColorOutButtonClicked() {
 	setButtonBackground(ui->colorOutButton, "Color in");
 }
 
-void ImportOptionsDialog::on_colorInButton_clicked() {
+void ImportOptionsDialog::onColorInButtonClicked() {
 	setButtonBackground(ui->colorInButton, "Color in");
 }
 
@@ -59,7 +67,7 @@ void ImportOptionsDialog::setButtonBackground(QPushButton* button, QColor backgr
 	button->update();
 }
 
-void ImportOptionsDialog::on_buttonBox_accepted() {
+void ImportOptionsDialog::onButtonBoxAccepted() {
 	m_frameSize = QSize(ui->spriteWidth->value(), ui->spriteHeight->value());
 	m_transparencyIn = QColor(ui->colorInButton->palette().color(QPalette::Button));
 	m_transparencyOut = QColor(ui->colorOutButton->palette().color(QPalette::Button));
@@ -67,6 +75,6 @@ void ImportOptionsDialog::on_buttonBox_accepted() {
 	accept();
 }
 
-void ImportOptionsDialog::on_buttonBox_rejected() {
+void ImportOptionsDialog::onButtonBoxRejected() {
 	reject();
 }

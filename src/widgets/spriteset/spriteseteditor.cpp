@@ -24,8 +24,7 @@ SpritesetEditor::SpritesetEditor(QWidget *parent): SphereEditor(parent), ui(new 
 	ui->setupUi(this);
 	m_type = SphereEditor::SpritesetEditor;
 	setContextMenuPolicy(Qt::CustomContextMenu);
-	connect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
-			this, SLOT(showContextMenu(const QPoint&)));
+	connect(this, &SpritesetEditor::customContextMenuRequested,this, &SpritesetEditor::showContextMenu);
 	setBackgroundRole(QPalette::Shadow);
 	ui->dirsLayout->setContentsMargins(8,4,4,4);
 	ui->dirsLayout->setSpacing(0);
@@ -48,12 +47,15 @@ SpritesetEditor::SpritesetEditor(QWidget *parent): SphereEditor(parent), ui(new 
 
 	ui->animView->setBackgroundBrush(QBrush(QPixmap(":/icons/transparency-bg.png")));
 	ui->dirsLayout->addStretch(5);
+	connect(ui->animDirChoose, &QComboBox::currentIndexChanged, this, &SpritesetEditor::onAnimDirChooseCurrentIndexChanged);
 }
 
 SpritesetEditor::~SpritesetEditor() {
 	delete ui;
-	disconnect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
-			   this, SLOT(showContextMenu(const QPoint&)));
+	disconnect(ui->animDirChoose, &QComboBox::currentIndexChanged, this, &SpritesetEditor::onAnimDirChooseCurrentIndexChanged);
+	disconnect(this, &SpritesetEditor::customContextMenuRequested, this, &SpritesetEditor::showContextMenu);
+//	disconnect(this, SIGNAL(customContextMenuRequested(const QPoint&)),
+//			   this, SLOT(showContextMenu(const QPoint&)));
 }
 
 bool SpritesetEditor::attach(Spriteset* spriteset) {
@@ -108,6 +110,6 @@ void SpritesetEditor::showContextMenu(const QPoint &pos) {
 	}
 }
 
-void SpritesetEditor::on_animDirChoose_currentIndexChanged(int index) {
+void SpritesetEditor::onAnimDirChooseCurrentIndexChanged(int index) {
 
 }

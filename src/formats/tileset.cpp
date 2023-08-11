@@ -90,7 +90,7 @@ bool Tileset::openTiledTileset(QString filename) {
 	if(!ok) m_header.tile_width = 0;
 	m_header.tile_height = attributes.value("tileheight").toInt(&ok);
 	if(!ok) m_header.tile_height = 0;
-	if(m_header.tile_width == 0 | m_header.tile_height == 0) {
+	if((m_header.tile_width == 0) | (m_header.tile_height == 0)) {
 		errorBox("Error getting Tiled tile size.");
 		goto cleanup;
 	}

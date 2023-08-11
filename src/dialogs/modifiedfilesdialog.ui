@@ -41,35 +41,35 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <widget class="QPushButton" name="cancelButton">
+        <widget class="QPushButton" name="cancelBtn">
          <property name="text">
           <string>Cancel</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="discardAllButton">
+        <widget class="QPushButton" name="discardSelectedBtn">
          <property name="text">
           <string>Discard selected</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="discardAllButton_2">
+        <widget class="QPushButton" name="discardAllBtn">
          <property name="text">
           <string>Discard All</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="saveButton">
+        <widget class="QPushButton" name="saveSelectedBtn">
          <property name="text">
           <string>Save selected</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="saveAllButton">
+        <widget class="QPushButton" name="saveAllBtn">
          <property name="text">
           <string>Save All</string>
          </property>

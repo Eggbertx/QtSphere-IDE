@@ -28,14 +28,14 @@ class MapEditor : public SphereEditor {
 		enum Tools { Pencil, Line, Rectangle, Fill, Select };
 
 	private slots:
-		void on_layersTable_cellClicked(int row, int column);
+		void onLayersTableCellClicked(int row, int column);
 		void setPencilSize(QAction* size);
 		void setCurrentTool(QAction* tool);
 		void setTileIndex(int tile);
-		void on_layersTable_customContextMenuRequested(const QPoint &pos);
+		void onLayersTableCustomContextMenuRequested(const QPoint &pos);
 		void layerPropertiesRequested(bool triggered);
-		void on_layersTable_itemChanged(QTableWidgetItem* item);
-		void on_layersTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
+		void onLayersTableItemChanged(QTableWidgetItem* item);
+		void onLayersTableCurrentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn);
 
 	private:
 		void createUndoActions();

@@ -20,10 +20,10 @@ class ImportOptionsDialog : public QDialog {
 		bool removeDuplicatesChecked();
 
 	private slots:
-		void on_colorOutButton_clicked();
-		void on_colorInButton_clicked();
-		void on_buttonBox_accepted();
-		void on_buttonBox_rejected();
+		void onColorOutButtonClicked();
+		void onColorInButtonClicked();
+		void onButtonBoxAccepted();
+		void onButtonBoxRejected();
 
 	private:
 		void setButtonBackground(QPushButton *button, char* title);

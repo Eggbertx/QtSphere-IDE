@@ -3,9 +3,19 @@
 
 LayerPropertiesDialog::LayerPropertiesDialog(QWidget *parent): QDialog(parent), ui(new Ui::LayerPropertiesDialog) {
 	ui->setupUi(this);
+	connect(ui->parallaxChk, &QCheckBox::stateChanged, this, &LayerPropertiesDialog::onParallaxChkStateChanged);
+	connect(ui->horizontalParallaxSlider, &QSlider::valueChanged, this, &LayerPropertiesDialog::onHorizontalParallaxSliderValueChanged);
+	connect(ui->verticalParallaxSlider, &QSlider::valueChanged, this, &LayerPropertiesDialog::onVerticalParallaxSliderValueChanged);
+	connect(ui->horizontalAsSlider, &QSlider::valueChanged, this, &LayerPropertiesDialog::onHorizontalAsSliderValueChanged);
+	connect(ui->verticalAsSlider, &QSlider::valueChanged, this, &LayerPropertiesDialog::onVerticalAsSliderValueChanged);
 }
 
 LayerPropertiesDialog::~LayerPropertiesDialog() {
+	disconnect(ui->parallaxChk, &QCheckBox::stateChanged, this, &LayerPropertiesDialog::onParallaxChkStateChanged);
+	disconnect(ui->horizontalParallaxSlider, &QSlider::valueChanged, this, &LayerPropertiesDialog::onHorizontalParallaxSliderValueChanged);
+	disconnect(ui->verticalParallaxSlider, &QSlider::valueChanged, this, &LayerPropertiesDialog::onVerticalParallaxSliderValueChanged);
+	disconnect(ui->horizontalAsSlider, &QSlider::valueChanged, this, &LayerPropertiesDialog::onHorizontalAsSliderValueChanged);
+	disconnect(ui->verticalAsSlider, &QSlider::valueChanged, this, &LayerPropertiesDialog::onVerticalAsSliderValueChanged);
 	delete ui;
 }
 
@@ -72,26 +82,26 @@ void LayerPropertiesDialog::setAutoScrolling(int h, int v) {
 	ui->verticalAsSlider->setValue(v);
 }
 
-void LayerPropertiesDialog::on_parallaxChk_stateChanged(int arg1) {
+void LayerPropertiesDialog::onParallaxChkStateChanged(int arg1) {
 	ui->horizontalParallaxSlider->setEnabled(arg1 == Qt::Checked);
 	ui->verticalParallaxSlider->setEnabled(arg1 == Qt::Checked);
 	ui->horizontalAsSlider->setEnabled(arg1 == Qt::Checked);
 	ui->verticalAsSlider->setEnabled(arg1 == Qt::Checked);
 }
 
-void LayerPropertiesDialog::on_horizontalParallaxSlider_valueChanged(int value) {
+void LayerPropertiesDialog::onHorizontalParallaxSliderValueChanged(int value) {
 	updateSliderIndicator(ui->horizontalParallaxSlider, ui->horizontalParallaxIndicator);
 }
 
-void LayerPropertiesDialog::on_verticalParallaxSlider_valueChanged(int value) {
+void LayerPropertiesDialog::onVerticalParallaxSliderValueChanged(int value) {
 	updateSliderIndicator(ui->verticalParallaxSlider, ui->verticalParallaxIndicator);
 }
 
-void LayerPropertiesDialog::on_horizontalAsSlider_valueChanged(int value) {
+void LayerPropertiesDialog::onHorizontalAsSliderValueChanged(int value) {
 	updateSliderIndicator(ui->horizontalAsSlider, ui->horizontalAsIndicator);
 }
 
-void LayerPropertiesDialog::on_verticalAsSlider_valueChanged(int value) {
+void LayerPropertiesDialog::onVerticalAsSliderValueChanged(int value) {
 	updateSliderIndicator(ui->verticalAsSlider, ui->verticalAsIndicator);
 }
 

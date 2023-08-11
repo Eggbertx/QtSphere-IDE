@@ -19,7 +19,7 @@ class NewMapDialog : public QDialog {
 		void setTilesetPath(QString path);
 
 	private slots:
-		void on_browse_btn_clicked();
+		void onBrowseButtonClicked();
 
 private:
 		Ui::NewMapDialog *ui;

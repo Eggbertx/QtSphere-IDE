@@ -46,7 +46,12 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Se
 	connect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(onOk()));
 	connect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(onApply()));
 	connect(ui->buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(onCancel()));
-	ui->browseDirButton->setIcon(style()->standardIcon(QStyle::SP_DirIcon));
+	connect(ui->neosphereDir_btn, &QToolButton::clicked, this, &SettingsWindow::onNeosphereDirButtonClicked);
+	connect(ui->legacySphereDir_btn, &QToolButton::clicked, this, &SettingsWindow::onLegacySphereDirButtonClicked);
+	connect(ui->themeCombo, &QComboBox::currentTextChanged, this, &SettingsWindow::onThemeComboCurrentTextChanged);
+	connect(ui->addDirButton, &QToolButton::clicked, this, &SettingsWindow::onAddDirButtonClicked);
+	connect(ui->removeDirButton, &QToolButton::clicked, this, &SettingsWindow::onRemoveDirButtonClicked);
+	connect(ui->browseDirButton, &QToolButton::clicked, this, &SettingsWindow::onBrowseDirButtonClicked);
 }
 
 SettingsWindow::~SettingsWindow() {
@@ -55,6 +60,12 @@ SettingsWindow::~SettingsWindow() {
 	disconnect(ui->buttonBox->button(QDialogButtonBox::Ok), SIGNAL(clicked()), this, SLOT(onOk()));
 	disconnect(ui->buttonBox->button(QDialogButtonBox::Apply), SIGNAL(clicked()), this, SLOT(onApply()));
 	disconnect(ui->buttonBox->button(QDialogButtonBox::Cancel), SIGNAL(clicked()), this, SLOT(onCancel()));
+	disconnect(ui->neosphereDir_btn, &QToolButton::clicked, this, &SettingsWindow::onNeosphereDirButtonClicked);
+	disconnect(ui->legacySphereDir_btn, &QToolButton::clicked, this, &SettingsWindow::onLegacySphereDirButtonClicked);
+	disconnect(ui->themeCombo, &QComboBox::currentTextChanged, this, &SettingsWindow::onThemeComboCurrentTextChanged);
+	disconnect(ui->addDirButton, &QToolButton::clicked, this, &SettingsWindow::onAddDirButtonClicked);
+	disconnect(ui->removeDirButton, &QToolButton::clicked, this, &SettingsWindow::onRemoveDirButtonClicked);
+	disconnect(ui->browseDirButton, &QToolButton::clicked, this, &SettingsWindow::onBrowseDirButtonClicked);
 	delete ui;
 }
 
@@ -74,23 +85,27 @@ void SettingsWindow::onCancel() {
 	reject();
 }
 
-void SettingsWindow::on_neosphereDir_btn_clicked() {
+void SettingsWindow::onNeosphereDirButtonClicked() {
 	QString _m_neosphereDir = QFileDialog::getExistingDirectory(this, "Open Directory");
 	if(_m_neosphereDir == "") return;
 	m_neosphereDir = _m_neosphereDir;
 	ui->neosphereDir_txt->setText(m_neosphereDir);
 }
 
-void SettingsWindow::on_legacySphereDir_btn_clicked() {
+void SettingsWindow::onLegacySphereDirButtonClicked() {
 	QString _m_legacySphereDir = QFileDialog::getExistingDirectory(this, "Open Directory", m_legacySphereDir);
 	if(_m_legacySphereDir == "") return;
 	m_legacySphereDir = _m_legacySphereDir;
 	ui->legacySphereDir_txt->setText(m_legacySphereDir);
 }
 
-void SettingsWindow::on_themeCombo_currentIndexChanged(const QString &newtext) {
-	if(newtext == "Default") m_newTheme = "";
-	else if(newtext == "Dark") m_newTheme = ":/text/dark.qss";
+void SettingsWindow::onThemeComboCurrentTextChanged(const QString &newtext) {
+	if(newtext == "Default")
+		m_newTheme = "";
+	else if(newtext == "Dark")
+		m_newTheme = ":/text/dark.qss";
+	else
+		m_newTheme = "";
 	MainWindow::instance()->setTheme(m_newTheme);
 }
 
@@ -120,14 +135,14 @@ void SettingsWindow::saveSettings() {
 	settings.setValue("gridColor", m_gridColor);
 }
 
-void SettingsWindow::on_addDirButton_clicked() {
+void SettingsWindow::onAddDirButtonClicked() {
 	QListWidgetItem* newItem = new QListWidgetItem("", ui->projectDirsList);
 	newItem->setFlags(newItem->flags()|Qt::ItemIsEditable);
 	ui->projectDirsList->addItem(newItem);
 	ui->projectDirsList->setCurrentRow(ui->projectDirsList->count()-1);
 }
 
-void SettingsWindow::on_removeDirButton_clicked() {
+void SettingsWindow::onRemoveDirButtonClicked() {
 	ui->projectDirsList->takeItem(ui->projectDirsList->currentRow());
 }
 
@@ -139,7 +154,7 @@ void SettingsWindow::gridColorChanged(QColor color) {
 	m_gridColor = color.name();
 }
 
-void SettingsWindow::on_browseDirButton_clicked() {
+void SettingsWindow::onBrowseDirButtonClicked() {
 	int row = ui->projectDirsList->currentRow();
 	if(row < 0) return;
 	QString dir = QFileDialog::getExistingDirectory(this, "Open Directory");

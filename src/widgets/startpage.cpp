@@ -35,9 +35,17 @@ StartPage::StartPage(QWidget *parent) : QWidget(parent), ui(new Ui::StartPage) {
 	m_rightClickMenu->addSeparator();
 	m_rightClickMenu->addAction("Refresh game list");
 	refreshGameList();
+	connect(ui->projectIcons, &QListWidget::customContextMenuRequested, this, &StartPage::onProjectIconsCustomContextMenuRequested);
+	connect(ui->projectIcons, &QListWidget::itemActivated, this, &StartPage::onProjectIconsItemActivated);
+	connect(ui->projectIcons, &QListWidget::itemSelectionChanged, this, &StartPage::onProjectIconsItemSelectionChanged);
+	connect(m_startGameAction, &QAction::triggered, this, &StartPage::onStartGame);
 }
 
 StartPage::~StartPage() {
+	disconnect(ui->projectIcons, &QListWidget::customContextMenuRequested, this, &StartPage::onProjectIconsCustomContextMenuRequested);
+	disconnect(ui->projectIcons, &QListWidget::itemActivated, this, &StartPage::onProjectIconsItemActivated);
+	disconnect(ui->projectIcons, &QListWidget::itemSelectionChanged, this, &StartPage::onProjectIconsItemSelectionChanged);
+	disconnect(m_startGameAction, &QAction::triggered, this, &StartPage::onStartGame);
 	delete m_rightClickMenu;
 	delete ui;
 }
@@ -107,7 +115,7 @@ void StartPage::setGameInfoText(QString name, QString author, QString resolution
 	);
 }
 
-void StartPage::on_projectIcons_customContextMenuRequested(const QPoint &pos) {
+void StartPage::onProjectIconsCustomContextMenuRequested(const QPoint &pos) {
 	QListWidgetItem* selected = ui->projectIcons->itemAt(pos);
 
 	bool actionsEnabled = (selected != nullptr);
@@ -130,11 +138,11 @@ void StartPage::on_projectIcons_customContextMenuRequested(const QPoint &pos) {
 	}
 }
 
-void StartPage::on_projectIcons_itemActivated(QListWidgetItem *item) {
+void StartPage::onProjectIconsItemActivated(QListWidgetItem *item) {
 	loadProject(m_gameList.at(ui->projectIcons->currentRow()));
 }
 
-void StartPage::on_projectIcons_itemSelectionChanged() {
+void StartPage::onProjectIconsItemSelectionChanged() {
 	int currentRow = ui->projectIcons->currentRow();
 	if(m_gameList.length() == 0) return;
 	m_currentProject = m_gameList.at(currentRow);
@@ -153,6 +161,6 @@ void StartPage::on_projectIcons_itemSelectionChanged() {
 	);
 }
 
-void StartPage::on_startGame(QAction* action) {
+void StartPage::onStartGame() {
 	emit gameStarted(m_currentProject->getBuildDir());
 }

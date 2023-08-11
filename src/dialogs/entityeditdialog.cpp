@@ -4,9 +4,11 @@
 EntityEditDialog::EntityEditDialog(QWidget *parent): QDialog(parent), ui(new Ui::EntityEditDialog) {
 	ui->setupUi(this);
 	m_attached = false;
+	connect(ui->nameGenerate_btn, &QPushButton::released, this, &EntityEditDialog::onNameGenerateBtnReleased);
 }
 
 EntityEditDialog::~EntityEditDialog() {
+	disconnect(ui->nameGenerate_btn, &QPushButton::released, this, &EntityEditDialog::onNameGenerateBtnReleased);
 	delete ui;
 }
 
@@ -31,7 +33,7 @@ void EntityEditDialog::attachMap(MapFile* map) {
 	m_attached = true;
 }
 
-void EntityEditDialog::on_nameGenerate_btn_released() {
+void EntityEditDialog::onNameGenerateBtnReleased() {
 	QString spriteset_fn = ui->spriteset_txt->text();
 	if(!m_attached || spriteset_fn == "") return;
 	QString spriteset_noExt = ui->spriteset_txt->text().remove(spriteset_fn.lastIndexOf(".rss"),4);

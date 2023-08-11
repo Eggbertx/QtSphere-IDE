@@ -16,9 +16,9 @@ class ProjectPropertiesDialog : public QDialog {
 		QSIProject* getProject();
 
 	private slots:
-		void on_resolutionCBox_currentTextChanged(const QString &newText);
-		void on_pathButton_clicked();
-		void on_buttonBox_accepted();
+		void onResolutionCBoxCurrentTextChanged(const QString &newText);
+		void onPathButtonClicked();
+		void onButtonBoxAccepted();
 
 private:
 		Ui::ProjectPropertiesDialog *ui;

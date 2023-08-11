@@ -32,11 +32,11 @@ class LayerPropertiesDialog : public QDialog {
 		void setAutoScrolling(int h, int v);
 
 	private slots:
-		void on_parallaxChk_stateChanged(int arg1);
-		void on_horizontalParallaxSlider_valueChanged(int value);
-		void on_verticalParallaxSlider_valueChanged(int value);
-		void on_horizontalAsSlider_valueChanged(int value);
-		void on_verticalAsSlider_valueChanged(int value);
+		void onParallaxChkStateChanged(int arg1);
+		void onHorizontalParallaxSliderValueChanged(int value);
+		void onVerticalParallaxSliderValueChanged(int value);
+		void onHorizontalAsSliderValueChanged(int value);
+		void onVerticalAsSliderValueChanged(int value);
 
 	private:
 		Ui::LayerPropertiesDialog *ui;

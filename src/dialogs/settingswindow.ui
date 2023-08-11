@@ -65,6 +65,9 @@
        <property name="text">
         <string/>
        </property>
+       <property name="icon">
+        <iconset theme="folder-open"/>
+       </property>
       </widget>
      </item>
      <item>
@@ -109,21 +112,6 @@
      <item>
       <property name="text">
        <string>Dark</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Blue</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Radnen</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Sublime</string>
       </property>
      </item>
      <item>

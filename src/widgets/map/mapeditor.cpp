@@ -66,6 +66,10 @@ MapEditor::MapEditor(QWidget *parent) : SphereEditor(parent), ui(new Ui::MapEdit
 	ui->entitiesTable->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
 	ui->mainSplitter->setStretchFactor(0,1);
 	createUndoActions();
+	connect(ui->layersTable, &QTableWidget::customContextMenuRequested, this, &MapEditor::onLayersTableCustomContextMenuRequested);
+	connect(ui->layersTable, &QTableWidget::cellClicked, this, &MapEditor::onLayersTableCellClicked);
+	connect(ui->layersTable, &QTableWidget::itemChanged, this, &MapEditor::onLayersTableItemChanged);
+	connect(ui->layersTable, &QTableWidget::currentCellChanged, this, &MapEditor::onLayersTableCurrentCellChanged);
 }
 
 MapEditor::~MapEditor() {
@@ -73,6 +77,10 @@ MapEditor::~MapEditor() {
 	disconnect(m_pencilMenu, SIGNAL(triggered(QAction*)), this, SLOT(setPencilSize(QAction*)));
 	disconnect(ui->tilesetView, SIGNAL(indexChanged(int)), this, SLOT(setTileIndex(int)));
 	disconnect(this, SLOT(layerPropertiesRequested(bool)));
+	disconnect(ui->layersTable, &QTableWidget::customContextMenuRequested, this, &MapEditor::onLayersTableCustomContextMenuRequested);
+	disconnect(ui->layersTable, &QTableWidget::cellClicked, this, &MapEditor::onLayersTableCellClicked);
+	disconnect(ui->layersTable, &QTableWidget::itemChanged, this, &MapEditor::onLayersTableItemChanged);
+	disconnect(ui->layersTable, &QTableWidget::currentCellChanged, this, &MapEditor::onLayersTableCurrentCellChanged);
 	delete ui;
 	delete m_pencilMenu;
 	delete m_layerMenu;
@@ -138,7 +146,7 @@ void MapEditor::attach(MapFile* attachedMap) {
 
 }
 
-void MapEditor::on_layersTable_cellClicked(int row, int column) {
+void MapEditor::onLayersTableCellClicked(int row, int column) {
 	switch(column) {
 		case 0: {
 			QWidget* item = ui->layersTable->cellWidget(row,column);
@@ -203,7 +211,7 @@ void MapEditor::setTileIndex(int tile) {
 	ui->mapView->setCurrentTile(tile);
 }
 
-void MapEditor::on_layersTable_customContextMenuRequested(const QPoint &pos) {
+void MapEditor::onLayersTableCustomContextMenuRequested(const QPoint &pos) {
 	m_layerMenu->exec(ui->layersTable->mapToGlobal(pos));
 }
 
@@ -219,12 +227,12 @@ void MapEditor::layerPropertiesRequested(bool triggered) {
 	ui->layersTable->item(ui->layersTable->currentRow(),1)->setText(lpd.getName());
 }
 
-void MapEditor::on_layersTable_itemChanged(QTableWidgetItem *item) {
+void MapEditor::onLayersTableItemChanged(QTableWidgetItem *item) {
 	if(item->column() != 1) return;
 	ui->mapView->getLayer(item->row())->name = item->text();
 }
 
-void MapEditor::on_layersTable_currentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn) {
+void MapEditor::onLayersTableCurrentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn) {
 	ui->mapView->setCurrentLayer(ui->layersTable->rowCount()-currentRow-1);
 }
 

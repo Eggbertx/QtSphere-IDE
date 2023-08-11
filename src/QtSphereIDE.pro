@@ -6,8 +6,6 @@ VERSION = 0.9
 DEFINES += QT_DEPRECATED_WARNINGS TARGET=\\\"$$TARGET\\\" VERSION=\\\"$$VERSION\\\"
 QMAKE_LFLAGS += -no-pie
 
-DESTDIR=build
-
 SOURCES += \
 	formats/qsitasklist.cpp \
 	formats/spherefont.cpp \

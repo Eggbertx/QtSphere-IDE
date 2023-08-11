@@ -17,8 +17,9 @@ class EntityEditDialog : public QDialog {
 		~EntityEditDialog();
 		QString getScript(int which);
 		void attachMap(MapFile* map);
+
 	private slots:
-		void on_nameGenerate_btn_released();
+		void onNameGenerateBtnReleased();
 
 	private:
 		Ui::EntityEditDialog* ui;

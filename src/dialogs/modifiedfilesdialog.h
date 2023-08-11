@@ -19,9 +19,9 @@ class ModifiedFilesDialog : public QDialog {
 		void discardModifiedItem(SphereFile item);
 
 	private slots:
-		void on_cancelButton_clicked();
-		void on_discardAllButton_2_clicked();
-		void on_saveAllButton_clicked();
+		void onCancelButtonClicked();
+		void onDiscardAllButtonClicked();
+		void onSaveAllButtonClicked();
 
 	private:
 		Ui::ModifiedFilesDialog *ui;
