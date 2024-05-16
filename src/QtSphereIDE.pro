@@ -4,7 +4,6 @@ TARGET = QtSphereIDE
 TEMPLATE = app
 VERSION = 0.9
 DEFINES += QT_DEPRECATED_WARNINGS TARGET=\\\"$$TARGET\\\" VERSION=\\\"$$VERSION\\\"
-QMAKE_LFLAGS += -no-pie
 
 SOURCES += \
 	formats/qsitasklist.cpp \

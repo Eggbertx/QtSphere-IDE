@@ -83,7 +83,7 @@ void StartPage::refreshGameList() {
 		settings.setArrayIndex(p);
 		QDir dir(settings.value("directory").toString());
 
-		if(!dir.exists() || dir.isEmpty()) return;
+		if(!dir.exists() || dir.isEmpty()) continue;
 		QFileInfoList dirs = dir.entryInfoList(QDir::NoDotAndDotDot|QDir::Dirs);
 
 		int numDirs = dirs.length();

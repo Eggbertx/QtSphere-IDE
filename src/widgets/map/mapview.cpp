@@ -1,4 +1,3 @@
-#include <QDebug>
 #include <QGraphicsItemGroup>
 #include <QGraphicsScene>
 #include <QGraphicsView>

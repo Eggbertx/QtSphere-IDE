@@ -344,11 +344,13 @@ void MainWindow::updateTreeView() {
 		return;
 	}
 	m_fsModel->setRootPath(m_project->getPath(false));
-
-	for (int i = 1; i < m_fsModel->columnCount(); ++i)
-		ui->treeView->hideColumn(i);
+	QModelIndex index = m_fsModel->index(m_project->getPath(false));
 	ui->treeView->setModel(m_fsModel);
-	ui->treeView->setRootIndex(m_fsModel->index(m_project->getPath(false)));
+	ui->treeView->setRootIndex(index);
+
+	for (int i = 1; i < m_fsModel->columnCount(); i++)
+		ui->treeView->hideColumn(i);
+
 	qDebug() << "Loading project:"  << m_project->getPath(false);
 	m_fsModel->setRootPath(m_project->getPath(false));
 	setWindowTitle("QtSphereIDE " + QString(VERSION) + " - " + QDir(m_project->getPath(false)).dirName());
@@ -426,7 +428,6 @@ void MainWindow::openFile(QString filename) {
 }
 
 void MainWindow::openProject(QString filename) {
-	qDebug() << "MainWindow::openProject:" << filename;
 	m_projectLoaded = m_project->open(filename);
 	if(m_projectLoaded) {
 		ui->menuProject->setEnabled(true);
@@ -446,7 +447,6 @@ void MainWindow::setCurrentProject(QSIProject* project) {
 	ui->menuProject->setEnabled(m_projectLoaded);
 	ui->toolbarPlayGame->setEnabled(m_projectLoaded);
 	ui->toolbarProjectProperties->setEnabled(m_projectLoaded);
-	qDebug() << "MainWindow::setCurrentProject.getPath(false): " << project->getPath(false);
 	if(m_projectLoaded)
 		m_project = project;
 
