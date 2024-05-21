@@ -19,8 +19,6 @@ Spriteset::Spriteset(QObject *parent) : SphereFile(parent) {
 
 Spriteset* Spriteset::fromImage(QString filename, QSize frameSize, bool removeDuplicates, QColor inColor, QColor outColor, bool* success) {
 	Spriteset* newSS = new Spriteset();
-	bool valid = false;
-
 	QImage* importImg = new QImage(filename);
 
 	int frameW = frameSize.width();

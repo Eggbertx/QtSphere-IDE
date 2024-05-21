@@ -216,6 +216,7 @@ void MapEditor::onLayersTableCustomContextMenuRequested(const QPoint &pos) {
 }
 
 void MapEditor::layerPropertiesRequested(bool triggered) {
+	Q_UNUSED(triggered);
 	LayerPropertiesDialog lpd;
 	MapFile::layer* l = ui->mapView->getLayer(ui->layersTable->currentRow());
 	lpd.setName(l->name);
@@ -233,6 +234,9 @@ void MapEditor::onLayersTableItemChanged(QTableWidgetItem *item) {
 }
 
 void MapEditor::onLayersTableCurrentCellChanged(int currentRow, int currentColumn, int previousRow, int previousColumn) {
+	Q_UNUSED(currentColumn);
+	Q_UNUSED(previousRow);
+	Q_UNUSED(previousColumn);
 	ui->mapView->setCurrentLayer(ui->layersTable->rowCount()-currentRow-1);
 }
 

@@ -43,11 +43,11 @@ bool ImportOptionsDialog::removeDuplicatesChecked() {
 
 
 void ImportOptionsDialog::onColorOutButtonClicked() {
-	setButtonBackground(ui->colorOutButton, "Color in");
+	setButtonBackground(ui->colorOutButton, (char*)"Color in");
 }
 
 void ImportOptionsDialog::onColorInButtonClicked() {
-	setButtonBackground(ui->colorInButton, "Color in");
+	setButtonBackground(ui->colorInButton, (char*)"Color in");
 }
 
 void ImportOptionsDialog::setButtonBackground(QPushButton *button, char *title) {

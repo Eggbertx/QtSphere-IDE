@@ -77,7 +77,7 @@ bool MapFile::open(QString filename, QIODevice::OpenMode flags) {
 		}
 		m_layers.append(cur_layer);
 
-		for(int s = 0; s < cur_layer.header.num_segments; s++) {
+		for(uint32_t s = 0; s < cur_layer.header.num_segments; s++) {
 			obs_segment segment;
 			segment.layer = l;
 			readFile(m_file, &segment.x1, sizeof(segment.x1));

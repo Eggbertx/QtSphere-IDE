@@ -247,8 +247,8 @@ void MapView::updateGrid() {
 	QSettings settings;
 	delete m_gridGroup;
 	m_gridGroup = new QGraphicsItemGroup();
-	QColor gridColor(settings.value("gridColor","#000000").toString());
-	if(!gridColor.isValid()) gridColor.setNamedColor("#000000");
+	QColor gridColor = QColor::fromString(settings.value("gridColor", "000000").toString());
+	if(!gridColor.isValid()) gridColor = QColor::fromString("#000000");
 
 	QSizeF mapSize = this->sceneRect().size();
 	qreal mapWidth = mapSize.width();

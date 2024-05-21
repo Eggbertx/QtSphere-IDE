@@ -9,9 +9,6 @@
 
 class MapFile : public SphereFile {
 	Q_OBJECT
-	Q_ENUMS(ScriptType)
-	Q_ENUMS(EntityDirection)
-	Q_ENUMS(TiledMapFormat)
 	public:
 		MapFile(QObject *parent = nullptr);
 		~MapFile() override;
@@ -25,8 +22,11 @@ class MapFile : public SphereFile {
 		QSize getTileSize();
 		Tileset* getTileset();
 		enum ScriptType { Entry, Exit, LeaveNorth, LeaveEast, LeaveSouth, LeaveWest };
+		Q_ENUM(ScriptType)
 		enum EntityDirection { North, Northeast, East, Southeast, South, Southwest, West, Northwest };
+		Q_ENUM(EntityDirection)
 		enum TiledMapFormat { TiledUnknownFormat = -1, TiledTMX, TiledJSON };
+		Q_ENUM(TiledMapFormat)
 
 		QString getScript(ScriptType type);
 		void setScript(ScriptType type, QString text);

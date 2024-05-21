@@ -53,7 +53,6 @@ bool SphereFont::open(QString filename, QIODevice::OpenMode flags) {
 bool SphereFont::save(QString filename) {
 	//memcpy(m_header.signature, ".rss", 4);
 
-	QByteArray ba;
 	QFile* fontFile = new QFile(filename);
 	writeFile(fontFile, &m_header, sizeof(m_header));
 
@@ -69,7 +68,6 @@ bool SphereFont::save(QString filename) {
 		char* pixels = bytes->data();
 		writeFile(fontFile, bytes->data(), bytes->length());
 	}
-
 	return true;
 }
 
@@ -97,8 +95,8 @@ SphereFont* SphereFont::fromSystemFont(QWidget* parent) {
 	QSize asciiSize;
 	QPainter* painter = new QPainter();
 
-	for(int i = 0; i < 256; i++) {
-		ushort ch = i;
+	for(char16_t i = 0; i < 256; i++) {
+		char16_t ch = i;
 		if(i < 32 || i == 127)
 			str = "";
 		else
@@ -135,7 +133,7 @@ QImage SphereFont::getTextImage(QString text) {
 	QString str = "";
 	if(text == nullptr) {
 		for(int i = 0; i < 256; i++) {
-			ushort ch = i;
+			char16_t ch = i;
 			if(i < 32 || i == 127)
 				str = "";
 			else

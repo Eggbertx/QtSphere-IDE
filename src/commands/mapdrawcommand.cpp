@@ -4,7 +4,7 @@ MapDrawCommand::MapDrawCommand(MapView* view, QList<QPoint> points, int tileInde
 	m_mapView = view;
 	m_points = points;
 	m_tileIndex = tileIndex;
-
+	m_parent = parent;
 }
 
 void MapDrawCommand::undo() {

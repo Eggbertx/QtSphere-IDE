@@ -39,7 +39,7 @@ SettingsWindow::SettingsWindow(QWidget *parent) : QDialog(parent), ui(new Ui::Se
 	m_gridColor = settings.value("gridColor", "#000000").toString();
 	QColor col(m_mapCursorColor);
 	if(col.isValid()) ui->mapCursorCol_btn->setColor(col);
-	col.setNamedColor(m_gridColor);
+	col = QColor::fromString(m_gridColor);
 	if(col.isValid()) ui->gridColor_btn->setColor(col);
 	connect(ui->mapCursorCol_btn,SIGNAL(colorChanged(QColor)),this,SLOT(mapCursorColChanged(QColor)));
 	connect(ui->gridColor_btn, SIGNAL(colorChanged(QColor)), this, SLOT(gridColorChanged(QColor)));

@@ -17,6 +17,7 @@ class MapDrawCommand : public QUndoCommand {
 		MapView* m_mapView;
 		QList<QPoint> m_points;
 		int m_tileIndex;
+		QWidget* m_parent;
 };
 
 #endif // DRAWCOMMAND_H
