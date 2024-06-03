@@ -1,3 +1,4 @@
+#include <QAudioOutput>
 #include <QStyle>
 #include <QFileInfo>
 #include <QSizePolicy>
@@ -7,7 +8,12 @@
 
 SoundPlayer::SoundPlayer(QWidget *parent): QWidget(parent), ui(new Ui::SoundPlayer) {
 	ui->setupUi(this);
+
 	m_mediaPlayer = new QMediaPlayer(this);
+    m_audioOutput = new QAudioOutput();
+    m_audioOutput->setVolume(100);
+    m_mediaPlayer->setAudioOutput(m_audioOutput);
+
 	ui->playToggleBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 	ui->stopBtn->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
 	ui->repeatBtn->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
@@ -29,6 +35,8 @@ SoundPlayer::~SoundPlayer() {
 	disconnect(ui->stopBtn, &QToolButton::clicked, this, &SoundPlayer::onStopButtonClicked);
 	disconnect(ui->repeatBtn, &QToolButton::clicked, this, &SoundPlayer::onRepeatButtonClicked);
 	disconnect(ui->seekSlider, &QSlider::valueChanged, this, &SoundPlayer::onSeekSliderValueChanged);
+    delete m_mediaPlayer;
+    delete m_audioOutput;
 	delete ui;
 }
 
@@ -70,6 +78,7 @@ void SoundPlayer::onPlayButtonClicked() {
 }
 
 void SoundPlayer::onStopButtonClicked() {
+    qDebug() << "Stop button clicked";
 	m_mediaPlayer->stop();
 	ui->playToggleBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 }
@@ -91,24 +100,28 @@ void SoundPlayer::audioPositionChanged(qint64 position) {
 void SoundPlayer::audioStateChanged(QMediaPlayer::PlaybackState state) {
 	switch(state) {
 	case QMediaPlayer::PlayingState:
+        qDebug() << "Playing";
 		ui->playToggleBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
 		break;
 	case QMediaPlayer::PausedState:
+        qDebug() << "Paused";
 		ui->playToggleBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 		break;
 	case QMediaPlayer::StoppedState: {
+        qDebug() << "Stopped";
 		ui->playToggleBtn->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
-		if(m_mediaPlayer->position() == m_audioDuration && m_loopingAudio) {
+        if(m_mediaPlayer->position() == m_audioDuration && m_loopingAudio) {
 			m_mediaPlayer->play();
-		} else ui->seekSlider->setSliderPosition(0);
+        } else ui->seekSlider->setSliderPosition(0);
 		break;
-		}
+        }
 	}
 }
 
 void SoundPlayer::onSeekSliderValueChanged(int value) {
 	if(!ui->seekSlider->isSliderDown()) return;
-	qint64 newPos = 0;
+    qDebug() << "Position changed to " << value;
+    qint64 newPos = 0;
 	float floatPos = (float)value;
 	newPos = m_audioDuration * (floatPos/100);
 	m_mediaPlayer->setPosition(newPos);

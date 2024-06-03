@@ -30,6 +30,7 @@ class SoundPlayer : public QWidget {
 	private:
 		Ui::SoundPlayer *ui;
 		QMediaPlayer* m_mediaPlayer;
+        QAudioOutput* m_audioOutput;
 		bool m_loopingAudio = false;
 		qint64 m_audioDuration;
 
