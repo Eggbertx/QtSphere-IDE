@@ -1,8 +1,6 @@
 #include <QApplication>
 #include <QSettings>
-#include "util.h"
 #include "mainwindow.h"
-#include "util.h"
 
 int main(int argc, char *argv[]) {
 	Q_INIT_RESOURCE(qsires);
@@ -12,7 +10,7 @@ int main(int argc, char *argv[]) {
 	a.setOrganizationDomain("spheredev.org");
 	a.setApplicationName("QtSphere IDE");
 	a.setApplicationVersion(VERSION);
-
+    a.setStyle("fusion");
 	MainWindow w;
 	w.setWindowTitle(a.applicationDisplayName() + " v" + a.applicationVersion());
 	QSettings settings;
