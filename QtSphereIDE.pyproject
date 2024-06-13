@@ -1,6 +1,8 @@
 {
     "files": [
         "mainwindow.py",
-        "form.ui"
+        "widgets/maintabwidget.py",
+        "qsires.qrc",
+        "ui/mainwindow.ui"
     ]
 }

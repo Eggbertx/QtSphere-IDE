@@ -20,7 +20,7 @@
    <string>QtSphere IDE</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="res/qsires.qrc">
+   <iconset>
     <normaloff>:/icons/icon.png</normaloff>:/icons/icon.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
@@ -649,17 +649,26 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset theme="document-new"/>
+   </property>
    <property name="text">
     <string>New</string>
    </property>
    <property name="toolTip">
     <string>New file</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
    <property name="visible">
     <bool>false</bool>
    </property>
   </action>
   <action name="toolbarOpenButton">
+   <property name="icon">
+    <iconset theme="document-open"/>
+   </property>
    <property name="text">
     <string>Open</string>
    </property>
@@ -671,6 +680,9 @@
    </property>
   </action>
   <action name="toolbarSaveButton">
+   <property name="icon">
+    <iconset theme="document-save"/>
+   </property>
    <property name="text">
     <string>Save</string>
    </property>
@@ -683,8 +695,8 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/qsires.qrc">
-     <normaloff>:/icons/sphere-icon.png</normaloff>:/icons/sphere-icon.png</iconset>
+    <iconset resource="../qsires.qrc">
+     <normaloff>:/icons/res/sphere-icon.png</normaloff>:/icons/res/sphere-icon.png</iconset>
    </property>
    <property name="text">
     <string>Play Game</string>
@@ -701,8 +713,8 @@
     <bool>false</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/qsires.qrc">
-     <normaloff>:/icons/gears.png</normaloff>:/icons/gears.png</iconset>
+    <iconset resource="../qsires.qrc">
+     <normaloff>:/icons/res/gears.png</normaloff>:/icons/res/gears.png</iconset>
    </property>
    <property name="text">
     <string>Project Properties</string>
@@ -794,8 +806,8 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="res/qsires.qrc">
-     <normaloff>:/icons/legacyconfig-24x24.png</normaloff>:/icons/legacyconfig-24x24.png</iconset>
+    <iconset resource="../qsires.qrc">
+     <normaloff>:/icons/res/legacyconfig-24x24.png</normaloff>:/icons/res/legacyconfig-24x24.png</iconset>
    </property>
    <property name="text">
     <string>Configure</string>
@@ -825,7 +837,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="res/qsires.qrc"/>
+  <include location="../qsires.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -1,9 +1,10 @@
 *.bak
 .vscode/
 build*/
-
-# This file is used to ignore files which are generated
-# ----------------------------------------------------------------------------
+.qtcreator/
+__pycache__
+/env
+rc_*.py
 
 *~
 *.autosave
@@ -32,6 +33,7 @@ Makefile*
 *.app
 moc_*.cpp
 ui_*.h
+ui_*.py
 qrc_*.cpp
 Thumbs.db
 *.res
@@ -40,7 +42,7 @@ Thumbs.db
 .qmake.stash
 
 # qtcreator generated files
-*.pro.user*
+*.user*
 CMakeLists.txt.user*
 
 # xemacs temporary files
