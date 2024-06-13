@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file>res/sphere-icon.png</file>
+        <file>res/icon.png</file>
+        <file>res/transparency-bg.png</file>
+        <file>res/eye.png</file>
+        <file>res/eye-closed.png</file>
+        <file>res/1x1grid.png</file>
+        <file>res/3x3grid.png</file>
+        <file>res/5x5grid.png</file>
+        <file>res/pencil.png</file>
+        <file>res/linetool.png</file>
+        <file>res/paintbucket.png</file>
+        <file>res/dropper.png</file>
+        <file>res/rectangletool.png</file>
+        <file>res/gears.png</file>
+        <file>res/map-person.png</file>
+        <file>res/legacyconfig-24x24.png</file>
+        <file>res/legacyengine-24x24.png</file>
+        <file>res/togglegrid.png</file>
+        <file>res/show_spritesets.png</file>
+    </qresource>
+    <qresource prefix="/text">
+        <file>res/dark.qss</file>
+    </qresource>
+</RCC>
