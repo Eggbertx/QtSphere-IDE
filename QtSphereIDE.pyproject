@@ -2,6 +2,7 @@
     "files": [
         "mainwindow.py",
         "widgets/maintabwidget.py",
+        "widgets/startpage.py",
         "qsiproject.py",
         "qsires.qrc",
         "ui/mainwindow.ui",

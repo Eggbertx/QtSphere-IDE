@@ -69,6 +69,7 @@ class QSIProject:
 			QMessageBox.critical(None, "Error", "Unable to get project info")
 			return False
 
+		self.buildDir = self.projectDir
 		with open(self.projectFilePath, "r") as projectFile:
 			return self._prepareProjectFile(projectFile)
 

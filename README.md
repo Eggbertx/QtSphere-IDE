@@ -16,11 +16,14 @@ Building this in Qt Creator will make things a lot easier and more convenient.
 
 If you want to run it from a terminal, just do:
 
-```
+```Shell
 python -m venv env
 source env/bin/activate
 pip install pyside6
-pyside6-uic ui/mainwindow.ui -o ui/ui_mainwindow.py
+# and for each .ui file:
+pyside6-uic ui/form.ui -o ui/ui_form.py
+# or alternatively:
+pyside2-uic ui/form.ui -o ui/ui_form.py
 python mainwindow.py
 ```
 Porting this from C++ to Python is still a work in progress
