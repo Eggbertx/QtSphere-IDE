@@ -3,6 +3,7 @@ from PySide6.QtCore import QCoreApplication, QSettings
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 
+from qsiproject import QSIProject
 from ui.ui_mainwindow import Ui_MainWindow
 from widgets.startpage import StartPage
 
@@ -16,6 +17,7 @@ See <a href=\"https://github.com/Eggbertx/QtSphere-IDE/blob/master/LICENSE.txt\"
 
 class MainWindow(QMainWindow):
 	settings: QSettings
+	startPage: StartPage
 	def __init__(self, settings:QSettings=None, parent=None):
 		super().__init__(parent)
 		self.ui = Ui_MainWindow()
@@ -31,7 +33,11 @@ class MainWindow(QMainWindow):
 		self.ui.actionExit.triggered.connect(sys.exit)
 		self.ui.actionAbout_Qt.triggered.connect(lambda: QMessageBox.aboutQt(self, "About Qt"))
 		self.ui.actionAbout.triggered.connect(lambda: QMessageBox.about(self, "About QtSphere IDE", _ABOUT_STRING))
+		self.startPage.projectLoaded.connect(self.loadProject)
 
+
+	def loadProject(self, project:QSIProject):
+		print("Loading project: ", project.projectFilePath)
 
 if __name__ == "__main__":
 	QCoreApplication.setApplicationName(_APPLICATION_NAME)

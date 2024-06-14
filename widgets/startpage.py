@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt,Signal,Slot,QPoint
+from PySide6.QtCore import Qt, Signal, Slot, QPoint, QSettings, QDir, QSize
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QWidget, QMenu, QListWidgetItem
 
@@ -30,7 +30,7 @@ class StartPage(QWidget):
 		self.ui.projectIcons.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 		self.rightClickMenu = QMenu(self.ui.projectIcons)
 
-		self.currentProject = None
+		self.currentProject = QSIProject()
 		self.startGameAction = self.rightClickMenu.addAction("Start game")
 		self.loadProjectAction = self.rightClickMenu.addAction("Load project")
 		self.openProjectDirAction = self.rightClickMenu.addAction("Open project directory")
@@ -51,8 +51,14 @@ class StartPage(QWidget):
 
 	@Slot(QListWidgetItem)
 	def onProjectIconsItemActivated(self, item: QListWidgetItem):
-		pass
-
+		self.currentProject = self.gameList[self.ui.projectIcons.indexFromItem(item).row()]
+		self.setGameInfoText(
+			self.currentProject.name,
+			self.currentProject.author,
+			self.currentProject.getResolutionString(),
+			self.currentProject.projectFilePath,
+			self.currentProject.summary)
+		self.projectLoaded.emit(self.currentProject)
 
 	@Slot()
 	def onProjectIconsItemSelectionChanged(self):
@@ -66,16 +72,41 @@ class StartPage(QWidget):
 
 
 	def getGameInfoText(self) -> str:
-		pass
-
-
-	def loadProject(self, project:QSIProject):
-		pass
-
+		self.ui.gameInfoText.toHtml()
 
 	def refreshGameList(self):
-		pass
+		self.gameList.clear()
+		self.ui.projectIcons.clear()
+		settings = QSettings()
+		numProjectDirs = settings.beginReadArray("projectDirs")
+		for p in range(numProjectDirs):
+			settings.setArrayIndex(p)
+			dir = QDir(settings.value("directory"))
+			if not dir.exists() or dir.isEmpty():
+				continue
+			dirs = dir.entryInfoList()
+			for projDir in dirs:
+				fn = projDir.fileName()
+				if fn == "." or fn == "..":
+					continue
+				project = QSIProject()
+				if project.open(projDir.filePath()):
+					self.gameList.append(project)
+		settings.endArray()
+
+		self.gameList.sort(key=lambda student: student.name)
+		for project in self.gameList:
+			item = QListWidgetItem(project.getIcon(), project.name)
+			item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+			self.ui.projectIcons.addItem(item)
 
 
 	def setGameInfoText(self, name:str, author:str, resolution:str, path:str, description:str):
-		pass
+		self.ui.gameInfoText.setHtml(self.baseInfoHTML
+			.replace("[PROJECTNAME]", name)
+			.replace("[PROJECTAUTHOR]", author)
+			.replace("[PROJECTRESOLUTION]", resolution)
+			.replace("[PROJECTPATH]", path)
+			.replace("[PROJECTDESCRIPTION]", description)
+		)
+

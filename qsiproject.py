@@ -34,6 +34,7 @@ class QSIProject:
 
 	def __init__(self):
 		self.projectType = ProjectType.Unknown
+		self.projectFilePath = None
 
 
 	def open(self, path: str) -> bool:
@@ -78,7 +79,7 @@ class QSIProject:
 		iconInfo = QFileInfo(QDir(self.projectDir), "icon.png");
 		if iconInfo.exists():
 			return QIcon(iconInfo.canonicalFilePath())
-		return QIcon(":/icons/sphere-icon.png")
+		return QIcon(":/icons/res/sphere-icon.png")
 
 
 	def getResolutionString(self) -> str:
@@ -133,6 +134,7 @@ class QSIProject:
 					self.height = int(parts[1])
 				case "screenWidth":
 					self.width = int(parts[1])
+		return True
 
 
 	def _readCellscript(self, projectFile:TextIOWrapper) -> bool:
@@ -185,3 +187,6 @@ class QSIProject:
 				case "script":
 					self.script = parts[1]
 		return True
+
+	def __repr__(self) -> str:
+		return repr((self.name, self.author))
