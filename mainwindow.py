@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl
 from PySide6.QtGui import QIcon, QDesktopServices
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox
 
 from qsiproject import QSIProject
 from ui.ui_mainwindow import Ui_MainWindow
@@ -18,6 +18,7 @@ See <a href=\"https://github.com/Eggbertx/QtSphere-IDE/blob/master/LICENSE.txt\"
 class MainWindow(QMainWindow):
 	settings: QSettings
 	startPage: StartPage
+	engineSelector: QComboBox
 	def __init__(self, settings:QSettings=None, parent=None):
 		super().__init__(parent)
 		self.ui = Ui_MainWindow()
@@ -27,9 +28,27 @@ class MainWindow(QMainWindow):
 		self.setWindowIcon(QIcon(":/icons/res/icon.png"))
 		self.startPage = StartPage(self.ui.openFileTabs)
 		self.ui.openFileTabs.addTab(self.startPage, "Start Page")
-		self.connectActions()
+		self.ui.actionNew_file.setMenu(self.ui.menuNew)
+		self.engineSelector = QComboBox(self.ui.mainToolBar)
+		self.engineSelector.addItem("neoSphere")
+		self.engineSelector.addItem("Sphere 1.x")
+		self.ui.mainToolBar.addWidget(self.engineSelector)
+		self._setupSettings()
+		self._connectActions()
 	
-	def connectActions(self):
+	def _setupSettings(self):
+		match self.settings.value("whichEngine", "neoSphere"):
+			case "Sphere 1.x":
+				self.engineSelector.setCurrentText("Sphere 1.x")
+				self.ui.actionLegacyConfig.setEnabled(True)
+				self.ui.actionConfigure_Engine.setEnabled(True)
+			case _:
+				self.engineSelector.setCurrentText("neoSphere")
+				self.ui.actionLegacyConfig.setEnabled(False)
+				self.ui.actionConfigure_Engine.setEnabled(False)
+			
+
+	def _connectActions(self):
 		self.ui.actionExit.triggered.connect(sys.exit)
 		self.ui.actionAbout_Qt.triggered.connect(lambda: QMessageBox.aboutQt(self, "About Qt"))
 		self.ui.actionAbout.triggered.connect(lambda: QMessageBox.about(self, "About QtSphere IDE", _ABOUT_STRING))
@@ -37,6 +56,20 @@ class MainWindow(QMainWindow):
 		self.startPage.loadProjectAction.triggered.connect(self.loadSelectedProject)
 		self.startPage.startGameAction.triggered.connect(self.startGame)
 		self.startPage.openProjectDirAction.triggered.connect(self.openSelectedProjectDir)
+		self.engineSelector.currentTextChanged.connect(self.engineChanged)
+
+
+	@Slot(str)
+	def engineChanged(self, engine:str):
+		match engine:
+			case "neoSphere"|"miniSphere":
+				self.settings.setValue("whichEngine", "neoSphere")
+				self.ui.actionConfigure_Engine.setEnabled(False)
+				self.ui.actionLegacyConfig.setEnabled(False)
+			case "Sphere 1.x":
+				self.settings.setValue("whichEngine", "legacy")
+				self.ui.actionConfigure_Engine.setEnabled(True)
+				self.ui.actionLegacyConfig.setEnabled(True)
 
 	@Slot()
 	def startGame(self):
