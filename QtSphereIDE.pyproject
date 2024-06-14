@@ -1,11 +1,13 @@
 {
     "files": [
         "mainwindow.py",
+        "widgets/colorbutton.py",
         "widgets/maintabwidget.py",
         "widgets/startpage.py",
         "qsiproject.py",
         "qsires.qrc",
         "ui/mainwindow.ui",
+        "ui/settingswindow.ui",
         "ui/startpage.ui"
     ]
 }

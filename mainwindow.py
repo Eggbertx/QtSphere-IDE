@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox
 from qsiproject import QSIProject
 from ui.ui_mainwindow import Ui_MainWindow
 from widgets.startpage import StartPage
+from dialogs.settingswindow import SettingsWindow
 
 _VERSION = "0.9"
 _APPLICATION_NAME = "QtSphere IDE"
@@ -19,11 +20,13 @@ class MainWindow(QMainWindow):
 	settings: QSettings
 	startPage: StartPage
 	engineSelector: QComboBox
+	settingsWindow: SettingsWindow
 	def __init__(self, settings:QSettings=None, parent=None):
 		super().__init__(parent)
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		self.settings = settings
+		self.settingsWindow = SettingsWindow(self)
 		self.ui.splitter.setStretchFactor(1, 4)
 		self.setWindowIcon(QIcon(":/icons/res/icon.png"))
 		self.startPage = StartPage(self.ui.openFileTabs)
@@ -52,11 +55,25 @@ class MainWindow(QMainWindow):
 		self.ui.actionExit.triggered.connect(sys.exit)
 		self.ui.actionAbout_Qt.triggered.connect(lambda: QMessageBox.aboutQt(self, "About Qt"))
 		self.ui.actionAbout.triggered.connect(lambda: QMessageBox.about(self, "About QtSphere IDE", _ABOUT_STRING))
+		self.ui.openFileTabs.tabCloseRequested.connect(self.tabCloseRequested)
+		self.ui.actionConfigure_QtSphere_IDE.triggered.connect(self.openSettingsWindow)
 		self.startPage.projectLoaded.connect(self.loadProject)
 		self.startPage.loadProjectAction.triggered.connect(self.loadSelectedProject)
 		self.startPage.startGameAction.triggered.connect(self.startGame)
 		self.startPage.openProjectDirAction.triggered.connect(self.openSelectedProjectDir)
 		self.engineSelector.currentTextChanged.connect(self.engineChanged)
+
+	@Slot()
+	def openSettingsWindow(self):
+		self.settingsWindow.show()
+
+	@Slot(int)
+	def tabCloseRequested(self, index:int):
+		self.ui.openFileTabs.removeTab(index)
+		if self.ui.openFileTabs.count() == 0:
+			# reopen the start page if there are no more tabs
+			self.ui.openFileTabs.addTab(self.startPage, "Start Page")
+			self.startPage.refreshGameList()
 
 
 	@Slot(str)
