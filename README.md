@@ -20,7 +20,7 @@ If you want to run it from a terminal, just do:
 python -m venv env
 source env/bin/activate
 pip install pyside6
-pyside6-uic ui_mainwindow.ui -o ui_mainwindow.py
+pyside6-uic ui/mainwindow.ui -o ui/ui_mainwindow.py
 python mainwindow.py
 ```
 Porting this from C++ to Python is still a work in progress
