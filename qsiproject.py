@@ -35,6 +35,7 @@ class QSIProject:
 	def __init__(self):
 		self.projectType = ProjectType.Unknown
 		self.projectFilePath = None
+		self.buildDir = None
 
 
 	def open(self, path: str) -> bool:

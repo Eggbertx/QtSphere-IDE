@@ -17,7 +17,6 @@ class StartPage(QWidget):
 	openProjectDirAction: QAction
 	refreshGameListAction: QAction
 	projectLoaded: Signal = Signal(QSIProject)
-	gameStarted: Signal = Signal(str)
 
 	def __init__(self, parent: QWidget = None, windowType: Qt.WindowType = Qt.WindowType.Widget):
 		super().__init__(parent, windowType)
@@ -25,9 +24,8 @@ class StartPage(QWidget):
 		self.ui.setupUi(self)
 		self.baseInfoHTML = self.ui.gameInfoText.toHtml()
 		self.ui.splitter.setSizes((250, 100))
-		self.setGameInfoText("","","","","")
+		self._setGameInfoText("","","","","")
 		self.gameList = []
-		self.ui.projectIcons.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
 		self.rightClickMenu = QMenu(self.ui.projectIcons)
 
 		self.currentProject = QSIProject()
@@ -40,19 +38,35 @@ class StartPage(QWidget):
 
 		self.ui.projectIcons.customContextMenuRequested.connect(self.onProjectIconsCustomContextMenuRequested)
 		self.ui.projectIcons.itemActivated.connect(self.onProjectIconsItemActivated)
-		self.ui.projectIcons.itemSelectionChanged.connect(self.onProjectIconsItemSelectionChanged)
-		self.startGameAction.triggered.connect(self.onStartGame)
+		self.ui.projectIcons.currentItemChanged.connect(self.onProjectIconsCurrentItemChanged)
+
+
+	def selectedGame(self) -> QSIProject|None:
+		selectedIndexes = self.ui.projectIcons.selectedIndexes()
+		if len(selectedIndexes) == 0 or selectedIndexes[0].row() >= len(self.gameList):
+			return None
+		return self.gameList[selectedIndexes[0].row()]
 
 
 	@Slot(QPoint)
 	def onProjectIconsCustomContextMenuRequested(self, pos:QPoint):
-		pass
+		selected = self.ui.projectIcons.itemAt(pos)
+		actionsEnabled = selected is not None
+		self.startGameAction.setEnabled(actionsEnabled)
+		self.loadProjectAction.setEnabled(actionsEnabled)
+		self.openProjectDirAction.setEnabled(actionsEnabled)
+		choice = self.rightClickMenu.exec(self.ui.projectIcons.mapToGlobal(pos))
+		if choice is None:
+			return
+		match choice:
+			case self.loadProjectAction:
+				self.ui.projectIcons.itemActivated.emit(selected)
 
 
 	@Slot(QListWidgetItem)
 	def onProjectIconsItemActivated(self, item: QListWidgetItem):
 		self.currentProject = self.gameList[self.ui.projectIcons.indexFromItem(item).row()]
-		self.setGameInfoText(
+		self._setGameInfoText(
 			self.currentProject.name,
 			self.currentProject.author,
 			self.currentProject.getResolutionString(),
@@ -60,16 +74,9 @@ class StartPage(QWidget):
 			self.currentProject.summary)
 		self.projectLoaded.emit(self.currentProject)
 
-	@Slot()
-	def onProjectIconsItemSelectionChanged(self):
+	@Slot(QListWidgetItem, QListWidgetItem)
+	def onProjectIconsCurrentItemChanged(self, cur: QListWidgetItem, prev: QListWidgetItem):
 		pass
-
-
-	@Slot()
-	def onStartGame(self):
-		self.gameStarted.emit(self.currentProject.buildDir)
-
-
 
 	def getGameInfoText(self) -> str:
 		self.ui.gameInfoText.toHtml()
@@ -101,7 +108,7 @@ class StartPage(QWidget):
 			self.ui.projectIcons.addItem(item)
 
 
-	def setGameInfoText(self, name:str, author:str, resolution:str, path:str, description:str):
+	def _setGameInfoText(self, name:str, author:str, resolution:str, path:str, description:str):
 		self.ui.gameInfoText.setHtml(self.baseInfoHTML
 			.replace("[PROJECTNAME]", name)
 			.replace("[PROJECTAUTHOR]", author)

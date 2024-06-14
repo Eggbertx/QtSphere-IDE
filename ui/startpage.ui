@@ -44,6 +44,12 @@
        </property>
        <item row="0" column="0">
         <widget class="QListWidget" name="projectIcons">
+         <property name="contextMenuPolicy">
+          <enum>Qt::CustomContextMenu</enum>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
          <property name="showDropIndicator" stdset="0">
           <bool>false</bool>
          </property>
@@ -73,6 +79,9 @@
          </property>
          <property name="selectionRectVisible">
           <bool>false</bool>
+         </property>
+         <property name="sortingEnabled">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

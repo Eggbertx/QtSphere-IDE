@@ -1,6 +1,6 @@
 import sys
-from PySide6.QtCore import QCoreApplication, QSettings
-from PySide6.QtGui import QIcon
+from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl
+from PySide6.QtGui import QIcon, QDesktopServices
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 
 from qsiproject import QSIProject
@@ -34,10 +34,33 @@ class MainWindow(QMainWindow):
 		self.ui.actionAbout_Qt.triggered.connect(lambda: QMessageBox.aboutQt(self, "About Qt"))
 		self.ui.actionAbout.triggered.connect(lambda: QMessageBox.about(self, "About QtSphere IDE", _ABOUT_STRING))
 		self.startPage.projectLoaded.connect(self.loadProject)
+		self.startPage.loadProjectAction.triggered.connect(self.loadSelectedProject)
+		self.startPage.startGameAction.triggered.connect(self.startGame)
+		self.startPage.openProjectDirAction.triggered.connect(self.openSelectedProjectDir)
 
+	@Slot()
+	def startGame(self):
+		game = self.startPage.selectedGame()
+		if game is None:
+			return
+		print("Starting game:", game.name)
 
+	@Slot()
+	def loadSelectedProject(self):
+		selected = self.startPage.selectedGame()
+		if selected is not None:
+			self.loadProject(selected)
+
+	@Slot(QSIProject)
 	def loadProject(self, project:QSIProject):
-		print("Loading project: ", project.projectFilePath)
+		print("Loading project:", project.projectFilePath)
+
+
+	@Slot()
+	def openSelectedProjectDir(self):
+		selected = self.startPage.selectedGame()
+		project = self.startPage.currentProject if selected is None else selected
+		QDesktopServices.openUrl(QUrl.fromLocalFile(project.projectDir))
 
 if __name__ == "__main__":
 	QCoreApplication.setApplicationName(_APPLICATION_NAME)
