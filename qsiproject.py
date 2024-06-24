@@ -88,19 +88,26 @@ class QSIProject:
 
 
 	def _getCellscriptStringValue(self, cellscriptStr:str, key:str, defaultValue:str = "") -> str:
-		matches: re.Match = re.match(r".*(" + key + r"):\s*['\"](.*)['\"].*", cellscriptStr, re.DOTALL|re.MULTILINE)
+		matches = re.match(r".*" + key + r"\s*:\s*(['\"`]).*", cellscriptStr, re.DOTALL|re.MULTILINE)
 		if matches is None:
 			return defaultValue
-		return matches.group(1)
-
+		quoteChar = matches.group(1)[0]
+		startIndex = matches.start(1)
+		scriptClipped = cellscriptStr[startIndex+1:]
+		endIndex = -1
+		for i in range(len(scriptClipped)):
+			if scriptClipped[i] == quoteChar and scriptClipped[i-1] != '\\':
+				endIndex = i
+				break
+		print(f"key: '{key}', value: '{scriptClipped[:endIndex]}'")
+		return scriptClipped[:endIndex]
 
 	def _getCellscriptIntValue(self, cellscriptStr:str, key:str, defaultValue:int = 0) -> int:
-		matches: re.Match = re.match(r".*(" + key + r")\s*:\s*(\d+).*", cellscriptStr, re.DOTALL|re.MULTILINE)
-		if matches is None:
+		matches = re.findall(r".*(" + key + r")\s*:\s*(\d+).*", cellscriptStr, re.DOTALL|re.MULTILINE)
+		if len(matches) == 0:
 			return defaultValue
-		value:str = matches.group(1)
+		value:str = matches[0][1]
 		return int(value) if value.isdigit() else defaultValue
-
 
 	def _prepareProjectFile(self, projectFile:TextIOWrapper) -> bool:
 		match self.projectType:
