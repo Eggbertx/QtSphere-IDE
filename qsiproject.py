@@ -80,7 +80,7 @@ class QSIProject:
 		iconInfo = QFileInfo(QDir(self.projectDir), "icon.png");
 		if iconInfo.exists():
 			return QIcon(iconInfo.canonicalFilePath())
-		return QIcon(":/icons/res/sphere-icon.png")
+		return QIcon(":/icons/res/neosphere.png")
 
 
 	def getResolutionString(self) -> str:

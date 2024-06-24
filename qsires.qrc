@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/icons">
-        <file>res/sphere-icon.png</file>
+        <file>res/neosphere.png</file>
         <file>res/icon.png</file>
         <file>res/transparency-bg.png</file>
         <file>res/eye.png</file>
@@ -15,8 +15,8 @@
         <file>res/rectangletool.png</file>
         <file>res/gears.png</file>
         <file>res/map-person.png</file>
-        <file>res/legacyconfig-24x24.png</file>
-        <file>res/legacyengine-24x24.png</file>
+        <file>res/legacyconfig.png</file>
+        <file>res/legacyengine.png</file>
         <file>res/togglegrid.png</file>
         <file>res/show_spritesets.png</file>
     </qresource>

@@ -83,10 +83,12 @@ class MainWindow(QMainWindow):
 				self.settings.setValue("whichEngine", "neoSphere")
 				self.ui.actionConfigure_Engine.setEnabled(False)
 				self.ui.actionLegacyConfig.setEnabled(False)
+				self.ui.toolbarPlayGame.setIcon(QIcon(":/icons/res/sphere.png"))
 			case "Sphere 1.x":
 				self.settings.setValue("whichEngine", "legacy")
 				self.ui.actionConfigure_Engine.setEnabled(True)
 				self.ui.actionLegacyConfig.setEnabled(True)
+				self.ui.toolbarPlayGame.setIcon(QIcon(":/icons/res/legacyengine.png"))
 
 	@Slot()
 	def startGame(self):

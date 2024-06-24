@@ -709,7 +709,7 @@
    </property>
    <property name="icon">
     <iconset resource="../qsires.qrc">
-     <normaloff>:/icons/res/sphere-icon.png</normaloff>:/icons/res/sphere-icon.png</iconset>
+     <normaloff>:/icons/res/neosphere.png</normaloff>:/icons/res/neosphere.png</iconset>
    </property>
    <property name="text">
     <string>Play Game</string>
@@ -820,7 +820,7 @@
    </property>
    <property name="icon">
     <iconset resource="../qsires.qrc">
-     <normaloff>:/icons/res/legacyconfig-24x24.png</normaloff>:/icons/res/legacyconfig-24x24.png</iconset>
+     <normaloff>:/icons/res/legacyconfig.png</normaloff>:/icons/res/legacyconfig.png</iconset>
    </property>
    <property name="text">
     <string>Configure</string>
