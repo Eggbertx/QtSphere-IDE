@@ -1,7 +1,7 @@
 import sys
 from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl
-from PySide6.QtGui import QIcon, QDesktopServices
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox
+from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel
 
 from qsiproject import QSIProject
 from ui.ui_mainwindow import Ui_MainWindow
@@ -21,6 +21,9 @@ class MainWindow(QMainWindow):
 	startPage: StartPage
 	engineSelector: QComboBox
 	settingsWindow: SettingsWindow
+	fsModel: QFileSystemModel
+	emptyProjectModel: QStandardItemModel
+	loadedProject: QSIProject
 	def __init__(self, settings:QSettings=None, parent=None):
 		super().__init__(parent)
 		self.ui = Ui_MainWindow()
@@ -36,6 +39,10 @@ class MainWindow(QMainWindow):
 		self.engineSelector.addItem("neoSphere")
 		self.engineSelector.addItem("Sphere 1.x")
 		self.ui.mainToolBar.addWidget(self.engineSelector)
+		self.fsModel = QFileSystemModel(self)
+		self.emptyProjectModel = QStandardItemModel(0,0,self.ui.treeView)
+		self.emptyProjectModel.appendRow(QStandardItem("<No open project>"));
+		self.loadedProject = None
 		self._setupSettings()
 		self._connectActions()
 	
@@ -62,6 +69,27 @@ class MainWindow(QMainWindow):
 		self.startPage.startGameAction.triggered.connect(self.startGame)
 		self.startPage.openProjectDirAction.triggered.connect(self.openSelectedProjectDir)
 		self.engineSelector.currentTextChanged.connect(self.engineChanged)
+
+	def _updateTree(self, game: QSIProject):
+		if game is None:
+			pass
+		self.fsModel.setRootPath(game.projectDir)
+		projectIndex = self.fsModel.index(game.projectDir)
+		self.ui.treeView.setModel(self.fsModel)
+		self.ui.treeView.setRootIndex(projectIndex)
+		for i in range(self.fsModel.columnCount()):
+			if i > 0:
+				self.ui.treeView.hideColumn(i)
+		print(f"Loading project: {game.projectDir}")
+		# self.fsModel.setRootPath(game.projectDir)
+		self.setWindowTitle(f"QtSphereIDE {_VERSION} - {game.name}")
+
+
+	def closeProject(self):
+		self.ui.treeView.setModel(self.emptyProjectModel)
+		self.loadedProject = None
+		self._updateTree(None)
+		self.setWindowTitle(f"QtSphere IDE {_VERSION}")
 
 	@Slot()
 	def openSettingsWindow(self):
@@ -100,13 +128,15 @@ class MainWindow(QMainWindow):
 	@Slot()
 	def loadSelectedProject(self):
 		selected = self.startPage.selectedGame()
-		if selected is not None:
+		if selected is None:
+			self.closeProject()
+		else:
 			self.loadProject(selected)
 
 	@Slot(QSIProject)
 	def loadProject(self, project:QSIProject):
 		print("Loading project:", project.projectFilePath)
-
+		self._updateTree(project)
 
 	@Slot()
 	def openSelectedProjectDir(self):
