@@ -8,7 +8,7 @@ from ui.ui_mainwindow import Ui_MainWindow
 from widgets.startpage import StartPage
 from dialogs.settingswindow import SettingsWindow
 
-_VERSION = "0.9"
+_VERSION = "0.10"
 _APPLICATION_NAME = "QtSphere IDE"
 _ORG_NAME = "Spherical"
 _ABOUT_STRING = f"""QtSphere IDE v{_VERSION}<br />
