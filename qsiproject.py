@@ -68,7 +68,7 @@ class QSIProject:
 			self.projectDir = fileInfo.dir().path()
 		
 		if self.projectFilePath == "" or self.projectFilePath is None:
-			QMessageBox.critical(None, "Error", "Unable to get project info")
+			print(f"Unable to get project info for path {path} - skipping")
 			return False
 
 		self.buildDir = self.projectDir
@@ -99,7 +99,6 @@ class QSIProject:
 			if scriptClipped[i] == quoteChar and scriptClipped[i-1] != '\\':
 				endIndex = i
 				break
-		print(f"key: '{key}', value: '{scriptClipped[:endIndex]}'")
 		return scriptClipped[:endIndex]
 
 	def _getCellscriptIntValue(self, cellscriptStr:str, key:str, defaultValue:int = 0) -> int:
