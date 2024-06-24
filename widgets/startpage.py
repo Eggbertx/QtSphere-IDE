@@ -28,7 +28,7 @@ class StartPage(QWidget):
 		self.gameList = []
 		self.rightClickMenu = QMenu(self.ui.projectIcons)
 
-		self.currentProject = QSIProject()
+		self.currentProject = None
 		self.startGameAction = self.rightClickMenu.addAction("Start game")
 		self.loadProjectAction = self.rightClickMenu.addAction("Load project")
 		self.openProjectDirAction = self.rightClickMenu.addAction("Open project directory")
@@ -65,7 +65,8 @@ class StartPage(QWidget):
 
 	@Slot(QListWidgetItem)
 	def onProjectIconsItemActivated(self, item: QListWidgetItem):
-		self.currentProject = self.gameList[self.ui.projectIcons.indexFromItem(item).row()]
+		selectedIndex = self.ui.projectIcons.indexFromItem(item).row()
+		self.currentProject = self.gameList[selectedIndex]
 		self._setGameInfoText(
 			self.currentProject.name,
 			self.currentProject.author,
@@ -83,7 +84,6 @@ class StartPage(QWidget):
 
 	def refreshGameList(self):
 		self.gameList.clear()
-		self.ui.projectIcons.clear()
 		settings = QSettings()
 		numProjectDirs = settings.beginReadArray("projectDirs")
 		for p in range(numProjectDirs):
@@ -101,7 +101,8 @@ class StartPage(QWidget):
 					self.gameList.append(project)
 		settings.endArray()
 
-		self.gameList.sort(key=lambda student: student.name)
+		self.gameList.sort(key=lambda game: game.name.lower())
+		self.ui.projectIcons.clear()
 		for project in self.gameList:
 			item = QListWidgetItem(project.getIcon(), project.name)
 			item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)

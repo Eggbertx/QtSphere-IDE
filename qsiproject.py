@@ -35,6 +35,10 @@ class QSIProject:
 	def __init__(self):
 		self.projectType = ProjectType.Unknown
 		self.projectFilePath = None
+		self.name = None
+		self.author = None
+		self.width = None
+		self.height = None
 		self.buildDir = None
 
 
