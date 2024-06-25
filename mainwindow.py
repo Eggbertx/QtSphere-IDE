@@ -1,8 +1,8 @@
 import sys
 from enum import Enum
-from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl
+from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl, QModelIndex
 from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog
 
 from qsiproject import QSIProject
 from ui.ui_mainwindow import Ui_MainWindow
@@ -16,6 +16,30 @@ _ABOUT_STRING = f"""QtSphere IDE v{_VERSION}<br />
 Copyright 2024 by <a href=\"https://github.com/eggbertx\">Eggbertx</a><br /><br />
 See <a href=\"https://github.com/Eggbertx/QtSphere-IDE/blob/master/LICENSE.txt\">LICENSE.txt</a> for more information.
 """
+_OPEN_DIALOG_FILTER = (
+	"All supported files (*.sgm *.txt *.js *.mjs *.cjs *.rmp *.rss *.rws)",
+	"Sphere projects (*.sgm)",
+	"Script files (*.js *.mjs, *.cjs)",
+	"Text files (*.txt *.md)",
+	"Audio files (*.wav *.ogg *.mp3 *.flac *.it *.mod *.s3m *.xm)",
+	"Sphere fonts (*.rfn)",
+	"Sphere maps (*.rmp)",
+	"Spritesets (*.rss)",
+	"Windowstyles (*.rws)",
+	"All files (*.*)"
+)
+
+class FileType(Enum):
+	AllSupported = 0
+	Projects = 1
+	Script = 2
+	Text = 3
+	Audio = 4
+	SphereFont = 5
+	SphereMap = 6
+	Spriteset = 7
+	WindowStyle = 8
+	All = 9
 
 class SidebarTab(Enum):
 	FileTree = 0
@@ -85,6 +109,11 @@ class MainWindow(QMainWindow):
 		self.ui.actionQSIGithub.triggered.connect(lambda: QDesktopServices.openUrl("https://github.com/Eggbertx/QtSphere-IDE"))
 		self.ui.actionNSGithub.triggered.connect(lambda: QDesktopServices.openUrl("https://github.com/spheredev/neoSphere"))
 		self.ui.actionOpen_Game_Directory.triggered.connect(self._openCurrentProjectDir)
+		self.ui.treeView.activated.connect(self.treeItemActivated)
+		self.ui.toolbarOpenButton.triggered.connect(self.openFileButtonPressed)
+		self.ui.actionOpenFile.triggered.connect(self.openFileButtonPressed)
+		self.ui.actionOpenProject.triggered.connect(self.openProjectPressed)
+
 
 	def _openCurrentProjectDir(self):
 		if self.loadedProject is not None:
@@ -102,6 +131,9 @@ class MainWindow(QMainWindow):
 			if i > 0:
 				self.ui.treeView.hideColumn(i)
 
+	def openFile(self, path:str):
+		print(f"Opening file {path}")
+
 	def closeProject(self):
 		self.loadedProject = None
 		self._updateTree(None)
@@ -116,6 +148,37 @@ class MainWindow(QMainWindow):
 				self.ui.sideBar.tabBar().setCurrentIndex(1)
 			case SidebarTab.SoundTest:
 				self.ui.sideBar.tabBar().setCurrentIndex(2)
+
+	def showOpenFileDialog(self, fileType: FileType = FileType.AllSupported, startDir:str = ".", title:str = "Open File") -> str:
+		result = QFileDialog.getOpenFileName(self, title, startDir,
+			";;".join(_OPEN_DIALOG_FILTER), _OPEN_DIALOG_FILTER[fileType.value])
+		return result[0] if len(result) > 0 else None
+
+	@Slot()
+	def openFileButtonPressed(self):
+		filePath = self.showOpenFileDialog(FileType.AllSupported,
+			self.loadedProject.projectDir if self.loadedProject is not None else ".")
+		print(f"Opening file {filePath}")
+
+	@Slot()
+	def openProjectPressed(self):
+		numProjectDirs = settings.beginReadArray("projectDirs")
+		startDir:str = None
+		if numProjectDirs > 0:
+			settings.setArrayIndex(0)
+			startDir = settings.value("directory")
+		settings.endArray()
+		projectDir = QFileDialog.getExistingDirectory(self, "Selct project directory", startDir)
+		newProject = QSIProject()
+		if newProject.open(projectDir):
+			self.loadProject(newProject)
+		else:
+			QMessageBox.critical(self, "Error", "Unable to open project directory")
+
+	@Slot()
+	def treeItemActivated(self, index: QModelIndex):
+		if not self.fsModel.isDir(index):
+			self.openFile(self.fsModel.filePath(index))
 
 	@Slot()
 	def openSettingsWindow(self):
