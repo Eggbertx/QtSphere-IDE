@@ -4,6 +4,8 @@ from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl, QModelIndex
 from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog
 
+from formats.spherefile import SphereFile
+from formats.spriteset import SphereSpriteset
 from qsiproject import QSIProject
 from ui.ui_mainwindow import Ui_MainWindow
 from widgets.startpage import StartPage
@@ -131,8 +133,23 @@ class MainWindow(QMainWindow):
 			if i > 0:
 				self.ui.treeView.hideColumn(i)
 
-	def openFile(self, path:str):
-		print(f"Opening file {path}")
+	def openFile(self, filePath:str):
+		ext = ""
+		if filePath.count(".") > 0:
+			ext = filePath[filePath.rindex("."):]
+		
+		opening:SphereFile = None
+		match ext:
+			case ".rss":
+				opening = SphereSpriteset(filePath)
+			case _:
+				QMessageBox.critical(self, "Error", f"A handler for file extension {ext} has not been implemented yet")
+				return
+		try:
+			opening.open()
+		except Exception as e:
+			QMessageBox.critical(self, "Error", str(e))
+
 
 	def closeProject(self):
 		self.loadedProject = None
@@ -158,7 +175,8 @@ class MainWindow(QMainWindow):
 	def openFileButtonPressed(self):
 		filePath = self.showOpenFileDialog(FileType.AllSupported,
 			self.loadedProject.projectDir if self.loadedProject is not None else ".")
-		print(f"Opening file {filePath}")
+		if filePath is not None:
+			self.openFile(filePath)
 
 	@Slot()
 	def openProjectPressed(self):
