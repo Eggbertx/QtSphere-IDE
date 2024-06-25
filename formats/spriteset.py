@@ -75,6 +75,8 @@ class SphereSpriteset(SphereFile):
 						(index, delay) = struct.unpack("<HH4x", file.read(8))
 						direction.addFrame(index, delay)
 					self.directions.append(direction)
-
 			case _:
 				raise FormatException(self.filePath, "spriteset versions 1 and 2 are not supported yet")
+
+	def _packBytes() -> bytes:
+		return bytes([])

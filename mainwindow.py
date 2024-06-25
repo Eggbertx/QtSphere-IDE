@@ -1,5 +1,6 @@
 import sys
 from enum import Enum
+from os.path import basename
 from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl, QModelIndex
 from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog
@@ -9,6 +10,7 @@ from formats.spriteset import SphereSpriteset
 from qsiproject import QSIProject
 from ui.ui_mainwindow import Ui_MainWindow
 from widgets.startpage import StartPage
+from widgets.spriteseteditor import SpritesetEditor
 from dialogs.settingswindow import SettingsWindow
 
 _VERSION = "0.10"
@@ -138,15 +140,17 @@ class MainWindow(QMainWindow):
 		if filePath.count(".") > 0:
 			ext = filePath[filePath.rindex("."):]
 		
-		opening:SphereFile = None
-		match ext:
-			case ".rss":
-				opening = SphereSpriteset(filePath)
-			case _:
-				QMessageBox.critical(self, "Error", f"A handler for file extension {ext} has not been implemented yet")
-				return
 		try:
-			opening.open()
+			match ext:
+				case ".rss":
+					rss = SphereSpriteset(filePath)
+					rss.open()
+					editor = SpritesetEditor(self.ui.openFileTabs)
+					t = self.ui.openFileTabs.addTab(editor, basename(rss.filePath))
+					editor.attachSpriteset(rss)
+					self.ui.openFileTabs.setCurrentIndex(t)
+				case _:
+					raise Exception(f"A handler for file extension {ext} has not been implemented yet")
 		except Exception as e:
 			QMessageBox.critical(self, "Error", str(e))
 

@@ -8,6 +8,7 @@
         "qsires.qrc",
         "ui/mainwindow.ui",
         "ui/settingswindow.ui",
+		"ui/spriteseteditor.ui",
         "ui/startpage.ui"
     ]
 }
