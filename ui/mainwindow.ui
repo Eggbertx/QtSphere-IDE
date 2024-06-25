@@ -344,7 +344,6 @@
     <addaction name="menuNew"/>
     <addaction name="actionOpenFile"/>
     <addaction name="actionOpenProject"/>
-    <addaction name="actionClose_Project"/>
     <addaction name="menuOpen_Recent"/>
     <addaction name="menuImport"/>
     <addaction name="separator"/>
@@ -464,14 +463,6 @@
    <addaction name="separator"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionClose_Project">
-   <property name="text">
-    <string>&amp;Close Project</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Q</string>
-   </property>
-  </action>
   <action name="actionOpenFile">
    <property name="text">
     <string>&amp;Open File...</string>
@@ -655,7 +646,10 @@
   </action>
   <action name="actionClose">
    <property name="text">
-    <string>Close</string>
+    <string>&amp;Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="toolbarNewButton">

@@ -1,4 +1,5 @@
 import sys
+from enum import Enum
 from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl
 from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel
@@ -15,6 +16,11 @@ _ABOUT_STRING = f"""QtSphere IDE v{_VERSION}<br />
 Copyright 2024 by <a href=\"https://github.com/eggbertx\">Eggbertx</a><br /><br />
 See <a href=\"https://github.com/Eggbertx/QtSphere-IDE/blob/master/LICENSE.txt\">LICENSE.txt</a> for more information.
 """
+
+class SidebarTab(Enum):
+	FileTree = 0
+	TaskList = 1
+	SoundTest = 2
 
 class MainWindow(QMainWindow):
 	settings: QSettings
@@ -43,6 +49,7 @@ class MainWindow(QMainWindow):
 		self.emptyProjectModel = QStandardItemModel(0,0,self.ui.treeView)
 		self.emptyProjectModel.appendRow(QStandardItem("<No open project>"));
 		self.loadedProject = None
+		self._updateTree(self.loadedProject)
 		self._setupSettings()
 		self._connectActions()
 	
@@ -69,10 +76,24 @@ class MainWindow(QMainWindow):
 		self.startPage.startGameAction.triggered.connect(self.startGame)
 		self.startPage.openProjectDirAction.triggered.connect(self.openSelectedProjectDir)
 		self.engineSelector.currentTextChanged.connect(self.engineChanged)
+		self.ui.actionClose.triggered.connect(self.closeProject)
+		self.ui.actionRefresh.triggered.connect(self._updateTree)
+		self.ui.actionProject_Explorer.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.FileTree))
+		self.ui.actionProject_Task_List.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.TaskList))
+		self.ui.actionSound_Test.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.SoundTest))
+		self.ui.actionSpherical_community.triggered.connect(lambda: QDesktopServices.openUrl("https://spheredev.org/"))
+		self.ui.actionQSIGithub.triggered.connect(lambda: QDesktopServices.openUrl("https://github.com/Eggbertx/QtSphere-IDE"))
+		self.ui.actionNSGithub.triggered.connect(lambda: QDesktopServices.openUrl("https://github.com/spheredev/neoSphere"))
+		self.ui.actionOpen_Game_Directory.triggered.connect(self._openCurrentProjectDir)
+
+	def _openCurrentProjectDir(self):
+		if self.loadedProject is not None:
+			QDesktopServices.openUrl(self.loadedProject.projectDir)
 
 	def _updateTree(self, game: QSIProject):
 		if game is None:
-			pass
+			self.ui.treeView.setModel(self.emptyProjectModel)
+			return
 		self.fsModel.setRootPath(game.projectDir)
 		projectIndex = self.fsModel.index(game.projectDir)
 		self.ui.treeView.setModel(self.fsModel)
@@ -80,16 +101,21 @@ class MainWindow(QMainWindow):
 		for i in range(self.fsModel.columnCount()):
 			if i > 0:
 				self.ui.treeView.hideColumn(i)
-		print(f"Loading project: {game.projectDir}")
-		# self.fsModel.setRootPath(game.projectDir)
-		self.setWindowTitle(f"QtSphereIDE {_VERSION} - {game.name}")
-
 
 	def closeProject(self):
-		self.ui.treeView.setModel(self.emptyProjectModel)
 		self.loadedProject = None
 		self._updateTree(None)
 		self.setWindowTitle(f"QtSphere IDE {_VERSION}")
+		self.ui.menuProject.setEnabled(False)
+
+	def switchSidebarTab(self, tab:SidebarTab):
+		match tab:
+			case SidebarTab.FileTree:
+				self.ui.sideBar.tabBar().setCurrentIndex(0)
+			case SidebarTab.TaskList:
+				self.ui.sideBar.tabBar().setCurrentIndex(1)
+			case SidebarTab.SoundTest:
+				self.ui.sideBar.tabBar().setCurrentIndex(2)
 
 	@Slot()
 	def openSettingsWindow(self):
@@ -135,7 +161,10 @@ class MainWindow(QMainWindow):
 
 	@Slot(QSIProject)
 	def loadProject(self, project:QSIProject):
-		print("Loading project:", project.projectFilePath)
+		print("Loading project:", project.projectDir)
+		self.setWindowTitle(f"QtSphereIDE {_VERSION} - {project.name}")
+		self.ui.menuProject.setEnabled(True)
+		self.loadedProject = project
 		self._updateTree(project)
 
 	@Slot()
