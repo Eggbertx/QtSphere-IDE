@@ -8,6 +8,7 @@ from ui.ui_startpage import Ui_StartPage
 
 class StartPage(QWidget):
 	ui: Ui_StartPage
+	printWarnings: bool
 	baseInfoHTML: str
 	gameList: list[QSIProject]
 	currentProject: QSIProject
@@ -18,10 +19,11 @@ class StartPage(QWidget):
 	refreshGameListAction: QAction
 	projectLoaded: Signal = Signal(QSIProject)
 
-	def __init__(self, parent: QWidget = None, windowType: Qt.WindowType = Qt.WindowType.Widget):
+	def __init__(self, parent:QWidget = None, windowType:Qt.WindowType = Qt.WindowType.Widget, printWarnings:bool = False):
 		super().__init__(parent, windowType)
 		self.ui = Ui_StartPage()
 		self.ui.setupUi(self)
+		self.printWarnings = printWarnings
 		self.baseInfoHTML = self.ui.gameInfoText.toHtml()
 		self.ui.splitter.setSizes((250, 100))
 		self._setGameInfoText("","","","","")
@@ -97,7 +99,7 @@ class StartPage(QWidget):
 				if fn == "." or fn == "..":
 					continue
 				project = QSIProject()
-				if project.open(projDir.filePath()):
+				if project.open(projDir.filePath(), self.printWarnings):
 					self.gameList.append(project)
 		settings.endArray()
 

@@ -1,6 +1,8 @@
-import sys
+from argparse import ArgumentParser
 from enum import Enum
 from os.path import basename
+import sys
+
 from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl, QModelIndex
 from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog
@@ -58,15 +60,17 @@ class MainWindow(QMainWindow):
 	fsModel: QFileSystemModel
 	emptyProjectModel: QStandardItemModel
 	loadedProject: QSIProject
-	def __init__(self, settings:QSettings=None, parent=None):
+	verbose: bool
+	def __init__(self, parent=None, settings:QSettings=QSettings(), verbose=False):
 		super().__init__(parent)
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
+		self.verbose = verbose
 		self.settings = settings
 		self.settingsWindow = SettingsWindow(self)
 		self.ui.splitter.setStretchFactor(1, 4)
 		self.setWindowIcon(QIcon(":/icons/res/icon.png"))
-		self.startPage = StartPage(self.ui.openFileTabs)
+		self.startPage = StartPage(self.ui.openFileTabs, printWarnings=self.verbose)
 		self.ui.openFileTabs.addTab(self.startPage, "Start Page")
 		self.ui.actionNew_file.setMenu(self.ui.menuNew)
 		self.engineSelector = QComboBox(self.ui.mainToolBar)
@@ -258,14 +262,23 @@ class MainWindow(QMainWindow):
 		project = self.startPage.currentProject if selected is None else selected
 		QDesktopServices.openUrl(QUrl.fromLocalFile(project.projectDir))
 
+
 if __name__ == "__main__":
+	parser = ArgumentParser()
+	parser.add_argument("--verbose", "-v",
+		action="store_true",
+		default=False,
+		help="If set, QtSphere IDE will print a warning when it finds a directory with no parseable game file (game.sgm, Cellscript.js, etc)")
+	
+	args = parser.parse_args()
+
 	QCoreApplication.setApplicationName(_APPLICATION_NAME)
 	QCoreApplication.setOrganizationName(_ORG_NAME)
 	QCoreApplication.setApplicationVersion(_VERSION)
 	app = QApplication(sys.argv)
 
 	settings = QSettings()
-	window = MainWindow(settings)
+	window = MainWindow(settings=settings, verbose=args.verbose)
 	if settings.value("maximized", True):
 		window.showMaximized()
 	else:

@@ -42,7 +42,7 @@ class QSIProject:
 		self.buildDir = None
 
 
-	def open(self, path: str) -> bool:
+	def open(self, path: str, printWarnings:bool = False) -> bool:
 		self.projectDir = path
 		fileInfo = QFileInfo(path)
 		if not fileInfo.exists():
@@ -72,7 +72,8 @@ class QSIProject:
 			self.projectDir = fileInfo.dir().path()
 		
 		if self.projectFilePath == "" or self.projectFilePath is None:
-			print(f"Unable to get project info for path {path} - skipping")
+			if printWarnings:
+				print(f"Unable to get project info for path {path} - skipping")
 			return False
 
 		self.buildDir = self.projectDir
