@@ -35,11 +35,18 @@ class QSIProject:
 	def __init__(self):
 		self.projectType = ProjectType.Unknown
 		self.projectFilePath = None
-		self.name = None
-		self.author = None
-		self.width = None
-		self.height = None
+		self.name = ""
+		self.author = ""
+		self.width = 0
+		self.height = 0
+		self.apiLevel = 0
+		self.version = 0
+		self.saveID = ""
+		self.summary = ""
 		self.buildDir = None
+		self.script = None
+		self.projectDir = None
+		self.compiler = None
 
 
 	def open(self, path: str, printWarnings:bool = False) -> bool:

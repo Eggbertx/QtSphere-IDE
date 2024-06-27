@@ -32,6 +32,7 @@ class SettingsWindow(QDialog):
 		self.ui.wineDir_txt.setText(settings.value("wineDir", "/usr/bin"))
 		self.ui.neosphereDir_txt.setText(settings.value("neosphereDir", ""))
 		self.ui.legacySphereDir_txt.setText(settings.value("legacySphereDir", ""))
+		self.ui.unrecognizedInText_chk.setChecked(settings.value("unrecognizedAsText", "true") == "true")
 
 		numSearchPaths = settings.beginReadArray("projectDirs")
 		for d in range(numSearchPaths):
@@ -49,6 +50,7 @@ class SettingsWindow(QDialog):
 		settings.setValue("wineDir", self.ui.wineDir_txt.text())
 		settings.setValue("neosphereDir", self.ui.neosphereDir_txt.text())
 		settings.setValue("legacySphereDir", self.ui.legacySphereDir_txt.text())
+		settings.setValue("unrecognizedAsText", self.ui.unrecognizedInText_chk.isChecked())
 
 		settings.remove("projectDirs")
 		settings.beginWriteArray("projectDirs")

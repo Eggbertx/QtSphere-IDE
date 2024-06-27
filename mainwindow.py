@@ -2,10 +2,11 @@ from argparse import ArgumentParser
 from enum import Enum
 from os.path import basename
 import sys
+import traceback
 
 from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl, QModelIndex
 from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog, QTextEdit
 
 from formats.spherefile import SphereFile
 from formats.spriteset import SphereSpriteset
@@ -144,20 +145,30 @@ class MainWindow(QMainWindow):
 		ext = ""
 		if filePath.count(".") > 0:
 			ext = filePath[filePath.rindex("."):]
-		
+		filename = basename(filePath)
 		try:
 			match ext:
 				case ".rss":
 					rss = SphereSpriteset(filePath)
 					rss.open()
 					editor = SpritesetEditor(self.ui.openFileTabs)
-					t = self.ui.openFileTabs.addTab(editor, basename(rss.filePath))
+					t = self.ui.openFileTabs.addTab(editor, filename)
 					editor.attachSpriteset(rss)
 					self.ui.openFileTabs.setCurrentIndex(t)
 				case _:
-					raise Exception(f"A handler for file extension {ext} has not been implemented yet")
+					if ext not in (".txt", ".js", ".cjs", ".mjs", ".ts", ".md", ".sgm") and self.settings.value("unrecognizedAsText", "true") != "true":
+						raise Exception(f"Unrecognized file extension {ext}, to open in text editor, review settings")
+
+					with open(filePath, errors="ignore") as file:
+						editor = QTextEdit(self.ui.openFileTabs)
+						editor.setTabStopDistance(editor.tabStopDistance()/2)
+						editor.setText(file.read())
+						t = self.ui.openFileTabs.addTab(editor, filename)
+						self.ui.openFileTabs.setCurrentIndex(t)
+
 		except Exception as e:
-			QMessageBox.critical(self, "Error", str(e))
+			QMessageBox.critical(self, "Error", traceback.format_exc())
+			raise
 
 
 	def closeProject(self):

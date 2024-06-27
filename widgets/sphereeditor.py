@@ -1,6 +1,6 @@
 from enum import Enum
 
-from PySide6.QtCore import Qt, QKeyCombination
+from PySide6.QtCore import Qt, QObject
 from PySide6.QtGui import QUndoStack, QAction
 from PySide6.QtWidgets import QWidget
 
