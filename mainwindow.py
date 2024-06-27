@@ -103,6 +103,7 @@ class MainWindow(QMainWindow):
 		self.ui.actionAbout.triggered.connect(lambda: QMessageBox.about(self, "About QtSphere IDE", _ABOUT_STRING))
 		self.ui.openFileTabs.tabCloseRequested.connect(self.tabCloseRequested)
 		self.ui.actionConfigure_QtSphere_IDE.triggered.connect(self.openSettingsWindow)
+		self.settingsWindow.settingsSaved.connect(self.onSettingsSaved)
 		self.startPage.projectLoaded.connect(self.loadProject)
 		self.startPage.loadProjectAction.triggered.connect(self.loadSelectedProject)
 		self.startPage.startGameAction.triggered.connect(self.startGame)
@@ -178,6 +179,10 @@ class MainWindow(QMainWindow):
 		result = QFileDialog.getOpenFileName(self, title, startDir,
 			";;".join(_OPEN_DIALOG_FILTER), _OPEN_DIALOG_FILTER[fileType.value])
 		return result[0] if len(result) > 0 else None
+
+	@Slot()
+	def onSettingsSaved(self):
+		self.startPage.refreshGameList()
 
 	@Slot()
 	def openFileButtonPressed(self):

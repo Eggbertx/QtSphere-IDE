@@ -4,6 +4,7 @@
         "widgets/colorbutton.py",
         "widgets/maintabwidget.py",
         "widgets/startpage.py",
+		"dialogs/settingswindow.py",
         "qsiproject.py",
         "qsires.qrc",
         "ui/mainwindow.ui",
