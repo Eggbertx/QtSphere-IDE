@@ -123,6 +123,11 @@ class MainWindow(QMainWindow):
 		self.ui.toolbarOpenButton.triggered.connect(self.openFileButtonPressed)
 		self.ui.actionOpenFile.triggered.connect(self.openFileButtonPressed)
 		self.ui.actionOpenProject.triggered.connect(self.openProjectPressed)
+		self.ui.openFileTabs.currentChanged.connect(self.onTabChanged)
+		self.ui.actionCut.triggered.connect(self.onCutTriggered)
+		self.ui.actionCopy.triggered.connect(self.onCopyTriggered)
+		self.ui.actionPaste.triggered.connect(self.onPasteTriggered)
+		self.ui.actionSelect_All.triggered.connect(self.onSelectAllTriggered)
 
 
 	def _openCurrentProjectDir(self):
@@ -140,6 +145,10 @@ class MainWindow(QMainWindow):
 		for i in range(self.fsModel.columnCount()):
 			if i > 0:
 				self.ui.treeView.hideColumn(i)
+
+	def currentTabIsFile(self):
+		opened = self.ui.openFileTabs.currentWidget()
+		print(opened.undo)
 
 	def openFile(self, filePath:str):
 		ext = ""
@@ -190,6 +199,51 @@ class MainWindow(QMainWindow):
 		result = QFileDialog.getOpenFileName(self, title, startDir,
 			";;".join(_OPEN_DIALOG_FILTER), _OPEN_DIALOG_FILTER[fileType.value])
 		return result[0] if len(result) > 0 else None
+
+	def currentTabCanCutCopyPaste(self):
+		active = self.ui.openFileTabs.currentWidget()
+		return hasattr(active, "cut") and hasattr(active, "copy") and hasattr(active, "paste")
+
+	def currentTabHasUndoRedo(self):
+		active = self.ui.openFileTabs.currentWidget()
+		return hasattr(active, "undo") and hasattr(active, "redo")
+
+	def currentTabHasSelectAll(self):
+		active = self.ui.openFileTabs.currentWidget()
+		return hasattr(active, "selectAll")
+
+	@Slot(int)
+	def onTabChanged(self, index:int):
+		if index < 0:
+			return
+		hasUndoRedo = self.currentTabHasUndoRedo()
+		hasClipboard = self.currentTabCanCutCopyPaste()
+		self.ui.actionUndo.setEnabled(hasUndoRedo)
+		self.ui.actionRedo.setEnabled(hasUndoRedo)
+		self.ui.actionCut.setEnabled(hasClipboard)
+		self.ui.actionCopy.setEnabled(hasClipboard)
+		self.ui.actionPaste.setEnabled(hasClipboard)
+		self.ui.actionSelect_All.setEnabled(self.currentTabHasSelectAll())
+
+	@Slot()
+	def onCutTriggered(self):
+		if self.currentTabCanCutCopyPaste():
+			self.ui.openFileTabs.currentWidget().cut()
+
+	@Slot()
+	def onCopyTriggered(self):
+		if self.currentTabCanCutCopyPaste():
+			self.ui.openFileTabs.currentWidget().copy()
+
+	@Slot()
+	def onPasteTriggered(self):
+		if self.currentTabCanCutCopyPaste():
+			self.ui.openFileTabs.currentWidget().paste()
+
+	@Slot()
+	def onSelectAllTriggered(self):
+		if self.currentTabHasSelectAll():
+			self.ui.openFileTabs.currentWidget().selectAll()
 
 	@Slot()
 	def onSettingsSaved(self):
