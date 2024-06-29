@@ -149,13 +149,21 @@ class MainWindow(QMainWindow):
 		opened = self.ui.openFileTabs.currentWidget()
 		print(opened.undo)
 
+	def openFileAsText(self, filePath:str):
+		with open(filePath, errors="ignore") as file:
+			editor = QTextEdit(self.ui.openFileTabs)
+			editor.setTabStopDistance(editor.tabStopDistance()/2)
+			editor.setText(file.read())
+			t = self.ui.openFileTabs.addTab(editor, basename(filePath))
+			self.ui.openFileTabs.setCurrentIndex(t)
+
 	def openFile(self, filePath:str):
 		ext = ""
 		if filePath.count(".") > 0:
 			ext = filePath[filePath.rindex("."):]
 		filename = basename(filePath)
 		try:
-			match ext:
+			match ext.lower():
 				case ".rss":
 					rss = SphereSpriteset(filePath)
 					rss.open()
@@ -163,16 +171,13 @@ class MainWindow(QMainWindow):
 					t = self.ui.openFileTabs.addTab(editor, filename)
 					editor.attachSpriteset(rss)
 					self.ui.openFileTabs.setCurrentIndex(t)
+				case ".txt"|".js"|".cjs"|".mjs"|".ts"|".md"|".sgm":
+					self.openFileAsText(filePath)
 				case _:
-					if ext not in (".txt", ".js", ".cjs", ".mjs", ".ts", ".md", ".sgm") and self.settings.value("unrecognizedAsText", "true") != "true":
-						raise Exception(f"Unrecognized file extension {ext}, to open in text editor, review settings")
-
-					with open(filePath, errors="ignore") as file:
-						editor = QTextEdit(self.ui.openFileTabs)
-						editor.setTabStopDistance(editor.tabStopDistance()/2)
-						editor.setText(file.read())
-						t = self.ui.openFileTabs.addTab(editor, filename)
-						self.ui.openFileTabs.setCurrentIndex(t)
+					if self.settings.value("unrecognizedFileEditor", "external") == "external":
+						QDesktopServices.openUrl(QUrl.fromLocalFile(filePath))
+					else:
+						self.openFileAsText(filePath)
 		except Exception as e:
 			QMessageBox.critical(self, "Error", traceback.format_exc())
 			raise

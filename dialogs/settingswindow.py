@@ -1,3 +1,4 @@
+from enum import Enum
 import os
 
 from PySide6.QtCore import Qt, Slot, Signal, QSettings
@@ -5,6 +6,10 @@ from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QDialog, QWidget, QDialogButtonBox, QListWidgetItem, QFileDialog, QAbstractButton
 
 from ui.ui_settingswindow import Ui_SettingsWindow
+
+class UnrecognizedFileHandler(Enum):
+	ExternalEditor = 0,
+	InternalTextEditor = 1
 
 class SettingsWindow(QDialog):
 	ui: Ui_SettingsWindow
@@ -32,7 +37,7 @@ class SettingsWindow(QDialog):
 		self.ui.wineDir_txt.setText(settings.value("wineDir", "/usr/bin"))
 		self.ui.neosphereDir_txt.setText(settings.value("neosphereDir", ""))
 		self.ui.legacySphereDir_txt.setText(settings.value("legacySphereDir", ""))
-		self.ui.unrecognizedFileEditor_combo.setCurrentIndex(0 if settings.value("unrecognizedAsText", "true") == "true" else 1)
+		self.ui.unrecognizedFileEditor_combo.setCurrentIndex(0 if settings.value("unrecognizedFileEditor", "external") == "external" else 1)
 
 		numSearchPaths = settings.beginReadArray("projectDirs")
 		for d in range(numSearchPaths):
@@ -51,7 +56,7 @@ class SettingsWindow(QDialog):
 			settings.setValue("wineDir", self.ui.wineDir_txt.text())
 		settings.setValue("neosphereDir", self.ui.neosphereDir_txt.text())
 		settings.setValue("legacySphereDir", self.ui.legacySphereDir_txt.text())
-		settings.setValue("unrecognizedAsText", self.ui.unrecognizedFileEditor_combo.currentIndex() == 0)
+		settings.setValue("unrecognizedFileEditor", "text" if self.ui.unrecognizedFileEditor_combo.currentIndex() == 1 else "external")
 
 		settings.remove("projectDirs")
 		settings.beginWriteArray("projectDirs")
@@ -69,7 +74,6 @@ class SettingsWindow(QDialog):
 		item.setFlags(item.flags()|Qt.ItemFlag.ItemIsEditable)
 		self.ui.projectDirsList.addItem(item)
 
-
 	def _removeWineIfWindows(self):
 		if os.name == "nt":
 			# running in Windows, no need for WINE stuff
@@ -82,6 +86,7 @@ class SettingsWindow(QDialog):
 			self.ui.wineDir_btn.deleteLater()
 			self.ui.wineDir_txt.deleteLater()
 			self.ui.wineDir_layout.deleteLater()
+
 
 	@Slot()	
 	def onOK(self):

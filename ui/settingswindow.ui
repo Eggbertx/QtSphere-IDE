@@ -302,12 +302,12 @@
     <widget class="QComboBox" name="unrecognizedFileEditor_combo">
      <item>
       <property name="text">
-       <string>Use internal text editor</string>
+       <string>External editor</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Use external editor</string>
+       <string>Internal text editor</string>
       </property>
      </item>
     </widget>
