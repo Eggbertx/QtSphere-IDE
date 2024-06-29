@@ -32,7 +32,7 @@ class SettingsWindow(QDialog):
 		self.ui.wineDir_txt.setText(settings.value("wineDir", "/usr/bin"))
 		self.ui.neosphereDir_txt.setText(settings.value("neosphereDir", ""))
 		self.ui.legacySphereDir_txt.setText(settings.value("legacySphereDir", ""))
-		self.ui.unrecognizedInText_chk.setChecked(settings.value("unrecognizedAsText", "true") == "true")
+		self.ui.unrecognizedFileEditor_combo.setCurrentIndex(0 if settings.value("unrecognizedAsText", "true") == "true" else 1)
 
 		numSearchPaths = settings.beginReadArray("projectDirs")
 		for d in range(numSearchPaths):
@@ -47,10 +47,11 @@ class SettingsWindow(QDialog):
 		settings = QSettings()
 		settings.setValue("mapCursorColor", self.ui.mapCursorCol_btn.color)
 		settings.setValue("gridColor", self.ui.gridColor_btn.color)
-		settings.setValue("wineDir", self.ui.wineDir_txt.text())
+		if os.name != "nt":
+			settings.setValue("wineDir", self.ui.wineDir_txt.text())
 		settings.setValue("neosphereDir", self.ui.neosphereDir_txt.text())
 		settings.setValue("legacySphereDir", self.ui.legacySphereDir_txt.text())
-		settings.setValue("unrecognizedAsText", self.ui.unrecognizedInText_chk.isChecked())
+		settings.setValue("unrecognizedAsText", self.ui.unrecognizedFileEditor_combo.currentIndex() == 0)
 
 		settings.remove("projectDirs")
 		settings.beginWriteArray("projectDirs")
@@ -74,9 +75,9 @@ class SettingsWindow(QDialog):
 			# running in Windows, no need for WINE stuff
 			settings = QSettings()
 			settings.remove("wineDir")
-			self.layout().removeWidget(self.ui.winePath_lbl)
-			self.ui.wineDir_layout.removeWidget(self.ui.winePath_btn)
-			self.ui.wineDir_layout.removeWidget(self.ui.winePath_txt)
+			self.layout().removeWidget(self.ui.wineDir_lbl)
+			self.ui.wineDir_layout.removeWidget(self.ui.wineDir_btn)
+			self.ui.wineDir_layout.removeWidget(self.ui.wineDir_txt)
 			self.ui.wineDir_lbl.deleteLater()
 			self.ui.wineDir_btn.deleteLater()
 			self.ui.wineDir_txt.deleteLater()
