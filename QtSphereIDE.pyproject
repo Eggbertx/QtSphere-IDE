@@ -3,6 +3,7 @@
         "mainwindow.py",
         "widgets/colorbutton.py",
         "widgets/maintabwidget.py",
+		"widgets/spriteseteditor.py",
         "widgets/startpage.py",
 		"dialogs/settingswindow.py",
         "qsiproject.py",
