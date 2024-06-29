@@ -2,6 +2,7 @@
     <qresource prefix="/icons">
         <file>res/neosphere.png</file>
         <file>res/icon.png</file>
+        <file>res/icon.ico</file>
         <file>res/transparency-bg.png</file>
         <file>res/eye.png</file>
         <file>res/eye-closed.png</file>

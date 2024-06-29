@@ -70,7 +70,6 @@ class MainWindow(QMainWindow):
 		self.settings = settings
 		self.settingsWindow = SettingsWindow(self)
 		self.ui.splitter.setStretchFactor(1, 4)
-		self.setWindowIcon(QIcon(":/icons/res/icon.png"))
 		self.startPage = StartPage(self.ui.openFileTabs, printWarnings=self.verbose)
 		self.ui.openFileTabs.addTab(self.startPage, "Start Page")
 		self.ui.actionNew_file.setMenu(self.ui.menuNew)
@@ -174,7 +173,6 @@ class MainWindow(QMainWindow):
 						editor.setText(file.read())
 						t = self.ui.openFileTabs.addTab(editor, filename)
 						self.ui.openFileTabs.setCurrentIndex(t)
-
 		except Exception as e:
 			QMessageBox.critical(self, "Error", traceback.format_exc())
 			raise
@@ -195,7 +193,7 @@ class MainWindow(QMainWindow):
 			case SidebarTab.SoundTest:
 				self.ui.sideBar.tabBar().setCurrentIndex(2)
 
-	def showOpenFileDialog(self, fileType: FileType = FileType.AllSupported, startDir:str = ".", title:str = "Open File") -> str:
+	def showOpenFileDialog(self, fileType: FileType = FileType.AllSupported, startDir:str = ".", title:str = "Open File") -> str|None:
 		result = QFileDialog.getOpenFileName(self, title, startDir,
 			";;".join(_OPEN_DIALOG_FILTER), _OPEN_DIALOG_FILTER[fileType.value])
 		return result[0] if len(result) > 0 else None
@@ -346,7 +344,7 @@ if __name__ == "__main__":
 	QCoreApplication.setOrganizationName(_ORG_NAME)
 	QCoreApplication.setApplicationVersion(_VERSION)
 	app = QApplication(sys.argv)
-
+	app.setStyle("fusion")
 	settings = QSettings()
 	window = MainWindow(settings=settings, verbose=args.verbose)
 	if settings.value("maximized", True):
