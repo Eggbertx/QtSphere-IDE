@@ -15,6 +15,7 @@ from ui.ui_mainwindow import Ui_MainWindow
 from widgets.startpage import StartPage
 from widgets.spriteseteditor import SpritesetEditor
 from dialogs.settingswindow import SettingsWindow
+from spherelauncher import SphereLauncher
 
 _VERSION = "0.10"
 _APPLICATION_NAME = "QtSphere IDE"
@@ -61,6 +62,7 @@ class MainWindow(QMainWindow):
 	fsModel: QFileSystemModel
 	emptyProjectModel: QStandardItemModel
 	loadedProject: QSIProject
+	launcher: SphereLauncher
 	verbose: bool
 	def __init__(self, parent=None, settings:QSettings=QSettings(), verbose=False):
 		super().__init__(parent)
@@ -81,20 +83,23 @@ class MainWindow(QMainWindow):
 		self.emptyProjectModel = QStandardItemModel(0,0,self.ui.treeView)
 		self.emptyProjectModel.appendRow(QStandardItem("<No open project>"));
 		self.loadedProject = None
+		self.launcher = SphereLauncher()
 		self._updateTree(self.loadedProject)
 		self._setupSettings()
 		self._connectActions()
 	
 	def _setupSettings(self):
-		match self.settings.value("whichEngine", "neoSphere"):
-			case "Sphere 1.x":
+		match self.settings.value("whichEngine", "neophere"):
+			case "legacy":
 				self.engineSelector.setCurrentText("Sphere 1.x")
 				self.ui.actionLegacyConfig.setEnabled(True)
 				self.ui.actionConfigure_Engine.setEnabled(True)
+				self.ui.toolbarPlayGame.setIcon(QIcon(":/icons/res/legacyengine.png"))
 			case _:
 				self.engineSelector.setCurrentText("neoSphere")
 				self.ui.actionLegacyConfig.setEnabled(False)
 				self.ui.actionConfigure_Engine.setEnabled(False)
+				self.ui.toolbarPlayGame.setIcon(QIcon(":/icons/res/neosphere.png"))
 			
 
 	def _connectActions(self):
@@ -108,7 +113,7 @@ class MainWindow(QMainWindow):
 		self.startPage.loadProjectAction.triggered.connect(self.loadSelectedProject)
 		self.startPage.startGameAction.triggered.connect(self.startGame)
 		self.startPage.openProjectDirAction.triggered.connect(self.openSelectedProjectDir)
-		self.engineSelector.currentTextChanged.connect(self.engineChanged)
+		self.engineSelector.currentIndexChanged.connect(self.engineChanged)
 		self.ui.actionClose.triggered.connect(self.closeProject)
 		self.ui.actionRefresh.triggered.connect(self._updateTree)
 		self.ui.actionProject_Explorer.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.FileTree))
@@ -127,6 +132,8 @@ class MainWindow(QMainWindow):
 		self.ui.actionCopy.triggered.connect(self.onCopyTriggered)
 		self.ui.actionPaste.triggered.connect(self.onPasteTriggered)
 		self.ui.actionSelect_All.triggered.connect(self.onSelectAllTriggered)
+		self.ui.actionLegacyConfig.triggered.connect(self.launcher.runLegacyConfig)
+		self.ui.toolbarPlayGame.triggered.connect(self.launchGame)
 
 
 	def _openCurrentProjectDir(self):
@@ -145,9 +152,13 @@ class MainWindow(QMainWindow):
 			if i > 0:
 				self.ui.treeView.hideColumn(i)
 
-	def currentTabIsFile(self):
-		opened = self.ui.openFileTabs.currentWidget()
-		print(opened.undo)
+	def launchGame(self, game:QSIProject = None):
+		if game is None:
+			game = self.loadedProject
+		if game is None or game.buildDir is None or game.buildDir == "":
+			QMessageBox.critical(self, "Error launching game", "A game does not appear to be loaded")
+		
+		self.launcher.launchGame(game)
 
 	def openFileAsText(self, filePath:str):
 		with open(filePath, errors="ignore") as file:
@@ -188,6 +199,7 @@ class MainWindow(QMainWindow):
 		self._updateTree(None)
 		self.setWindowTitle(f"QtSphere IDE {_VERSION}")
 		self.ui.menuProject.setEnabled(False)
+		self.ui.toolbarPlayGame.setEnabled(False)
 
 	def switchSidebarTab(self, tab:SidebarTab):
 		match tab:
@@ -250,7 +262,9 @@ class MainWindow(QMainWindow):
 
 	@Slot()
 	def onSettingsSaved(self):
+		print("settings saved")
 		self.startPage.refreshGameList()
+		self.engineSelector.setCurrentIndex(1 if self.settings.value("whichEngine", "neosphere") == "legacy" else 0)
 
 	@Slot()
 	def openFileButtonPressed(self):
@@ -281,6 +295,7 @@ class MainWindow(QMainWindow):
 
 	@Slot()
 	def openSettingsWindow(self):
+		self.settingsWindow.loadSettings()
 		self.settingsWindow.show()
 
 	@Slot(int)
@@ -291,16 +306,15 @@ class MainWindow(QMainWindow):
 			self.ui.openFileTabs.addTab(self.startPage, "Start Page")
 			self.startPage.refreshGameList()
 
-
-	@Slot(str)
-	def engineChanged(self, engine:str):
-		match engine:
-			case "neoSphere"|"miniSphere":
-				self.settings.setValue("whichEngine", "neoSphere")
+	@Slot(int)
+	def engineChanged(self, index:int):
+		match index:
+			case 0:
+				self.settings.setValue("whichEngine", "neosphere")
 				self.ui.actionConfigure_Engine.setEnabled(False)
 				self.ui.actionLegacyConfig.setEnabled(False)
-				self.ui.toolbarPlayGame.setIcon(QIcon(":/icons/res/sphere.png"))
-			case "Sphere 1.x":
+				self.ui.toolbarPlayGame.setIcon(QIcon(":/icons/res/neosphere.png"))
+			case 1:
 				self.settings.setValue("whichEngine", "legacy")
 				self.ui.actionConfigure_Engine.setEnabled(True)
 				self.ui.actionLegacyConfig.setEnabled(True)
@@ -311,7 +325,7 @@ class MainWindow(QMainWindow):
 		game = self.startPage.selectedGame()
 		if game is None:
 			return
-		print("Starting game:", game.name)
+		self.launchGame(game)
 
 	@Slot()
 	def loadSelectedProject(self):
@@ -327,6 +341,7 @@ class MainWindow(QMainWindow):
 		self.setWindowTitle(f"QtSphereIDE {_VERSION} - {project.name}")
 		self.ui.menuProject.setEnabled(True)
 		self.loadedProject = project
+		self.ui.toolbarPlayGame.setEnabled(True)
 		self._updateTree(project)
 
 	@Slot()

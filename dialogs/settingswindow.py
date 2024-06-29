@@ -28,9 +28,9 @@ class SettingsWindow(QDialog):
 		self.ui.neosphereDir_btn.clicked.connect(self.onNeoSphereDirButtonClicked)
 		self.ui.legacySphereDir_btn.clicked.connect(self.onLegacySphereDirButtonClicked)
 		self._removeWineIfWindows()
-		self._loadSettings()
+		self.loadSettings()
 
-	def _loadSettings(self):
+	def loadSettings(self):
 		settings = QSettings()
 		self.ui.mapCursorCol_btn.setColor(QColor(settings.value("mapCursorColor", QColor.fromString("#0080ff"))))
 		self.ui.gridColor_btn.setColor(QColor(settings.value("gridColor", QColor.fromString("#000000"))))
@@ -38,6 +38,7 @@ class SettingsWindow(QDialog):
 		self.ui.neosphereDir_txt.setText(settings.value("neosphereDir", ""))
 		self.ui.legacySphereDir_txt.setText(settings.value("legacySphereDir", ""))
 		self.ui.unrecognizedFileEditor_combo.setCurrentIndex(0 if settings.value("unrecognizedFileEditor", "external") == "external" else 1)
+		self.ui.whichEngine_combo.setCurrentIndex(1 if settings.value("whichEngine", "neosphere") == "legacy" else 0)
 
 		numSearchPaths = settings.beginReadArray("projectDirs")
 		for d in range(numSearchPaths):
@@ -57,6 +58,7 @@ class SettingsWindow(QDialog):
 		settings.setValue("neosphereDir", self.ui.neosphereDir_txt.text())
 		settings.setValue("legacySphereDir", self.ui.legacySphereDir_txt.text())
 		settings.setValue("unrecognizedFileEditor", "text" if self.ui.unrecognizedFileEditor_combo.currentIndex() == 1 else "external")
+		settings.setValue("whichEngine", "legacy" if self.ui.whichEngine_combo.currentIndex() == 1 else "neosphere")
 
 		settings.remove("projectDirs")
 		settings.beginWriteArray("projectDirs")
