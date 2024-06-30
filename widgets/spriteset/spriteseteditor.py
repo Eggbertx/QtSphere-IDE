@@ -3,7 +3,7 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QWidget, QGraphicsPixmapItem, QGraphicsScene
 
 from formats.spriteset import SphereSpriteset
-from .sphereeditor import SphereEditor, SphereFile
+from ..sphereeditor import SphereEditor, SphereFile
 from .imagechooser import ImageChooser
 
 from ui.ui_spriteseteditor import Ui_SpritesetEditor

@@ -13,7 +13,7 @@ from formats.spriteset import SphereSpriteset
 from qsiproject import QSIProject
 from ui.ui_mainwindow import Ui_MainWindow
 from widgets.startpage import StartPage
-from widgets.spriteseteditor import SpritesetEditor
+from widgets.spriteset.spriteseteditor import SpritesetEditor
 from dialogs.settingswindow import SettingsWindow
 from spherelauncher import SphereLauncher
 
