@@ -4,22 +4,30 @@ from PySide6.QtWidgets import QWidget, QGraphicsPixmapItem, QGraphicsScene
 
 from formats.spriteset import SphereSpriteset
 from .sphereeditor import SphereEditor, SphereFile
+from .imagechooser import ImageChooser
 
 from ui.ui_spriteseteditor import Ui_SpritesetEditor
 
 class SpritesetEditor(SphereEditor):
 	ui: Ui_SpritesetEditor
 	loadedSpriteset: SphereSpriteset
-	directionItems: list[QGraphicsPixmapItem]
+	imagesScene: QGraphicsScene
+	directionScene: QGraphicsScene
+	imageChooser: ImageChooser
+
 	def __init__(self, parent: QWidget = None, windowType: Qt.WindowType = Qt.WindowType.Widget) -> None:
 		super().__init__(parent, windowType)
 		self.ui = Ui_SpritesetEditor()
 		self.ui.setupUi(self)
 		self.editorType = SphereFile.Spriteset
 		self.loadedSpriteset = None
-		self.ui.animView.setScene(QGraphicsScene(self.ui.animView))
+		self.directionScene = QGraphicsScene(self.ui.animView)
+		self.ui.animView.setScene(self.directionScene)
+		self.imagesScene = QGraphicsScene(self.ui.ssImages)
 		self.ui.animDirChoose.currentIndexChanged.connect(self.onDirectionChanged)
-		self.directionItems = []
+		self.imageChooser = ImageChooser(self, True)
+		self.ui.ssImages.setWidget(self.imageChooser)
+		self.ui.ssImages.setAlignment(Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
 		self._adjustSizes()
 
 	def _adjustSizes(self):
@@ -28,20 +36,20 @@ class SpritesetEditor(SphereEditor):
 		self.ui.choosers.setSizes((200,150,200))
 
 	def setDirection(self, d:int):
-		self.ui.animView.scene().clear()
-		self.ui.animView.scene().addItem(self.directionItems[d])
+		self.directionScene.clear()
+		image = self.loadedSpriteset.images[self.loadedSpriteset.directions[d].frames[0].imageIndex]
+		item = QGraphicsPixmapItem(QPixmap.fromImage(image)) # the internal C++ object is deleted when scene.clear() is called so we have to recreate it
+		item.setScale(2)
+		self.directionScene.addItem(item)
 
 	def attachSpriteset(self, spriteset:SphereSpriteset):
 		self.ui.animDirChoose.clear()
 		for direction in spriteset.directions:
 			if len(direction.frames) > 0:
-				imageIndex = direction.frames[0].imageIndex
-				item = QGraphicsPixmapItem(QPixmap.fromImage(spriteset.images[imageIndex]))
-				item.setScale(2)
-				self.directionItems.append(item)
 				self.ui.animDirChoose.addItem(direction.name)
-		self.setDirection(0)
+		self.imageChooser.images = spriteset.images
 		self.loadedSpriteset = spriteset
+		self.setDirection(0)
 
 	@Slot(int)
 	def onDirectionChanged(self, d:int):

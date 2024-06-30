@@ -83,7 +83,6 @@ class SphereSpriteset(SphereFile):
 					self.directions.append(SpritesetDirection.fromReader(file))
 			case _:
 				raise FormatException(self.filePath, "spriteset versions 1 and 2 are not supported yet")
-		print("Done parsing")
 
 	def _packBytes() -> bytes:
 		return bytes([])
