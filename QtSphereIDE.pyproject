@@ -1,5 +1,6 @@
 {
     "files": [
+        "mainwindow.py",
         "qsires.qrc",
         "ui/drawingwidget.ui",
         "ui/entityeditdialog.ui",

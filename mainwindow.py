@@ -8,14 +8,15 @@ from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl, QModelIndex
 from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog, QTextEdit
 
-from formats.spherefile import SphereFile
+from ui.ui_mainwindow import Ui_MainWindow
+
+from dialogs.newmapdialog import NewMapDialog
+from dialogs.settingswindow import SettingsWindow
 from formats.spriteset import SphereSpriteset
 from qsiproject import QSIProject
-from ui.ui_mainwindow import Ui_MainWindow
+from spherelauncher import SphereLauncher
 from widgets.startpage import StartPage
 from widgets.spriteset.spriteseteditor import SpritesetEditor
-from dialogs.settingswindow import SettingsWindow
-from spherelauncher import SphereLauncher
 
 _VERSION = "0.10"
 _APPLICATION_NAME = "QtSphere IDE"
@@ -62,6 +63,7 @@ class MainWindow(QMainWindow):
 	fsModel: QFileSystemModel
 	emptyProjectModel: QStandardItemModel
 	loadedProject: QSIProject
+	newMapDialog: NewMapDialog
 	launcher: SphereLauncher
 	verbose: bool
 	def __init__(self, parent=None, settings:QSettings=QSettings(), verbose=False):
@@ -84,6 +86,7 @@ class MainWindow(QMainWindow):
 		self.emptyProjectModel.appendRow(QStandardItem("<No open project>"));
 		self.loadedProject = None
 		self.launcher = SphereLauncher()
+		self.newMapDialog = NewMapDialog(self)
 		self._updateTree(self.loadedProject)
 		self._setupSettings()
 		self._connectActions()
@@ -134,6 +137,7 @@ class MainWindow(QMainWindow):
 		self.ui.actionSelect_All.triggered.connect(self.onSelectAllTriggered)
 		self.ui.actionLegacyConfig.triggered.connect(self.launcher.runLegacyConfig)
 		self.ui.toolbarPlayGame.triggered.connect(self.launchGame)
+		self.ui.newMap.triggered.connect(self.newMapDialog.show)
 
 
 	def _openCurrentProjectDir(self):
@@ -192,7 +196,6 @@ class MainWindow(QMainWindow):
 		except Exception as e:
 			QMessageBox.critical(self, "Error", traceback.format_exc())
 			raise
-
 
 	def closeProject(self):
 		self.loadedProject = None
@@ -342,6 +345,7 @@ class MainWindow(QMainWindow):
 		self.ui.menuProject.setEnabled(True)
 		self.loadedProject = project
 		self.ui.toolbarPlayGame.setEnabled(True)
+		self.newMapDialog.projectPath = project.projectDir
 		self._updateTree(project)
 
 	@Slot()
