@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QWidget, QGraphicsPixmapItem, QGraphicsScene
 from formats.spriteset import SphereSpriteset
 from ..sphereeditor import SphereEditor, SphereFile
 from .imagechooser import ImageChooser
+from .directionview import DirectionView
 
 from ui.ui_spriteseteditor import Ui_SpritesetEditor
 
@@ -44,9 +45,10 @@ class SpritesetEditor(SphereEditor):
 
 	def attachSpriteset(self, spriteset:SphereSpriteset):
 		self.ui.animDirChoose.clear()
-		for direction in spriteset.directions:
-			if len(direction.frames) > 0:
-				self.ui.animDirChoose.addItem(direction.name)
+		for d in range(len(spriteset.directions)):
+			self.ui.animDirChoose.addItem(spriteset.directions[d].name)
+			self.ui.dirsContainer.addWidget(DirectionView(self, spriteset, d))
+
 		self.imageChooser.images = spriteset.images
 		self.loadedSpriteset = spriteset
 		self.setDirection(0)
