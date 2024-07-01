@@ -1,17 +1,18 @@
 {
     "files": [
-        "mainwindow.py",
-        "widgets/colorbutton.py",
-        "widgets/maintabwidget.py",
-		"widgets/spriteseteditor.py",
-        "widgets/startpage.py",
-		"dialogs/settingswindow.py",
-        "qsiproject.py",
         "qsires.qrc",
+        "ui/drawingwidget.ui",
+        "ui/entityeditdialog.ui",
+        "ui/fonteditor.ui",
+        "ui/importoptionsdialog.ui",
+        "ui/layerpropertiesdialog.ui",
         "ui/mainwindow.ui",
+        "ui/modifiedfilesdialog.ui",
+        "ui/newmapdialog.ui",
+        "ui/projectpropertiesdialog.ui",
         "ui/settingswindow.ui",
-        "ui/spriteset/spriteseteditor.ui",
-        "ui/spriteset/imagechooser.ui",
+        "ui/soundplayer.ui",
+        "ui/spriteseteditor.ui",
         "ui/startpage.ui"
     ]
 }
