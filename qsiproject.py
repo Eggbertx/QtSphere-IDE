@@ -48,7 +48,7 @@ class QSIProject:
 		self.buildDir = None
 		self.script = None
 		self.projectDir = None
-		self.compiler = None
+		self.compiler = "Vanilla"
 
 
 	def open(self, path: str, printWarnings:bool = False) -> bool:
@@ -75,6 +75,7 @@ class QSIProject:
 					self.projectType = ProjectType.Cellscript_cjs
 					self.compiler = "Cell"
 				elif filename == "game.sgm":
+					self.compiler = "Vanilla"
 					self.projectType = ProjectType.SGM
 		else:
 			self.projectFilePath = fileInfo.filePath()
@@ -106,6 +107,19 @@ class QSIProject:
 	def getResolutionString(self) -> str:
 		return "%dx%d" % (self.width, self.height)
 
+	def saveSSProj(self):
+		if self.projectDir is None or self.name == "":
+			return
+		with open(path.join(self.projectDir, self.name.replace("/", "-").replace(":", "-") + ".ssproj"), "bw")  as file:
+			file.write("[.ssproj]\r\n" +
+				f"author={self.author}\r\n" +
+				"backCompatible=True\r\n" +
+				f"compiler={self.compiler}\r\n" +
+				f"description={self.author}\r\n" +
+				f"mainScript={self.script}\r\n" +
+				f"name={self.name}\r\n" +
+				f"screenHeight={self.height}\r\n" +
+				f"screenWidth={self.width}\r\n\r\n")
 
 	def _getCellscriptStringValue(self, cellscriptStr:str, key:str, defaultValue:str = "") -> str:
 		matches = re.match(r".*" + key + r"\s*:\s*(['\"`]).*", cellscriptStr, re.DOTALL|re.MULTILINE)

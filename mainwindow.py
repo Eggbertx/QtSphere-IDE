@@ -1,16 +1,19 @@
 from argparse import ArgumentParser
+import ctypes
 from enum import Enum
+import os
 from os.path import basename
 import sys
 import traceback
 
-from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl, QModelIndex
+from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl, QModelIndex, QSize
 from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog, QTextEdit
 
 from ui.ui_mainwindow import Ui_MainWindow
 
 from dialogs.newmapdialog import NewMapDialog
+from dialogs.projectpropertiesdialog import ProjectPropertiesDialog
 from dialogs.settingswindow import SettingsWindow
 from formats.spriteset import SphereSpriteset
 from qsiproject import QSIProject
@@ -66,6 +69,7 @@ class MainWindow(QMainWindow):
 	newMapDialog: NewMapDialog
 	launcher: SphereLauncher
 	verbose: bool
+	projectPropertiesDialog: ProjectPropertiesDialog
 	def __init__(self, parent=None, settings:QSettings=QSettings(), verbose=False):
 		super().__init__(parent)
 		self.ui = Ui_MainWindow()
@@ -87,10 +91,15 @@ class MainWindow(QMainWindow):
 		self.loadedProject = None
 		self.launcher = SphereLauncher()
 		self.newMapDialog = NewMapDialog(self)
+		self.projectPropertiesDialog = ProjectPropertiesDialog(self, self.loadedProject)
 		self._updateTree(self.loadedProject)
 		self._setupSettings()
 		self._connectActions()
-	
+		if os.name == "nt":
+			# makes it so that our icon shows up correctly in the task bar instead of using pythonw.exe's icon
+			ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(f"spherical.QtSphereIDE{_VERSION}")
+
+
 	def _setupSettings(self):
 		match self.settings.value("whichEngine", "neophere"):
 			case "legacy":
@@ -138,6 +147,8 @@ class MainWindow(QMainWindow):
 		self.ui.actionLegacyConfig.triggered.connect(self.launcher.runLegacyConfig)
 		self.ui.toolbarPlayGame.triggered.connect(self.launchGame)
 		self.ui.newMap.triggered.connect(self.newMapDialog.show)
+		self.ui.toolbarProjectProperties.triggered.connect(self.projectPropertiesDialog.show)
+		self.ui.actionProject_Properties.triggered.connect(self.projectPropertiesDialog.show)
 
 
 	def _openCurrentProjectDir(self):
@@ -346,6 +357,7 @@ class MainWindow(QMainWindow):
 		self.loadedProject = project
 		self.ui.toolbarPlayGame.setEnabled(True)
 		self.newMapDialog.projectPath = project.projectDir
+		self.projectPropertiesDialog.project = self.loadedProject
 		self._updateTree(project)
 
 	@Slot()
