@@ -1,5 +1,7 @@
 from enum import Enum
+import glob
 from io import TextIOWrapper
+from os import path
 import re
 
 from PySide6.QtGui import QIcon
@@ -89,9 +91,15 @@ class QSIProject:
 
 
 	def getIcon(self) -> QIcon:
-		iconInfo = QFileInfo(QDir(self.projectDir), "icon.png");
+		dir = QDir(self.projectDir)
+		iconInfo = QFileInfo(dir, "icon.png")
+		
 		if iconInfo.exists():
 			return QIcon(iconInfo.canonicalFilePath())
+		else:
+			icoList = glob.glob("*.ico", root_dir=self.projectDir, recursive=False)
+			if len(icoList) > 0:
+				return QIcon(path.join(self.projectDir, icoList[0]))
 		return QIcon(":/icons/res/neosphere.png")
 
 
