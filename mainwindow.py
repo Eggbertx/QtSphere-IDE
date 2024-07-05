@@ -82,8 +82,9 @@ class MainWindow(QMainWindow):
 		self.ui.openFileTabs.addTab(self.startPage, "Start Page")
 		self.ui.actionNew_file.setMenu(self.ui.menuNew)
 		self.engineSelector = QComboBox(self.ui.mainToolBar)
-		self.engineSelector.addItem("neoSphere")
-		self.engineSelector.addItem("Sphere 1.x")
+		self.engineSelector.setMinimumWidth(120)
+		self.engineSelector.addItem(QIcon(":/icons/res/neosphere.png"), "neoSphere")
+		self.engineSelector.addItem(QIcon(":/icons/res/legacyengine.png"),"Sphere 1.x")
 		self.ui.mainToolBar.addWidget(self.engineSelector)
 		self.fsModel = QFileSystemModel(self)
 		self.emptyProjectModel = QStandardItemModel(0,0,self.ui.treeView)
@@ -106,13 +107,11 @@ class MainWindow(QMainWindow):
 				self.engineSelector.setCurrentText("Sphere 1.x")
 				self.ui.actionLegacyConfig.setEnabled(True)
 				self.ui.actionConfigure_Engine.setEnabled(True)
-				self.ui.toolbarPlayGame.setIcon(QIcon(":/icons/res/legacyengine.png"))
 			case _:
 				self.engineSelector.setCurrentText("neoSphere")
 				self.ui.actionLegacyConfig.setEnabled(False)
 				self.ui.actionConfigure_Engine.setEnabled(False)
-				self.ui.toolbarPlayGame.setIcon(QIcon(":/icons/res/neosphere.png"))
-			
+
 
 	def _connectActions(self):
 		self.ui.actionExit.triggered.connect(sys.exit)
@@ -327,12 +326,12 @@ class MainWindow(QMainWindow):
 				self.settings.setValue("whichEngine", "neosphere")
 				self.ui.actionConfigure_Engine.setEnabled(False)
 				self.ui.actionLegacyConfig.setEnabled(False)
-				self.ui.toolbarPlayGame.setIcon(QIcon(":/icons/res/neosphere.png"))
+				# self.ui.toolbarPlayGame.setIcon(QIcon(":/icons/res/neosphere.png"))
 			case 1:
 				self.settings.setValue("whichEngine", "legacy")
 				self.ui.actionConfigure_Engine.setEnabled(True)
 				self.ui.actionLegacyConfig.setEnabled(True)
-				self.ui.toolbarPlayGame.setIcon(QIcon(":/icons/res/legacyengine.png"))
+				# self.ui.toolbarPlayGame.setIcon(QIcon(":/icons/res/legacyengine.png"))
 
 	@Slot()
 	def startGame(self):
