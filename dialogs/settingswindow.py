@@ -34,12 +34,14 @@ class SettingsWindow(QDialog):
 		settings = QSettings()
 		self.ui.mapCursorCol_btn.setColor(QColor(settings.value("mapCursorColor", QColor.fromString("#0080ff"))))
 		self.ui.gridColor_btn.setColor(QColor(settings.value("gridColor", QColor.fromString("#000000"))))
-		self.ui.wineDir_txt.setText(settings.value("wineDir", "/usr/bin"))
+		if os.name != "nt":
+			self.ui.wineDir_txt.setText(settings.value("wineDir", "/usr/bin"))
 		self.ui.neosphereDir_txt.setText(settings.value("neosphereDir", ""))
 		self.ui.legacySphereDir_txt.setText(settings.value("legacySphereDir", ""))
 		self.ui.unrecognizedFileEditor_combo.setCurrentIndex(0 if settings.value("unrecognizedFileEditor", "external") == "external" else 1)
 		self.ui.whichEngine_combo.setCurrentIndex(1 if settings.value("whichEngine", "neosphere") == "legacy" else 0)
 
+		self.ui.projectDirsList.clear()
 		numSearchPaths = settings.beginReadArray("projectDirs")
 		for d in range(numSearchPaths):
 			settings.setArrayIndex(d)
