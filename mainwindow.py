@@ -8,7 +8,7 @@ import traceback
 
 from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl, QModelIndex, QSize
 from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog, QTextEdit
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog, QTextEdit, QToolButton
 
 from ui.ui_mainwindow import Ui_MainWindow
 
@@ -70,6 +70,7 @@ class MainWindow(QMainWindow):
 	launcher: SphereLauncher
 	verbose: bool
 	projectPropertiesDialog: ProjectPropertiesDialog
+	newButton: QToolButton
 	def __init__(self, parent=None, settings:QSettings=QSettings(), verbose=False):
 		super().__init__(parent)
 		self.ui = Ui_MainWindow()
@@ -80,12 +81,20 @@ class MainWindow(QMainWindow):
 		self.ui.splitter.setStretchFactor(1, 4)
 		self.startPage = StartPage(self.ui.openFileTabs, printWarnings=self.verbose)
 		self.ui.openFileTabs.addTab(self.startPage, "Start Page")
-		self.ui.actionNew_file.setMenu(self.ui.menuNew)
+
 		self.engineSelector = QComboBox(self.ui.mainToolBar)
 		self.engineSelector.setMinimumWidth(120)
 		self.engineSelector.addItem(QIcon(":/icons/res/neosphere.png"), "neoSphere")
 		self.engineSelector.addItem(QIcon(":/icons/res/legacyengine.png"),"Sphere 1.x")
 		self.ui.mainToolBar.addWidget(self.engineSelector)
+
+		self.newButton = QToolButton()
+		self.newButton.setIcon(QIcon.fromTheme("document-new"))
+		self.newButton.setText("New file")
+		self.newButton.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+		self.newButton.setMenu(self.ui.menuNew)
+		self.ui.mainToolBar.insertWidget(self.ui.toolbarOpenButton, self.newButton)
+
 		self.fsModel = QFileSystemModel(self)
 		self.emptyProjectModel = QStandardItemModel(0,0,self.ui.treeView)
 		self.emptyProjectModel.appendRow(QStandardItem("<No open project>"));
@@ -144,7 +153,7 @@ class MainWindow(QMainWindow):
 		self.ui.actionPaste.triggered.connect(self.onPasteTriggered)
 		self.ui.actionSelect_All.triggered.connect(self.onSelectAllTriggered)
 		self.ui.actionLegacyConfig.triggered.connect(self.launcher.runLegacyConfig)
-		self.ui.toolbarPlayGame.triggered.connect(self.launchGame)
+		self.ui.toolbarPlayGame.triggered.connect(self.onGameLaunched)
 		self.ui.newMap.triggered.connect(self.newMapDialog.show)
 		self.ui.toolbarProjectProperties.triggered.connect(self.projectPropertiesDialog.show)
 		self.ui.actionProject_Properties.triggered.connect(self.projectPropertiesDialog.show)
@@ -239,6 +248,11 @@ class MainWindow(QMainWindow):
 	def currentTabHasSelectAll(self):
 		active = self.ui.openFileTabs.currentWidget()
 		return hasattr(active, "selectAll")
+
+	#region Slots
+	@Slot()
+	def onGameLaunched(self):
+		self.launchGame(self.loadedProject)
 
 	@Slot(int)
 	def onTabChanged(self, index:int):
@@ -364,7 +378,7 @@ class MainWindow(QMainWindow):
 		selected = self.startPage.selectedGame()
 		project = self.startPage.currentProject if selected is None else selected
 		QDesktopServices.openUrl(QUrl.fromLocalFile(project.projectDir))
-
+	#endregion
 
 if __name__ == "__main__":
 	parser = ArgumentParser()
