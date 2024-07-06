@@ -54,6 +54,20 @@ class ProjectPropertiesDialog(QDialog):
 		self.ui.pathLineEdit.setText(self.projectDir)
 		self.ui.nameLineEdit.setText(self.project.name)
 		self.ui.authorLineEdit.setText(self.project.author)
+		self.ui.summaryText.setPlainText(self.project.summary)
+		self.ui.tabWidget.setCurrentIndex(0)
+		if self.project.compiler == "Cell":
+			self.ui.tabWidget.setTabEnabled(0, False)
+			self.ui.compilerCB.setCurrentIndex(0)
+			self.ui.tabWidget.setTabToolTip(0, "See Cellscript.js")
+		else:
+			self.ui.tabWidget.setTabToolTip(0, None)
+			self.ui.tabWidget.setTabEnabled(0, True)
+			self.ui.compilerCB.setCurrentIndex(0)
+		
+		self.ui.reswLineEdit.setText(str(self.project.width))
+		self.ui.reshLineEdit.setText(str(self.project.height))
+		self.ui.entryScriptLineEdit.setText(self.project.script)
 		self.setWindowTitle("New Project" if self.projectDir is None else "Project Properties")
 		return super().show()
 

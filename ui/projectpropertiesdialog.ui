@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>524</width>
-    <height>549</height>
+    <width>594</width>
+    <height>296</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,92 +25,14 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="nameLabel">
-         <property name="text">
-          <string>Name</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="nameLineEdit"/>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="authorLabel">
-         <property name="text">
-          <string>Author</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QLineEdit" name="authorLineEdit"/>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="resolutionLabel">
-         <property name="text">
-          <string>Resolution</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <layout class="QHBoxLayout" name="resolutionLayout" stretch="3,1,1">
-         <item>
-          <widget class="QComboBox" name="resolutionCBox">
-           <item>
-            <property name="text">
-             <string>Resolution presets</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>320x240</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>640x480</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>800x600</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>1024x768</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>1280x720</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>1366x768</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>1920x1080</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="reswLineEdit"/>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="reshLineEdit"/>
-         </item>
-        </layout>
-       </item>
        <item row="0" column="1">
         <layout class="QHBoxLayout" name="pathLayout">
          <item>
           <widget class="QLineEdit" name="pathLineEdit">
            <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="clearButtonEnabled">
             <bool>false</bool>
            </property>
           </widget>
@@ -130,91 +52,196 @@
       </layout>
      </item>
      <item>
-      <widget class="QLabel" name="summaryLabel">
-       <property name="text">
-        <string>Project Summary</string>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>0</number>
        </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPlainTextEdit" name="summaryText"/>
-     </item>
-     <item>
-      <widget class="QGroupBox" name="groupBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>1</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="title">
-        <string>IMPORTANT</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <item>
-         <widget class="QLabel" name="warningLabel">
-          <property name="text">
-           <string>Changing the build settings of an established project may prevent the project from being built or even lead to undesirable behavior. Proceed with caution</string>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
-      <layout class="QFormLayout" name="buildLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="buildDestLabel">
-         <property name="text">
-          <string>Build Destination</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="buildInLineEdit">
-         <property name="text">
-          <string>dist/</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="entryScriptLabel">
-         <property name="text">
-          <string>Entry Script</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="entryScriptLineEdit"/>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="compilerLabel">
-         <property name="text">
-          <string>Compiler</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QComboBox" name="compilerCB">
+       <widget class="QWidget" name="tabSphere">
+        <attribute name="title">
+         <string>Sphere</string>
+        </attribute>
+        <layout class="QFormLayout" name="formLayout_2">
+         <item row="0" column="0">
+          <widget class="QLabel" name="nameLabel">
+           <property name="text">
+            <string>Name</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLineEdit" name="nameLineEdit"/>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="authorLabel">
+           <property name="text">
+            <string>Author</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLineEdit" name="authorLineEdit"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="resolutionLabel">
+           <property name="text">
+            <string>Resolution</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <layout class="QHBoxLayout" name="resolutionLayout" stretch="3,1,1">
+           <item>
+            <widget class="QComboBox" name="resolutionCBox">
+             <item>
+              <property name="text">
+               <string>Resolution presets</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>320x240</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>640x480</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>800x600</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>1024x768</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>1280x720</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>1366x768</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>1920x1080</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="reswLineEdit"/>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="reshLineEdit"/>
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="summaryLabel">
+           <property name="text">
+            <string>Project Summary</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QPlainTextEdit" name="summaryText"/>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="entryScriptLabel">
+           <property name="text">
+            <string>Entry Script</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLineEdit" name="entryScriptLineEdit"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tabBuilding">
+        <attribute name="title">
+         <string>Building</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="verticalLayout">
          <item>
-          <property name="text">
-           <string>Cell</string>
-          </property>
+          <layout class="QFormLayout" name="formLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="compilerLabel">
+             <property name="text">
+              <string>Compiler</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="compilerCB">
+             <item>
+              <property name="text">
+               <string>Cell</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Sphere 1.x</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="buildDestLabel">
+             <property name="text">
+              <string>Build Destination</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLineEdit" name="buildInLineEdit">
+             <property name="text">
+              <string>dist/</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
-          <property name="text">
-           <string>Vanilla</string>
-          </property>
+          <widget class="QGroupBox" name="groupBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>1</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="title">
+            <string>IMPORTANT</string>
+           </property>
+           <property name="flat">
+            <bool>false</bool>
+           </property>
+           <property name="checkable">
+            <bool>false</bool>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <item>
+             <widget class="QLabel" name="warningLabel">
+              <property name="text">
+               <string>Changing the build settings of an established project may prevent the project from being built or even lead to undesirable behavior. Proceed with caution</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </item>
-        </widget>
-       </item>
-      </layout>
+        </layout>
+       </widget>
+      </widget>
      </item>
     </layout>
    </item>

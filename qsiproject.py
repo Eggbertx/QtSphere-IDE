@@ -57,7 +57,7 @@ class QSIProject:
 		if not fileInfo.exists():
 			QMessageBox.critical(None, "Error!", "Project path %s does not exist" % path)
 			return False
-		
+
 		if fileInfo.isDir():
 			infoList = QDir(path).entryInfoList(_file_filters, QDir.Filter.Files|QDir.Filter.NoDotAndDotDot)
 			for info in infoList:
@@ -158,23 +158,24 @@ class QSIProject:
 			if line == "" or line.find("=") == -1:
 				continue
 			parts = line.split("=")
+			val = parts[1].strip()
 			match parts[0]:
 				case "author":
-					self.author = parts[1]
+					self.author = val
 				case "buildDir":
-					self.buildDir = QDir(self.projectDir).absoluteFilePath(parts[1])
+					self.buildDir = QDir(self.projectDir).absoluteFilePath(val)
 				case "compiler":
-					self.compiler = parts[1]
+					self.compiler = val
 				case "description":
-					self.summary = parts[1]
+					self.summary = val
 				case "mainScript":
-					self.script = parts[1]
+					self.script = val
 				case "name":
-					self.name = parts[1]
+					self.name = val
 				case "screenHeight":
-					self.height = int(parts[1])
+					self.height = int(val)
 				case "screenWidth":
-					self.width = int(parts[1])
+					self.width = int(val)
 		return True
 
 
