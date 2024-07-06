@@ -1,6 +1,8 @@
 # QtSphere IDE
 A cross-platform IDE for the [Sphere game engine](http://spheredev.org)
 
+Porting this from C++ to Python is still a work in progress
+
 ![Screenshot](screenshots/screenshot-map.png)
 
 ## Dependencies
@@ -12,15 +14,15 @@ A cross-platform IDE for the [Sphere game engine](http://spheredev.org)
 	* It may or may not come standard for the Windows and macOS Qt package.
 
 ## Compilation
-Building this in Qt Creator will make things a lot easier and more convenient.
+Building this in Qt Creator will make things more convenient, but if you want to run it from the command line, run `python -m venv env`.
 
-If you want to run it from a terminal, just do:
+Then, if you are in Windows, run `.\env\Scripts\activate`.
 
-```Shell
-python -m venv env
-source env/bin/activate
+In macOS, Linux, or BSD, run `source env/bin/activate`.
+
+Then, run the following:
+```
 pip install pyside6
 pyside6-project build
 python mainwindow.py
 ```
-Porting this from C++ to Python is still a work in progress
