@@ -1,10 +1,12 @@
-from PySide6.QtCore import Qt, Signal, Slot, QPoint, QSettings, QDir, QSize
+from PySide6.QtCore import Qt, Signal, Slot, QPoint, QDir
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QWidget, QMenu, QListWidgetItem
 
 from qsiproject import QSIProject
+from settings import Settings
 
 from ui.ui_startpage import Ui_StartPage
+
 
 class StartPage(QWidget):
 	ui: Ui_StartPage
@@ -86,11 +88,10 @@ class StartPage(QWidget):
 
 	def refreshGameList(self):
 		self.gameList.clear()
-		settings = QSettings()
-		numProjectDirs = settings.beginReadArray("projectDirs")
-		for p in range(numProjectDirs):
-			settings.setArrayIndex(p)
-			dir = QDir(settings.value("directory"))
+		settings = Settings()
+		projectDirs:list[str] = settings.projectDirs
+		for pDir in projectDirs:
+			dir = QDir(pDir)
 			if not dir.exists() or dir.isEmpty():
 				continue
 			dirs = dir.entryInfoList()
@@ -101,7 +102,6 @@ class StartPage(QWidget):
 				project = QSIProject()
 				if project.open(projDir.filePath(), self.printWarnings):
 					self.gameList.append(project)
-		settings.endArray()
 
 		self.gameList.sort(key=lambda game: game.name.lower())
 		self.ui.projectIcons.clear()

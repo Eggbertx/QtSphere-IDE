@@ -38,6 +38,7 @@ class NewMapDialog(QDialog):
 		self.projectPath = projectPath
 		self.ui.browse_btn.clicked.connect(self.showTilesetBrowseDialog)
 
+
 	def show(self):
 		self.ui.width_num.setValue(_DEFAULT_TILES_W)
 		self.ui.height_num.setValue(_DEFAULT_TILES_W)

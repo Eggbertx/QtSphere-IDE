@@ -1,9 +1,12 @@
 from enum import Enum
 import os
+from pprint import pprint
 
-from PySide6.QtCore import Qt, Slot, Signal, QSettings
+from PySide6.QtCore import Qt, Slot, Signal
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QDialog, QWidget, QDialogButtonBox, QListWidgetItem, QFileDialog, QAbstractButton
+
+from settings import Settings
 
 from ui.ui_settingswindow import Ui_SettingsWindow
 
@@ -31,46 +34,41 @@ class SettingsWindow(QDialog):
 		self.loadSettings()
 
 	def loadSettings(self):
-		settings = QSettings()
-		self.ui.mapCursorCol_btn.setColor(QColor(settings.value("mapCursorColor", QColor.fromString("#0080ff"))))
-		self.ui.gridColor_btn.setColor(QColor(settings.value("gridColor", QColor.fromString("#000000"))))
+		settings = Settings()
+		self.ui.mapCursorCol_btn.setColor(QColor(settings.mapCursorColor))
+		self.ui.gridColor_btn.setColor(QColor(settings.gridColor))
 		if os.name != "nt":
-			self.ui.wineDir_txt.setText(settings.value("wineDir", "/usr/bin"))
-		self.ui.neosphereDir_txt.setText(settings.value("neosphereDir", ""))
-		self.ui.legacySphereDir_txt.setText(settings.value("legacySphereDir", ""))
-		self.ui.unrecognizedFileEditor_combo.setCurrentIndex(0 if settings.value("unrecognizedFileEditor", "external") == "external" else 1)
-		self.ui.whichEngine_combo.setCurrentIndex(1 if settings.value("whichEngine", "neosphere") == "legacy" else 0)
+			self.ui.wineDir_txt.setText(settings.wineDir or "/usr/bin")
+		self.ui.neosphereDir_txt.setText(settings.neosphereDir or "")
+		self.ui.legacySphereDir_txt.setText(settings.legacySphereDir or "")
+		self.ui.unrecognizedFileEditor_combo.setCurrentIndex(0 if settings.unrecognizedFileEditor == "external" else 1)
+		self.ui.whichEngine_combo.setCurrentIndex(1 if settings.whichEngine == "legacy" else 0)
 
 		self.ui.projectDirsList.clear()
-		numSearchPaths = settings.beginReadArray("projectDirs")
-		for d in range(numSearchPaths):
-			settings.setArrayIndex(d)
-			directory = settings.value("directory")
-			if directory != "":
-				self._addProjectDirItem(directory)
-		settings.endArray()
-
+		searchPaths = settings.projectDirs
+		for sPath in searchPaths:
+			if sPath != "":
+				self._addProjectDirItem(sPath)
 
 	def _saveSettings(self):
-		settings = QSettings()
-		settings.setValue("mapCursorColor", self.ui.mapCursorCol_btn.color)
-		settings.setValue("gridColor", self.ui.gridColor_btn.color)
+		settings = Settings()
+		settings.mapCursorColor = self.ui.mapCursorCol_btn.color
+		settings.gridColor = self.ui.gridColor_btn.color
 		if os.name != "nt":
-			settings.setValue("wineDir", self.ui.wineDir_txt.text())
-		settings.setValue("neosphereDir", self.ui.neosphereDir_txt.text())
-		settings.setValue("legacySphereDir", self.ui.legacySphereDir_txt.text())
-		settings.setValue("unrecognizedFileEditor", "text" if self.ui.unrecognizedFileEditor_combo.currentIndex() == 1 else "external")
-		settings.setValue("whichEngine", "legacy" if self.ui.whichEngine_combo.currentIndex() == 1 else "neosphere")
+			settings.wineDir = self.ui.wineDir_txt.text()
+		settings.neosphereDir = self.ui.neosphereDir_txt.text()
+		settings.legacySphereDir = self.ui.legacySphereDir_txt.text()
+		settings.unrecognizedFileEditor = "text" if self.ui.unrecognizedFileEditor_combo.currentIndex() == 1 else "external"
+		settings.whichEngine = "legacy" if self.ui.whichEngine_combo.currentIndex() == 1 else "neosphere"
 
-		settings.remove("projectDirs")
-		settings.beginWriteArray("projectDirs")
+		del settings.projectDirs
 		numDirs = self.ui.projectDirsList.count()
+		dirs = []
 		for d in range(numDirs):
-			settings.setArrayIndex(d)
 			directory = self.ui.projectDirsList.item(d).text()
 			if directory != "" and not self.ui.projectDirsList.item(d).isHidden():
-				settings.setValue("directory", directory)
-		settings.endArray()
+				dirs.append(directory)
+		settings.projectDirs = dirs
 		self.settingsSaved.emit()
 
 	def _addProjectDirItem(self, text:str):
@@ -81,8 +79,8 @@ class SettingsWindow(QDialog):
 	def _removeWineIfWindows(self):
 		if os.name == "nt":
 			# running in Windows, no need for WINE stuff
-			settings = QSettings()
-			settings.remove("wineDir")
+			settings = Settings()
+			del settings.wineDir
 			self.layout().removeWidget(self.ui.wineDir_lbl)
 			self.ui.wineDir_layout.removeWidget(self.ui.wineDir_btn)
 			self.ui.wineDir_layout.removeWidget(self.ui.wineDir_txt)

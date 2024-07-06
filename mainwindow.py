@@ -6,7 +6,7 @@ from os.path import basename
 import sys
 import traceback
 
-from PySide6.QtCore import QCoreApplication, QSettings, Slot, QUrl, QModelIndex, QSize
+from PySide6.QtCore import QCoreApplication, Slot, QUrl, QModelIndex, QSize
 from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog, QTextEdit, QToolButton
 
@@ -20,6 +20,7 @@ from qsiproject import QSIProject
 from spherelauncher import SphereLauncher
 from widgets.startpage import StartPage
 from widgets.spriteset.spriteseteditor import SpritesetEditor
+from settings import Settings
 
 _VERSION = "0.10"
 _APPLICATION_NAME = "QtSphere IDE"
@@ -59,7 +60,6 @@ class SidebarTab(Enum):
 	SoundTest = 2
 
 class MainWindow(QMainWindow):
-	settings: QSettings
 	startPage: StartPage
 	engineSelector: QComboBox
 	settingsWindow: SettingsWindow
@@ -71,12 +71,11 @@ class MainWindow(QMainWindow):
 	verbose: bool
 	projectPropertiesDialog: ProjectPropertiesDialog
 	newButton: QToolButton
-	def __init__(self, parent=None, settings:QSettings=QSettings(), verbose=False):
+	def __init__(self, parent=None, verbose=False):
 		super().__init__(parent)
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		self.verbose = verbose
-		self.settings = settings
 		self.settingsWindow = SettingsWindow(self)
 		self.ui.splitter.setStretchFactor(1, 4)
 		self.startPage = StartPage(self.ui.openFileTabs, printWarnings=self.verbose)
@@ -111,7 +110,8 @@ class MainWindow(QMainWindow):
 
 
 	def _setupSettings(self):
-		match self.settings.value("whichEngine", "neophere"):
+		settings = Settings()
+		match settings.whichEngine:
 			case "legacy":
 				self.engineSelector.setCurrentText("Sphere 1.x")
 				self.ui.actionLegacyConfig.setEnabled(True)
@@ -197,6 +197,7 @@ class MainWindow(QMainWindow):
 			ext = filePath[filePath.rindex("."):]
 		filename = basename(filePath)
 		try:
+			settings = Settings()
 			match ext.lower():
 				case ".rss":
 					rss = SphereSpriteset(filePath)
@@ -208,7 +209,7 @@ class MainWindow(QMainWindow):
 				case ".txt"|".js"|".cjs"|".mjs"|".ts"|".md"|".sgm":
 					self.openFileAsText(filePath)
 				case _:
-					if self.settings.value("unrecognizedFileEditor", "external") == "external":
+					if settings.unrecognizedFileEditor == "external":
 						QDesktopServices.openUrl(QUrl.fromLocalFile(filePath))
 					else:
 						self.openFileAsText(filePath)
@@ -289,9 +290,10 @@ class MainWindow(QMainWindow):
 
 	@Slot()
 	def onSettingsSaved(self):
+		settings = Settings()
 		print("settings saved")
 		self.startPage.refreshGameList()
-		self.engineSelector.setCurrentIndex(1 if self.settings.value("whichEngine", "neosphere") == "legacy" else 0)
+		self.engineSelector.setCurrentIndex(1 if settings.whichEngine == "legacy" else 0)
 
 	@Slot()
 	def openFileButtonPressed(self):
@@ -302,12 +304,9 @@ class MainWindow(QMainWindow):
 
 	@Slot()
 	def openProjectPressed(self):
-		numProjectDirs = settings.beginReadArray("projectDirs")
-		startDir:str = None
-		if numProjectDirs > 0:
-			settings.setArrayIndex(0)
-			startDir = settings.value("directory")
-		settings.endArray()
+		settings = Settings()
+		projectDirs = settings.projectDirs
+		startDir = None if len(projectDirs) == 0 else projectDirs[0]
 		projectDir = QFileDialog.getExistingDirectory(self, "Selct project directory", startDir)
 		newProject = QSIProject()
 		if newProject.open(projectDir):
@@ -335,17 +334,16 @@ class MainWindow(QMainWindow):
 
 	@Slot(int)
 	def engineChanged(self, index:int):
+		settings = Settings()
 		match index:
 			case 0:
-				self.settings.setValue("whichEngine", "neosphere")
+				settings.whichEngine ="neosphere"
 				self.ui.actionConfigure_Engine.setEnabled(False)
 				self.ui.actionLegacyConfig.setEnabled(False)
-				# self.ui.toolbarPlayGame.setIcon(QIcon(":/icons/res/neosphere.png"))
 			case 1:
-				self.settings.setValue("whichEngine", "legacy")
+				settings.whichEngine ="legacy"
 				self.ui.actionConfigure_Engine.setEnabled(True)
 				self.ui.actionLegacyConfig.setEnabled(True)
-				# self.ui.toolbarPlayGame.setIcon(QIcon(":/icons/res/legacyengine.png"))
 
 	@Slot()
 	def startGame(self):
@@ -394,9 +392,9 @@ if __name__ == "__main__":
 	QCoreApplication.setApplicationVersion(_VERSION)
 	app = QApplication(sys.argv)
 	app.setStyle("fusion")
-	settings = QSettings()
-	window = MainWindow(settings=settings, verbose=args.verbose)
-	if settings.value("maximized", True):
+	window = MainWindow(verbose=args.verbose)
+	settings = Settings()
+	if settings.maximized:
 		window.showMaximized()
 	else:
 		window.show()
