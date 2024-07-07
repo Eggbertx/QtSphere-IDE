@@ -6,9 +6,9 @@ from os.path import basename
 import sys
 import traceback
 
-from PySide6.QtCore import QCoreApplication, Slot, QUrl, QModelIndex, QSize
-from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog, QTextEdit, QToolButton
+from PySide6.QtCore import QCoreApplication, Qt, Slot, QUrl, QModelIndex, Signal
+from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel, QShortcut
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog, QToolButton
 
 from ui.ui_mainwindow import Ui_MainWindow
 
@@ -20,6 +20,7 @@ from qsiproject import QSIProject
 from spherelauncher import SphereLauncher
 from widgets.startpage import StartPage
 from widgets.spriteset.spriteseteditor import SpritesetEditor
+from widgets.textedit import TextEdit
 from settings import Settings
 
 _VERSION = "0.10"
@@ -71,15 +72,27 @@ class MainWindow(QMainWindow):
 	verbose: bool
 	projectPropertiesDialog: ProjectPropertiesDialog
 	newButton: QToolButton
+	openFilePaths:list[str] # each element should correspond to the respective tab index, with Start Page (and any other non-file tabs) being None
+
+	@property
+	def currentTabWidget(self):
+		return self.ui.openFileTabs.currentWidget()
+
+	@property
+	def currentTabIndex(self):
+		return self.ui.openFileTabs.currentIndex()
+
 	def __init__(self, parent=None, verbose=False):
 		super().__init__(parent)
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
+		self.ui.sideBar.setCurrentIndex(0)
 		self.verbose = verbose
 		self.settingsWindow = SettingsWindow(self)
 		self.ui.splitter.setStretchFactor(1, 4)
 		self.startPage = StartPage(self.ui.openFileTabs, printWarnings=self.verbose)
 		self.ui.openFileTabs.addTab(self.startPage, "Start Page")
+		self.openFilePaths = [None]
 
 		self.engineSelector = QComboBox(self.ui.mainToolBar)
 		self.engineSelector.setMinimumWidth(120)
@@ -127,6 +140,7 @@ class MainWindow(QMainWindow):
 		self.ui.actionAbout_Qt.triggered.connect(lambda: QMessageBox.aboutQt(self, "About Qt"))
 		self.ui.actionAbout.triggered.connect(lambda: QMessageBox.about(self, "About QtSphere IDE", _ABOUT_STRING))
 		self.ui.openFileTabs.tabCloseRequested.connect(self.tabCloseRequested)
+		self.ui.openFileTabs.tabBar().tabMoved.connect(self.onTabMoved)
 		self.ui.actionConfigure_QtSphere_IDE.triggered.connect(self.openSettingsWindow)
 		self.settingsWindow.settingsSaved.connect(self.onSettingsSaved)
 		self.startPage.projectLoaded.connect(self.loadProject)
@@ -157,6 +171,12 @@ class MainWindow(QMainWindow):
 		self.ui.newMap.triggered.connect(self.newMapDialog.show)
 		self.ui.toolbarProjectProperties.triggered.connect(self.projectPropertiesDialog.show)
 		self.ui.actionProject_Properties.triggered.connect(self.projectPropertiesDialog.show)
+		self.ui.actionSave.triggered.connect(lambda: self.saveCurrentTab(False))
+		self.ui.actionSave_As.triggered.connect(lambda: self.saveCurrentTab(True))
+		self.ui.newPlainTextFile.triggered.connect(lambda: self.newTextFile())
+
+		QShortcut(Qt.Modifier.CTRL | Qt.Key.Key_PageDown, self, self.onNextTabTriggered)
+		QShortcut(Qt.Modifier.CTRL | Qt.Key.Key_PageUp, self, self.onPrevTabTriggered)
 
 
 	def _openCurrentProjectDir(self):
@@ -183,13 +203,15 @@ class MainWindow(QMainWindow):
 		
 		self.launcher.launchGame(game)
 
-	def openFileAsText(self, filePath:str):
-		with open(filePath, errors="ignore") as file:
-			editor = QTextEdit(self.ui.openFileTabs)
-			editor.setTabStopDistance(editor.tabStopDistance()/2)
-			editor.setText(file.read())
-			t = self.ui.openFileTabs.addTab(editor, basename(filePath))
-			self.ui.openFileTabs.setCurrentIndex(t)
+	def newTextFile(self):
+		self.openFileAsText()
+
+	def openFileAsText(self, filePath:str = None):
+		editor = TextEdit(self) if filePath is None else TextEdit.fromFile(self.ui.openFileTabs, filePath)
+		t = self.ui.openFileTabs.addTab(editor, basename(filePath or "<new file>"))
+		self.openFilePaths.append(filePath or "")
+		self.ui.openFileTabs.setCurrentIndex(t)
+		editor.modificationChanged.connect(self.onCurrentFileModificationChanged)
 
 	def openFile(self, filePath:str):
 		ext = ""
@@ -203,6 +225,7 @@ class MainWindow(QMainWindow):
 					rss = SphereSpriteset(filePath)
 					rss.open()
 					editor = SpritesetEditor(self.ui.openFileTabs)
+					self.openFilePaths.append(filePath)
 					t = self.ui.openFileTabs.addTab(editor, filename)
 					editor.attachSpriteset(rss)
 					self.ui.openFileTabs.setCurrentIndex(t)
@@ -236,24 +259,79 @@ class MainWindow(QMainWindow):
 	def showOpenFileDialog(self, fileType: FileType = FileType.AllSupported, startDir:str = ".", title:str = "Open File") -> str|None:
 		result = QFileDialog.getOpenFileName(self, title, startDir,
 			";;".join(_OPEN_DIALOG_FILTER), _OPEN_DIALOG_FILTER[fileType.value])
-		return result[0] if len(result) > 0 else None
+		return result[0] if len(result) > 0 and result[0] != "" else None
+
+	def showSaveFileDialog(self, fileType: FileType = FileType.AllSupported, startDir:str = ".", title:str = "Save File"):
+		result = QFileDialog.getSaveFileName(self, title, startDir,
+			";;".join(_OPEN_DIALOG_FILTER), _OPEN_DIALOG_FILTER[fileType.value])
+		return result[0] if len(result) > 0 and result[0] != "" else None
+
+	def saveCurrentTab(self, saveAs:bool):
+		index = self.currentTabIndex
+		filePath = self.openFilePaths[index]
+		if saveAs or filePath == "":
+			newFilePath = self.showSaveFileDialog()
+			if newFilePath is None:
+				return # cancelled
+			filePath = newFilePath
+
+		try:
+			activeWidget = self.currentTabWidget
+			if hasattr(activeWidget, "save"):
+				activeWidget.save(filePath)
+			else:
+				raise NotImplementedError(f"Saving has not been implemented yet for this editor ({type(activeWidget)})")
+		except Exception as e:
+			QMessageBox.critical(self, "Error", traceback.format_exc())
+			raise
+
+	def currentTabIsModified(self):
+		active = self.currentTabWidget
+		return hasattr(active, "isModified") and active.isModified()
+
+	def setCurrentTabSetModified(self, modified:bool):
+		active = self.currentTabWidget
+		if hasattr(active, "setModified"):
+			active.setModified(modified)
 
 	def currentTabCanCutCopyPaste(self):
-		active = self.ui.openFileTabs.currentWidget()
+		active = self.currentTabWidget
 		return hasattr(active, "cut") and hasattr(active, "copy") and hasattr(active, "paste")
 
 	def currentTabHasUndoRedo(self):
-		active = self.ui.openFileTabs.currentWidget()
+		active = self.currentTabWidget
 		return hasattr(active, "undo") and hasattr(active, "redo")
 
 	def currentTabHasSelectAll(self):
-		active = self.ui.openFileTabs.currentWidget()
-		return hasattr(active, "selectAll")
+		return hasattr(self.currentTabWidget, "selectAll")
+
+	def showSaveConfirmationDialog(self):
+		msgbox = QMessageBox(self)
+		msgbox.setStandardButtons(QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Discard|QMessageBox.StandardButton.Cancel)
+
+		filename = basename(self.openFilePaths[self.currentTabIndex])
+		msg = "The current file" if filename == "" else f"The file {filename}"
+		msg += " has been modified. Do you want to save your changes?"
+
+		msgbox.setInformativeText(msg)
+		return msgbox.exec()
 
 	#region Slots
 	@Slot()
 	def onGameLaunched(self):
 		self.launchGame(self.loadedProject)
+
+	@Slot(bool)
+	def onCurrentFileModificationChanged(self, modified:bool):
+		index = self.currentTabIndex
+		tabText = self.ui.openFileTabs.tabBar().tabText(index)
+		showsModified = tabText.endswith(" *")
+
+		if modified and not showsModified:
+			self.ui.openFileTabs.tabBar().setTabText(index, tabText + " *")
+		elif not modified and showsModified:
+			self.ui.openFileTabs.tabBar().setTabText(index, tabText[:-2])
+
 
 	@Slot(int)
 	def onTabChanged(self, index:int):
@@ -267,6 +345,29 @@ class MainWindow(QMainWindow):
 		self.ui.actionCopy.setEnabled(hasClipboard)
 		self.ui.actionPaste.setEnabled(hasClipboard)
 		self.ui.actionSelect_All.setEnabled(self.currentTabHasSelectAll())
+		index = self.currentTabIndex
+		if index < len(self.openFilePaths):
+			currentPath = self.openFilePaths[index]
+			self.ui.actionSave.setEnabled(currentPath is not None)
+			self.ui.actionSave_As.setEnabled(currentPath is not None)
+
+	@Slot()
+	def onNextTabTriggered(self):
+		next = self.currentTabIndex + 1 if self.currentTabIndex+1 < len(self.openFilePaths) else 0
+		self.ui.openFileTabs.setCurrentIndex(next)
+
+	@Slot()
+	def onPrevTabTriggered(self):
+		prev = self.currentTabIndex - 1 if self.currentTabIndex > 0 else len(self.openFilePaths) - 1
+		self.ui.openFileTabs.setCurrentIndex(prev)
+
+	@Slot()
+	def onFileSaveTriggered(self):
+		currentPath = self.openFilePaths[self.currentTabIndex]
+		if currentPath is None:
+			QMessageBox.critical(self, "Error", "Invalid tab path. This should not normally happen.")
+			return
+
 
 	@Slot()
 	def onCutTriggered(self):
@@ -324,13 +425,37 @@ class MainWindow(QMainWindow):
 		self.settingsWindow.loadSettings()
 		self.settingsWindow.show()
 
+	@Slot(int,int)
+	def onTabMoved(self, fromIndex:int, toIndex:int):
+		fromPath = self.openFilePaths.pop(fromIndex)
+		if toIndex < len(self.openFilePaths):
+			self.openFilePaths.insert(toIndex, fromPath)
+		else:
+			self.openFilePaths.append(fromPath)
+
+
 	@Slot(int)
 	def tabCloseRequested(self, index:int):
+		if self.currentTabIsModified():
+			match self.showSaveConfirmationDialog():
+				case QMessageBox.StandardButton.Save:
+					self.saveCurrentTab(False)
+				case QMessageBox.StandardButton.Discard:
+					pass
+				case QMessageBox.StandardButton.Cancel:
+					return
+
+		widget = self.ui.openFileTabs.widget(index)
+		if hasattr(widget, "modificationChanged"):
+			widget.modificationChanged.disconnect()
+
 		self.ui.openFileTabs.removeTab(index)
+		self.openFilePaths.pop(index)
 		if self.ui.openFileTabs.count() == 0:
 			# reopen the start page if there are no more tabs
 			self.ui.openFileTabs.addTab(self.startPage, "Start Page")
-			self.startPage.refreshGameList()
+			self.openFilePaths.append(None)
+			# self.startPage.refreshGameList()
 
 	@Slot(int)
 	def engineChanged(self, index:int):

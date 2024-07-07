@@ -16,8 +16,8 @@ class SpritesetEditor(SphereEditor):
 	directionScene: QGraphicsScene
 	imageChooser: ImageChooser
 
-	def __init__(self, parent: QWidget = None, windowType: Qt.WindowType = Qt.WindowType.Widget) -> None:
-		super().__init__(parent, windowType)
+	def __init__(self, parent: QWidget = None):
+		super().__init__(parent)
 		self.ui = Ui_SpritesetEditor()
 		self.ui.setupUi(self)
 		self.editorType = SphereFile.Spriteset
@@ -45,6 +45,7 @@ class SpritesetEditor(SphereEditor):
 
 	def attachSpriteset(self, spriteset:SphereSpriteset):
 		self.ui.animDirChoose.clear()
+		self.filePath = spriteset.filePath
 		for d in range(len(spriteset.directions)):
 			self.ui.animDirChoose.addItem(spriteset.directions[d].name)
 			self.ui.dirsContainer.addWidget(DirectionView(self, spriteset, d))

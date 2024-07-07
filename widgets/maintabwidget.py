@@ -6,6 +6,7 @@ class MainTabBar(QTabBar):
 	def __init__(self, parent=None):
 		super().__init__(parent)
 		self.setTabsClosable(True)
+		self.setMovable(True)
 	
 	def mouseReleaseEvent(self, event: QMouseEvent):
 		if event.button() == Qt.MouseButton.MiddleButton:

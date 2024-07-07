@@ -1,6 +1,5 @@
 from enum import Enum
 import os
-from pprint import pprint
 
 from PySide6.QtCore import Qt, Slot, Signal
 from PySide6.QtGui import QColor
