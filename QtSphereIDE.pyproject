@@ -8,6 +8,7 @@
         "ui/importoptionsdialog.ui",
         "ui/layerpropertiesdialog.ui",
         "ui/mainwindow.ui",
+        "ui/mapeditor.ui",
         "ui/modifiedfilesdialog.ui",
         "ui/newmapdialog.ui",
         "ui/projectpropertiesdialog.ui",
