@@ -2,6 +2,7 @@ from io import BufferedReader
 import struct
 
 from formats.spherefile import SphereFile, FormatException, readSphereString
+from formats.tileset import Tileset
 
 class MapDirections:
 	North = 0
@@ -15,9 +16,9 @@ class MapDirections:
 
 
 class MapString:
-	TilesetFile = 0 # obsolete(?)
+	TilesetFile = 0
 	MusicFile = 1
-	ScriptFile = 2 # obsolete(?)
+	ScriptFile = 2
 	EntryScript = 3
 	ExitScript = 4
 	NorthScript = 5
@@ -138,12 +139,22 @@ class MapZone:
 	y2:int
 	layer:int
 	reactivateInNumSteps:int
+	script:str
 
 	@staticmethod
-	def fromReader(reader: BufferedReader, filePath:str):
+	def fromReader(reader: BufferedReader):
 		zone = MapZone()
 		(zone.x1,zone.y1,zone.x2,zone.y2,zone.layer,zone.reactivateInNumSteps) = struct.unpack("<6H4x", reader.read(16))
+		zone.script = readSphereString(reader)
 		return zone
+	def __init__(self, x1:int = 0, y1:int = 0, x2:int = 0, y2:int = 0, layer:int = 0, reactivateInNumSteps:int = 8, script:str = ""):
+		self.x1 = x1
+		self.y1 = y1
+		self.x2 = x2
+		self.y2 = y2
+		self.layer = layer
+		self.reactivateInNumSteps = reactivateInNumSteps
+		self.script = script
 
 
 class SphereMap(SphereFile):
@@ -151,10 +162,24 @@ class SphereMap(SphereFile):
 	startY: int
 	startLayer: int
 	startDirection: MapDirections
+	tileset: Tileset
 
 	strings:list[str]
 	layers:list[MapLayer]
 	entities:list[MapEntity]
+	zones:list[MapZone]
+
+	@property
+	def tilesetFile(self):
+		if len(self.strings) < MapString.TilesetFile:
+			raise FormatException(self.filePath, "Missing tileset string data")
+		return self.strings[MapString.TilesetFile]
+
+	@tilesetFile.setter
+	def tilesetFile(self, val:str):
+		if len(self.strings) < MapString.TilesetFile:
+			return
+		self.strings[MapString.TilesetFile] = val
 
 	def __init__(self, filePath: str = None):
 		super().__init__(filePath)
@@ -162,6 +187,13 @@ class SphereMap(SphereFile):
 		self.layers = []
 		self.entities = []
 		self.zones = []
+		self.tileset = None
+
+	def open(self):
+		super().open()
+		if self.tilesetFile != "":
+			with open(self.tilesetFile, "rb") as file:
+				self.tileset = Tileset.fromReader(file, self.tilesetFile)
 
 	def _parseFileData(self, file: BufferedReader):
 		super()._parseFileData(file)
@@ -190,10 +222,13 @@ class SphereMap(SphereFile):
 			self.entities.append(entity)
 
 		for z in range(numZones):
-			zone = MapZone.fromReader(file, self.filePath)
+			zone = MapZone.fromReader(file)
 			if zone.layer < 0 or zone.layer >= numLayers:
 				raise FormatException(self.filePath, f"Invalid zone layer {zone.layer}, expected layer between 0 and {numLayers}")
 			self.zones.append(zone)
 
+		if self.tilesetFile == "":
+			self.tileset = Tileset.fromReader(file, "")
+
 	def _packBytes() -> bytes:
-		raise NotImplementedError()
+		raise NotImplementedError("Map saving not implemented yet")

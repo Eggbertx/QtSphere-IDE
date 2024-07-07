@@ -1,5 +1,4 @@
 from io import BufferedReader
-from os import path
 import struct
 
 from .spherefile import SphereFile, FormatException, readSphereString
@@ -85,4 +84,4 @@ class SphereSpriteset(SphereFile):
 				raise FormatException(self.filePath, "spriteset versions 1 and 2 are not supported yet")
 
 	def _packBytes() -> bytes:
-		return bytes([])
+		raise NotImplementedError("Spriteset saving not implemented yet")
