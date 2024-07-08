@@ -1,6 +1,6 @@
 from enum import Enum
 import glob
-from io import TextIOWrapper
+from io import BufferedReader
 from os import path
 import re
 
@@ -87,7 +87,7 @@ class QSIProject:
 			return False
 
 		self.buildDir = self.projectDir
-		with open(self.projectFilePath, "r") as projectFile:
+		with open(self.projectFilePath, "rb") as projectFile:
 			return self._prepareProjectFile(projectFile)
 
 
@@ -142,7 +142,7 @@ class QSIProject:
 		value:str = matches[0][1]
 		return int(value) if value.isdigit() else defaultValue
 
-	def _prepareProjectFile(self, projectFile:TextIOWrapper) -> bool:
+	def _prepareProjectFile(self, projectFile:BufferedReader) -> bool:
 		match self.projectType:
 			case ProjectType.SSProject:
 				return self._readSSProj(projectFile)
@@ -152,9 +152,10 @@ class QSIProject:
 				return self._readSGM(projectFile)
 
 
-	def _readSSProj(self, projectFile:TextIOWrapper) -> bool:
+	def _readSSProj(self, projectFile:BufferedReader) -> bool:
 		lines = projectFile.readlines()
 		for line in lines:
+			line = line.decode()
 			if line == "" or line.find("=") == -1:
 				continue
 			parts = line.split("=")
@@ -179,8 +180,8 @@ class QSIProject:
 		return True
 
 
-	def _readCellscript(self, projectFile:TextIOWrapper) -> bool:
-		scriptStr = projectFile.read()
+	def _readCellscript(self, projectFile:BufferedReader) -> bool:
+		scriptStr = projectFile.read().decode()
 		self.name = self._getCellscriptStringValue(scriptStr, "name")
 		self.author = self._getCellscriptStringValue(scriptStr, "author")
 		self.version = self._getCellscriptIntValue(scriptStr, "version", 1)
@@ -209,12 +210,12 @@ class QSIProject:
 		return True
 
 
-	def _readSGM(self, projectFile:TextIOWrapper) -> bool:
+	def _readSGM(self, projectFile:BufferedReader) -> bool:
 		lines = projectFile.readlines()
 		for line in lines:
 			if line == "":
 				continue
-			parts = line.split("=", 1)
+			parts = line.decode().split("=", 1)
 			match parts[0]:
 				case "name":
 					self.name = parts[1]
