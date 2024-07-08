@@ -37,10 +37,11 @@ class MapView(QGraphicsView):
 	def attachMap(self, map:SphereMap):
 		tileW = map.tileset.tileWidth
 		tileH = map.tileset.tileHeight
-		map.layers.reverse()
-		for l in range(map.layers):
+		self.mapScene.clear()
+		for l in range(len(map.layers)):
+			# layer = map.layers[len(map.layers)-l-1]
 			layer = map.layers[l]
-			for t in range(layer.tiles):
+			for t in range(len(layer.tiles)):
 				tile = layer.tiles[t]
 				tilePixmap = self.mapScene.addPixmap(QPixmap.fromImage(map.tileset.tiles[tile].image))
 				tilePixmap.setShapeMode(QGraphicsPixmapItem.ShapeMode.BoundingRectShape)
@@ -49,7 +50,6 @@ class MapView(QGraphicsView):
 				tilePixmap.setPos(x * tileW,y * tileH)
 				tilePixmap.setZValue(l)
 				tilePixmap.setVisible(layer.visible)
-		map.layers.reverse()
 		self.mapFile = map
 		self.__resetPointerGroup()
 		self.drawSize = 1
@@ -117,10 +117,10 @@ class MapView(QGraphicsView):
 		if not gridColor.isValid():
 			gridColor = QColor.fromString("#000000")
 			settings.gridColor = gridColor
-		
+
 		mapSize = self.sceneRect().size()
-		mapWidth = mapSize.width()
-		mapHeight = mapSize.height()
+		mapWidth = int(mapSize.width())
+		mapHeight = int(mapSize.height())
 		
 		sceneWidth = self.mapScene.width()
 		sceneHeight = self.mapScene.height()

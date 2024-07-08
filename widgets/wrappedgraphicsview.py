@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, QSize, QPoint, QRect, Signal
-from PySide6.QtGui import QMouseEvent, QResizeEvent, QPixmap, QColor
+from PySide6.QtGui import QMouseEvent, QResizeEvent, QPixmap, QColor, QImage
 from PySide6.QtWidgets import QWidget, QGraphicsView, QGraphicsScene
 
 from settings import Settings
@@ -10,7 +10,7 @@ class WrappedGraphicsView(QGraphicsView):
 	wScene:QGraphicsScene
 	__scaleMult:int
 	pixmaps:list[QPixmap]
-	indexChanged:Signal
+	indexChanged:Signal = Signal(int)
 
 	@property
 	def scaleFactor(self):
@@ -35,7 +35,6 @@ class WrappedGraphicsView(QGraphicsView):
 		self.tSize = QSize(0,0)
 		self.__scaleMult = 1
 		self.pixmaps = []
-		self.indexChanged = Signal(int)
 
 	def indexAt(self, pos:QPoint):
 		x = 0
@@ -64,9 +63,9 @@ class WrappedGraphicsView(QGraphicsView):
 
 	def addPixmap(self, pixmap:QPixmap):
 		self.pixmaps.append(pixmap)
-		self.arrangeItems(self.width(), self.height())
+		self.arrangeItems()
 
-	def arrangeItems(self, width:int, height:int):
+	def arrangeItems(self, width:int = -1, height:int = -1):
 		if len(self.pixmaps) == 0:
 			return
 
@@ -89,11 +88,11 @@ class WrappedGraphicsView(QGraphicsView):
 		self.wScene.clear()
 		for p in range(len(self.pixmaps)):
 			pixmap = self.pixmaps[p]
-			item = self.wScene.addPixmap(pixmap)
+			item = self.wScene.addPixmap(QPixmap(pixmap))
 			item.setScale(self.__scaleMult)
 			if x + self.tSize.height() > self.width():
 				x = 0
-				y += self.tSize.height
+				y += self.tSize.height()
 
 			item.setPos(x * self.scaleFactor, y * self.scaleFactor)
 			if self.selectedIndex == p:
