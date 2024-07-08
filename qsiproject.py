@@ -101,7 +101,7 @@ class QSIProject:
 			icoList = glob.glob("*.ico", root_dir=self.projectDir, recursive=False)
 			if len(icoList) > 0:
 				return QIcon(path.join(self.projectDir, icoList[0]))
-		return QIcon(":/icons/res/neosphere.png")
+		return QIcon(":/res/neosphere.png")
 
 
 	def getResolutionString(self) -> str:

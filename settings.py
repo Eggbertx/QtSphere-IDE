@@ -19,7 +19,6 @@ class Keys:
 	maximized = "maximized"
 	neosphereDir = "neosphereDir"
 	projectDirs = "projectDirs"
-	theme = "theme"
 	unrecognizedFileEditor = "unrecognizedFileEditor"
 	whichEngine = "whichEngine"
 	wineDir = "wineDir"

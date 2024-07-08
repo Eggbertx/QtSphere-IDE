@@ -99,8 +99,8 @@ class MainWindow(QMainWindow):
 
 		self.engineSelector = QComboBox(self.ui.mainToolBar)
 		self.engineSelector.setMinimumWidth(120)
-		self.engineSelector.addItem(QIcon(":/icons/res/neosphere.png"), "neoSphere")
-		self.engineSelector.addItem(QIcon(":/icons/res/legacyengine.png"),"Sphere 1.x")
+		self.engineSelector.addItem(QIcon(":/res/neosphere.png"), "neoSphere")
+		self.engineSelector.addItem(QIcon(":/res/legacyengine.png"),"Sphere 1.x")
 		self.ui.mainToolBar.addWidget(self.engineSelector)
 
 		self.newButton = QToolButton()

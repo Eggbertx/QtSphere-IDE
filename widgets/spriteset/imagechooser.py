@@ -29,7 +29,7 @@ class ImageChooser(QWidget):
 		super().__init__(parent)
 		self.installEventFilter(self)
 		self.showTransparency = showTransparency
-		self.alphaBG = QPixmap.fromImage(QImage(":/icons/res/transparency-bg.png"))
+		self.alphaBG = QPixmap.fromImage(QImage(":/res/transparency-bg.png"))
 
 		self.images = []
 		self.selectedIndex = 0

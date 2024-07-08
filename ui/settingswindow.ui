@@ -35,7 +35,7 @@
    <property name="sizeConstraint">
     <enum>QLayout::SetNoConstraint</enum>
    </property>
-   <item row="3" column="1">
+   <item row="2" column="1">
     <widget class="QComboBox" name="whichEngine_combo">
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If the legacy engine is chosen on a non-Windows OS and WINE is available, it will be used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -55,24 +55,166 @@
      </item>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QComboBox" name="theme_combo">
+   <item row="7" column="1">
+    <layout class="QGridLayout" name="colorsLayout">
+     <property name="topMargin">
+      <number>4</number>
+     </property>
+     <property name="horizontalSpacing">
+      <number>6</number>
+     </property>
+     <item row="1" column="0">
+      <widget class="ColorButton" name="mapCursorCol_btn">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="mapCursor_lbl">
+       <property name="text">
+        <string>Map cursor</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="gridColor_lbl">
+       <property name="text">
+        <string>Grid color</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="ColorButton" name="gridColor_btn">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="6" column="1">
+    <widget class="QComboBox" name="unrecognizedFileEditor_combo">
      <item>
       <property name="text">
-       <string>Default</string>
+       <string>External editor</string>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Dark</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Custom</string>
+       <string>Internal text editor</string>
       </property>
      </item>
     </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="neoSphereDir_lbl">
+     <property name="text">
+      <string>neoSphere directory</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLineEdit" name="legacySphereDir_txt"/>
+     </item>
+     <item>
+      <widget class="QToolButton" name="legacySphereDir_btn">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="1">
+    <widget class="QListWidget" name="projectDirsList">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="sortingEnabled">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="sphereEngine_lbl">
+     <property name="text">
+      <string>Sphere engine</string>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="0">
+    <widget class="QLabel" name="unrecognizedFileEditor_lbl">
+     <property name="text">
+      <string>Unrecognized file editor</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <layout class="QHBoxLayout" name="engineDirLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QLineEdit" name="neosphereDir_txt"/>
+     </item>
+     <item>
+      <widget class="QToolButton" name="neosphereDir_btn">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="projectDirectories_lbl">
+     <property name="text">
+      <string>Project directories</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Colors</string>
+     </property>
+    </widget>
+   </item>
+   <item row="9" column="1">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+     <property name="centerButtons">
+      <bool>false</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <layout class="QHBoxLayout" name="wineDir_layout">
+     <item>
+      <widget class="QLineEdit" name="wineDir_txt"/>
+     </item>
+     <item>
+      <widget class="QToolButton" name="wineDir_btn">
+       <property name="text">
+        <string>...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item row="1" column="1">
     <layout class="QHBoxLayout" name="projectDirBtnsLayout">
@@ -130,186 +272,18 @@
      </item>
     </layout>
    </item>
-   <item row="4" column="1">
-    <layout class="QHBoxLayout" name="engineDirLayout">
-     <property name="spacing">
-      <number>0</number>
-     </property>
-     <item>
-      <widget class="QLineEdit" name="neosphereDir_txt"/>
-     </item>
-     <item>
-      <widget class="QToolButton" name="neosphereDir_btn">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="10" column="1">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-     <property name="centerButtons">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
    <item row="5" column="0">
-    <widget class="QLabel" name="legacySphereDir_lbl">
-     <property name="text">
-      <string>Legacy Sphere directory</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="1">
-    <layout class="QGridLayout" name="colorsLayout">
-     <property name="topMargin">
-      <number>4</number>
-     </property>
-     <property name="horizontalSpacing">
-      <number>6</number>
-     </property>
-     <item row="1" column="0">
-      <widget class="ColorButton" name="mapCursorCol_btn">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QLabel" name="mapCursor_lbl">
-       <property name="text">
-        <string>Map cursor</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="gridColor_lbl">
-       <property name="text">
-        <string>Grid color</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="ColorButton" name="gridColor_btn">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="0" column="1">
-    <widget class="QListWidget" name="projectDirsList">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="sortingEnabled">
-      <bool>false</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="5" column="1">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLineEdit" name="legacySphereDir_txt"/>
-     </item>
-     <item>
-      <widget class="QToolButton" name="legacySphereDir_btn">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="sphereEngine_lbl">
-     <property name="text">
-      <string>Sphere engine</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QLabel" name="projectDirectories_lbl">
-     <property name="text">
-      <string>Project directories</string>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Colors</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="neoSphereDir_lbl">
-     <property name="text">
-      <string>neoSphere directory</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="theme_lbl">
-     <property name="text">
-      <string>Theme</string>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="1">
-    <layout class="QHBoxLayout" name="wineDir_layout">
-     <item>
-      <widget class="QLineEdit" name="wineDir_txt"/>
-     </item>
-     <item>
-      <widget class="QToolButton" name="wineDir_btn">
-       <property name="text">
-        <string>...</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="6" column="0">
     <widget class="QLabel" name="wineDir_lbl">
      <property name="text">
       <string>WINE directory</string>
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="unrecognizedFileEditor_lbl">
+   <item row="4" column="0">
+    <widget class="QLabel" name="legacySphereDir_lbl">
      <property name="text">
-      <string>Unrecognized file editor</string>
+      <string>Legacy Sphere directory</string>
      </property>
-    </widget>
-   </item>
-   <item row="7" column="1">
-    <widget class="QComboBox" name="unrecognizedFileEditor_combo">
-     <item>
-      <property name="text">
-       <string>External editor</string>
-      </property>
-     </item>
-     <item>
-      <property name="text">
-       <string>Internal text editor</string>
-      </property>
-     </item>
     </widget>
    </item>
   </layout>
@@ -318,7 +292,7 @@
   <customwidget>
    <class>ColorButton</class>
    <extends>QToolButton</extends>
-   <header>widgets/colorbutton.h</header>
+   <header location="global">widgets.colorbutton</header>
   </customwidget>
  </customwidgets>
  <resources/>

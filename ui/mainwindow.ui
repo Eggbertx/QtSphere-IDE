@@ -21,7 +21,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="../qsires.qrc">
-    <normaloff>:/icons/res/icon.png</normaloff>:/icons/res/icon.png</iconset>
+    <normaloff>:/res/icon.png</normaloff>:/res/icon.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="autoFillBackground">
@@ -725,7 +725,7 @@
    </property>
    <property name="icon">
     <iconset resource="../qsires.qrc">
-     <normaloff>:/icons/res/gears.png</normaloff>:/icons/res/gears.png</iconset>
+     <normaloff>:/res/gears.png</normaloff>:/res/gears.png</iconset>
    </property>
    <property name="text">
     <string>Project Properties</string>
@@ -818,7 +818,7 @@
    </property>
    <property name="icon">
     <iconset resource="../qsires.qrc">
-     <normaloff>:/icons/res/legacyconfig.png</normaloff>:/icons/res/legacyconfig.png</iconset>
+     <normaloff>:/res/legacyconfig.png</normaloff>:/res/legacyconfig.png</iconset>
    </property>
    <property name="text">
     <string>Configure</string>

@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/icons">
+    <qresource prefix="/">
         <file>res/neosphere.png</file>
         <file>res/icon.png</file>
         <file>res/icon.ico</file>
@@ -20,8 +20,5 @@
         <file>res/legacyengine.png</file>
         <file>res/togglegrid.png</file>
         <file>res/show_spritesets.png</file>
-    </qresource>
-    <qresource prefix="/text">
-        <file>res/dark.qss</file>
     </qresource>
 </RCC>

@@ -1,3 +1,8 @@
+/*
+Theming was never fully implemented in the C++ version of QtSphere IDE and has been deprecated.
+This file is being left here for now, but it may end up being deleted (or properly implemented) at some point
+*/
+
 #mainSpriteAreaLayout, #mainSpriteAreaLayout QFrame { 
 	background-color: #1e1e1e;
 }
