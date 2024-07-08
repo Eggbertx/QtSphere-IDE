@@ -1,6 +1,8 @@
 from io import BufferedReader
 import struct
 
+from PySide6.QtCore import QSize
+
 from formats.spherefile import SphereFile, FormatException, readSphereString
 from formats.tileset import Tileset
 
@@ -175,12 +177,6 @@ class SphereMap(SphereFile):
 			raise FormatException(self.filePath, "Missing tileset string data")
 		return self.strings[MapString.TilesetFile]
 
-	@tilesetFile.setter
-	def tilesetFile(self, val:str):
-		if len(self.strings) < MapString.TilesetFile:
-			return
-		self.strings[MapString.TilesetFile] = val
-
 	def __init__(self, filePath: str = None):
 		super().__init__(filePath)
 		self.strings = []
@@ -232,3 +228,13 @@ class SphereMap(SphereFile):
 
 	def _packBytes() -> bytes:
 		raise NotImplementedError("Map saving not implemented yet")
+
+	def largestLayerSize(self):
+		largestW = 0
+		largestH = 0
+		for layer in self.layers:
+			if layer.width > largestW:
+				largestW = layer.width
+			if layer.height > largestH:
+				largestH = layer.height
+		return QSize(largestW, largestH)

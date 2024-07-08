@@ -15,9 +15,11 @@ from ui.ui_mainwindow import Ui_MainWindow
 from dialogs.newmapdialog import NewMapDialog
 from dialogs.projectpropertiesdialog import ProjectPropertiesDialog
 from dialogs.settingswindow import SettingsWindow
+from formats.spheremap import SphereMap
 from formats.spriteset import SphereSpriteset
 from qsiproject import QSIProject
 from spherelauncher import SphereLauncher
+from widgets.map.mapeditor import MapEditor
 from widgets.startpage import StartPage
 from widgets.spriteset.spriteseteditor import SpritesetEditor
 from widgets.textedit import TextEdit
@@ -221,6 +223,14 @@ class MainWindow(QMainWindow):
 		try:
 			settings = Settings()
 			match ext.lower():
+				case ".rmp":
+					rmp = SphereMap(filePath)
+					rmp.open()
+					editor = MapEditor(self.ui.openFileTabs)
+					self.openFilePaths.append(filePath)
+					t = self.ui.openFileTabs.addTab(editor, filename)
+					editor.attachMap(rmp)
+					self.ui.openFileTabs.setCurrentIndex(t)
 				case ".rss":
 					rss = SphereSpriteset(filePath)
 					rss.open()
