@@ -342,7 +342,6 @@
      <addaction name="separator"/>
     </widget>
     <addaction name="menuNew"/>
-    <addaction name="actionOpenFile"/>
     <addaction name="actionOpenProject"/>
     <addaction name="menuOpen_Recent"/>
     <addaction name="menuImport"/>
@@ -385,7 +384,7 @@
     <property name="title">
      <string>&amp;Tools</string>
     </property>
-    <addaction name="actionConfigure_Engine"/>
+    <addaction name="actionLegacyConfig"/>
     <addaction name="actionConfigure_QtSphere_IDE"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -452,27 +451,28 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="toolbarNewButton"/>
-   <addaction name="toolbarOpenButton"/>
-   <addaction name="toolbarSaveButton"/>
+   <addaction name="actionOpenFile"/>
+   <addaction name="actionSave"/>
    <addaction name="separator"/>
+   <addaction name="toolbarNewButton"/>
    <addaction name="toolbarPlayGame"/>
-   <addaction name="toolbarProjectProperties"/>
+   <addaction name="actionProject_Properties"/>
    <addaction name="actionLegacyConfig"/>
    <addaction name="separator"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionOpenFile">
-   <property name="text">
-    <string>&amp;Open File...</string>
-   </property>
-  </action>
   <action name="actionSave">
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset theme="document-save"/>
+   </property>
    <property name="text">
     <string>&amp;Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Save the current file</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
@@ -482,6 +482,9 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset theme="document-save-as"/>
+   </property>
    <property name="text">
     <string>Save &amp;As...</string>
    </property>
@@ -489,6 +492,9 @@
   <action name="actionUndo">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset theme="edit-undo"/>
    </property>
    <property name="text">
     <string>Undo</string>
@@ -501,6 +507,9 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset theme="edit-redo"/>
+   </property>
    <property name="text">
     <string>Redo</string>
    </property>
@@ -511,6 +520,9 @@
   <action name="actionCut">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset theme="edit-cut"/>
    </property>
    <property name="text">
     <string>Cu&amp;t</string>
@@ -523,6 +535,9 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset theme="edit-copy"/>
+   </property>
    <property name="text">
     <string>&amp;Copy</string>
    </property>
@@ -533,6 +548,9 @@
   <action name="actionPaste">
    <property name="enabled">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset theme="edit-paste"/>
    </property>
    <property name="text">
     <string>&amp;Paste</string>
@@ -545,6 +563,9 @@
    <property name="enabled">
     <bool>false</bool>
    </property>
+   <property name="icon">
+    <iconset theme="edit-select-all"/>
+   </property>
    <property name="text">
     <string>Select &amp;All</string>
    </property>
@@ -553,6 +574,9 @@
    </property>
   </action>
   <action name="actionZoom_In">
+   <property name="icon">
+    <iconset theme="zoom-in"/>
+   </property>
    <property name="text">
     <string>Zoom In</string>
    </property>
@@ -561,6 +585,9 @@
    </property>
   </action>
   <action name="actionZoom_Out">
+   <property name="icon">
+    <iconset theme="zoom-out"/>
+   </property>
    <property name="text">
     <string>Zoom Out</string>
    </property>
@@ -584,11 +611,21 @@
    </property>
   </action>
   <action name="actionRefresh">
+   <property name="icon">
+    <iconset theme="view-refresh"/>
+   </property>
    <property name="text">
     <string>Refresh</string>
    </property>
   </action>
   <action name="actionProject_Properties">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="../qsires.qrc">
+     <normaloff>:/res/gears.png</normaloff>:/res/gears.png</iconset>
+   </property>
    <property name="text">
     <string>Project Properties</string>
    </property>
@@ -598,12 +635,22 @@
     <string>Package Game...</string>
    </property>
   </action>
-  <action name="actionConfigure_Engine">
+  <action name="actionLegacyConfig">
+   <property name="icon">
+    <iconset resource="../qsires.qrc">
+     <normaloff>:/res/legacyconfig.png</normaloff>:/res/legacyconfig.png</iconset>
+   </property>
    <property name="text">
     <string>Configure Engine...</string>
    </property>
+   <property name="toolTip">
+    <string>Run legacy config.exe (only available for legacy engine)</string>
+   </property>
   </action>
   <action name="actionConfigure_QtSphere_IDE">
+   <property name="icon">
+    <iconset theme="preferences-desktop"/>
+   </property>
    <property name="text">
     <string>Configure QtSphere IDE</string>
    </property>
@@ -616,6 +663,9 @@
   <action name="actionAbout">
    <property name="checkable">
     <bool>false</bool>
+   </property>
+   <property name="icon">
+    <iconset theme="help-about"/>
    </property>
    <property name="text">
     <string>About QtSphere IDE</string>
@@ -677,7 +727,7 @@
     <bool>false</bool>
    </property>
   </action>
-  <action name="toolbarOpenButton">
+  <action name="actionOpenFile">
    <property name="icon">
     <iconset theme="document-open"/>
    </property>
@@ -689,17 +739,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
-   </property>
-  </action>
-  <action name="toolbarSaveButton">
-   <property name="icon">
-    <iconset theme="document-save"/>
-   </property>
-   <property name="text">
-    <string>Save</string>
-   </property>
-   <property name="toolTip">
-    <string>Save current file</string>
    </property>
   </action>
   <action name="toolbarPlayGame">
@@ -717,21 +756,6 @@
    </property>
    <property name="shortcut">
     <string>F5</string>
-   </property>
-  </action>
-  <action name="toolbarProjectProperties">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../qsires.qrc">
-     <normaloff>:/res/gears.png</normaloff>:/res/gears.png</iconset>
-   </property>
-   <property name="text">
-    <string>Project Properties</string>
-   </property>
-   <property name="toolTip">
-    <string>Project Properties</string>
    </property>
   </action>
   <action name="actionTiled_map_to_Sphere_map">
@@ -810,21 +834,6 @@
   <action name="action8x">
    <property name="text">
     <string>8x</string>
-   </property>
-  </action>
-  <action name="actionLegacyConfig">
-   <property name="enabled">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="../qsires.qrc">
-     <normaloff>:/res/legacyconfig.png</normaloff>:/res/legacyconfig.png</iconset>
-   </property>
-   <property name="text">
-    <string>Configure</string>
-   </property>
-   <property name="toolTip">
-    <string>Run legacy config.exe (only available for legacy engine)</string>
    </property>
   </action>
   <action name="actionSystem_font_to_Sphere_font">

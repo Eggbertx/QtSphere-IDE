@@ -108,7 +108,7 @@ class MainWindow(QMainWindow):
 		self.newButton.setText("New file")
 		self.newButton.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
 		self.newButton.setMenu(self.ui.menuNew)
-		self.ui.mainToolBar.insertWidget(self.ui.toolbarOpenButton, self.newButton)
+		self.ui.mainToolBar.insertWidget(self.ui.actionOpenFile, self.newButton)
 
 		self.fsModel = QFileSystemModel(self)
 		self.emptyProjectModel = QStandardItemModel(0,0,self.ui.treeView)
@@ -131,11 +131,9 @@ class MainWindow(QMainWindow):
 			case "legacy":
 				self.engineSelector.setCurrentText("Sphere 1.x")
 				self.ui.actionLegacyConfig.setEnabled(True)
-				self.ui.actionConfigure_Engine.setEnabled(True)
 			case _:
 				self.engineSelector.setCurrentText("neoSphere")
 				self.ui.actionLegacyConfig.setEnabled(False)
-				self.ui.actionConfigure_Engine.setEnabled(False)
 
 
 	def _connectActions(self):
@@ -161,7 +159,6 @@ class MainWindow(QMainWindow):
 		self.ui.actionNSGithub.triggered.connect(lambda: QDesktopServices.openUrl("https://github.com/spheredev/neoSphere"))
 		self.ui.actionOpen_Game_Directory.triggered.connect(self._openCurrentProjectDir)
 		self.ui.treeView.activated.connect(self.treeItemActivated)
-		self.ui.toolbarOpenButton.triggered.connect(self.openFileButtonPressed)
 		self.ui.actionOpenFile.triggered.connect(self.openFileButtonPressed)
 		self.ui.actionOpenProject.triggered.connect(self.openProjectPressed)
 		self.ui.openFileTabs.currentChanged.connect(self.onTabChanged)
@@ -172,7 +169,6 @@ class MainWindow(QMainWindow):
 		self.ui.actionLegacyConfig.triggered.connect(self.launcher.runLegacyConfig)
 		self.ui.toolbarPlayGame.triggered.connect(self.onGameLaunched)
 		self.ui.newMap.triggered.connect(self.newMapDialog.show)
-		self.ui.toolbarProjectProperties.triggered.connect(self.projectPropertiesDialog.show)
 		self.ui.actionProject_Properties.triggered.connect(self.projectPropertiesDialog.show)
 		self.ui.actionSave.triggered.connect(lambda: self.saveCurrentTab(False))
 		self.ui.actionSave_As.triggered.connect(lambda: self.saveCurrentTab(True))
@@ -256,6 +252,7 @@ class MainWindow(QMainWindow):
 		self._updateTree(None)
 		self.setWindowTitle(f"QtSphere IDE {_VERSION}")
 		self.ui.menuProject.setEnabled(False)
+		self.ui.actionProject_Properties.setEnabled(False)
 		self.ui.toolbarPlayGame.setEnabled(False)
 
 	def switchSidebarTab(self, tab:SidebarTab):
@@ -426,6 +423,8 @@ class MainWindow(QMainWindow):
 		projectDirs = settings.projectDirs
 		startDir = None if len(projectDirs) == 0 else projectDirs[0]
 		projectDir = QFileDialog.getExistingDirectory(self, "Selct project directory", startDir)
+		if projectDir == "" or projectDir is None:
+			return
 		newProject = QSIProject()
 		if newProject.open(projectDir):
 			self.loadProject(newProject)
@@ -480,11 +479,9 @@ class MainWindow(QMainWindow):
 		match index:
 			case 0:
 				settings.whichEngine ="neosphere"
-				self.ui.actionConfigure_Engine.setEnabled(False)
 				self.ui.actionLegacyConfig.setEnabled(False)
 			case 1:
 				settings.whichEngine ="legacy"
-				self.ui.actionConfigure_Engine.setEnabled(True)
 				self.ui.actionLegacyConfig.setEnabled(True)
 
 	@Slot()
@@ -507,6 +504,7 @@ class MainWindow(QMainWindow):
 		print("Loading project:", project.projectDir)
 		self.setWindowTitle(f"QtSphereIDE {_VERSION} - {project.name}")
 		self.ui.menuProject.setEnabled(True)
+		self.ui.actionProject_Properties.setEnabled(True)
 		self.loadedProject = project
 		self.ui.toolbarPlayGame.setEnabled(True)
 		self.newMapDialog.projectPath = project.projectDir
