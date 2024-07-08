@@ -1,4 +1,5 @@
 from io import BufferedReader
+from os import path
 import struct
 
 from PySide6.QtCore import QSize
@@ -188,7 +189,7 @@ class SphereMap(SphereFile):
 	def open(self):
 		super().open()
 		if self.tilesetFile != "":
-			with open(self.tilesetFile, "rb") as file:
+			with open(self.tilesetPath(), "rb") as file:
 				self.tileset = Tileset.fromReader(file, self.tilesetFile)
 
 	def _parseFileData(self, file: BufferedReader):
@@ -225,6 +226,10 @@ class SphereMap(SphereFile):
 
 		if self.tilesetFile == "":
 			self.tileset = Tileset.fromReader(file, "")
+
+	def tilesetPath(self):
+			mapDir = "." if self.filePath is None else path.dirname(self.filePath)
+			return path.normpath(path.join(mapDir, self.tilesetFile)).replace("\\", "/")
 
 	def _packBytes() -> bytes:
 		raise NotImplementedError("Map saving not implemented yet")
