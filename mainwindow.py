@@ -6,7 +6,7 @@ from os.path import basename
 import sys
 import traceback
 
-from PySide6.QtCore import QCoreApplication, Qt, Slot, QUrl, QModelIndex, Signal
+from PySide6.QtCore import QCoreApplication, Qt, Slot, QUrl, QModelIndex
 from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel, QShortcut
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog, QToolButton
 
@@ -74,7 +74,7 @@ class MainWindow(QMainWindow):
 	verbose: bool
 	projectPropertiesDialog: ProjectPropertiesDialog
 	newButton: QToolButton
-	openFilePaths:list[str] # each element should correspond to the respective tab index, with Start Page (and any other non-file tabs) being None
+	openFilePaths: list[str] # each element should correspond to the respective tab index, with Start Page (and any other non-file tabs) being None
 
 	@property
 	def currentTabWidget(self):
@@ -88,6 +88,7 @@ class MainWindow(QMainWindow):
 		super().__init__(parent)
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
+
 		self.ui.sideBar.setCurrentIndex(0)
 		self.verbose = verbose
 		self.settingsWindow = SettingsWindow(self)
@@ -325,6 +326,12 @@ class MainWindow(QMainWindow):
 
 		msgbox.setInformativeText(msg)
 		return msgbox.exec()
+
+	def setStatus(self, status:str, timeout:int = 0):
+		if status is None or status == "":
+			self.ui.statusBar.clearMessage()
+		else:
+			self.ui.statusBar.showMessage(status, timeout)
 
 	#region Slots
 	@Slot()

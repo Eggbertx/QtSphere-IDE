@@ -10,8 +10,8 @@
     <height>408</height>
    </rect>
   </property>
-  <property name="windowTitle">
-   <string>Form</string>
+  <property name="contextMenuPolicy">
+   <enum>Qt::CustomContextMenu</enum>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_11">
    <property name="spacing">
@@ -136,9 +136,6 @@
             <property name="text">
              <string>Delete</string>
             </property>
-            <property name="textAlignment">
-             <set>AlignCenter</set>
-            </property>
            </column>
           </widget>
          </item>
@@ -166,6 +163,9 @@
          </property>
          <item>
           <widget class="QTableWidget" name="entitiesTable">
+           <property name="contextMenuPolicy">
+            <enum>Qt::CustomContextMenu</enum>
+           </property>
            <property name="selectionMode">
             <enum>QAbstractItemView::SingleSelection</enum>
            </property>
@@ -224,7 +224,11 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QTableWidget" name="zonesTable"/>
+          <widget class="QTableWidget" name="zonesTable">
+           <property name="contextMenuPolicy">
+            <enum>Qt::CustomContextMenu</enum>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

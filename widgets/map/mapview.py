@@ -1,3 +1,4 @@
+from enum import Enum, auto
 from math import floor
 from PySide6.QtCore import QEvent, Qt, QPoint, QRect
 from PySide6.QtGui import QMouseEvent, QPixmap, QColor
@@ -6,22 +7,39 @@ from PySide6.QtWidgets import QGraphicsItemGroup, QGraphicsScene, QGraphicsView,
 from formats.spheremap import SphereMap
 from settings import Settings
 
+class MapTool(Enum):
+	Pencil = auto()
+	Line = auto()
+	Rectangle = auto()
+	Fill = auto()
+	Select = auto()
+
 class MapView(QGraphicsView):
 	mapScene: QGraphicsScene
 	mapFile: SphereMap
 	drawSize:int
 	gridGroup: QGraphicsItemGroup
-	gridVisible: bool
+	__gridVisible: bool
 	pointerGroup: QGraphicsItemGroup
 	drawing: bool
 	currentTile: int
 	currentLayer: int
 
+	@property
+	def gridVisible(self):
+		return self.__gridVisible
+	
+	@gridVisible.setter
+	def gridVisible(self, visible:bool):
+		self.__gridVisible = visible
+		self.gridGroup.setVisible(visible)
+
 	def __init__(self, parent: QWidget = None):
 		super().__init__(parent)
+		self.setMouseTracking(True)
 		self.pointerGroup = QGraphicsItemGroup()
 		self.gridGroup = QGraphicsItemGroup()
-		self.gridVisible = False
+		self.__gridVisible = False
 		self.gridGroup.setVisible(False)
 		self.mapScene = QGraphicsScene(self)
 		self.setScene(self.mapScene)
@@ -60,14 +78,17 @@ class MapView(QGraphicsView):
 			return QPoint(-1, -1)
 		return QPoint(x * self.mapFile.tileset.tileWidth, y * self.mapFile.tileset.tileHeight)
 
+	def setCurrentTool(self, tool:MapTool):
+		pass
+
 	def widgetToMapPos(self, x:int, y:int):
 		if self.mapFile is None:
 			return QPoint(-1, -1)
 		return QPoint(floor(x/self.mapFile.tileset.tileWidth), floor(y/self.mapFile.tileset.tileHeight))
 
 	def mouseMoveEvent(self, event: QMouseEvent):
-		super().mouseMoveEvent(event)
 		if self.mapFile is None:
+			print("map not loaded")
 			self.setStatusTip("Map not loaded")
 			return
 		mapSize = self.mapFile.largestLayerSize()
@@ -84,21 +105,22 @@ class MapView(QGraphicsView):
 				tilePos.x() - floor(self.drawSize/2),
 				tilePos.y() - floor(self.drawSize/2)
 			)
-			self.setStatusTip("Map tile: ({},{}) Pixel: ({},{})".format(
+			self.window().setStatus("Map tile: ({},{}) Pixel: ({},{})".format(
 				tilePos.x(), tilePos.y(), event.pos().x(), event.pos().y()
 			))
 			self.pointerGroup.show()
 			self.pointerGroup.setPos(pointerUL)
 		else:
-			self.window().setStatusTip("Ready")
+			self.window().setStatus("")
 			self.pointerGroup.hide()
+
 
 	def leaveEvent(self, event: QEvent):
 		super().leaveEvent(event)
 		self.pointerGroup.hide()
 		self.drawing = False
-		self.setStatusTip("Ready")
-		event.accept()
+		self.window().setStatus("")
+
 
 	def __resetPointerGroup(self):
 		if self.pointerGroup is not None:
@@ -138,6 +160,6 @@ class MapView(QGraphicsView):
 			line.setPen(gridColor)
 			self.gridGroup.addToGroup(line)
 		
-		self.gridGroup.setVisible(self.gridVisible)
+		self.gridGroup.setVisible(self.__gridVisible)
 		self.mapScene.addItem(self.gridGroup)
 		self.gridGroup.setZValue(256)
