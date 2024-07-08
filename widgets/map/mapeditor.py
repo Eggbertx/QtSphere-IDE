@@ -31,6 +31,12 @@ class MapEditor(SphereEditor):
 	gridTool:QAction
 	showSpritesetsTool:QAction
 
+	@staticmethod
+	def openAndAttach(parent: QWidget, filePath:str):
+		rmp = SphereMap(filePath)
+		rmp.open()
+		editor = MapEditor(parent)
+		editor.attachMap(rmp)
 
 	def __init__(self, parent: QWidget | None = None):
 		super().__init__(parent)

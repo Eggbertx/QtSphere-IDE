@@ -6,7 +6,7 @@ class TextEdit(QTextEdit):
 	modificationChanged:Signal = Signal(bool)
 
 	@staticmethod
-	def fromFile(parent: QWidget, filePath:str):
+	def openAndAttach(parent: QWidget, filePath:str):
 		te = TextEdit(parent)
 		with open(filePath, "rb") as file:
 			te.setText(file.read().decode("utf-8", "replace"))

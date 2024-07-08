@@ -41,13 +41,13 @@ class NewMapDialog(QDialog):
 
 	def show(self):
 		self.ui.width_num.setValue(_DEFAULT_TILES_W)
-		self.ui.height_num.setValue(_DEFAULT_TILES_W)
+		self.ui.height_num.setValue(_DEFAULT_TILES_H)
 		self.ui.browse_txt.setText("")
 		return super().show()
 
 	@Slot()
 	def showTilesetBrowseDialog(self):
-		result = QFileDialog.getOpenFileName(self, "Select a Sphere tileset", curdir if self.projectPath is None else self.projectPath,
+		result = QFileDialog.getOpenFileName(self, "Select a Sphere tileset", self.projectPath or curdir,
 			";;".join(_TILESET_FILE_FILTER), _TILESET_FILE_FILTER[0])
 		if result[0] is not None and result[0] != "":
 			self.ui.browse_txt.setText(result[0])

@@ -22,6 +22,10 @@ class SphereEditor(QWidget):
 	modificationChanged:Signal = Signal(bool)
 	__modified:bool
 
+	@staticmethod
+	def openAndAttach(parent: QWidget, filePath:str):
+		pass
+
 	def __init__(self, parent: QWidget | None = None):
 		super().__init__(parent)
 		self.filePath = ""

@@ -8,7 +8,7 @@ import traceback
 
 from PySide6.QtCore import QCoreApplication, Qt, Slot, QUrl, QModelIndex
 from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel, QShortcut
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog, QToolButton
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog, QToolButton, QWidget
 
 from ui.ui_mainwindow import Ui_MainWindow
 
@@ -169,6 +169,7 @@ class MainWindow(QMainWindow):
 		self.ui.actionLegacyConfig.triggered.connect(self.launcher.runLegacyConfig)
 		self.ui.toolbarPlayGame.triggered.connect(self.onGameLaunched)
 		self.ui.newMap.triggered.connect(self.newMapDialog.show)
+		self.newMapDialog.accepted.connect(self.onNewMapAccepted)
 		self.ui.actionProject_Properties.triggered.connect(self.projectPropertiesDialog.show)
 		self.ui.actionSave.triggered.connect(lambda: self.saveCurrentTab(False))
 		self.ui.actionSave_As.triggered.connect(lambda: self.saveCurrentTab(True))
@@ -212,30 +213,24 @@ class MainWindow(QMainWindow):
 		self.ui.openFileTabs.setCurrentIndex(t)
 		editor.modificationChanged.connect(self.onCurrentFileModificationChanged)
 
+	def openAndGoToNewEditorWidget(self, editor:QWidget, filePath:str):
+		self.openFilePaths.append(filePath)
+		t = self.ui.openFileTabs.addTab(editor, basename(filePath))
+		self.ui.openFileTabs.setCurrentIndex(t)
+
 	def openFile(self, filePath:str):
 		ext = ""
 		if filePath.count(".") > 0:
 			ext = filePath[filePath.rindex("."):]
-		filename = basename(filePath)
 		try:
 			settings = Settings()
 			match ext.lower():
 				case ".rmp":
-					rmp = SphereMap(filePath)
-					rmp.open()
-					editor = MapEditor(self.ui.openFileTabs)
-					self.openFilePaths.append(filePath)
-					t = self.ui.openFileTabs.addTab(editor, filename)
-					editor.attachMap(rmp)
-					self.ui.openFileTabs.setCurrentIndex(t)
+					editor = MapEditor.openAndAttach(self.ui.openFileTabs, filePath)
+					self.openAndGoToNewEditorWidget(editor, filePath)
 				case ".rss":
-					rss = SphereSpriteset(filePath)
-					rss.open()
-					editor = SpritesetEditor(self.ui.openFileTabs)
-					self.openFilePaths.append(filePath)
-					t = self.ui.openFileTabs.addTab(editor, filename)
-					editor.attachSpriteset(rss)
-					self.ui.openFileTabs.setCurrentIndex(t)
+					editor = SpritesetEditor.openAndAttach(self.ui.openFileTabs, filePath)
+					self.openAndGoToNewEditorWidget(editor, filePath)
 				case ".txt"|".js"|".cjs"|".mjs"|".ts"|".md"|".sgm":
 					self.openFileAsText(filePath)
 				case _:
@@ -254,6 +249,7 @@ class MainWindow(QMainWindow):
 		self.ui.menuProject.setEnabled(False)
 		self.ui.actionProject_Properties.setEnabled(False)
 		self.ui.toolbarPlayGame.setEnabled(False)
+		self.newMapDialog.projectPath = None
 
 	def switchSidebarTab(self, tab:SidebarTab):
 		match tab:
@@ -331,6 +327,10 @@ class MainWindow(QMainWindow):
 			self.ui.statusBar.showMessage(status, timeout)
 
 	#region Slots
+	@Slot()
+	def onNewMapAccepted(self):
+		pass
+
 	@Slot()
 	def onGameLaunched(self):
 		self.launchGame(self.loadedProject)

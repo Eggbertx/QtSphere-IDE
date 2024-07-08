@@ -16,6 +16,14 @@ class SpritesetEditor(SphereEditor):
 	directionScene: QGraphicsScene
 	imageChooser: ImageChooser
 
+	@staticmethod
+	def openAndAttach(parent: QWidget, filePath:str):
+		rss = SphereSpriteset(filePath)
+		rss.open()
+		editor = SpritesetEditor(parent)
+		editor.attachSpriteset(rss)
+		return editor
+
 	def __init__(self, parent: QWidget = None):
 		super().__init__(parent)
 		self.ui = Ui_SpritesetEditor()
