@@ -2,7 +2,7 @@ from os import curdir
 from typing import Any
 
 from PySide6.QtCore import Qt, Slot
-from PySide6.QtWidgets import QDialog, QWidget, QFileDialog
+from PySide6.QtWidgets import QDialog, QWidget, QFileDialog, QMessageBox
 
 from ui.ui_newmapdialog import Ui_NewMapDialog
 
@@ -31,6 +31,10 @@ class NewMapDialog(QDialog):
 	def tilesetPath(self):
 		return self.ui.browse_txt.text()
 
+	@tilesetPath.setter
+	def tilesetPath(self, path:str):
+		self.ui.browse_txt.setText(path)
+
 	def __init__(self, parent: QWidget | None = None, projectPath:str = None):
 		super().__init__(parent)
 		self.ui = Ui_NewMapDialog()
@@ -38,6 +42,14 @@ class NewMapDialog(QDialog):
 		self.projectPath = projectPath
 		self.ui.browse_btn.clicked.connect(self.showTilesetBrowseDialog)
 
+	def accept(self):
+		if self.tilesetPath == "":
+			if QMessageBox.question(self, "No tileset selected",
+				"This will create an empty, internal tileset. Are you sure you want to continue?",
+				defaultButton=QMessageBox.StandardButton.Yes) != QMessageBox.StandardButton.Yes:
+				self.reject()
+				return
+		super().accept()
 
 	def show(self):
 		self.ui.width_num.setValue(_DEFAULT_TILES_W)

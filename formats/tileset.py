@@ -31,7 +31,6 @@ class Tile:
 
 
 class Tileset(SphereFile):
-	version:int
 	tileWidth:int
 	tileHeight:int
 	tileBPP:int
@@ -59,10 +58,10 @@ class Tileset(SphereFile):
 		if file.read(4) != b".rts":
 			raise FormatException(self.filePath, "invalid tileset file signature")
 
-		(self.version, numTiles, self.tileWidth, self.tileHeight, self.tileBPP, self.compression,
+		(version, numTiles, self.tileWidth, self.tileHeight, self.tileBPP, self.compression,
 		self.hasObstructions) = struct.unpack("<5H2?240x", file.read(252))
-		if self.version != 1:
-			raise FormatException(self.filePath, f"Expected tileset version 1, got {self.version}")
+		if version != 1:
+			raise FormatException(self.filePath, f"Expected tileset version 1, got {version}")
 
 		if self.tileBPP != 32:
 			raise FormatException(self.filePath, f"Expected tile BPP to be 32, got {self.tileBPP}")
