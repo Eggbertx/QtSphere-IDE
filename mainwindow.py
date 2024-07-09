@@ -21,6 +21,7 @@ from qsiproject import QSIProject
 from spherelauncher import SphereLauncher
 from widgets.map.mapeditor import MapEditor
 from widgets.startpage import StartPage
+from widgets.sphereeditor import SphereEditor
 from widgets.spriteset.spriteseteditor import SpritesetEditor
 from widgets.textedit import TextEdit
 from settings import Settings
@@ -173,7 +174,7 @@ class MainWindow(QMainWindow):
 		self.ui.actionProject_Properties.triggered.connect(self.projectPropertiesDialog.show)
 		self.ui.actionSave.triggered.connect(lambda: self.saveCurrentTab(False))
 		self.ui.actionSave_As.triggered.connect(lambda: self.saveCurrentTab(True))
-		self.ui.newPlainTextFile.triggered.connect(lambda: self.newTextFile())
+		self.ui.newPlainTextFile.triggered.connect(self.newTextFile)
 
 		QShortcut(Qt.Modifier.CTRL | Qt.Key.Key_PageDown, self, self.onNextTabTriggered)
 		QShortcut(Qt.Modifier.CTRL | Qt.Key.Key_PageUp, self, self.onPrevTabTriggered)
@@ -204,18 +205,12 @@ class MainWindow(QMainWindow):
 		self.launcher.launchGame(game)
 
 	def newTextFile(self):
-		self.openFileAsText()
-
-	def openFileAsText(self, filePath:str = None):
-		editor = TextEdit(self) if filePath is None else TextEdit.fromFile(self.ui.openFileTabs, filePath)
-		t = self.ui.openFileTabs.addTab(editor, basename(filePath or "<new file>"))
-		self.openFilePaths.append(filePath or "")
-		self.ui.openFileTabs.setCurrentIndex(t)
-		editor.modificationChanged.connect(self.onCurrentFileModificationChanged)
+		editor = TextEdit(self.ui.openFileTabs)
+		self.openAndGoToNewEditorWidget(editor, "")
 
 	def openAndGoToNewEditorWidget(self, editor:QWidget, filePath:str):
 		self.openFilePaths.append(filePath)
-		t = self.ui.openFileTabs.addTab(editor, basename(filePath))
+		t = self.ui.openFileTabs.addTab(editor, "<new file>" if filePath == "" else basename(filePath))
 		self.ui.openFileTabs.setCurrentIndex(t)
 
 	def openFile(self, filePath:str):
@@ -223,21 +218,23 @@ class MainWindow(QMainWindow):
 		if filePath.count(".") > 0:
 			ext = filePath[filePath.rindex("."):]
 		try:
+			editor:SphereEditor = None
 			settings = Settings()
 			match ext.lower():
 				case ".rmp":
 					editor = MapEditor.openAndAttach(self.ui.openFileTabs, filePath)
-					self.openAndGoToNewEditorWidget(editor, filePath)
 				case ".rss":
 					editor = SpritesetEditor.openAndAttach(self.ui.openFileTabs, filePath)
-					self.openAndGoToNewEditorWidget(editor, filePath)
 				case ".txt"|".js"|".cjs"|".mjs"|".ts"|".md"|".sgm":
-					self.openFileAsText(filePath)
+					editor = TextEdit.openAndAttach(self.ui.openFileTabs, filePath)
 				case _:
 					if settings.unrecognizedFileEditor == "external":
 						QDesktopServices.openUrl(QUrl.fromLocalFile(filePath))
+						return
 					else:
-						self.openFileAsText(filePath)
+						editor = TextEdit.openAndAttach(self.ui.openFileTabs, filePath)
+			editor.modificationChanged.connect(self.onCurrentFileModificationChanged)
+			self.openAndGoToNewEditorWidget(editor, filePath)
 		except Exception as e:
 			QMessageBox.critical(self, "Error", traceback.format_exc())
 			raise
@@ -406,7 +403,6 @@ class MainWindow(QMainWindow):
 	@Slot()
 	def onSettingsSaved(self):
 		settings = Settings()
-		print("settings saved")
 		self.startPage.refreshGameList()
 		self.engineSelector.setCurrentIndex(1 if settings.whichEngine == "legacy" else 0)
 

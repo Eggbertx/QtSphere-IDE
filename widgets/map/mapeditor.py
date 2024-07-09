@@ -37,6 +37,7 @@ class MapEditor(SphereEditor):
 		rmp.open()
 		editor = MapEditor(parent)
 		editor.attachMap(rmp)
+		return editor
 
 	def __init__(self, parent: QWidget | None = None):
 		super().__init__(parent)

@@ -44,7 +44,6 @@ class SphereEditor(QWidget):
 		self.undoStack.redo()
 
 	def isModified(self):
-		print(self.__modified)
 		return self.__modified
 
 	def setModified(self, modified:bool):

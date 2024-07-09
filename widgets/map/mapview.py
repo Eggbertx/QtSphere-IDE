@@ -88,9 +88,9 @@ class MapView(QGraphicsView):
 
 	def mouseMoveEvent(self, event: QMouseEvent):
 		if self.mapFile is None:
-			print("map not loaded")
 			self.setStatusTip("Map not loaded")
 			return
+
 		mapSize = self.mapFile.largestLayerSize()
 		tileW = self.mapFile.tileset.tileWidth
 		tileH = self.mapFile.tileset.tileHeight
