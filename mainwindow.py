@@ -8,14 +8,16 @@ import traceback
 
 from PySide6.QtCore import QCoreApplication, Qt, Slot, QUrl, QModelIndex
 from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel, QShortcut
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel, QFileDialog, QToolButton, QWidget
+from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel,
+	QFileDialog, QToolButton, QWidget, QDialog)
 
 from ui.ui_mainwindow import Ui_MainWindow
 
 from dialogs.newmapdialog import NewMapDialog
 from dialogs.projectpropertiesdialog import ProjectPropertiesDialog
 from dialogs.settingswindow import SettingsWindow
-from formats.spheremap import SphereMap
+from formats.spheremap import SphereMap, Tileset
+from formats.spherefile import SphereFile
 from formats.spriteset import SphereSpriteset
 from qsiproject import QSIProject
 from spherelauncher import SphereLauncher
@@ -196,11 +198,10 @@ class MainWindow(QMainWindow):
 			if i > 0:
 				self.ui.treeView.hideColumn(i)
 
-	def launchGame(self, game:QSIProject = None):
-		if game is None:
-			game = self.loadedProject
+	def launchGame(self, game:QSIProject):
 		if game is None or game.buildDir is None or game.buildDir == "":
 			QMessageBox.critical(self, "Error launching game", "A game does not appear to be loaded")
+			return
 		
 		self.launcher.launchGame(game)
 
@@ -225,6 +226,13 @@ class MainWindow(QMainWindow):
 					editor = MapEditor.openAndAttach(self.ui.openFileTabs, filePath)
 				case ".rss":
 					editor = SpritesetEditor.openAndAttach(self.ui.openFileTabs, filePath)
+				case ".rts":
+					self.newMapDialog.tilesetPath = filePath
+					if self.newMapDialog.exec() == QDialog.DialogCode.Rejected:
+						return
+					rmp = SphereMap.create(self.newMapDialog.tilesW, self.newMapDialog.tilesH, self.newMapDialog.tilesetPath)
+					editor = MapEditor(self.ui.openFileTabs)
+					editor.attachMap(rmp)
 				case ".txt"|".js"|".cjs"|".mjs"|".ts"|".md"|".sgm":
 					editor = TextEdit.openAndAttach(self.ui.openFileTabs, filePath)
 				case _:
@@ -309,12 +317,13 @@ class MainWindow(QMainWindow):
 	def showSaveConfirmationDialog(self):
 		msgbox = QMessageBox(self)
 		msgbox.setStandardButtons(QMessageBox.StandardButton.Save|QMessageBox.StandardButton.Discard|QMessageBox.StandardButton.Cancel)
-
+		QIcon.fromTheme("")
 		filename = basename(self.openFilePaths[self.currentTabIndex])
-		msg = "The current file" if filename == "" else f"The file {filename}"
-		msg += " has been modified. Do you want to save your changes?"
-
-		msgbox.setInformativeText(msg)
+		if filename == "":
+			filename = "The current file"
+		msgbox.setText(f"{filename} has been modified")
+		msgbox.setIcon(QMessageBox.Icon.Question)
+		msgbox.setInformativeText("Do you want to save your changes?")
 		return msgbox.exec()
 
 	def setStatus(self, status:str, timeout:int = 0):
@@ -326,7 +335,11 @@ class MainWindow(QMainWindow):
 	#region Slots
 	@Slot()
 	def onNewMapAccepted(self):
-		pass
+		rmp = SphereMap.create(self.newMapDialog.tilesW, self.newMapDialog.tilesH, self.newMapDialog.tilesetPath)
+		editor = MapEditor(self.ui.openFileTabs)
+		editor.attachMap(rmp)
+		self.openAndGoToNewEditorWidget(editor, "")
+		editor.modificationChanged.connect(self.onCurrentFileModificationChanged)
 
 	@Slot()
 	def onGameLaunched(self):

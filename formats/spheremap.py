@@ -3,9 +3,12 @@ from os import path
 import struct
 
 from PySide6.QtCore import QSize
+from PySide6.QtGui import QImage, QColor
 
 from formats.spherefile import SphereFile, FormatException, readSphereString
-from formats.tileset import Tileset
+from formats.tileset import Tileset, Tile
+
+#region Enums
 
 class MapDirections:
 	North = 0
@@ -16,7 +19,6 @@ class MapDirections:
 	Southwest = 5
 	West = 6
 	Northwest = 7
-
 
 class MapString:
 	TilesetFile = 0
@@ -39,6 +41,10 @@ class EntityScriptType:
 	OnActivateTouch = 2
 	OnActivateTalk = 3
 	GenerateCommands = 4
+
+#endregion
+
+#region Map components
 
 class ObstructionSegment:
 	x1:int
@@ -88,6 +94,19 @@ class MapLayer:
 			layer.segments.append(segment)
 		return layer
 
+	def __init__(self) -> None:
+		self.width = 0
+		self.height = 0
+		self.flags = 0
+		self.parallaxX = 1.0
+		self.parallaxY = 1.0
+		self.scrollingX = 0.0
+		self.scrollingY = 0.0
+		self.numSegments = 0
+		self.reflective = False
+		self.name = ""
+		self.tiles = []
+		self.segments = []
 
 class MapEntity:
 	mapX:int
@@ -159,6 +178,7 @@ class MapZone:
 		self.reactivateInNumSteps = reactivateInNumSteps
 		self.script = script
 
+#endregion
 
 class SphereMap(SphereFile):
 	startX: int
@@ -178,6 +198,34 @@ class SphereMap(SphereFile):
 			raise FormatException(self.filePath, "Missing tileset string data")
 		return self.strings[MapString.TilesetFile]
 
+
+	@staticmethod
+	def create(width:int, height:int, tileset:str = None):
+		rts = Tileset()
+		if tileset != "" and tileset is not None:
+			rts.openFile(tileset)
+		else:
+			rts.tileBPP = 32
+			rts.tileWidth = 16
+			rts.tileHeight = 16
+			img = QImage(16, 16, QImage.Format.Format_ARGB32)
+			img.fill(QColor("#000000"))
+			rts.tiles.append(Tile(img))
+
+		layer = MapLayer()
+		layer.name = "Base"
+		layer.width = width
+		layer.height = height
+		layer.tiles = [0] * width * height
+
+		rmp = SphereMap()
+		rmp.tileset = rts
+		rmp.layers.append(layer)
+		rmp.strings = [""] * 9
+		rmp.strings[MapString.TilesetFile] = rts.filePath or ""
+		return rmp
+
+
 	def __init__(self, filePath: str = None):
 		super().__init__(filePath)
 		self.strings = []
@@ -185,6 +233,8 @@ class SphereMap(SphereFile):
 		self.entities = []
 		self.zones = []
 		self.tileset = None
+		self.startX = 0
+		self.startY = 0
 
 	def open(self):
 		super().open()
@@ -228,8 +278,8 @@ class SphereMap(SphereFile):
 			self.tileset = Tileset.fromReader(file, "")
 
 	def tilesetPath(self):
-			mapDir = "." if self.filePath is None else path.dirname(self.filePath)
-			return path.normpath(path.join(mapDir, self.tilesetFile)).replace("\\", "/")
+		mapDir = "." if self.filePath is None else path.dirname(self.filePath)
+		return path.normpath(path.join(mapDir, self.tilesetFile)).replace("\\", "/")
 
 	def _packBytes() -> bytes:
 		raise NotImplementedError("Map saving not implemented yet")

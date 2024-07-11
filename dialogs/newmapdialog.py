@@ -47,7 +47,6 @@ class NewMapDialog(QDialog):
 			if QMessageBox.question(self, "No tileset selected",
 				"This will create an empty, internal tileset. Are you sure you want to continue?",
 				defaultButton=QMessageBox.StandardButton.Yes) != QMessageBox.StandardButton.Yes:
-				self.reject()
 				return
 		super().accept()
 
