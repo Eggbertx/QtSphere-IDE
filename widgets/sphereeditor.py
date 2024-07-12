@@ -51,3 +51,6 @@ class SphereEditor(QWidget):
 		self.__modified = modified
 		if self.__modified != oldModified:
 			self.modificationChanged.emit(modified)
+	
+	def save(self, newFilePath:str = None):
+		pass

@@ -7,12 +7,13 @@ import sys
 import traceback
 
 from PySide6.QtCore import QCoreApplication, Qt, Slot, QUrl, QModelIndex
-from PySide6.QtGui import QIcon, QDesktopServices, QStandardItem, QStandardItemModel, QShortcut
+from PySide6.QtGui import QCloseEvent, QIcon, QDesktopServices, QStandardItem, QStandardItemModel, QShortcut
 from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel,
-	QFileDialog, QToolButton, QWidget, QDialog)
+	QFileDialog, QToolButton, QWidget, QDialog, QDialogButtonBox, QAbstractButton)
 
 from ui.ui_mainwindow import Ui_MainWindow
 
+from dialogs.modifiedfilesdialog import ModifiedFilesDialog
 from dialogs.newmapdialog import NewMapDialog
 from dialogs.projectpropertiesdialog import ProjectPropertiesDialog
 from dialogs.settingswindow import SettingsWindow
@@ -38,7 +39,7 @@ See <a href=\"https://github.com/Eggbertx/QtSphere-IDE/blob/master/LICENSE.txt\"
 _OPEN_DIALOG_FILTER = (
 	"All supported files (*.sgm *.txt *.js *.mjs *.cjs *.rmp *.rss *.rws)",
 	"Sphere projects (*.sgm)",
-	"Script files (*.js *.mjs, *.cjs)",
+	"Script files (*.js *.mjs, *.cjs, *.ts)",
 	"Text files (*.txt *.md)",
 	"Audio files (*.wav *.ogg *.mp3 *.flac *.it *.mod *.s3m *.xm)",
 	"Sphere fonts (*.rfn)",
@@ -76,6 +77,7 @@ class MainWindow(QMainWindow):
 	launcher: SphereLauncher
 	verbose: bool
 	projectPropertiesDialog: ProjectPropertiesDialog
+	modifiedFilesDialog: ModifiedFilesDialog
 	newButton: QToolButton
 	openFilePaths: list[str] # each element should correspond to the respective tab index, with Start Page (and any other non-file tabs) being None
 
@@ -91,6 +93,7 @@ class MainWindow(QMainWindow):
 		super().__init__(parent)
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
+		self.installEventFilter(self)
 
 		self.ui.sideBar.setCurrentIndex(0)
 		self.verbose = verbose
@@ -119,6 +122,7 @@ class MainWindow(QMainWindow):
 		self.loadedProject = None
 		self.launcher = SphereLauncher()
 		self.newMapDialog = NewMapDialog(self)
+		self.modifiedFilesDialog = ModifiedFilesDialog(self)
 		self.projectPropertiesDialog = ProjectPropertiesDialog(self, self.loadedProject)
 		self._updateTree(self.loadedProject)
 		self._setupSettings()
@@ -177,6 +181,7 @@ class MainWindow(QMainWindow):
 		self.ui.actionSave.triggered.connect(lambda: self.saveCurrentTab(False))
 		self.ui.actionSave_As.triggered.connect(lambda: self.saveCurrentTab(True))
 		self.ui.newPlainTextFile.triggered.connect(self.newTextFile)
+		self.modifiedFilesDialog.buttonBox.clicked.connect(self.modifiedFileDialogButtonClicked)
 
 		QShortcut(Qt.Modifier.CTRL | Qt.Key.Key_PageDown, self, self.onNextTabTriggered)
 		QShortcut(Qt.Modifier.CTRL | Qt.Key.Key_PageUp, self, self.onPrevTabTriggered)
@@ -207,6 +212,7 @@ class MainWindow(QMainWindow):
 
 	def newTextFile(self):
 		editor = TextEdit(self.ui.openFileTabs)
+		editor.setModified(True)
 		self.openAndGoToNewEditorWidget(editor, "")
 
 	def openAndGoToNewEditorWidget(self, editor:QWidget, filePath:str):
@@ -288,7 +294,7 @@ class MainWindow(QMainWindow):
 			activeWidget = self.currentTabWidget
 			if hasattr(activeWidget, "save"):
 				activeWidget.save(filePath)
-			else:
+			elif activeWidget is not StartPage:
 				raise NotImplementedError(f"Saving has not been implemented yet for this editor ({type(activeWidget)})")
 		except Exception as e:
 			QMessageBox.critical(self, "Error", traceback.format_exc())
@@ -331,8 +337,75 @@ class MainWindow(QMainWindow):
 			self.ui.statusBar.clearMessage()
 		else:
 			self.ui.statusBar.showMessage(status, timeout)
+	
+	def closeEvent(self, event: QCloseEvent):
+		tabs = self.ui.openFileTabs.count()
+		self.modifiedFilesDialog.clearPaths()
+
+		for t in range(tabs):
+			widget:SphereEditor = self.ui.openFileTabs.widget(t)
+			filePath = self.openFilePaths[t]
+			if filePath is not None and hasattr(widget, "isModified") and widget.isModified():
+				self.modifiedFilesDialog.addPath(filePath if filePath != "" else "<new file>")
+
+		if len(self.modifiedFilesDialog.paths) > 0:
+			self.modifiedFilesDialog.show()
+			event.ignore()
+		else:
+			super().closeEvent(event)
+
+	def getExtensionFilterIndex(self, ext:str) -> int:
+		match ext:
+			case ".js"|".cjs"|".mjs"|".ts":
+				return FileType.Script.value
+			case ".txt"|".md":
+				return FileType.Text.value
+			case ".wav"|".ogg"|".mp3":
+				return FileType.Audio.value
+			case ".rfn":
+				return FileType.SphereFont.value
+			case ".rmp":
+				return FileType.SphereMap.value
+			case ".rss":
+				return FileType.Spriteset.value
+			case ".rws":
+				return FileType.WindowStyle.value
+		return FileType.All.value
+
+	def saveAllModified(self):
+		tabs = self.ui.openFileTabs.count()
+		for t in range(tabs):
+			editor:SphereEditor = self.ui.openFileTabs.widget(t)
+			filePath = self.openFilePaths[t]
+			
+			if filePath is None or not hasattr(editor, "isModified") or not editor.isModified():
+				continue
+		
+			ext = filePath[filePath.rindex("."):]
+			filter = self.getExtensionFilterIndex(ext)
+			saveFilename = self.showSaveFileDialog(filter, "." if self.loadedProject is None else self.loadedProject.projectDir)
+			if saveFilename is None:
+				# user clicked cancel in save dialog, abort exiting
+				return False
+
+			editor.save(saveFilename)
+		return True
 
 	#region Slots
+
+	@Slot(QAbstractButton)
+	def modifiedFileDialogButtonClicked(self, btn:QAbstractButton):
+		match self.modifiedFilesDialog.buttonBox.standardButton(btn):
+			case QDialogButtonBox.StandardButton.SaveAll:
+				if self.saveAllModified():
+					QApplication.exit(0)
+			case QDialogButtonBox.StandardButton.Discard:
+				self.modifiedFilesDialog.close()
+				QApplication.exit(0)
+			case QDialogButtonBox.StandardButton.Cancel:
+				self.modifiedFilesDialog.close()
+
+
 	@Slot()
 	def onNewMapAccepted(self):
 		rmp = SphereMap.create(self.newMapDialog.tilesW, self.newMapDialog.tilesH, self.newMapDialog.tilesetPath)

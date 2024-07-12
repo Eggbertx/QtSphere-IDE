@@ -32,6 +32,9 @@ class TextEdit(QTextEdit):
 	def isModified(self):
 		return self.document().isModified()
 
+	def setModified(self, modified:bool):
+		self.document().setModified(modified)
+
 	@Slot(bool)
 	def __onDocumentModificationChanged(self, modified:bool):
 		self.modificationChanged.emit(modified)
