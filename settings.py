@@ -4,7 +4,7 @@ from PySide6.QtCore import QSettings, QRect
 from PySide6.QtGui import QColor
 
 class Defaults(Enum):
-	gridColor = QColor.fromString("#000000")
+	gridColor = QColor.fromString("#FF00FF")
 	mapCursorColor = QColor.fromString("#0080ff")
 	whichEngine = "neosphere"
 	unrecognizedFileEditor = "text"
