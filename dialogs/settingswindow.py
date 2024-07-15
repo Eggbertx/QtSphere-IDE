@@ -2,10 +2,12 @@ from enum import Enum
 import os
 
 from PySide6.QtCore import Qt, Slot, Signal
-from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QDialog, QWidget, QDialogButtonBox, QListWidgetItem, QFileDialog, QAbstractButton
+from PySide6.QtGui import QColor, QGuiApplication
+from PySide6.QtWidgets import QDialog, QWidget, QDialogButtonBox, QListWidgetItem, QFileDialog, QMenu, QMessageBox
 
-from settings import Settings
+from settings import Settings, Defaults
+
+from widgets.colorbutton import ColorButton
 
 from ui.ui_settingswindow import Ui_SettingsWindow
 
@@ -29,9 +31,18 @@ class SettingsWindow(QDialog):
 		self.ui.browseDirButton.clicked.connect(self.onBrowseDirButtonClicked)
 		self.ui.neosphereDir_btn.clicked.connect(self.onNeoSphereDirButtonClicked)
 		self.ui.legacySphereDir_btn.clicked.connect(self.onLegacySphereDirButtonClicked)
+		
+		self._addColorMenu(self.ui.gridColor_btn)
+		self._addColorMenu(self.ui.mapCursorCol_btn)
 		self._removeWineIfWindows()
 		self.loadSettings()
 
+	def _addColorMenu(self, btn:ColorButton):
+		menu = QMenu(btn)
+		menu.addAction("Copy color to clipboard").triggered.connect(lambda: QGuiApplication.clipboard().setText(btn.color.name()))
+		menu.addAction("Reset color").triggered.connect(lambda: self._resetColorPressed(btn))
+		btn.customContextMenuRequested.connect(lambda pt: menu.exec(btn.mapToGlobal(pt)))
+	
 	def loadSettings(self):
 		settings = Settings()
 		self.ui.mapCursorCol_btn.setColor(QColor(settings.mapCursorColor))
@@ -88,8 +99,16 @@ class SettingsWindow(QDialog):
 			self.ui.wineDir_txt.deleteLater()
 			self.ui.wineDir_layout.deleteLater()
 
+	def _resetColorPressed(self, btn:ColorButton):
+		match btn:
+			case self.ui.mapCursorCol_btn:
+				btn.setColor(Defaults.mapCursorColor.value)
+			case self.ui.gridColor_btn:
+				btn.setColor(Defaults.gridColor.value)
+			case _:
+				QMessageBox.critical(self, "Error", f"Unrecognized color button '{btn.objectName()}'")
 
-	@Slot()	
+	@Slot()
 	def onOK(self):
 		self._saveSettings()
 		self.accept()
