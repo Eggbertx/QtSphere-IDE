@@ -61,8 +61,12 @@ class ObstructionSegment:
 class MapLayer:
 	@property
 	def visible(self):
-		return (~self.flags) & 1 == 1
+		return self.flags & 1 == 0
 	
+	@visible.setter
+	def visible(self, vis:bool):
+		self.flags = self.flags & (~1) if vis else self.flags | 1
+
 	@property
 	def hasParallax(self):
 		return self.flags & 2 == 2

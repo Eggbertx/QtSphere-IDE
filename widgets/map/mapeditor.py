@@ -52,6 +52,7 @@ class MapEditor(SphereEditor):
 		self.ui.layersTable.horizontalHeader().setSectionResizeMode(1,QHeaderView.ResizeMode.Stretch)
 		self.ui.entitiesTable.horizontalHeader().setSectionResizeMode(1,QHeaderView.ResizeMode.Stretch)
 		self.ui.mainSplitter.setStretchFactor(0,1)
+		self.ui.layersTable.cellClicked.connect(self.onLayerTableCellClicked)
 
 	def setupToolbar(self):
 		self.menuBar = QToolBar()
@@ -144,6 +145,20 @@ class MapEditor(SphereEditor):
 			self.ui.tilesetView.addPixmap(tile.image)
 		
 		self.ui.mapView.attachMap(map)
+
+	@Slot(int,int)
+	def onLayerTableCellClicked(self, row:int, column:int):
+		if column == 0:
+			# clicked eye
+			item:QLabel = self.ui.layersTable.cellWidget(row, column)
+			visible = self.ui.mapView.toggleLayerVisibility(self.ui.layersTable.rowCount() - row - 1)
+			item.setPixmap(QPixmap(":/res/eye.png" if visible else ":/res/eye-closed.png"))
+		elif column == 2:
+			# clicked remove
+			if self.ui.layersTable.rowCount() > 1:
+				self.ui.mapView.deleteLayer(self.ui.layersTable.rowCount() - row - 1)
+				self.ui.layersTable.removeRow(row)
+
 
 	@Slot()
 	def layerPropertiesRequested(self):

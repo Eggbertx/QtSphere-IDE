@@ -79,6 +79,30 @@ class MapView(QGraphicsView):
 		self.__updateGrid()
 
 
+	def setLayerVisible(self, layer:int, visible:bool):
+		if layer < 0 or layer >= len(self.mapFile.layers):
+			raise IndexError(f"Layer index {layer} does not exist")
+		self.mapFile.layers[layer].visible = visible
+		items = self.mapScene.items()
+		for item in items:
+			if item.zValue() == layer and item.type != 10:
+				item.setVisible(visible)
+
+
+	def toggleLayerVisibility(self, layer:int):
+		self.setLayerVisible(layer, not self.mapFile.layers[layer].visible)
+		return self.mapFile.layers[layer].visible
+
+
+	def deleteLayer(self, layer:int):
+		if layer < 0 or layer >= len(self.mapFile.layers):
+			raise IndexError(f"Layer index {layer} does not exist")
+		items = self.mapScene.items()
+		for item in items:
+			if item.zValue() == layer and item.type != 10:
+				self.mapScene.removeItem(item)
+
+
 	def mapToWidgetPos(self, x:int, y:int):
 		if self.mapFile is None:
 			return QPoint(-1, -1)
