@@ -28,16 +28,17 @@ class MapView(QGraphicsView):
 	@property
 	def gridVisible(self):
 		return self.__gridVisible
-	
+
 	@gridVisible.setter
 	def gridVisible(self, visible:bool):
 		self.__gridVisible = visible
 		self.gridGroup.setVisible(visible)
 
+
 	def __init__(self, parent: QWidget = None):
 		super().__init__(parent)
 		self.setMouseTracking(True)
-		self.pointerGroup = QGraphicsItemGroup()
+		self.pointerGroup = None
 		self.gridGroup = QGraphicsItemGroup()
 		self.__gridVisible = False
 		self.gridGroup.setVisible(False)
@@ -45,12 +46,13 @@ class MapView(QGraphicsView):
 		self.setScene(self.mapScene)
 
 		self.mapFile = None
-		self.drawSize = 1
+		self.drawSize = 3
 		self.drawing = False
 		self.currentTile = 0
 		self.currentLayer = 0
 
 		self.setMouseTracking(True)
+
 
 	def attachMap(self, map:SphereMap):
 		tileW = map.tileset.tileWidth
@@ -68,27 +70,24 @@ class MapView(QGraphicsView):
 				tilePixmap.setZValue(l)
 				tilePixmap.setVisible(layer.visible)
 		self.mapFile = map
-		self.__resetPointerGroup()
-		self.drawSize = 1
+		self.setDrawSize(1)
 		self.__updateGrid()
-		self.__updatePointer()
+
 
 	def mapToWidgetPos(self, x:int, y:int):
 		if self.mapFile is None:
 			return QPoint(-1, -1)
 		return QPoint(x * self.mapFile.tileset.tileWidth, y * self.mapFile.tileset.tileHeight)
 
+
 	def setCurrentTool(self, tool:MapTool):
 		pass
 
+
 	def __updatePointer(self):
-		if self.pointerGroup is not None:
-			self.__resetPointerGroup()
-		
 		settings = Settings()
 		tw = self.mapFile.tileset.tileWidth
 		th = self.mapFile.tileset.tileHeight
-		print(self.drawSize)
 		cursorColor = QColor(settings.mapCursorColor)
 		cursorColor.setAlpha(128)
 
@@ -99,10 +98,11 @@ class MapView(QGraphicsView):
 				self.pointerGroup.addToGroup(item)
 
 		self.pointerGroup.setZValue(257)
-		self.mapScene.addItem(self.pointerGroup)
+
 
 	def setDrawSize(self, size:int):
 		self.drawSize = size
+		self.__resetPointerGroup()
 		self.__updatePointer()
 
 
@@ -110,6 +110,7 @@ class MapView(QGraphicsView):
 		if self.mapFile is None:
 			return QPoint(-1, -1)
 		return QPoint(floor(x/self.mapFile.tileset.tileWidth), floor(y/self.mapFile.tileset.tileHeight))
+
 
 	def mouseMoveEvent(self, event: QMouseEvent):
 		if self.mapFile is None:
@@ -151,10 +152,14 @@ class MapView(QGraphicsView):
 
 	def __resetPointerGroup(self):
 		if self.pointerGroup is not None:
-			if self.pointerGroup.scene() is not None:
-				self.mapScene.destroyItemGroup(self.pointerGroup)
-			del self.pointerGroup
+			items = self.pointerGroup.childItems()
+			for item in items:
+				self.mapScene.removeItem(item)
+			self.mapScene.removeItem(self.pointerGroup)
+
 		self.pointerGroup = QGraphicsItemGroup()
+		self.mapScene.addItem(self.pointerGroup)
+
 
 	def __resetGridGroup(self):
 		if self.gridGroup is not None:
