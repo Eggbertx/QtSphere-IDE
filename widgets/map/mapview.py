@@ -1,6 +1,6 @@
 from enum import Enum, auto
 from math import floor
-from PySide6.QtCore import QEvent, Qt, QPoint, QRect
+from PySide6.QtCore import QEvent, QPoint, QRect, Signal, Slot
 from PySide6.QtGui import QMouseEvent, QPixmap, QColor
 from PySide6.QtWidgets import QGraphicsItemGroup, QGraphicsScene, QGraphicsView, QWidget, QGraphicsPixmapItem, QGraphicsLineItem, QGraphicsRectItem
 
@@ -24,6 +24,8 @@ class MapView(QGraphicsView):
 	drawing: bool
 	currentTile: int
 	currentLayer: int
+	hoverTilePos: QPoint
+	hoverTilePosChanged: Signal = Signal(QPoint)
 
 	@property
 	def gridVisible(self):
@@ -52,6 +54,9 @@ class MapView(QGraphicsView):
 		self.currentLayer = 0
 
 		self.setMouseTracking(True)
+		self.hoverTilePos = QPoint(-1, -1)
+		self.hoverTilePosChanged.connect(self.onHoverTilePosChanged)
+		self.setViewportUpdateMode(QGraphicsView.ViewportUpdateMode.FullViewportUpdate)
 
 
 	def attachMap(self, map:SphereMap):
@@ -121,25 +126,23 @@ class MapView(QGraphicsView):
 		tileW = self.mapFile.tileset.tileWidth
 		tileH = self.mapFile.tileset.tileHeight
 		widgetRect = QRect(0, 0, mapSize.width() * tileW, mapSize.height() * tileH)
-
+		
 		tilePos = self.widgetToMapPos(
 			event.pos().x() + self.horizontalScrollBar().value() - 1,
 			event.pos().y() + self.verticalScrollBar().value() - 1
 		)
-		pointerUL = self.mapToWidgetPos(
-			tilePos.x() - floor(self.drawSize/2),
-			tilePos.y() - floor(self.drawSize/2)
-		)
+		if tilePos != self.hoverTilePos:
+			self.hoverTilePos = tilePos
+			self.hoverTilePosChanged.emit(self.hoverTilePos)
 
 		if widgetRect.contains(event.pos()):
 			self.window().setStatus("Map tile: ({},{}) Pixel: ({},{})".format(
 				tilePos.x(), tilePos.y(), event.pos().x(), event.pos().y()
 			))
-			self.pointerGroup.show()
 		else:
+			self.hoverTilePos = QPoint(-1,-1)
+			self.hoverTilePosChanged.emit(self.hoverTilePos)
 			self.window().setStatus("")
-			self.pointerGroup.hide()
-		self.pointerGroup.setPos(pointerUL)
 		self.setSceneRect(widgetRect)
 
 
@@ -167,6 +170,7 @@ class MapView(QGraphicsView):
 				self.mapScene.destroyItemGroup(self.gridGroup)
 			del self.gridGroup
 		self.gridGroup = QGraphicsItemGroup()
+
 
 	def __updateGrid(self):
 		self.__resetGridGroup()
@@ -200,3 +204,16 @@ class MapView(QGraphicsView):
 		self.gridGroup.setVisible(self.__gridVisible)
 		self.mapScene.addItem(self.gridGroup)
 		self.gridGroup.setZValue(256)
+
+
+	@Slot(QPoint)
+	def onHoverTilePosChanged(self, pos:QPoint):
+		pointerUL = self.mapToWidgetPos(
+			pos.x() - floor(self.drawSize/2),
+			pos.y() - floor(self.drawSize/2)
+		)
+		self.pointerGroup.setPos(pointerUL)
+		if pos.x() > -1 and pos.y() > -1:
+			self.pointerGroup.show()
+		else:
+			self.pointerGroup.hide()
