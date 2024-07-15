@@ -1765,7 +1765,6 @@ __expectedZones = (
 	},
 )
 __expectedTileset = {
-	"version": 1,
 	"tileWidth": 16,
 	"tileHeight": 16,
 	"tileBPP": 32,
@@ -1900,7 +1899,6 @@ def test_parse_rmp(tileset:str):
 		rmp.tileset = Tileset.fromReader(rts_file, "")
 
 	assert rmp.tileset
-	assert rmp.tileset.version == __expectedTileset["version"]
 	assert rmp.tileset.tileWidth == __expectedTileset["tileWidth"]
 	assert rmp.tileset.tileHeight == __expectedTileset["tileHeight"]
 	assert rmp.tileset.tileBPP == __expectedTileset["tileBPP"]
