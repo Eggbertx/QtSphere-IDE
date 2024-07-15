@@ -2,10 +2,10 @@ from enum import Enum, auto
 from math import floor
 from PySide6.QtCore import QEvent, Qt, QPoint, QRect
 from PySide6.QtGui import QMouseEvent, QPixmap, QColor
-from PySide6.QtWidgets import QGraphicsItemGroup, QGraphicsScene, QGraphicsView, QWidget, QGraphicsPixmapItem, QGraphicsLineItem
+from PySide6.QtWidgets import QGraphicsItemGroup, QGraphicsScene, QGraphicsView, QWidget, QGraphicsPixmapItem, QGraphicsLineItem, QGraphicsRectItem
 
 from formats.spheremap import SphereMap
-from settings import Settings
+from settings import Settings, Defaults
 
 class MapTool(Enum):
 	Pencil = auto()
@@ -57,7 +57,6 @@ class MapView(QGraphicsView):
 		tileH = map.tileset.tileHeight
 		self.mapScene.clear()
 		for l in range(len(map.layers)):
-			# layer = map.layers[len(map.layers)-l-1]
 			layer = map.layers[l]
 			for t in range(len(layer.tiles)):
 				tile = layer.tiles[t]
@@ -72,6 +71,7 @@ class MapView(QGraphicsView):
 		self.__resetPointerGroup()
 		self.drawSize = 1
 		self.__updateGrid()
+		self.__updatePointer()
 
 	def mapToWidgetPos(self, x:int, y:int):
 		if self.mapFile is None:
@@ -80,6 +80,31 @@ class MapView(QGraphicsView):
 
 	def setCurrentTool(self, tool:MapTool):
 		pass
+
+	def __updatePointer(self):
+		if self.pointerGroup is not None:
+			self.__resetPointerGroup()
+		
+		settings = Settings()
+		tw = self.mapFile.tileset.tileWidth
+		th = self.mapFile.tileset.tileHeight
+		print(self.drawSize)
+		cursorColor = QColor(settings.mapCursorColor)
+		cursorColor.setAlpha(128)
+
+		for y in range(self.drawSize):
+			for x in range(self.drawSize):
+				item = QGraphicsRectItem(x * tw, y * th, tw, th)
+				item.setBrush(cursorColor)
+				self.pointerGroup.addToGroup(item)
+
+		self.pointerGroup.setZValue(257)
+		self.mapScene.addItem(self.pointerGroup)
+
+	def setDrawSize(self, size:int):
+		self.drawSize = size
+		self.__updatePointer()
+
 
 	def widgetToMapPos(self, x:int, y:int):
 		if self.mapFile is None:
@@ -96,23 +121,25 @@ class MapView(QGraphicsView):
 		tileH = self.mapFile.tileset.tileHeight
 		widgetRect = QRect(0, 0, mapSize.width() * tileW, mapSize.height() * tileH)
 
+		tilePos = self.widgetToMapPos(
+			event.pos().x() + self.horizontalScrollBar().value() - 1,
+			event.pos().y() + self.verticalScrollBar().value() - 1
+		)
+		pointerUL = self.mapToWidgetPos(
+			tilePos.x() - floor(self.drawSize/2),
+			tilePos.y() - floor(self.drawSize/2)
+		)
+
 		if widgetRect.contains(event.pos()):
-			tilePos = self.widgetToMapPos(
-				event.pos().x() + self.horizontalScrollBar().value() - 1,
-				event.pos().y() + self.verticalScrollBar().value() - 1
-			)
-			pointerUL = self.mapToWidgetPos(
-				tilePos.x() - floor(self.drawSize/2),
-				tilePos.y() - floor(self.drawSize/2)
-			)
 			self.window().setStatus("Map tile: ({},{}) Pixel: ({},{})".format(
 				tilePos.x(), tilePos.y(), event.pos().x(), event.pos().y()
 			))
 			self.pointerGroup.show()
-			self.pointerGroup.setPos(pointerUL)
 		else:
 			self.window().setStatus("")
 			self.pointerGroup.hide()
+		self.pointerGroup.setPos(pointerUL)
+		self.setSceneRect(widgetRect)
 
 
 	def leaveEvent(self, event: QEvent):
@@ -124,11 +151,15 @@ class MapView(QGraphicsView):
 
 	def __resetPointerGroup(self):
 		if self.pointerGroup is not None:
+			if self.pointerGroup.scene() is not None:
+				self.mapScene.destroyItemGroup(self.pointerGroup)
 			del self.pointerGroup
 		self.pointerGroup = QGraphicsItemGroup()
 
 	def __resetGridGroup(self):
 		if self.gridGroup is not None:
+			if self.gridGroup.scene() is not None:
+				self.mapScene.destroyItemGroup(self.gridGroup)
 			del self.gridGroup
 		self.gridGroup = QGraphicsItemGroup()
 
@@ -137,8 +168,9 @@ class MapView(QGraphicsView):
 		settings = Settings()
 		gridColor = settings.gridColor
 		if not gridColor.isValid():
-			gridColor = QColor.fromString("#000000")
+			gridColor = Defaults.gridColor.value
 			settings.gridColor = gridColor
+		gridColor.setAlpha(128)
 
 		mapSize = self.sceneRect().size()
 		mapWidth = int(mapSize.width())
@@ -151,15 +183,15 @@ class MapView(QGraphicsView):
 		gridHeight = self.mapFile.tileset.tileHeight
 
 		for y in range(gridHeight, mapHeight, gridHeight):
-			line = QGraphicsLineItem(0, y, sceneWidth, y)
+			line = QGraphicsLineItem(0, y, sceneWidth-1, y)
 			line.setPen(gridColor)
 			self.gridGroup.addToGroup(line)
 		
 		for x in range(gridWidth, mapWidth, gridWidth):
-			line = QGraphicsLineItem(x, 0, x, sceneHeight)
+			line = QGraphicsLineItem(x, 0, x, sceneHeight-1)
 			line.setPen(gridColor)
 			self.gridGroup.addToGroup(line)
-		
+
 		self.gridGroup.setVisible(self.__gridVisible)
 		self.mapScene.addItem(self.gridGroup)
 		self.gridGroup.setZValue(256)

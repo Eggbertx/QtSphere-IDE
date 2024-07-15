@@ -50,7 +50,7 @@ class Settings(QSettings):
 		self.remove(Keys.gridColor)
 
 	@property
-	def legacySphereDir(self):
+	def legacySphereDir(self) -> str:
 		return self.value(Keys.legacySphereDir)
 
 	@legacySphereDir.setter
@@ -58,11 +58,11 @@ class Settings(QSettings):
 		self.setValue(Keys.legacySphereDir, val)
 
 	@property
-	def mapCursorColor(self):
+	def mapCursorColor(self) -> QColor|str:
 		return self.value(Keys.mapCursorColor, Defaults.mapCursorColor.value)
 
 	@mapCursorColor.setter
-	def mapCursorColor(self, col:QColor):
+	def mapCursorColor(self, col:QColor|str):
 		self.setValue(Keys.mapCursorColor, col)
 	
 	@mapCursorColor.deleter

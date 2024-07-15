@@ -59,8 +59,11 @@ class MapEditor(SphereEditor):
 
 		self.pencilMenu = QMenu(self)
 		self.pencil1 = self.pencilMenu.addAction(QIcon(":/res/1x1grid.png"), "1x1")
+		self.pencil1.triggered.connect(lambda: self.ui.mapView.setDrawSize(1))
 		self.pencil3 = self.pencilMenu.addAction(QIcon(":/res/3x3grid.png"), "3x3")
+		self.pencil3.triggered.connect(lambda: self.ui.mapView.setDrawSize(3))
 		self.pencil5 = self.pencilMenu.addAction(QIcon(":/res/5x5grid.png"), "5x5")
+		self.pencil5.triggered.connect(lambda: self.ui.mapView.setDrawSize(5))
 		self.pencilMenu.setDefaultAction(self.pencil1)
 		self.pencilMenu.triggered.connect(self.setPencilSize)
 		self.pencilMenu.triggered.connect(self.setCurrentTool)
