@@ -13,8 +13,6 @@ from ui.ui_mapeditor import Ui_MapEditor
 
 class MapEditor(SphereEditor):
 	ui: Ui_MapEditor
-	map: SphereMap
-
 	layerMenu:QMenu
 
 	# menubar tools
@@ -31,6 +29,10 @@ class MapEditor(SphereEditor):
 	gridTool:QAction
 	showSpritesetsTool:QAction
 
+	@property
+	def map(self):
+		return self.ui.mapView.mapFile
+
 	@staticmethod
 	def openAndAttach(parent: QWidget, filePath:str):
 		rmp = SphereMap(filePath)
@@ -45,7 +47,6 @@ class MapEditor(SphereEditor):
 		self.ui.setupUi(self)
 		self.setupToolbar()
 		self.setupContextMenus()
-		self.map = None
 		self.currentTool = MapTool.Pencil
 		self.ui.layersTable.setColumnWidth(0,48)
 		self.ui.layersTable.setColumnWidth(2,24)
@@ -66,7 +67,6 @@ class MapEditor(SphereEditor):
 		self.pencil5 = self.pencilMenu.addAction(QIcon(":/res/5x5grid.png"), "5x5")
 		self.pencil5.triggered.connect(lambda: self.ui.mapView.setDrawSize(5))
 		self.pencilMenu.setDefaultAction(self.pencil1)
-		self.pencilMenu.triggered.connect(self.setPencilSize)
 		self.pencilMenu.triggered.connect(self.setCurrentTool)
 
 		self.pencilTool = QToolButton(self.menuBar)
@@ -94,6 +94,7 @@ class MapEditor(SphereEditor):
 		self.showSpritesetsTool = self.menuBar.addAction(QIcon(":/res/show_spritesets.png"), "Show/hide spritesets (not yet implemented)")
 		self.showSpritesetsTool.setCheckable(True)
 		self.menuBar.actionTriggered.connect(self.setCurrentTool)
+		self.ui.tilesetView.indexChanged.connect(self.ui.mapView.onTileIndexChanged)
 
 	def setupContextMenus(self):
 		self.layerMenu = QMenu(self)
@@ -108,7 +109,7 @@ class MapEditor(SphereEditor):
 
 
 	def attachMap(self, map:SphereMap):
-		self.map = map
+		self.ui.mapView.attachMap(map)
 		self.ui.layersTable.clear()
 		self.ui.layersTable.setRowCount(len(map.layers))
 		for l in range(len(self.map.layers)):
@@ -143,8 +144,7 @@ class MapEditor(SphereEditor):
 		
 		for tile in map.tileset.tiles:
 			self.ui.tilesetView.addPixmap(tile.image)
-		
-		self.ui.mapView.attachMap(map)
+
 
 	@Slot(int,int)
 	def onLayerTableCellClicked(self, row:int, column:int):
@@ -158,11 +158,14 @@ class MapEditor(SphereEditor):
 			if self.ui.layersTable.rowCount() > 1:
 				self.ui.mapView.deleteLayer(self.ui.layersTable.rowCount() - row - 1)
 				self.ui.layersTable.removeRow(row)
+				return
+		self.ui.mapView.currentLayer = row
 
 
 	@Slot()
 	def layerPropertiesRequested(self):
 		pass
+
 
 	@Slot(QAction)
 	def setCurrentTool(self, tool:QAction|QToolButton):
@@ -194,8 +197,3 @@ class MapEditor(SphereEditor):
 			case self.dropperTool:
 				self.ui.mapView.setCurrentTool(MapTool.Select)
 				self.dropperTool.setChecked(True)
-
-
-	@Slot(QAction)
-	def setPencilSize(self, sizeAction:QAction):
-		pass

@@ -1,8 +1,10 @@
 from enum import Enum, auto
 from math import floor
-from PySide6.QtCore import QEvent, QPoint, QRect, Signal, Slot
+
+from PySide6.QtCore import Qt, QEvent, QPoint, QRect, Signal, Slot, QSize
 from PySide6.QtGui import QMouseEvent, QPixmap, QColor
 from PySide6.QtWidgets import QGraphicsItemGroup, QGraphicsScene, QGraphicsView, QWidget, QGraphicsPixmapItem, QGraphicsLineItem, QGraphicsRectItem
+
 
 from formats.spheremap import SphereMap
 from settings import Settings, Defaults
@@ -141,6 +143,23 @@ class MapView(QGraphicsView):
 		return QPoint(floor(x/self.mapFile.tileset.tileWidth), floor(y/self.mapFile.tileset.tileHeight))
 
 
+	def pointerRect(self, tiles:bool):
+		rX = self.pointerGroup.x()
+		rY = self.pointerGroup.y()
+		if tiles:
+			tilePos = self.widgetToMapPos(
+				rX + self.horizontalScrollBar().value(),
+				rY + self.verticalScrollBar().value()
+			)
+			rX = tilePos.x()
+			rY = tilePos.y()
+
+		rSize = QSize(self.drawSize, self.drawSize)
+		if not tiles:
+			rSize.setWidth(rSize.width() * self.mapFile.tileset.tileWidth)
+			rSize.setHeight(rSize.height() * self.mapFile.tileset.tileWidth)
+		return QRect(QPoint(rX, rY), rSize)
+
 	def mouseMoveEvent(self, event: QMouseEvent):
 		if self.mapFile is None:
 			self.setStatusTip("Map not loaded")
@@ -149,7 +168,7 @@ class MapView(QGraphicsView):
 		mapSize = self.mapFile.largestLayerSize()
 		tileW = self.mapFile.tileset.tileWidth
 		tileH = self.mapFile.tileset.tileHeight
-		widgetRect = QRect(0, 0, mapSize.width() * tileW, mapSize.height() * tileH)
+		mapRect = QRect(0, 0, mapSize.width() * tileW, mapSize.height() * tileH)
 		
 		tilePos = self.widgetToMapPos(
 			event.pos().x() + self.horizontalScrollBar().value() - 1,
@@ -159,7 +178,7 @@ class MapView(QGraphicsView):
 			self.hoverTilePos = tilePos
 			self.hoverTilePosChanged.emit(self.hoverTilePos)
 
-		if widgetRect.contains(event.pos()):
+		if mapRect.contains(event.pos()):
 			self.window().setStatus("Map tile: ({},{}) Pixel: ({},{})".format(
 				tilePos.x(), tilePos.y(), event.pos().x(), event.pos().y()
 			))
@@ -167,7 +186,17 @@ class MapView(QGraphicsView):
 			self.hoverTilePos = QPoint(-1,-1)
 			self.hoverTilePosChanged.emit(self.hoverTilePos)
 			self.window().setStatus("")
-		self.setSceneRect(widgetRect)
+		self.setSceneRect(mapRect)
+
+
+	def mousePressEvent(self, event: QMouseEvent) -> None:
+		if event.button() == Qt.MouseButton.LeftButton:
+			self.drawing = True
+			self.__drawTile()
+
+
+	def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+		self.drawing = False
 
 
 	def leaveEvent(self, event: QEvent):
@@ -175,6 +204,22 @@ class MapView(QGraphicsView):
 		self.pointerGroup.hide()
 		self.drawing = False
 		self.window().setStatus("")
+
+
+	def __drawTile(self):
+		tileWidth = self.mapFile.tileset.tileWidth
+		tileHeight = self.mapFile.tileset.tileHeight
+		pRect = self.pointerRect(True)
+		print(self.currentTile, self.currentLayer)
+		for rY in range(pRect.y(), pRect.bottom() + 1, 1):
+			for rX in range(pRect.x(), pRect.right() + 1, 1):
+				sceneX = rX * tileWidth
+				sceneY = rY * tileHeight
+				mouseItems = self.items(sceneX, sceneY)
+				for item in mouseItems:
+					if isinstance(item, QGraphicsPixmapItem) and item.zValue() == len(self.mapFile.layers)-self.currentLayer-1:
+						item.setPixmap(QPixmap.fromImage(self.mapFile.tileset.tiles[self.currentTile].image))
+						break
 
 
 	def __resetPointerGroup(self):
@@ -230,6 +275,10 @@ class MapView(QGraphicsView):
 		self.gridGroup.setZValue(256)
 
 
+	@Slot(int)
+	def onTileIndexChanged(self, newIndex:int):
+		self.currentTile = newIndex
+
 	@Slot(QPoint)
 	def onHoverTilePosChanged(self, pos:QPoint):
 		pointerUL = self.mapToWidgetPos(
@@ -239,5 +288,7 @@ class MapView(QGraphicsView):
 		self.pointerGroup.setPos(pointerUL)
 		if pos.x() > -1 and pos.y() > -1:
 			self.pointerGroup.show()
+			if self.drawing:
+				self.__drawTile()
 		else:
 			self.pointerGroup.hide()
