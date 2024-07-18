@@ -23,9 +23,9 @@ from formats.spriteset import SphereSpriteset
 from qsiproject import QSIProject
 from spherelauncher import SphereLauncher
 from widgets.map.mapeditor import MapEditor
-from widgets.startpage import StartPage
 from widgets.sphereeditor import SphereEditor
 from widgets.spriteset.spriteseteditor import SpritesetEditor
+from widgets.startpage import StartPage
 from widgets.textedit import TextEdit
 from settings import Settings
 
@@ -241,6 +241,10 @@ class MainWindow(QMainWindow):
 					editor.attachMap(rmp)
 				case ".txt"|".js"|".cjs"|".mjs"|".ts"|".md"|".sgm":
 					editor = TextEdit.openAndAttach(self.ui.openFileTabs, filePath)
+				case ".wav"|".ogg"|".mp3"|".flac"|".it"|".mod"|".s3m"|".xm":
+					self.ui.soundPlayer.load(filePath)
+					self.ui.sideBar.setCurrentIndex(2)
+					return
 				case _:
 					if settings.unrecognizedFileEditor == "external":
 						QDesktopServices.openUrl(QUrl.fromLocalFile(filePath))
@@ -360,7 +364,7 @@ class MainWindow(QMainWindow):
 				return FileType.Script.value
 			case ".txt"|".md":
 				return FileType.Text.value
-			case ".wav"|".ogg"|".mp3":
+			case ".wav"|".ogg"|".mp3"|".flac"|".it"|".mod"|".s3m"|".xm":
 				return FileType.Audio.value
 			case ".rfn":
 				return FileType.SphereFont.value

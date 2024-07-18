@@ -78,6 +78,9 @@
            <property name="text">
             <string>Play</string>
            </property>
+           <property name="icon">
+            <iconset theme="media-playback-start"/>
+           </property>
           </widget>
          </item>
          <item>
@@ -85,12 +88,18 @@
            <property name="text">
             <string>Stop</string>
            </property>
+           <property name="icon">
+            <iconset theme="media-playback-stop"/>
+           </property>
           </widget>
          </item>
          <item>
           <widget class="QToolButton" name="repeatBtn">
            <property name="text">
             <string>Repeat</string>
+           </property>
+           <property name="icon">
+            <iconset theme="media-playlist-repeat"/>
            </property>
            <property name="checkable">
             <bool>true</bool>

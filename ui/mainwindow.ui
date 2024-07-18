@@ -65,7 +65,7 @@
         <enum>QTabWidget::Rounded</enum>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>2</number>
        </property>
        <property name="documentMode">
         <bool>true</bool>
@@ -256,6 +256,9 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
+         <item>
+          <widget class="SoundPlayer" name="soundPlayer" native="true"/>
+         </item>
         </layout>
        </widget>
       </widget>
@@ -853,6 +856,12 @@
    <class>MainTabWidget</class>
    <extends>QTabWidget</extends>
    <header>widgets.maintabwidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SoundPlayer</class>
+   <extends>QWidget</extends>
+   <header location="global">widgets.soundplayer</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
