@@ -95,7 +95,7 @@ class MainWindow(QMainWindow):
 		self.ui.setupUi(self)
 		self.installEventFilter(self)
 
-		self.ui.sideBar.setCurrentIndex(0)
+		self.switchSidebarTab(SidebarTab.FileTree)
 		self.verbose = verbose
 		self.settingsWindow = SettingsWindow(self)
 		self.ui.splitter.setStretchFactor(1, 4)
@@ -243,7 +243,7 @@ class MainWindow(QMainWindow):
 					editor = TextEdit.openAndAttach(self.ui.openFileTabs, filePath)
 				case ".wav"|".ogg"|".mp3"|".flac"|".it"|".mod"|".s3m"|".xm":
 					self.ui.soundPlayer.load(filePath)
-					self.ui.sideBar.setCurrentIndex(2)
+					self.switchSidebarTab(SidebarTab.SoundTest)
 					return
 				case _:
 					if settings.unrecognizedFileEditor == "external":
@@ -596,6 +596,7 @@ class MainWindow(QMainWindow):
 		self.newMapDialog.projectPath = project.projectDir
 		self.projectPropertiesDialog.project = self.loadedProject
 		self._updateTree(project)
+		self.switchSidebarTab(SidebarTab.FileTree)
 
 	@Slot()
 	def openSelectedProjectDir(self):
