@@ -1,7 +1,8 @@
-from PySide6.QtCore import Qt, Slot
+from PySide6.QtCore import Qt, Slot, QObject
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QWidget, QGraphicsPixmapItem, QGraphicsScene
 
+from commands.directioncommands import AddRemoveDirectionFrameCommand
 from formats.spriteset import SphereSpriteset
 from ..sphereeditor import SphereEditor, SphereFile
 from .imagechooser import ImageChooser
@@ -14,6 +15,7 @@ class SpritesetEditor(SphereEditor):
 	loadedSpriteset: SphereSpriteset
 	imagesScene: QGraphicsScene
 	directionScene: QGraphicsScene
+	directionViews: list[DirectionView]
 	imageChooser: ImageChooser
 
 	@staticmethod
@@ -28,6 +30,7 @@ class SpritesetEditor(SphereEditor):
 		super().__init__(parent)
 		self.ui = Ui_SpritesetEditor()
 		self.ui.setupUi(self)
+		self.directionViews = []
 		self.editorType = SphereFile.Spriteset
 		self.loadedSpriteset = None
 		self.directionScene = QGraphicsScene(self.ui.animView)
@@ -51,12 +54,17 @@ class SpritesetEditor(SphereEditor):
 		item.setScale(2)
 		self.directionScene.addItem(item)
 
+
 	def attachSpriteset(self, spriteset:SphereSpriteset):
 		self.ui.animDirChoose.clear()
 		self.filePath = spriteset.filePath
 		for d in range(len(spriteset.directions)):
 			self.ui.animDirChoose.addItem(spriteset.directions[d].name)
-			self.ui.dirsContainer.addWidget(DirectionView(self, spriteset, d))
+			view = DirectionView(self, spriteset, d, self.undoStack)
+			# view.addFrameButton.clicked.connect(lambda: self.onAddDirectionFrameClicked(d))
+			self.directionViews.append(view)
+			self.ui.dirsContainer.addWidget(view)
+
 
 		self.imageChooser.images = spriteset.images
 		self.loadedSpriteset = spriteset
@@ -68,3 +76,8 @@ class SpritesetEditor(SphereEditor):
 			return
 		self.setDirection(d)
 		
+
+	# @Slot(int)
+	# def onAddDirectionFrameClicked(self, direction:int):
+	# 	print(direction)
+	# 	self.undoStack.push(AddDirectionFrameCommand(self.directionViews[direction], direction))

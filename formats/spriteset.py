@@ -34,6 +34,13 @@ class SpritesetDirection:
 		self.name = name
 		self.frames = frames
 
+
+	def addFrame(self, index:int = 0, delay:int = 8):
+		frame = SpritesetFrame(index, delay)
+		self.frames.append(frame)
+		return frame
+
+
 class SphereSpriteset(SphereFile):
 	filePath: str|None
 	version:int
@@ -60,6 +67,15 @@ class SphereSpriteset(SphereFile):
 		self.baseY2 = 0
 		self.images = []
 		self.directions = []
+
+
+	def addDirection(self, name:str = None, frames:list[SpritesetFrame] = []):
+		direction = SpritesetDirection(name or f"direction{len(self.directions)}", frames)
+		if len(direction.frames) == 0:
+			direction.addFrame(0, 8)
+		self.directions.append(direction)
+		
+
 
 	def _parseFileData(self, file: BufferedReader):
 		super()._parseFileData(file)

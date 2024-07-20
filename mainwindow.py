@@ -169,6 +169,8 @@ class MainWindow(QMainWindow):
 		self.ui.actionOpenFile.triggered.connect(self.openFileButtonPressed)
 		self.ui.actionOpenProject.triggered.connect(self.openProjectPressed)
 		self.ui.openFileTabs.currentChanged.connect(self.onTabChanged)
+		self.ui.actionUndo.triggered.connect(self.onUndoTriggered)
+		self.ui.actionRedo.triggered.connect(self.onRedoTriggered)
 		self.ui.actionCut.triggered.connect(self.onCutTriggered)
 		self.ui.actionCopy.triggered.connect(self.onCopyTriggered)
 		self.ui.actionPaste.triggered.connect(self.onPasteTriggered)
@@ -469,6 +471,14 @@ class MainWindow(QMainWindow):
 			QMessageBox.critical(self, "Error", "Invalid tab path. This should not normally happen.")
 			return
 
+	@Slot()
+	def onUndoTriggered(self):
+		if self.currentTabHasUndoRedo():
+			self.currentTabWidget.undo()
+
+	def onRedoTriggered(self):
+		if self.currentTabHasUndoRedo():
+			self.currentTabWidget.redo()
 
 	@Slot()
 	def onCutTriggered(self):
