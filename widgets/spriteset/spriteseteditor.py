@@ -2,7 +2,6 @@ from PySide6.QtCore import Qt, Slot, QObject
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QWidget, QGraphicsPixmapItem, QGraphicsScene
 
-from commands.directioncommands import AddRemoveDirectionFrameCommand
 from formats.spriteset import SphereSpriteset
 from ..sphereeditor import SphereEditor, SphereFile
 from .imagechooser import ImageChooser
@@ -75,9 +74,3 @@ class SpritesetEditor(SphereEditor):
 		if self.loadedSpriteset is None or d < 0 or d >= len(self.loadedSpriteset.directions):
 			return
 		self.setDirection(d)
-		
-
-	# @Slot(int)
-	# def onAddDirectionFrameClicked(self, direction:int):
-	# 	print(direction)
-	# 	self.undoStack.push(AddDirectionFrameCommand(self.directionViews[direction], direction))

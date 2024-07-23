@@ -2,8 +2,9 @@ from PySide6.QtCore import Qt, QPoint, Slot
 from PySide6.QtGui import QImage, QIcon, QBrush, QPixmap, QUndoStack
 from PySide6.QtWidgets import QWidget, QFrame, QHBoxLayout, QLineEdit, QGraphicsView, QGraphicsScene, QToolButton, QMenu, QGraphicsPixmapItem
 
-from commands.directioncommands import AddRemoveDirectionFrameCommand
+from commands.directioncommands import DirectionAppendFrameCommand, DirectionRemoveLastFrameCommand
 from formats.spriteset import SphereSpriteset
+
 
 class DirectionView(QFrame):
 	spriteset: SphereSpriteset
@@ -21,6 +22,7 @@ class DirectionView(QFrame):
 	@property
 	def direction(self):
 		return self.spriteset.directions[self.directionIndex]
+
 
 	def __init__(self, parent: QWidget, spriteset: SphereSpriteset, index:int, undoStack:QUndoStack) -> None:
 		super().__init__(parent)
@@ -85,6 +87,7 @@ class DirectionView(QFrame):
 
 		self.undoStack = undoStack
 
+
 	def addFrame(self, img: QImage):
 		scene = QGraphicsScene()
 		view = QGraphicsView(scene, self)
@@ -105,24 +108,28 @@ class DirectionView(QFrame):
 		self.framesLayout.addWidget(view)
 		self.frameViews.append(view)
 
+
 	def removeFrame(self):
 		if len(self.frameViews) < 2:
 			return
 		toRemove = self.frameViews.pop(len(self.frameViews)-1)
 		self.framesLayout.removeWidget(toRemove)
 
+
 	@Slot()
 	def frameAddClicked(self):
-		self.undoStack.push(AddRemoveDirectionFrameCommand(self, self.directionIndex, False))
+		self.undoStack.push(DirectionAppendFrameCommand(self, self.directionIndex))
+
 
 	@Slot()
 	def frameRemoveClicked(self):
-		self.undoStack.push(AddRemoveDirectionFrameCommand(self, self.directionIndex, True))
-		# self.removeFrame()
+		self.undoStack.push(DirectionRemoveLastFrameCommand(self, self.directionIndex))
+
 
 	@Slot(QPoint)
 	def showContextMenu(self, pos: QPoint):
 		self.contextMenu.exec(self.mapToGlobal(pos))
+
 
 	@Slot(str)
 	def nameChanged(self, newName:str):
