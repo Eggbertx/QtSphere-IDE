@@ -4,6 +4,7 @@ from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QPixmap, QIcon, QAction, QActionGroup
 from PySide6.QtWidgets import QWidget, QLabel, QTableWidgetItem, QToolButton, QHeaderView, QMenu, QToolBar
 
+from dialogs.layerpropertiesdialog import LayerPropertiesDialog
 from formats.spheremap import SphereMap, EntityType
 from widgets.sphereeditor import SphereEditor
 from widgets.map.mapview import MapTool
@@ -28,6 +29,7 @@ class MapEditor(SphereEditor):
 	currentTool:MapTool
 	gridTool:QAction
 	showSpritesetsTool:QAction
+	layerPropertiesDialog:LayerPropertiesDialog
 
 	@property
 	def map(self):
@@ -48,6 +50,7 @@ class MapEditor(SphereEditor):
 		self.setupToolbar()
 		self.setupContextMenus()
 		self.currentTool = MapTool.Pencil
+		self.layerPropertiesDialog = LayerPropertiesDialog(self)
 		self.ui.layersTable.setColumnWidth(0,48)
 		self.ui.layersTable.setColumnWidth(2,24)
 		self.ui.layersTable.horizontalHeader().setSectionResizeMode(1,QHeaderView.ResizeMode.Stretch)
@@ -164,7 +167,7 @@ class MapEditor(SphereEditor):
 
 	@Slot()
 	def layerPropertiesRequested(self):
-		pass
+		self.layerPropertiesDialog.show(self.ui.layersTable.currentRow(), self.map)
 
 
 	@Slot(QAction)
