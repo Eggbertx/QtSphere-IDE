@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>EntityEditDialog</class>
- <widget class="QDialog" name="EntityEditDialog">
+ <widget class="QDialog" name="PersonEditDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Edit Person</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="1">
@@ -71,7 +71,7 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="QComboBox" name="comboBox"/>
+    <widget class="QComboBox" name="layersCombo"/>
    </item>
    <item row="0" column="1">
     <layout class="QHBoxLayout" name="nameLayout">
