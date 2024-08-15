@@ -136,6 +136,9 @@
        <property name="text">
         <string>...</string>
        </property>
+       <property name="icon">
+        <iconset theme="folder-open"/>
+       </property>
       </widget>
      </item>
     </layout>
@@ -180,6 +183,9 @@
        <property name="text">
         <string>...</string>
        </property>
+       <property name="icon">
+        <iconset theme="folder-open"/>
+       </property>
       </widget>
      </item>
     </layout>
@@ -217,6 +223,9 @@
       <widget class="QToolButton" name="wineDir_btn">
        <property name="text">
         <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset theme="folder-open"/>
        </property>
       </widget>
      </item>
