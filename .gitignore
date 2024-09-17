@@ -74,7 +74,11 @@ CMakeLists.txt.user*
 *.pyc
 
 # Binaries
-# --------
 *.dll
 *.exe
+*.bin
+
+# PyInstaller files
+*.manifest
+*.spec
 
