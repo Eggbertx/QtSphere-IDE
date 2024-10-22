@@ -10,6 +10,7 @@ class Defaults(Enum):
 	unrecognizedFileEditor = "text"
 	maximized = True
 	wineDir = "/usr/bin"
+	theme = "Fusion"
 
 class Keys:
 	geometry = "geometry"
@@ -22,6 +23,7 @@ class Keys:
 	unrecognizedFileEditor = "unrecognizedFileEditor"
 	whichEngine = "whichEngine"
 	wineDir = "wineDir"
+	theme = "theme"
 
 
 class Settings(QSettings):
@@ -130,7 +132,7 @@ class Settings(QSettings):
 		self.remove(Keys.whichEngine)
 
 	@property
-	def wineDir(self):
+	def wineDir(self) -> str:
 		return self.value(Keys.wineDir)
 	
 	@wineDir.setter
@@ -140,6 +142,18 @@ class Settings(QSettings):
 	@wineDir.deleter
 	def wineDir(self):
 		self.remove(Keys.wineDir)
+
+	@property
+	def theme(self) -> str:
+		return self.value(Keys.theme, Defaults.theme.value)
+
+	@theme.setter
+	def theme(self, newTheme:str):
+		self.setValue(Keys.theme, newTheme)
+
+	@theme.deleter
+	def theme(self):
+		self.remove(Keys.theme)
 
 	def __init__(self, filename:str = None) -> None:
 		if filename is None:

@@ -557,6 +557,7 @@ class MainWindow(QMainWindow):
 		settings = Settings()
 		self.startPage.refreshGameList()
 		self.engineSelector.setCurrentIndex(1 if settings.whichEngine == "legacy" else 0)
+		QApplication.setStyle(settings.theme)
 
 
 	@Slot()
@@ -677,9 +678,10 @@ if __name__ == "__main__":
 	QCoreApplication.setOrganizationName(_ORG_NAME)
 	QCoreApplication.setApplicationVersion(_VERSION)
 	app = QApplication(sys.argv)
-	app.setStyle("fusion")
+
 	window = MainWindow(verbose=args.verbose)
 	settings = Settings()
+	app.setStyle(settings.theme)
 	if settings.maximized:
 		window.showMaximized()
 	else:

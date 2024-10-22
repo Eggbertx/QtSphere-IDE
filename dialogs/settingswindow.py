@@ -3,7 +3,7 @@ import os
 
 from PySide6.QtCore import Qt, Slot, Signal
 from PySide6.QtGui import QColor, QGuiApplication
-from PySide6.QtWidgets import QDialog, QWidget, QDialogButtonBox, QListWidgetItem, QFileDialog, QMenu, QMessageBox
+from PySide6.QtWidgets import QDialog, QWidget, QDialogButtonBox, QListWidgetItem, QFileDialog, QMenu, QMessageBox, QStyleFactory
 
 from settings import Settings, Defaults
 
@@ -35,7 +35,9 @@ class SettingsWindow(QDialog):
 		self._addColorMenu(self.ui.gridColor_btn)
 		self._addColorMenu(self.ui.mapCursorCol_btn)
 		self._removeWineIfWindows()
+		self._addThemeItems()
 		self.loadSettings()
+		
 
 	def _addColorMenu(self, btn:ColorButton):
 		menu = QMenu(btn)
@@ -79,7 +81,15 @@ class SettingsWindow(QDialog):
 			if directory != "" and not self.ui.projectDirsList.item(d).isHidden():
 				dirs.append(directory)
 		settings.projectDirs = dirs
+		settings.theme = self.ui.theme_combo.currentText()
 		self.settingsSaved.emit()
+
+	def _addThemeItems(self):
+		keys:list[str] = QStyleFactory.keys()
+		settings = Settings()
+		self.ui.theme_combo.addItems(keys)
+		index = keys.index(settings.theme)
+		self.ui.theme_combo.setCurrentIndex(index)
 
 	def _addProjectDirItem(self, text:str):
 		item = QListWidgetItem(text, self.ui.projectDirsList)
