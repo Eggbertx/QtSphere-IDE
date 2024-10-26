@@ -19,9 +19,7 @@ from dialogs.modifiedfilesdialog import ModifiedFilesDialog
 from dialogs.newmapdialog import NewMapDialog
 from dialogs.projectpropertiesdialog import ProjectPropertiesDialog
 from dialogs.settingswindow import SettingsWindow
-from formats.spheremap import SphereMap, Tileset
-from formats.spherefile import SphereFile
-from formats.spriteset import SphereSpriteset
+from formats.spheremap import SphereMap
 from qsiproject import QSIProject
 from spherelauncher import SphereLauncher
 from widgets.map.mapeditor import MapEditor
@@ -184,6 +182,7 @@ class MainWindow(QMainWindow):
 		self.ui.actionSelect_All.triggered.connect(self.onSelectAllTriggered)
 		self.ui.actionLegacyConfig.triggered.connect(self.launcher.runLegacyConfig)
 		self.ui.toolbarPlayGame.triggered.connect(self.onGameLaunched)
+		self.ui.newProject.triggered.connect(self.projectPropertiesDialog.show)
 		self.ui.newMap.triggered.connect(self.newMapDialog.show)
 		self.newMapDialog.accepted.connect(self.onNewMapAccepted)
 		self.ui.actionProject_Properties.triggered.connect(self.projectPropertiesDialog.show)
