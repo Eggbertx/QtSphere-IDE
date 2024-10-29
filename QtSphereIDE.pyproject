@@ -10,6 +10,7 @@
         "ui/mainwindow.ui",
         "ui/mapeditor.ui",
         "ui/modifiedfilesdialog.ui",
+        "ui/newimagedialog.ui",
         "ui/newmapdialog.ui",
         "ui/projectpropertiesdialog.ui",
         "ui/settingswindow.ui",
