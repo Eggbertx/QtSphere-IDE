@@ -23,7 +23,7 @@ from dialogs.settingswindow import SettingsWindow
 from formats.spheremap import SphereMap
 from qsiproject import QSIProject
 from spherelauncher import SphereLauncher
-from widgets.drawingview import DrawingView
+from widgets.image.drawingview import DrawingView
 from widgets.map.mapeditor import MapEditor
 from widgets.sphereeditor import SphereEditor
 from widgets.spriteset.spriteseteditor import SpritesetEditor

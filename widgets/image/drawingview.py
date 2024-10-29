@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from PySide6.QtCore import Qt, QSize, Signal, QPoint, QRect
-from PySide6.QtWidgets import QWidget
-from PySide6.QtGui import QMouseEvent, QPaintEvent, QImage, QColor, QPainter, QPen
+from PySide6.QtWidgets import QWidget, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
+from PySide6.QtGui import QMouseEvent, QPaintEvent, QImage, QColor, QPainter, QPen, QPixmap
 
 
 class DrawingMode(Enum):
@@ -10,7 +10,8 @@ class DrawingMode(Enum):
 	Rectangle = auto()
 	Fill = auto()
 
-class DrawingView(QWidget):
+class DrawingView(QGraphicsView):
+	scene: QGraphicsScene
 	drawingMode: DrawingMode
 	image: QImage
 	__modified: bool
@@ -19,6 +20,7 @@ class DrawingView(QWidget):
 	rightColor: QColor
 	brushSize: int
 	lastPos: QPoint
+	imageItem: QGraphicsPixmapItem
 
 	@property
 	def isLeftMouseBtnDown(self) -> bool:
@@ -54,6 +56,12 @@ class DrawingView(QWidget):
 		self.rightColor = QColor("white")
 		self.brushSize = 1
 		self.lastPos = QPoint(-1, -1)
+		self.scene = QGraphicsScene(self)
+		self.setScene(self.scene)
+		
+		self.imageItem = self.scene.addPixmap(QPixmap.fromImage(self.image))
+		self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+		self.setSceneRect(0, 0, image.width(), image.height())
 
 
 	def setModified(self, modified:bool):
@@ -62,13 +70,14 @@ class DrawingView(QWidget):
 		if self.__modified != oldModified:
 			self.modificationChanged.emit(modified)
 
-
-	def isOutOfBounds(self, pos:QPoint) -> bool:
-		return pos.x() < 0 or pos.y() < 0 or pos.x() > self.image.width() or pos.y() > self.image.height()
+	def scrolledPos(self, pos: QPoint) -> QPoint:
+		return QPoint(
+			pos.x() + self.horizontalScrollBar().value(),
+			pos.y() + self.verticalScrollBar().value())
 
 #region Event overloads
 	def mousePressEvent(self, event: QMouseEvent) -> None:
-		self.lastPos = event.pos()
+		self.lastPos = self.scrolledPos(event.pos())
 		match event.button():
 			case Qt.MouseButton.LeftButton:
 				self.pressedButtons |= 1
@@ -86,23 +95,21 @@ class DrawingView(QWidget):
 
 
 	def mouseMoveEvent(self, event: QMouseEvent) -> None:
-		pos = event.pos()
-		if self.isOutOfBounds(pos):
+		scrolledPos = self.scrolledPos(event.pos())
+		if not self.imageRect.contains(scrolledPos):
 			return
+
 		if self.isLeftMouseBtnDown or self.isRightMouseBtnDown:
 			painter = QPainter(self.image)
 			
 			painter.setPen(QPen(self.leftColor if self.isLeftMouseBtnDown else self.rightColor, self.brushSize,
 				Qt.PenStyle.SolidLine, Qt.PenCapStyle.RoundCap, Qt.PenJoinStyle.RoundJoin))
 
-			painter.drawLine(event.pos() if self.lastPos.x() < 0 else self.lastPos, event.pos())
-			self.lastPos = pos
+			painter.drawLine(scrolledPos if self.lastPos.x() < 0 else self.lastPos, scrolledPos)
+			self.imageItem.setPixmap(QPixmap.fromImage(self.image))
+			self.lastPos = scrolledPos
 			self.update()
 
-
-	def paintEvent(self, event: QPaintEvent) -> None:
-		canvasPainter = QPainter(self)
-		canvasPainter.drawImage(self.image.rect(), self.image, self.image.rect())
 
 #endregion
 
