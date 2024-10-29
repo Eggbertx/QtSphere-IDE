@@ -41,7 +41,7 @@
      <x>10</x>
      <y>10</y>
      <width>261</width>
-     <height>116</height>
+     <height>124</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
@@ -70,15 +70,33 @@
     </item>
     <item row="0" column="1">
      <widget class="QSpinBox" name="width_num">
+      <property name="suffix">
+       <string> px</string>
+      </property>
       <property name="minimum">
        <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>999999999</number>
+      </property>
+      <property name="value">
+       <number>64</number>
       </property>
      </widget>
     </item>
     <item row="1" column="1">
      <widget class="QSpinBox" name="height_num">
+      <property name="suffix">
+       <string> px</string>
+      </property>
       <property name="minimum">
        <number>1</number>
+      </property>
+      <property name="maximum">
+       <number>999999999</number>
+      </property>
+      <property name="value">
+       <number>64</number>
       </property>
      </widget>
     </item>
@@ -93,12 +111,29 @@
      <widget class="ColorButton" name="fill_btn">
       <property name="minimumSize">
        <size>
-        <width>32</width>
-        <height>32</height>
+        <width>0</width>
+        <height>0</height>
        </size>
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="opacity_lbl">
+      <property name="text">
+       <string>Opacity</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QSpinBox" name="opacity_num">
+      <property name="maximum">
+       <number>255</number>
+      </property>
+      <property name="value">
+       <number>255</number>
       </property>
      </widget>
     </item>

@@ -9,13 +9,14 @@ import sys
 import traceback
 
 from PySide6.QtCore import QCoreApplication, Qt, Slot, QUrl, QModelIndex
-from PySide6.QtGui import QCloseEvent, QIcon, QDesktopServices, QStandardItem, QStandardItemModel, QShortcut
+from PySide6.QtGui import QCloseEvent, QIcon, QDesktopServices, QImage, QStandardItem, QStandardItemModel, QShortcut
 from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel,
 	QFileDialog, QToolButton, QWidget, QDialog, QDialogButtonBox, QAbstractButton)
 
 from ui.ui_mainwindow import Ui_MainWindow
 
 from dialogs.modifiedfilesdialog import ModifiedFilesDialog
+from dialogs.newimagedialog import NewImageDialog
 from dialogs.newmapdialog import NewMapDialog
 from dialogs.projectpropertiesdialog import ProjectPropertiesDialog
 from dialogs.settingswindow import SettingsWindow
@@ -79,6 +80,7 @@ class MainWindow(QMainWindow):
 	fsModel: QFileSystemModel
 	emptyProjectModel: QStandardItemModel
 	loadedProject: QSIProject
+	newImageDialog: NewImageDialog
 	newMapDialog: NewMapDialog
 	launcher: SphereLauncher
 	verbose: bool
@@ -128,6 +130,7 @@ class MainWindow(QMainWindow):
 		self.emptyProjectModel.appendRow(QStandardItem("<No open project>"));
 		self.loadedProject = None
 		self.launcher = SphereLauncher()
+		self.newImageDialog = NewImageDialog(self)
 		self.newMapDialog = NewMapDialog(self)
 		self.modifiedFilesDialog = ModifiedFilesDialog(self)
 		self.projectPropertiesDialog = ProjectPropertiesDialog(self, self.loadedProject)
@@ -185,6 +188,8 @@ class MainWindow(QMainWindow):
 		self.ui.actionLegacyConfig.triggered.connect(self.launcher.runLegacyConfig)
 		self.ui.toolbarPlayGame.triggered.connect(self.onGameLaunched)
 		self.ui.newProject.triggered.connect(self.projectPropertiesDialog.show)
+		self.ui.newImage.triggered.connect(self.newImageDialog.show)
+		self.newImageDialog.accepted.connect(self.onNewImageAccepted)
 		self.ui.newMap.triggered.connect(self.newMapDialog.show)
 		self.newMapDialog.accepted.connect(self.onNewMapAccepted)
 		self.ui.actionProject_Properties.triggered.connect(self.projectPropertiesDialog.show)
@@ -453,6 +458,19 @@ class MainWindow(QMainWindow):
 				QApplication.exit(0)
 			case QDialogButtonBox.StandardButton.Cancel:
 				self.modifiedFilesDialog.close()
+
+
+	@Slot()
+	def onNewImageAccepted(self):
+		# TODO: replace this with an actual editor, with a toolbar
+		image = QImage(self.newImageDialog.imageWidth, self.newImageDialog.imageHeight,
+			QImage.Format.Format_RGBA8888)
+		color = self.newImageDialog.fillColor
+		color.setAlpha(self.newImageDialog.fillOpacity)
+		image.fill(self.newImageDialog.fillColor)
+		view = DrawingView(self.ui.openFileTabs, image)
+		self.openAndGoToNewEditorWidget(view, "")
+		view.modificationChanged.connect(self.onCurrentFileModificationChanged)
 
 
 	@Slot()

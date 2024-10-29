@@ -328,6 +328,7 @@
      <addaction name="actionSpriteset"/>
      <addaction name="newFont"/>
      <addaction name="newWindowstyle"/>
+     <addaction name="newImage"/>
     </widget>
     <widget class="QMenu" name="menuImport">
      <property name="title">
@@ -847,6 +848,11 @@
   <action name="actionAbout_Qt">
    <property name="text">
     <string>About Qt</string>
+   </property>
+  </action>
+  <action name="newImage">
+   <property name="text">
+    <string>Image</string>
    </property>
   </action>
  </widget>

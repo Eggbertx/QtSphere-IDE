@@ -17,7 +17,11 @@ class NewImageDialog(QDialog):
 
 	@property
 	def fillColor(self) -> QColor:
-		return self.ui.fill_btn.color()
+		return self.ui.fill_btn.color
+
+	@property
+	def fillOpacity(self) -> int:
+		return self.ui.opacity_num.value()
 
 	def __init__(self, parent: QWidget | None = None,):
 		super().__init__(parent)
