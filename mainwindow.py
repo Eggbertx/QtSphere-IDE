@@ -22,6 +22,7 @@ from dialogs.settingswindow import SettingsWindow
 from formats.spheremap import SphereMap
 from qsiproject import QSIProject
 from spherelauncher import SphereLauncher
+from widgets.drawingview import DrawingView
 from widgets.map.mapeditor import MapEditor
 from widgets.sphereeditor import SphereEditor
 from widgets.spriteset.spriteseteditor import SpritesetEditor
@@ -42,6 +43,7 @@ _OPEN_DIALOG_FILTER = (
 	"Sphere projects (*.sgm)",
 	"Script files (*.js *.mjs, *.cjs, *.ts)",
 	"Text files (*.txt *.md)",
+	"Images (*.bmp *.gif *.jpeg *.jpg *.png)",
 	"Audio files (*.wav *.ogg *.mp3 *.flac *.it *.mod *.s3m *.xm)",
 	"Sphere fonts (*.rfn)",
 	"Sphere maps (*.rmp)",
@@ -254,6 +256,8 @@ class MainWindow(QMainWindow):
 					editor.attachMap(rmp)
 				case ".txt"|".js"|".cjs"|".mjs"|".ts"|".md"|".sgm":
 					editor = TextEdit.openAndAttach(self.ui.openFileTabs, filePath)
+				case ".bmp"|".gif"|".jpeg"|".jpg"|".png":
+					editor = DrawingView.openAndAttach(self.ui.openFileTabs, filePath)
 				case ".wav"|".ogg"|".mp3"|".flac"|".it"|".mod"|".s3m"|".xm":
 					self.ui.soundPlayer.load(filePath)
 					self.switchSidebarTab(SidebarTab.SoundTest)

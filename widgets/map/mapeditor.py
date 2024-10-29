@@ -1,11 +1,9 @@
-from enum import Enum, auto
-
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QPixmap, QIcon, QAction, QActionGroup
 from PySide6.QtWidgets import QWidget, QLabel, QTableWidgetItem, QToolButton, QHeaderView, QMenu, QToolBar
 
 from dialogs.layerpropertiesdialog import LayerPropertiesDialog
-from formats.spheremap import SphereMap, EntityType
+from formats.spheremap import SphereMap, EntityType, MapLayer, MapEntity
 from widgets.sphereeditor import SphereEditor
 from widgets.map.mapview import MapTool
 
@@ -110,40 +108,49 @@ class MapEditor(SphereEditor):
 		self.ui.layersTable.customContextMenuRequested.connect(
 			lambda pos: self.layerMenu.exec(self.ui.layersTable.mapToGlobal(pos)))
 
+	def attachLayer(self, layer:MapLayer):
+		eyeLabel = QLabel("Toggle visible")
+		eyeLabel.setToolTip("Toggle layer visibility")
+		eyeLabel.setPixmap(QPixmap(":/res/eye.png" if layer.visible else ":/res/eye-closed.png"))
+		eyeLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		l = self.ui.layersTable.rowCount() - 1
+		self.ui.layersTable.setCellWidget(l,0,eyeLabel)
+		self.ui.layersTable.setItem(l,1, QTableWidgetItem(layer.name))
+		self.ui.layersTable.cellClicked.emit(0, 1)
+		self.ui.layersTable.selectRow(0)
+
+		deleteLabel = QLabel("X")
+		deleteLabel.setToolTip("Delete layer")
+		deleteLabel.setStyleSheet("QLabel { color:red;font-weight:bold; }")
+		deleteLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+		self.ui.layersTable.setCellWidget(l,2,deleteLabel)
+
+	def attachEntity(self, entity:MapEntity):
+		e = self.ui.entitiesTable.rowCount() - 1
+		self.ui.entitiesTable.setCellWidget(e, 0, QLabel(entity.name))
+		self.ui.entitiesTable.setCellWidget(e, 1, QLabel(entity.spritesetFilename))
+		browseBtn = QToolButton()
+		browseBtn.setText("...")
+		self.ui.entitiesTable.setCellWidget(e, 2, browseBtn)
+		self.ui.entitiesTable.setColumnWidth(2, browseBtn.width())
 
 	def attachMap(self, map:SphereMap):
 		self.ui.mapView.attachMap(map)
 		self.ui.layersTable.clear()
 		self.ui.layersTable.setRowCount(len(map.layers))
 		for l in range(len(self.map.layers)):
-			layer = self.map.layers[len(self.map.layers) - l - 1]
-			eyeLabel = QLabel("Toggle visible")
-			eyeLabel.setToolTip("Toggle layer visibility")
-			if self.map.layers[l].visible:
-				eyeLabel.setPixmap(QPixmap(":/res/eye.png"))
-			else:
-				eyeLabel.setPixmap(QPixmap(":/res/eye-closed.png"))
-			eyeLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-			self.ui.layersTable.setCellWidget(l,0,eyeLabel)
-			self.ui.layersTable.setItem(l,1, QTableWidgetItem(layer.name))
+			layer = self.map.layers[len(self.map.layers) - l - 1] # layers are ordered bottom to top, get them in reverse order
+			self.attachLayer(layer)
 
-			deleteLabel = QLabel("X")
-			deleteLabel.setToolTip("Delete layer")
-			deleteLabel.setStyleSheet("QLabel { color:red;font-weight:bold; }")
-			deleteLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-			self.ui.layersTable.setCellWidget(l,2,deleteLabel)
+		self.ui.layersTable.cellClicked.emit(0, 1)
+		self.ui.layersTable.selectRow(0)
 
 		self.ui.entitiesTable.clear()
 		entities = list(filter(lambda e: e.type == 1, map.entities))
 		self.ui.entitiesTable.setRowCount(len(entities))
 		
 		for e in range(len(entities)):
-			self.ui.entitiesTable.setCellWidget(e, 0, QLabel(entities[e].name))
-			self.ui.entitiesTable.setCellWidget(e, 1, QLabel(entities[e].spritesetFilename))
-			browseBtn = QToolButton()
-			browseBtn.setText("...")
-			self.ui.entitiesTable.setCellWidget(e, 2, browseBtn)
-			self.ui.entitiesTable.setColumnWidth(2, browseBtn.width())
+			self.attachEntity(entities[e])
 		
 		for tile in map.tileset.tiles:
 			self.ui.tilesetView.addPixmap(tile.image)
