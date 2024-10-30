@@ -96,10 +96,7 @@ class DrawingView(QGraphicsView):
 
 	def mouseMoveEvent(self, event: QMouseEvent) -> None:
 		scrolledPos = self.scrolledPos(event.pos())
-		if not self.imageRect.contains(scrolledPos):
-			return
-
-		if self.isLeftMouseBtnDown or self.isRightMouseBtnDown:
+		if self.imageRect.contains(scrolledPos) and (self.isLeftMouseBtnDown or self.isRightMouseBtnDown):
 			painter = QPainter(self.image)
 			
 			painter.setPen(QPen(self.leftColor if self.isLeftMouseBtnDown else self.rightColor, self.brushSize,
@@ -107,8 +104,8 @@ class DrawingView(QGraphicsView):
 
 			painter.drawLine(scrolledPos if self.lastPos.x() < 0 else self.lastPos, scrolledPos)
 			self.imageItem.setPixmap(QPixmap.fromImage(self.image))
-			self.lastPos = scrolledPos
 			self.update()
+		self.lastPos = scrolledPos
 
 
 #endregion
