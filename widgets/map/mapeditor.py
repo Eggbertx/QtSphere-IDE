@@ -79,7 +79,8 @@ class MapEditor(SphereEditor):
 		eyeLabel.setToolTip("Toggle layer visibility")
 		eyeLabel.setPixmap(QPixmap(":/res/eye.png" if layer.visible else ":/res/eye-closed.png"))
 		eyeLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		l = self.ui.layersTable.rowCount() - 1
+		l = self.ui.layersTable.rowCount()
+		self.ui.layersTable.insertRow(l)
 		self.ui.layersTable.setCellWidget(l,0,eyeLabel)
 		self.ui.layersTable.setItem(l,1, QTableWidgetItem(layer.name))
 		self.ui.layersTable.cellClicked.emit(0, 1)
@@ -92,7 +93,8 @@ class MapEditor(SphereEditor):
 		self.ui.layersTable.setCellWidget(l,2,deleteLabel)
 
 	def attachEntity(self, entity:MapEntity):
-		e = self.ui.entitiesTable.rowCount() - 1
+		e = self.ui.entitiesTable.rowCount()
+		self.ui.entitiesTable.insertRow(e)
 		self.ui.entitiesTable.setCellWidget(e, 0, QLabel(entity.name))
 		self.ui.entitiesTable.setCellWidget(e, 1, QLabel(entity.spritesetFilename))
 		browseBtn = QToolButton()
@@ -103,7 +105,6 @@ class MapEditor(SphereEditor):
 	def attachMap(self, map:SphereMap):
 		self.ui.mapView.attachMap(map)
 		self.ui.layersTable.clear()
-		self.ui.layersTable.setRowCount(len(map.layers))
 		for l in range(len(self.map.layers)):
 			layer = self.map.layers[len(self.map.layers) - l - 1] # layers are ordered bottom to top, get them in reverse order
 			self.attachLayer(layer)
@@ -113,7 +114,6 @@ class MapEditor(SphereEditor):
 
 		self.ui.entitiesTable.clear()
 		entities = list(filter(lambda e: e.type == 1, map.entities))
-		self.ui.entitiesTable.setRowCount(len(entities))
 		
 		for e in range(len(entities)):
 			self.attachEntity(entities[e])
