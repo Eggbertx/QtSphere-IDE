@@ -24,6 +24,7 @@ from formats.spheremap import SphereMap
 from qsiproject import QSIProject
 from spherelauncher import SphereLauncher
 from widgets.image.drawingview import DrawingView
+from widgets.image.imageeditor import ImageEditor
 from widgets.map.mapeditor import MapEditor
 from widgets.sphereeditor import SphereEditor
 from widgets.spriteset.spriteseteditor import SpritesetEditor
@@ -262,7 +263,7 @@ class MainWindow(QMainWindow):
 				case ".txt"|".js"|".cjs"|".mjs"|".ts"|".md"|".sgm":
 					editor = TextEdit.openAndAttach(self.ui.openFileTabs, filePath)
 				case ".bmp"|".gif"|".jpeg"|".jpg"|".png":
-					editor = DrawingView.openAndAttach(self.ui.openFileTabs, filePath)
+					editor = ImageEditor.openAndAttach(self.ui.openFileTabs, filePath)
 				case ".wav"|".ogg"|".mp3"|".flac"|".it"|".mod"|".s3m"|".xm":
 					self.ui.soundPlayer.load(filePath)
 					self.switchSidebarTab(SidebarTab.SoundTest)
@@ -462,15 +463,14 @@ class MainWindow(QMainWindow):
 
 	@Slot()
 	def onNewImageAccepted(self):
-		# TODO: replace this with an actual editor, with a toolbar
 		image = QImage(self.newImageDialog.imageWidth, self.newImageDialog.imageHeight,
 			QImage.Format.Format_RGBA8888)
 		color = self.newImageDialog.fillColor
 		color.setAlpha(self.newImageDialog.fillOpacity)
 		image.fill(self.newImageDialog.fillColor)
-		view = DrawingView(self.ui.openFileTabs, image)
-		self.openAndGoToNewEditorWidget(view, "")
-		view.modificationChanged.connect(self.onCurrentFileModificationChanged)
+		editor = ImageEditor(self.ui.openFileTabs, image)
+		self.openAndGoToNewEditorWidget(editor, "")
+		editor.modificationChanged.connect(self.onCurrentFileModificationChanged)
 
 
 	@Slot()
