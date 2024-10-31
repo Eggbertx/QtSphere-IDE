@@ -82,3 +82,5 @@ CMakeLists.txt.user*
 *.manifest
 *.spec
 
+# Sphere stuff
+*.usr

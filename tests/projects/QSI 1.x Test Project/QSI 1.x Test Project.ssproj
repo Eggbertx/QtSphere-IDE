@@ -1,0 +1,11 @@
+[.ssproj]
+apiLevel=1
+apiVersion=2
+author=Eggbertx
+compiler=Sphere Classic
+description=
+mainScript=scripts/main.js
+manageGameJson=True
+name=QSI 1.x Test Project
+resolution=800x600
+saveID=

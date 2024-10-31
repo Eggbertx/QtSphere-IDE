@@ -1,0 +1,7 @@
+[.ssproj]
+author=eggbertx
+compiler=Cell
+description=
+mainScript=scripts/main.js
+name=QSI neoSphere test project
+resolution=800x600

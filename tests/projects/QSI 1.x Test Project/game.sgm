@@ -1,0 +1,7 @@
+author=Eggbertx
+description=
+name=QSI neoSphere Test Project
+screen_height=600
+screen_width=800
+script=main.js
+
