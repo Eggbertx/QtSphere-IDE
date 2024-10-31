@@ -116,9 +116,11 @@ class MainWindow(QMainWindow):
 
 		self.engineSelector = QComboBox(self.ui.mainToolBar)
 		self.engineSelector.setMinimumWidth(120)
+		self.engineSelector.setToolTip("Sphere engine")
 		self.engineSelector.addItem(QIcon(":/res/neosphere.png"), "neoSphere")
 		self.engineSelector.addItem(QIcon(":/res/legacyengine.png"),"Sphere 1.x")
 		self.ui.mainToolBar.addWidget(self.engineSelector)
+		self.engineSelector.setEnabled(False)
 
 		self.newButton = QToolButton()
 		self.newButton.setIcon(QIcon.fromTheme("document-new"))
@@ -287,6 +289,7 @@ class MainWindow(QMainWindow):
 		self._updateTree(None)
 		self.setWindowTitle(f"QtSphere IDE {_VERSION}")
 		self.ui.menuProject.setEnabled(False)
+		self.engineSelector.setEnabled(False)
 		self.ui.actionProject_Properties.setEnabled(False)
 		self.ui.toolbarPlayGame.setEnabled(False)
 		self.newMapDialog.projectPath = None
@@ -439,6 +442,7 @@ class MainWindow(QMainWindow):
 		print("Loading project:", project.projectDir)
 		self.setWindowTitle(f"QtSphereIDE {_VERSION} - {project.name}")
 		self.ui.menuProject.setEnabled(True)
+		self.engineSelector.setEnabled(True)
 		self.ui.actionProject_Properties.setEnabled(True)
 		self.loadedProject = project
 		self.ui.toolbarPlayGame.setEnabled(True)
