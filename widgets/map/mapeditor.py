@@ -59,6 +59,7 @@ class MapEditor(SphereEditor):
 		self.menuBar.pencilTool.clicked.connect(lambda: self.setCurrentTool(self.pencilTool))
 		self.ui.tilesetView.indexChanged.connect(self.ui.mapView.onTileIndexChanged)
 		self.showSpritesetsTool = self.menuBar.addAction("Show Spritesets")
+		self.showSpritesetsTool.setIcon(QIcon(":/res/show_spritesets.png"))
 		self.showSpritesetsTool.setCheckable(True)
 		self.showSpritesetsTool.setChecked(False)
 		self.menuBar.actionTriggered.connect(self.setCurrentTool)

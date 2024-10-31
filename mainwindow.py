@@ -7,6 +7,7 @@ import os
 from os.path import basename
 import sys
 import traceback
+from signal import signal, SIGINT, SIG_DFL
 
 from PySide6.QtCore import QCoreApplication, Qt, Slot, QUrl, QModelIndex
 from PySide6.QtGui import QCloseEvent, QIcon, QDesktopServices, QImage, QStandardItem, QStandardItemModel, QShortcut
@@ -707,4 +708,5 @@ if __name__ == "__main__":
 		window.showMaximized()
 	else:
 		window.show()
+	signal(SIGINT, SIG_DFL)
 	sys.exit(app.exec())
