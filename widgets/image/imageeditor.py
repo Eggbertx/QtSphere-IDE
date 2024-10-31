@@ -24,5 +24,6 @@ class ImageEditor(SphereEditor):
 		self.viewLayout.setSpacing(0)
 		self.viewLayout.setContentsMargins(0, 0, 0, 0)
 		self.viewLayout.addWidget(self.drawingView)
+		self.viewLayout.addStretch(0)
 		self.setLayout(self.viewLayout)
 		self.viewLayout.setMenuBar(self.menuBar)

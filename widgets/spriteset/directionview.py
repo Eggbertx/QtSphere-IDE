@@ -94,7 +94,7 @@ class DirectionView(QFrame):
 		view.setScene(scene)
 		view.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-		view.setBackgroundBrush(QBrush(QPixmap(":/icons/transparency-bg.png")))
+		view.setBackgroundBrush(QBrush(QPixmap(":/res/transparency-bg.png")))
 
 		pixmap = QPixmap.fromImage(img if img is not None else self.spriteset.images[0])
 		item = QGraphicsPixmapItem(pixmap)

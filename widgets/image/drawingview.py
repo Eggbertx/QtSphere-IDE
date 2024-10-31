@@ -1,7 +1,7 @@
 from enum import Enum, auto
 from PySide6.QtCore import Qt, QSize, Signal, QPoint, QRect
-from PySide6.QtWidgets import QWidget, QGraphicsView, QGraphicsScene, QGraphicsPixmapItem
-from PySide6.QtGui import QMouseEvent, QPaintEvent, QImage, QColor, QPainter, QPen, QPixmap
+from PySide6.QtWidgets import QGraphicsPixmapItem, QGraphicsScene, QGraphicsView, QWidget, QAbstractScrollArea
+from PySide6.QtGui import QBrush, QColor, QImage, QMouseEvent, QPainter, QPen, QPixmap
 
 
 class DrawingMode(Enum):
@@ -47,6 +47,8 @@ class DrawingView(QGraphicsView):
 		self.drawingMode = DrawingMode.Pencil
 		self.__modified = False
 		self.pressedButtons = 0
+		self.setBackgroundBrush(QBrush(QPixmap(":/res/transparency-bg.png")))
+
 		if image is None:
 			self.image = QImage(320, 240, QImage.Format.Format_RGBA8888)
 			self.image.fill(Qt.GlobalColor.white)
@@ -58,13 +60,17 @@ class DrawingView(QGraphicsView):
 		self.lastPos = QPoint(-1, -1)
 		self.scene = QGraphicsScene(self)
 		self.setScene(self.scene)
-		
+		self.setFixedSize(self.image.size())
+		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
 		self.imageItem = self.scene.addPixmap(QPixmap.fromImage(self.image))
 		self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
 		self.setSceneRect(0, 0, image.width(), image.height())
 
 
 	def setModified(self, modified:bool):
+		# TODO: Either make this use QUndoStack, or have ImageEditor handle image editing
 		oldModified = self.__modified
 		self.__modified = modified
 		if self.__modified != oldModified:
@@ -107,11 +113,9 @@ class DrawingView(QGraphicsView):
 			self.update()
 		self.lastPos = scrolledPos
 
-
 #endregion
 
 	@staticmethod
 	def openAndAttach(parent:QWidget, imagePath:str):
-		image = QImage()
-		image.load(imagePath)
+		image = QImage(imagePath)
 		return DrawingView(parent, image)
