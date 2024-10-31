@@ -6,7 +6,7 @@ from PySide6.QtGui import QColor
 class Defaults(Enum):
 	gridColor = QColor.fromString("#FF00FF")
 	mapCursorColor = QColor.fromString("#0080ff")
-	whichEngine = "neosphere"
+	defaultEngine = "neosphere"
 	unrecognizedFileEditor = "text"
 	maximized = True
 	wineDir = "/usr/bin"
@@ -21,7 +21,7 @@ class Keys:
 	neosphereDir = "neosphereDir"
 	projectDirs = "projectDirs"
 	unrecognizedFileEditor = "unrecognizedFileEditor"
-	whichEngine = "whichEngine"
+	defaultEngine = "defaultEngine"
 	wineDir = "wineDir"
 	theme = "theme"
 
@@ -120,16 +120,16 @@ class Settings(QSettings):
 		self.remove(Keys.unrecognizedFileEditor)
 
 	@property
-	def whichEngine(self):
-		return self.value(Keys.whichEngine)
+	def defaultEngine(self):
+		return self.value(Keys.defaultEngine)
 
-	@whichEngine.setter
-	def whichEngine(self, which:str):
-		self.setValue(Keys.whichEngine, which)
+	@defaultEngine.setter
+	def defaultEngine(self, which:str):
+		self.setValue(Keys.defaultEngine, which)
 
-	@whichEngine.deleter
-	def whichEngine(self):
-		self.remove(Keys.whichEngine)
+	@defaultEngine.deleter
+	def defaultEngine(self):
+		self.remove(Keys.defaultEngine)
 
 	@property
 	def wineDir(self) -> str:

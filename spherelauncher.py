@@ -58,7 +58,7 @@ class SphereLauncher:
 		self._runSphereProgram(False, self.neospherePath, [gameDir], gameDir)
 
 	def launchGame(self, project:QSIProject):
-		if self.settings.value("whichEngine", "neosphere") == "neosphere":
+		if self.settings.value("defaultEngine", "neosphere") == "neosphere":
 			self.runNeosphere(project.buildDir)
 		else:
 			self.runLegacyEngine(project.buildDir)

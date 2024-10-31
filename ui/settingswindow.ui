@@ -3,7 +3,7 @@
  <class>SettingsWindow</class>
  <widget class="QDialog" name="SettingsWindow">
   <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
+   <enum>Qt::WindowModality::ApplicationModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -33,12 +33,12 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="sizeConstraint">
-    <enum>QLayout::SetNoConstraint</enum>
+    <enum>QLayout::SizeConstraint::SetNoConstraint</enum>
    </property>
    <item row="2" column="0">
-    <widget class="QLabel" name="sphereEngine_lbl">
+    <widget class="QLabel" name="defaultEngine_lbl">
      <property name="text">
-      <string>Sphere engine</string>
+      <string>Default Sphere engine</string>
      </property>
     </widget>
    </item>
@@ -100,7 +100,7 @@
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+        <enum>Qt::Orientation::Horizontal</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -210,7 +210,7 @@
    <item row="10" column="1">
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="standardButtons">
-      <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+      <set>QDialogButtonBox::StandardButton::Apply|QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
      </property>
      <property name="centerButtons">
       <bool>false</bool>
@@ -242,7 +242,7 @@
      <item row="1" column="0">
       <widget class="ColorButton" name="mapCursorCol_btn">
        <property name="contextMenuPolicy">
-        <enum>Qt::CustomContextMenu</enum>
+        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
        </property>
        <property name="text">
         <string/>
@@ -255,7 +255,7 @@
         <string>Map cursor</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignCenter</set>
+        <set>Qt::AlignmentFlag::AlignCenter</set>
        </property>
       </widget>
      </item>
@@ -265,14 +265,14 @@
         <string>Grid color</string>
        </property>
        <property name="alignment">
-        <set>Qt::AlignCenter</set>
+        <set>Qt::AlignmentFlag::AlignCenter</set>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
       <widget class="ColorButton" name="gridColor_btn">
        <property name="contextMenuPolicy">
-        <enum>Qt::CustomContextMenu</enum>
+        <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
        </property>
        <property name="text">
         <string/>
@@ -282,21 +282,29 @@
     </layout>
    </item>
    <item row="2" column="1">
-    <widget class="QComboBox" name="whichEngine_combo">
+    <widget class="QComboBox" name="defaultEngine_combo">
      <property name="toolTip">
       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If the legacy engine is chosen on a non-Windows OS and WINE is available, it will be used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="currentText">
-      <string>Use neoSphere</string>
+      <string>neoSphere</string>
      </property>
      <item>
       <property name="text">
-       <string>Use neoSphere</string>
+       <string>neoSphere</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../qsires.qrc">
+        <normaloff>:/res/neosphere.png</normaloff>:/res/neosphere.png</iconset>
       </property>
      </item>
      <item>
       <property name="text">
-       <string>Use Sphere 1.x (legacy)</string>
+       <string>Sphere 1.x (legacy)</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../qsires.qrc">
+        <normaloff>:/res/legacyengine.png</normaloff>:/res/legacyengine.png</iconset>
       </property>
      </item>
     </widget>
@@ -320,6 +328,8 @@
    <header location="global">widgets.colorbutton</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../qsires.qrc"/>
+ </resources>
  <connections/>
 </ui>

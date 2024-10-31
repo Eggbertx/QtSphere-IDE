@@ -146,7 +146,7 @@ class MainWindow(QMainWindow):
 
 	def _setupSettings(self):
 		settings = Settings()
-		match settings.whichEngine:
+		match settings.defaultEngine:
 			case "legacy":
 				self.engineSelector.setCurrentText("Sphere 1.x")
 				self.ui.actionLegacyConfig.setEnabled(True)
@@ -578,7 +578,7 @@ class MainWindow(QMainWindow):
 	def onSettingsSaved(self):
 		settings = Settings()
 		self.startPage.refreshGameList()
-		self.engineSelector.setCurrentIndex(1 if settings.whichEngine == "legacy" else 0)
+		self.engineSelector.setCurrentIndex(1 if settings.defaultEngine == "legacy" else 0)
 		QApplication.setStyle(settings.theme)
 
 
@@ -655,10 +655,10 @@ class MainWindow(QMainWindow):
 		settings = Settings()
 		match index:
 			case 0:
-				settings.whichEngine ="neosphere"
+				settings.defaultEngine ="neosphere"
 				self.ui.actionLegacyConfig.setEnabled(False)
 			case 1:
-				settings.whichEngine ="legacy"
+				settings.defaultEngine ="legacy"
 				self.ui.actionLegacyConfig.setEnabled(True)
 
 

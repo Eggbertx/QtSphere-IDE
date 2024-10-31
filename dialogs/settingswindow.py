@@ -54,7 +54,7 @@ class SettingsWindow(QDialog):
 		self.ui.neosphereDir_txt.setText(settings.neosphereDir or "")
 		self.ui.legacySphereDir_txt.setText(settings.legacySphereDir or "")
 		self.ui.unrecognizedFileEditor_combo.setCurrentIndex(0 if settings.unrecognizedFileEditor == "external" else 1)
-		self.ui.whichEngine_combo.setCurrentIndex(1 if settings.whichEngine == "legacy" else 0)
+		self.ui.defaultEngine_combo.setCurrentIndex(1 if settings.defaultEngine == "legacy" else 0)
 
 		self.ui.projectDirsList.clear()
 		searchPaths = settings.projectDirs
@@ -71,7 +71,7 @@ class SettingsWindow(QDialog):
 		settings.neosphereDir = self.ui.neosphereDir_txt.text()
 		settings.legacySphereDir = self.ui.legacySphereDir_txt.text()
 		settings.unrecognizedFileEditor = "text" if self.ui.unrecognizedFileEditor_combo.currentIndex() == 1 else "external"
-		settings.whichEngine = "legacy" if self.ui.whichEngine_combo.currentIndex() == 1 else "neosphere"
+		settings.defaultEngine = "legacy" if self.ui.defaultEngine_combo.currentIndex() == 1 else "neosphere"
 
 		del settings.projectDirs
 		numDirs = self.ui.projectDirsList.count()
