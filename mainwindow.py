@@ -9,9 +9,9 @@ import sys
 import traceback
 from signal import signal, SIGINT, SIG_DFL
 
-from PySide6.QtCore import QCoreApplication, Qt, Slot, QUrl, QModelIndex
-from PySide6.QtGui import QCloseEvent, QIcon, QDesktopServices, QImage, QStandardItem, QStandardItemModel, QShortcut
-from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QComboBox, QFileSystemModel,
+from PySide6.QtCore import QCoreApplication, Qt, Slot, QUrl
+from PySide6.QtGui import QCloseEvent, QIcon, QDesktopServices, QImage, QShortcut
+from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QComboBox,
 	QFileDialog, QToolButton, QWidget, QDialog, QDialogButtonBox, QAbstractButton)
 
 from ui.ui_mainwindow import Ui_MainWindow
@@ -61,12 +61,13 @@ class FileType(Enum):
 	Projects = 1
 	Script = 2
 	Text = 3
-	Audio = 4
-	SphereFont = 5
-	SphereMap = 6
-	Spriteset = 7
-	WindowStyle = 8
-	All = 9
+	Image = 4
+	Audio = 5
+	SphereFont = 6
+	SphereMap = 7
+	Spriteset = 8
+	WindowStyle = 9
+	All = 10
 
 
 class SidebarTab(Enum):
@@ -79,8 +80,6 @@ class MainWindow(QMainWindow):
 	startPage: StartPage
 	engineSelector: QComboBox
 	settingsWindow: SettingsWindow
-	fsModel: QFileSystemModel
-	emptyProjectModel: QStandardItemModel
 	loadedProject: QSIProject
 	newImageDialog: NewImageDialog
 	newMapDialog: NewMapDialog
@@ -129,16 +128,13 @@ class MainWindow(QMainWindow):
 		self.newButton.setMenu(self.ui.menuNew)
 		self.ui.mainToolBar.insertWidget(self.ui.actionOpenFile, self.newButton)
 
-		self.fsModel = QFileSystemModel(self)
-		self.emptyProjectModel = QStandardItemModel(0,0,self.ui.treeView)
-		self.emptyProjectModel.appendRow(QStandardItem("<No open project>"));
 		self.loadedProject = None
 		self.launcher = SphereLauncher()
 		self.newImageDialog = NewImageDialog(self)
 		self.newMapDialog = NewMapDialog(self)
 		self.modifiedFilesDialog = ModifiedFilesDialog(self)
 		self.projectPropertiesDialog = ProjectPropertiesDialog(self, self.loadedProject)
-		self._updateTree(self.loadedProject)
+		self.ui.treeView.updateProject(self.loadedProject)
 		self._setupSettings()
 		self._connectActions()
 		if os.name == "nt":
@@ -171,7 +167,7 @@ class MainWindow(QMainWindow):
 		self.startPage.openProjectDirAction.triggered.connect(self.onOpenSelectedProjectDir)
 		self.engineSelector.currentIndexChanged.connect(self.onEngineChanged)
 		self.ui.actionClose.triggered.connect(self.closeProject)
-		self.ui.actionRefresh.triggered.connect(self._updateTree)
+		self.ui.actionRefresh.triggered.connect(self.ui.treeView.updateProject)
 		self.ui.actionProject_Explorer.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.FileTree))
 		self.ui.actionProject_Task_List.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.TaskList))
 		self.ui.actionSound_Test.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.SoundTest))
@@ -179,7 +175,7 @@ class MainWindow(QMainWindow):
 		self.ui.actionQSIGithub.triggered.connect(lambda: QDesktopServices.openUrl("https://github.com/Eggbertx/QtSphere-IDE"))
 		self.ui.actionNSGithub.triggered.connect(lambda: QDesktopServices.openUrl("https://github.com/spheredev/neoSphere"))
 		self.ui.actionOpen_Game_Directory.triggered.connect(self._openCurrentProjectDir)
-		self.ui.treeView.activated.connect(self.onTreeItemActivated)
+		self.ui.treeView.fileItemActivated.connect(self.openFile)
 		self.ui.actionOpenFile.triggered.connect(self.onOpenFileTriggered)
 		self.ui.actionOpenProject.triggered.connect(self.onOpenProjectTriggered)
 		self.ui.openFileTabs.currentChanged.connect(self.onTabChanged)
@@ -209,19 +205,6 @@ class MainWindow(QMainWindow):
 	def _openCurrentProjectDir(self):
 		if self.loadedProject is not None:
 			QDesktopServices.openUrl(self.loadedProject.projectDir)
-
-
-	def _updateTree(self, game: QSIProject|None):
-		if game is None:
-			self.ui.treeView.setModel(self.emptyProjectModel)
-			return
-		self.fsModel.setRootPath(game.projectDir)
-		projectIndex = self.fsModel.index(game.projectDir)
-		self.ui.treeView.setModel(self.fsModel)
-		self.ui.treeView.setRootIndex(projectIndex)
-		for i in range(self.fsModel.columnCount()):
-			if i > 0:
-				self.ui.treeView.hideColumn(i)
 
 
 	def launchGame(self, game:QSIProject):
@@ -286,7 +269,7 @@ class MainWindow(QMainWindow):
 
 	def closeProject(self):
 		self.loadedProject = None
-		self._updateTree(None)
+		self.ui.treeView.updateProject(None)
 		self.setWindowTitle(f"QtSphere IDE {_VERSION}")
 		self.ui.menuProject.setEnabled(False)
 		self.engineSelector.setEnabled(False)
@@ -448,7 +431,7 @@ class MainWindow(QMainWindow):
 		self.ui.toolbarPlayGame.setEnabled(True)
 		self.newMapDialog.projectPath = project.projectDir
 		self.projectPropertiesDialog.project = self.loadedProject
-		self._updateTree(project)
+		self.ui.treeView.updateProject(project)
 		self.switchSidebarTab(SidebarTab.FileTree)
 
 
@@ -607,12 +590,6 @@ class MainWindow(QMainWindow):
 			self.loadProject(newProject)
 		else:
 			QMessageBox.critical(self, "Error", "Unable to open project directory")
-
-
-	@Slot()
-	def onTreeItemActivated(self, index: QModelIndex):
-		if not self.fsModel.isDir(index):
-			self.openFile(self.fsModel.filePath(index))
 
 
 	@Slot()

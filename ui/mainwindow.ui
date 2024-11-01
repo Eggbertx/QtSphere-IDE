@@ -46,7 +46,7 @@
        <bool>true</bool>
       </property>
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
       <property name="opaqueResize">
        <bool>true</bool>
@@ -59,10 +59,10 @@
         </sizepolicy>
        </property>
        <property name="tabPosition">
-        <enum>QTabWidget::East</enum>
+        <enum>QTabWidget::TabPosition::East</enum>
        </property>
        <property name="tabShape">
-        <enum>QTabWidget::Rounded</enum>
+        <enum>QTabWidget::TabShape::Rounded</enum>
        </property>
        <property name="currentIndex">
         <number>0</number>
@@ -94,7 +94,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QTreeView" name="treeView">
+          <widget class="ProjectTreeView" name="treeView">
            <property name="animated">
             <bool>true</bool>
            </property>
@@ -147,7 +147,7 @@
            <item>
             <spacer name="horizontalSpacer">
              <property name="orientation">
-              <enum>Qt::Horizontal</enum>
+              <enum>Qt::Orientation::Horizontal</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
@@ -194,7 +194,7 @@
             <bool>true</bool>
            </property>
            <property name="gridStyle">
-            <enum>Qt::SolidLine</enum>
+            <enum>Qt::PenStyle::SolidLine</enum>
            </property>
            <property name="cornerButtonEnabled">
             <bool>false</bool>
@@ -267,10 +267,10 @@
         <bool>true</bool>
        </property>
        <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+        <enum>QFrame::Shape::StyledPanel</enum>
        </property>
        <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
+        <enum>QFrame::Shadow::Raised</enum>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <property name="leftMargin">
@@ -307,11 +307,11 @@
      <x>0</x>
      <y>0</y>
      <width>936</width>
-     <height>23</height>
+     <height>21</height>
     </rect>
    </property>
    <property name="contextMenuPolicy">
-    <enum>Qt::CustomContextMenu</enum>
+    <enum>Qt::ContextMenuPolicy::CustomContextMenu</enum>
    </property>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -441,7 +441,7 @@
   </widget>
   <widget class="QToolBar" name="mainToolBar">
    <property name="contextMenuPolicy">
-    <enum>Qt::PreventContextMenu</enum>
+    <enum>Qt::ContextMenuPolicy::PreventContextMenu</enum>
    </property>
    <property name="movable">
     <bool>false</bool>
@@ -867,8 +867,13 @@
   <customwidget>
    <class>SoundPlayer</class>
    <extends>QWidget</extends>
-   <header location="global">widgets.soundplayer</header>
+   <header>widgets.soundplayer</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ProjectTreeView</class>
+   <extends>QTreeView</extends>
+   <header>widgets.projecttreeview</header>
   </customwidget>
  </customwidgets>
  <resources>
