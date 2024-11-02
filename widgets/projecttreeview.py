@@ -1,8 +1,10 @@
+import os
 from os import path
+import shutil
 
 from PySide6.QtCore import Qt, Signal, Slot, QModelIndex
-from PySide6.QtGui import QAction, QPixmap, QStandardItemModel, QStandardItem, QContextMenuEvent, QIcon, QGuiApplication
-from PySide6.QtWidgets import QTreeView, QFileSystemModel, QMenu, QWidget, QStyle
+from PySide6.QtGui import QAction, QMouseEvent, QPixmap, QStandardItemModel, QStandardItem, QContextMenuEvent, QIcon, QGuiApplication
+from PySide6.QtWidgets import QTreeView, QFileSystemModel, QMenu, QWidget, QStyle, QAbstractItemView, QMessageBox
 
 from qsiproject import QSIProject
 
@@ -10,30 +12,41 @@ class ProjectTreeView(QTreeView):
 	fsModel: QFileSystemModel
 	contextMenu: QMenu
 
+	openFileAction: QAction
 	showInExplorerAction: QAction
 	copyPathAction: QAction
 	copyRelativePathAction: QAction
+	renameAction: QAction
+	deleteAction: QAction
 
 	fileItemActivated: Signal = Signal(str)
 
 	def __init__(self, parent: QWidget|None = None):
 		super().__init__(parent)
 		self.fsModel = QFileSystemModel(self)
+		self.fsModel.setReadOnly(False)
 		self.emptyProjectModel = QStandardItemModel(0, 0, self)
 		self.emptyProjectModel.appendRow(QStandardItem("<No open project>"))
 		self.emptyProjectModel.item(0, 0).setEditable(False)
 		self.contextMenu = QMenu(self)
-		self.showInExplorerAction = self.addContextMenuAction("Show in File Explorer", QStyle.StandardPixmap.SP_DirIcon)
+		self.openFileAction = self.addContextMenuAction("Open File", QStyle.StandardPixmap.SP_DialogOpenButton)
+		self.showInExplorerAction = self.addContextMenuAction("Open containing folder", QStyle.StandardPixmap.SP_DirIcon)
 		self.copyPathAction = self.addContextMenuAction("Copy Path")
 		self.copyRelativePathAction = self.addContextMenuAction("Copy Relative Path")
+		self.contextMenu.addSeparator()
+		self.renameAction = self.addContextMenuAction("Rename")
+		self.setEditTriggers(QAbstractItemView.EditTrigger.SelectedClicked)
+		self.deleteAction = self.addContextMenuAction("Delete", QIcon.ThemeIcon.EditDelete)
 		self.activated.connect(self.onItemActivated)
 
 
-	def addContextMenuAction(self, text:str, icon:QIcon|QStyle.StandardPixmap|QPixmap = None):
+	def addContextMenuAction(self, text:str, icon:QIcon|QStyle.StandardPixmap|QPixmap|QIcon.ThemeIcon = None):
 		if icon is None:
 			return self.contextMenu.addAction(text)
 		if isinstance(icon, QStyle.StandardPixmap):
 			return self.contextMenu.addAction(self.style().standardIcon(icon), text)
+		if isinstance(icon, QIcon.ThemeIcon):
+			return self.contextMenu.addAction(QIcon.fromTheme(icon), text)
 		return self.contextMenu.addAction(icon, text)
 
 
@@ -49,17 +62,42 @@ class ProjectTreeView(QTreeView):
 			if i > 0:
 				self.hideColumn(i)
 
+	def __deleteIndexFile(self, index: QModelIndex):
+		filePath = self.fsModel.filePath(index)
+		try:
+			if self.fsModel.isDir(index):
+				shutil.rmtree(filePath)
+			else:
+				os.remove(filePath)
+			self.fsModel.remove(index)
+		except Exception as e:
+			QMessageBox.critical(self, "Error", f"Unable to delete {filePath}: {e}")
 
 	def contextMenuEvent(self, event: QContextMenuEvent):
 		index = self.indexAt(event.pos())
 		if self.model() != self.emptyProjectModel and index.isValid():
+			isDir = self.fsModel.isDir(index)
+			self.openFileAction.setEnabled(not isDir)
 			action = self.contextMenu.exec(event.globalPos())
+			filePath = self.fsModel.filePath(index)
 			match action:
+				case self.openFileAction:
+					if not isDir:
+						self.fileItemActivated.emit(filePath)
 				case self.copyPathAction:
-					QGuiApplication.clipboard().setText(self.fsModel.filePath(index))
+					QGuiApplication.clipboard().setText(filePath)
 				case self.copyRelativePathAction:
-					relPath = path.relpath(self.fsModel.filePath(index), self.fsModel.rootPath())
+					relPath = path.relpath(filePath, self.fsModel.rootPath())
 					QGuiApplication.clipboard().setText(relPath)
+				case self.renameAction:
+					self.edit(index)
+				case self.deleteAction:
+					confirm = QMessageBox.question(self, "Confirm deletion",
+						f"Are you sure you want to delete {filePath}?",
+						QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No,
+						QMessageBox.StandardButton.No)
+					if confirm == QMessageBox.StandardButton.Yes:
+						self.__deleteIndexFile(index)
 
 
 	@Slot()
