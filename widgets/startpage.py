@@ -65,6 +65,8 @@ class StartPage(QWidget):
 		match choice:
 			case self.loadProjectAction:
 				self.ui.projectIcons.itemActivated.emit(selected)
+			case self.refreshGameListAction:
+				self.refreshGameList()
 
 
 	@Slot(QListWidgetItem)

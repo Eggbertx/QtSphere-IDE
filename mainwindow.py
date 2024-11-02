@@ -167,7 +167,7 @@ class MainWindow(QMainWindow):
 		self.startPage.openProjectDirAction.triggered.connect(self.onOpenSelectedProjectDir)
 		self.engineSelector.currentIndexChanged.connect(self.onEngineChanged)
 		self.ui.actionClose.triggered.connect(self.closeProject)
-		self.ui.actionRefresh.triggered.connect(self.ui.treeView.updateProject)
+		self.ui.actionRefresh.triggered.connect(lambda: self.ui.treeView.updateProject(self.loadedProject))
 		self.ui.actionProject_Explorer.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.FileTree))
 		self.ui.actionProject_Task_List.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.TaskList))
 		self.ui.actionSound_Test.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.SoundTest))
