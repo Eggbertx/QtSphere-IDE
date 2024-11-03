@@ -33,6 +33,7 @@ class MapEditor(SphereEditor):
 		editor.attachMap(rmp)
 		return editor
 
+
 	def __init__(self, parent: QWidget | None = None):
 		super().__init__(parent)
 		self.ui = Ui_MapEditor()
@@ -48,6 +49,7 @@ class MapEditor(SphereEditor):
 		self.ui.mainSplitter.setStretchFactor(0,1)
 		self.ui.layersTable.cellClicked.connect(self.onLayerTableCellClicked)
 
+
 	def setupToolbar(self):
 		self.menuBar = DrawingToolbar()
 		self.ui.mapViewLayout.setMenuBar(self.menuBar)
@@ -60,22 +62,24 @@ class MapEditor(SphereEditor):
 		self.menuBar.addSeparator()
 		self.toggleGridAction = self.menuBar.addCheckableAction(QIcon(":/res/togglegrid.png"), "Show/Hide grid", True)
 		self.ui.tilesetView.indexChanged.connect(self.ui.mapView.onTileIndexChanged)
-		self.toggleSpritesetsAction = self.menuBar.addAction("Show Spritesets")
-		self.toggleSpritesetsAction.setIcon(QIcon(":/res/show_spritesets.png"))
-		self.toggleSpritesetsAction.setCheckable(True)
-		self.toggleSpritesetsAction.setChecked(False)
+		self.toggleSpritesetsAction = self.menuBar.addCheckableAction(QIcon(":/res/person.svg"), "Show Spritesets", True)
 		self.menuBar.actionTriggered.connect(self.setCurrentTool)
+
 
 	def setupContextMenus(self):
 		self.layerMenu = QMenu(self)
-		self.layerMenu.addAction("Insert layer")
-		self.layerMenu.addAction("Delete layer")
-		self.layerMenu.addAction("Duplicate layer")
+		self.layerMenu.addAction("Insert layer", self.onInsertLayerTriggered)
+		self.layerMenu.addAction("Delete layer", self.deleteCurrentLayer)
+		self.layerMenu.addAction("Duplicate layer", self.duplicateCurrentLayer)
 		self.layerMenu.addSeparator()
-		self.layerMenu.addAction("Toggle lock layer")
+		self.layerMenu.addAction("Move layer up", self.moveCurrentLayerUp)
+		self.layerMenu.addAction("Move layer down", self.moveCurrentLayerDown)
+		self.layerMenu.addSeparator()
+		self.layerMenu.addAction("Toggle lock layer", self.onLockCurrentLayerTriggered)
 		self.layerMenu.addAction("Properties", self.layerPropertiesRequested)
 		self.ui.layersTable.customContextMenuRequested.connect(
 			lambda pos: self.layerMenu.exec(self.ui.layersTable.mapToGlobal(pos)))
+
 
 	def attachLayer(self, layer:MapLayer):
 		l = self.ui.layersTable.rowCount()
@@ -98,18 +102,22 @@ class MapEditor(SphereEditor):
 		deleteButton.clicked.connect(self.onDeleteLayerButtonClicked)
 		self.ui.layersTable.setCellWidget(l,2,deleteButton)
 
+
 	def getTableWidgetRow(self, btn:QWidget):
 		return self.ui.layersTable.rowAt(btn.pos().y())
+
 
 	def attachEntity(self, entity:MapEntity):
 		e = self.ui.entitiesTable.rowCount()
 		self.ui.entitiesTable.insertRow(e)
 		self.ui.entitiesTable.setCellWidget(e, 0, QLabel(entity.name))
 		self.ui.entitiesTable.setCellWidget(e, 1, QLabel(entity.spritesetFilename))
-		browseBtn = QToolButton()
-		browseBtn.setText("...")
-		self.ui.entitiesTable.setCellWidget(e, 2, browseBtn)
-		self.ui.entitiesTable.setColumnWidth(2, browseBtn.width())
+		propertiesButton = QPushButton(QIcon.fromTheme(QIcon.ThemeIcon.DocumentProperties), "")
+		propertiesButton.setFlat(True)
+		
+		self.ui.entitiesTable.setCellWidget(e, 2, propertiesButton)
+		self.ui.entitiesTable.setColumnWidth(2, propertiesButton.width())
+
 
 	def attachMap(self, map:SphereMap):
 		self.ui.mapView.attachMap(map)
@@ -149,6 +157,36 @@ class MapEditor(SphereEditor):
 	@Slot(int,int)
 	def onLayerTableCellClicked(self, row:int, column:int):
 		self.ui.mapView.currentLayer = row
+
+
+	@Slot()
+	def onInsertLayerTriggered(self):
+		pass
+
+
+	@Slot()
+	def duplicateCurrentLayer(self):
+		pass
+
+
+	@Slot()
+	def moveCurrentLayerUp(self):
+		pass
+
+	@Slot()
+	def moveCurrentLayerDown(self):
+		pass
+
+	@Slot()
+	def deleteCurrentLayer(self):
+		row = self.ui.layersTable.currentRow()
+		self.ui.mapView.deleteLayer(self.ui.layersTable.rowCount() - row - 1)
+		self.ui.layersTable.removeRow(row)
+
+
+	@Slot()
+	def onLockCurrentLayerTriggered(self):
+		pass
 
 
 	@Slot()

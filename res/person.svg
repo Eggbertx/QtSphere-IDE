@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="120"
+   height="120"
+   viewBox="0 0 31.75 31.75"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   sodipodi:docname="person.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="4.1323288"
+     inkscape:cx="51.907776"
+     inkscape:cy="87.601934"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient1"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#ffff7a;stop-opacity:1;"
+         offset="0"
+         id="stop1" />
+      <stop
+         style="stop-color:#b2b200;stop-opacity:1;"
+         offset="1"
+         id="stop2" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1"
+       id="radialGradient2"
+       cx="99.795647"
+       cy="76.980202"
+       fx="99.795647"
+       fy="76.980202"
+       r="40.030487"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.8893066,0,0,1.8893066,-88.266722,-72.075584)" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-29.629594,-53.053658)">
+    <g
+       id="g2"
+       transform="matrix(0.23302351,0,0,0.23302351,26.852231,41.068495)"
+       style="stroke-width:4.54174488;stroke-dasharray:none">
+      <path
+         id="ellipse1"
+         style="fill:#007d00;stroke:#000000;stroke-width:4.54174488;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+         d="m -95.927478,80.045243 a 60.36787,48.415432 0 0 0 -60.367892,-48.415649 60.36787,48.415432 0 0 0 -8.59741,0.494027 48.415432,60.36787 0 0 0 -19.17247,47.921622 48.415432,60.36787 0 0 0 19.17299,47.921627 60.36787,48.415432 0 0 0 8.59689,0.49351 60.36787,48.415432 0 0 0 60.367892,-48.415137 z"
+         transform="rotate(-90)" />
+      <circle
+         style="fill:url(#radialGradient2);fill-opacity:1;stroke:#000000;stroke-width:4.54174488;stroke-opacity:1;paint-order:markers fill stroke;stroke-dasharray:none"
+         id="path1"
+         cx="80.04512"
+         cy="93.084145"
+         r="38.030487" />
+    </g>
+    <g
+       id="g3"
+       transform="translate(-0.66201672)">
+      <ellipse
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.09461;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+         id="path2"
+         cx="43.404873"
+         cy="61.597088"
+         rx="1.5"
+         ry="3" />
+      <ellipse
+         style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.09461;stroke-dasharray:none;stroke-opacity:1;paint-order:markers fill stroke"
+         id="ellipse2"
+         cx="48.928349"
+         cy="61.597088"
+         rx="1.5"
+         ry="3" />
+    </g>
+  </g>
+</svg>

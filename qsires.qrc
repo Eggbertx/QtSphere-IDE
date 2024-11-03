@@ -20,5 +20,6 @@
         <file>res/legacyengine.png</file>
         <file>res/togglegrid.png</file>
         <file>res/show_spritesets.png</file>
+        <file>res/person.svg</file>
     </qresource>
 </RCC>
