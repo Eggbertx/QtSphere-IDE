@@ -57,7 +57,6 @@ class DrawingToolbar(QToolBar):
 		self.fillTool.setCheckable(True)
 		self.dropperTool = self.addAction(QIcon(":/res/dropper.png"), "Select tile")
 		self.dropperTool.setCheckable(True)
-		self.addSeparator()
 		self.notToolActions = []
 		self.actionTriggered.connect(self.setCurrentTool)
 

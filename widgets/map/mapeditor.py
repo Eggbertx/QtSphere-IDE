@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt, Slot
 from PySide6.QtGui import QPixmap, QIcon, QAction, QActionGroup
-from PySide6.QtWidgets import QWidget, QLabel, QTableWidgetItem, QToolButton, QHeaderView, QMenu, QToolBar
+from PySide6.QtWidgets import QWidget, QLabel, QTableWidgetItem, QToolButton, QHeaderView, QMenu, QPushButton, QTableWidget, QStyle
 
 from dialogs.layerpropertiesdialog import LayerPropertiesDialog
 from formats.spheremap import SphereMap, EntityType, MapLayer, MapEntity
@@ -57,6 +57,7 @@ class MapEditor(SphereEditor):
 		self.menuBar.pencil5.triggered.connect(lambda: self.ui.mapView.setDrawSize(5))
 		self.menuBar.pencilMenu.triggered.connect(self.setCurrentTool)
 		self.menuBar.pencilTool.clicked.connect(lambda: self.setCurrentTool(self.menuBar.pencilTool))
+		self.menuBar.addSeparator()
 		self.toggleGridAction = self.menuBar.addCheckableAction(QIcon(":/res/togglegrid.png"), "Show/Hide grid", True)
 		self.ui.tilesetView.indexChanged.connect(self.ui.mapView.onTileIndexChanged)
 		self.toggleSpritesetsAction = self.menuBar.addAction("Show Spritesets")
@@ -77,22 +78,28 @@ class MapEditor(SphereEditor):
 			lambda pos: self.layerMenu.exec(self.ui.layersTable.mapToGlobal(pos)))
 
 	def attachLayer(self, layer:MapLayer):
-		eyeLabel = QLabel("Toggle visible")
-		eyeLabel.setToolTip("Toggle layer visibility")
-		eyeLabel.setPixmap(QPixmap(":/res/eye.png" if layer.visible else ":/res/eye-closed.png"))
-		eyeLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 		l = self.ui.layersTable.rowCount()
 		self.ui.layersTable.insertRow(l)
-		self.ui.layersTable.setCellWidget(l,0,eyeLabel)
+
+		eyeButton = QPushButton("")
+		eyeButton.setIcon(QPixmap(":/res/eye.png" if layer.visible else ":/res/eye-closed.png"))
+		eyeButton.setFlat(True)
+		eyeButton.setToolTip("Toggle layer visibility")
+		eyeButton.clicked.connect(self.onToggleLayerVisibleButtonClicked)
+		self.ui.layersTable.setCellWidget(l,0,eyeButton)
+
 		self.ui.layersTable.setItem(l,1, QTableWidgetItem(layer.name))
 		self.ui.layersTable.cellClicked.emit(0, 1)
 		self.ui.layersTable.selectRow(0)
 
-		deleteLabel = QLabel("X")
-		deleteLabel.setToolTip("Delete layer")
-		deleteLabel.setStyleSheet("QLabel { color:red;font-weight:bold; }")
-		deleteLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-		self.ui.layersTable.setCellWidget(l,2,deleteLabel)
+		deleteButton = QPushButton(QIcon.fromTheme("list-remove"), "")
+		deleteButton.setFlat(True)
+		deleteButton.setToolTip("Delete layer")
+		deleteButton.clicked.connect(self.onDeleteLayerButtonClicked)
+		self.ui.layersTable.setCellWidget(l,2,deleteButton)
+
+	def getTableWidgetRow(self, btn:QWidget):
+		return self.ui.layersTable.rowAt(btn.pos().y())
 
 	def attachEntity(self, entity:MapEntity):
 		e = self.ui.entitiesTable.rowCount()
@@ -124,19 +131,23 @@ class MapEditor(SphereEditor):
 			self.ui.tilesetView.addPixmap(tile.image)
 
 
+	@Slot(bool)
+	def onToggleLayerVisibleButtonClicked(self):
+		row = self.getTableWidgetRow(self.sender())
+		btn:QPushButton = self.ui.layersTable.cellWidget(row, 0)
+		visible = self.ui.mapView.toggleLayerVisibility(self.ui.layersTable.rowCount() - row - 1)
+		btn.setIcon(QPixmap(":/res/eye.png" if visible else ":/res/eye-closed.png"))
+
+
+	@Slot(bool)
+	def onDeleteLayerButtonClicked(self):
+		row = self.getTableWidgetRow(self.sender())
+		self.ui.mapView.deleteLayer(self.ui.layersTable.rowCount() - row - 1)
+		self.ui.layersTable.removeRow(row)
+
+
 	@Slot(int,int)
 	def onLayerTableCellClicked(self, row:int, column:int):
-		if column == 0:
-			# clicked eye
-			item:QLabel = self.ui.layersTable.cellWidget(row, column)
-			visible = self.ui.mapView.toggleLayerVisibility(self.ui.layersTable.rowCount() - row - 1)
-			item.setPixmap(QPixmap(":/res/eye.png" if visible else ":/res/eye-closed.png"))
-		elif column == 2:
-			# clicked remove
-			if self.ui.layersTable.rowCount() > 1:
-				self.ui.mapView.deleteLayer(self.ui.layersTable.rowCount() - row - 1)
-				self.ui.layersTable.removeRow(row)
-				return
 		self.ui.mapView.currentLayer = row
 
 
