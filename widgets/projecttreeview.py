@@ -26,8 +26,10 @@ class ProjectTreeView(QTreeView):
 		self.fsModel = QFileSystemModel(self)
 		self.fsModel.setReadOnly(False)
 		self.emptyProjectModel = QStandardItemModel(0, 0, self)
-		self.emptyProjectModel.appendRow(QStandardItem("<No open project>"))
-		self.emptyProjectModel.item(0, 0).setEditable(False)
+		emptyProjectItem = QStandardItem("<No open project>")
+		self.emptyProjectModel.appendRow(emptyProjectItem)
+		emptyProjectItem.setEditable(False)
+		emptyProjectItem.setSelectable(False)
 		self.contextMenu = QMenu(self)
 		self.openFileAction = self.addContextMenuAction("Open File", QStyle.StandardPixmap.SP_DialogOpenButton)
 		self.showInExplorerAction = self.addContextMenuAction("Open containing folder", QStyle.StandardPixmap.SP_DirIcon)
@@ -74,33 +76,36 @@ class ProjectTreeView(QTreeView):
 			QMessageBox.critical(self, "Error", f"Unable to delete {filePath}: {e}")
 
 	def contextMenuEvent(self, event: QContextMenuEvent):
+		if self.model() == self.emptyProjectModel:
+			return
 		index = self.indexAt(event.pos())
-		if self.model() != self.emptyProjectModel and index.isValid():
-			isDir = self.fsModel.isDir(index)
-			self.openFileAction.setEnabled(not isDir)
-			action = self.contextMenu.exec(event.globalPos())
-			filePath = self.fsModel.filePath(index)
-			match action:
-				case self.openFileAction:
-					if not isDir:
-						self.fileItemActivated.emit(filePath)
-				case self.copyPathAction:
-					QGuiApplication.clipboard().setText(filePath)
-				case self.copyRelativePathAction:
-					relPath = path.relpath(filePath, self.fsModel.rootPath())
-					QGuiApplication.clipboard().setText(relPath)
-				case self.renameAction:
-					self.edit(index)
-				case self.deleteAction:
-					confirm = QMessageBox.question(self, "Confirm deletion",
-						f"Are you sure you want to delete {filePath}?",
-						QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No,
-						QMessageBox.StandardButton.No)
-					if confirm == QMessageBox.StandardButton.Yes:
-						self.__deleteIndexFile(index)
+		if not index.isValid():
+			return
+		isDir = self.fsModel.isDir(index)
+		self.openFileAction.setEnabled(not isDir)
+		action = self.contextMenu.exec(event.globalPos())
+		filePath = self.fsModel.filePath(index)
+		match action:
+			case self.openFileAction:
+				if not isDir:
+					self.fileItemActivated.emit(filePath)
+			case self.copyPathAction:
+				QGuiApplication.clipboard().setText(filePath)
+			case self.copyRelativePathAction:
+				relPath = path.relpath(filePath, self.fsModel.rootPath())
+				QGuiApplication.clipboard().setText(relPath)
+			case self.renameAction:
+				self.edit(index)
+			case self.deleteAction:
+				confirm = QMessageBox.question(self, "Confirm deletion",
+					f"Are you sure you want to delete {filePath}?",
+					QMessageBox.StandardButton.Yes|QMessageBox.StandardButton.No,
+					QMessageBox.StandardButton.No)
+				if confirm == QMessageBox.StandardButton.Yes:
+					self.__deleteIndexFile(index)
 
 
-	@Slot()
+	@Slot(QModelIndex)
 	def onItemActivated(self, index: QModelIndex):
-		if not self.fsModel.isDir(index):
+		if not self.model() == self.emptyProjectModel and not self.fsModel.isDir(index):
 			self.fileItemActivated.emit(self.fsModel.filePath(index))
