@@ -21,6 +21,7 @@ class DrawingToolbar(QToolBar):
 	lineTool:QAction
 	fillTool:QAction
 	dropperTool:QAction
+	notToolActions: list[QAction]
 
 	pencilSizeChanged: Signal = Signal(int)
 	currentToolChanged: Signal = Signal(DrawingTool)
@@ -57,14 +58,21 @@ class DrawingToolbar(QToolBar):
 		self.dropperTool = self.addAction(QIcon(":/res/dropper.png"), "Select tile")
 		self.dropperTool.setCheckable(True)
 		self.addSeparator()
-		self.gridTool = self.addAction(QIcon(":/res/togglegrid.png"), "Show/Hide grid")
-		self.gridTool.setCheckable(True)
+		self.notToolActions = []
 		self.actionTriggered.connect(self.setCurrentTool)
+
+	def addCheckableAction(self, icon: QIcon, text:str, notATool:bool = False) -> QAction:
+		action = self.addAction(icon, text)
+		action.setCheckable(True)
+		if notATool:
+			self.notToolActions.append(action)
+		return action
 
 
 	@Slot(QAction)
 	def setCurrentTool(self, tool:QAction|QToolButton):
-		if tool == self.gridTool:
+		if tool in self.notToolActions:
+			# clicked action is a checkable action but not a tool (ex: toggle grid)
 			return
 
 		self.pencilTool.setChecked(False)

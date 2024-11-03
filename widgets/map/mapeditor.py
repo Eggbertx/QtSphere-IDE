@@ -17,8 +17,8 @@ class MapEditor(SphereEditor):
 
 	# menubar tools
 	menuBar:DrawingToolbar
-	gridTool:QAction
-	showSpritesetsTool:QAction
+	toggleGridAction:QAction
+	toggleSpritesetsAction:QAction
 	layerPropertiesDialog:LayerPropertiesDialog
 
 	@property
@@ -56,12 +56,13 @@ class MapEditor(SphereEditor):
 		self.menuBar.pencil3.triggered.connect(lambda: self.ui.mapView.setDrawSize(3))
 		self.menuBar.pencil5.triggered.connect(lambda: self.ui.mapView.setDrawSize(5))
 		self.menuBar.pencilMenu.triggered.connect(self.setCurrentTool)
-		self.menuBar.pencilTool.clicked.connect(lambda: self.setCurrentTool(self.pencilTool))
+		self.menuBar.pencilTool.clicked.connect(lambda: self.setCurrentTool(self.menuBar.pencilTool))
+		self.toggleGridAction = self.menuBar.addCheckableAction(QIcon(":/res/togglegrid.png"), "Show/Hide grid", True)
 		self.ui.tilesetView.indexChanged.connect(self.ui.mapView.onTileIndexChanged)
-		self.showSpritesetsTool = self.menuBar.addAction("Show Spritesets")
-		self.showSpritesetsTool.setIcon(QIcon(":/res/show_spritesets.png"))
-		self.showSpritesetsTool.setCheckable(True)
-		self.showSpritesetsTool.setChecked(False)
+		self.toggleSpritesetsAction = self.menuBar.addAction("Show Spritesets")
+		self.toggleSpritesetsAction.setIcon(QIcon(":/res/show_spritesets.png"))
+		self.toggleSpritesetsAction.setCheckable(True)
+		self.toggleSpritesetsAction.setChecked(False)
 		self.menuBar.actionTriggered.connect(self.setCurrentTool)
 
 	def setupContextMenus(self):
@@ -146,20 +147,20 @@ class MapEditor(SphereEditor):
 
 	@Slot(QAction)
 	def setCurrentTool(self, tool:QAction|QToolButton):
-		if tool == self.menuBar.gridTool:
-			self.ui.mapView.gridVisible = self.menuBar.gridTool.isChecked()
+		if tool == self.toggleGridAction:
+			self.ui.mapView.gridVisible = self.toggleGridAction.isChecked()
 			return
-		elif tool == self.showSpritesetsTool:
+		elif tool == self.toggleSpritesetsAction:
 			return
 
 		match tool:
-			case self.pencil1|self.pencil3|self.pencil5|self.pencilTool:
+			case self.menuBar.pencil1|self.menuBar.pencil3|self.menuBar.pencil5|self.menuBar.pencilTool:
 				self.ui.mapView.setCurrentTool(MapTool.Pencil)
-			case self.lineTool:
+			case self.menuBar.lineTool:
 				self.ui.mapView.setCurrentTool(MapTool.Line)
-			case self.rectTool:
+			case self.menuBar.rectTool:
 				self.ui.mapView.setCurrentTool(MapTool.Rectangle)
-			case self.fillTool:
+			case self.menuBar.fillTool:
 				self.ui.mapView.setCurrentTool(MapTool.Fill)
-			case self.dropperTool:
+			case self.menuBar.dropperTool:
 				self.ui.mapView.setCurrentTool(MapTool.Select)
