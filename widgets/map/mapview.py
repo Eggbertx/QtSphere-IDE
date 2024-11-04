@@ -6,7 +6,7 @@ from PySide6.QtGui import QMouseEvent, QPixmap, QColor
 from PySide6.QtWidgets import QGraphicsItemGroup, QGraphicsScene, QGraphicsView, QWidget, QGraphicsPixmapItem, QGraphicsLineItem, QGraphicsRectItem, QGraphicsTextItem
 
 
-from formats.spheremap import SphereMap
+from formats.spheremap import SphereMap, EntityType
 from settings import Settings, Defaults
 
 class MapTool(Enum):
@@ -79,10 +79,10 @@ class MapView(QGraphicsView):
 		self.mapFile = map
 		self.setDrawSize(1)
 		self.__updateGrid()
-		self.__updateIcons(tileW, tileH)
+		self.__updateMapIcons(tileW, tileH)
 
 
-	def __updateIcons(self, tileW:int, tileH:int):
+	def __updateMapIcons(self, tileW:int, tileH:int):
 		spawnPointPixmap = QPixmap(":/res/spawnpoint_icon.svg")
 		if spawnPointPixmap.height() > tileH:
 			spawnPointPixmap = spawnPointPixmap.scaledToHeight(tileH, Qt.TransformationMode.SmoothTransformation)
@@ -90,9 +90,28 @@ class MapView(QGraphicsView):
 			spawnPointPixmap = spawnPointPixmap.scaledToWidth(tileW, Qt.TransformationMode.SmoothTransformation)
 
 		spawnPointItem = self.mapScene.addPixmap(spawnPointPixmap)
-		startX = (self.mapFile.startX - tileW/2+1) if self.mapFile.startX > 0 else 0
-		startY = (self.mapFile.startY - tileH/2+1) if self.mapFile.startY > 0 else 0
+		startX = self.mapFile.startX - tileW/2+1 if self.mapFile.startX > 0 else 0
+		startY = self.mapFile.startY - tileH/2+1 if self.mapFile.startY > 0 else 0
 		spawnPointItem.setPos(startX, startY)
+
+		personIcon = QPixmap(":/res/person.svg")
+		if personIcon.height() > tileH:
+			personIcon = personIcon.scaledToHeight(tileH, Qt.TransformationMode.SmoothTransformation)
+		if personIcon.width() > tileW:
+			personIcon = personIcon.scaledToWidth(tileW, Qt.TransformationMode.SmoothTransformation)
+		
+		triggerIcon = QPixmap(":/res/trigger.svg")
+		if triggerIcon.height() > tileH:
+			triggerIcon = triggerIcon.scaledToHeight(tileH, Qt.TransformationMode.SmoothTransformation)
+		if triggerIcon.width() > tileW:
+			triggerIcon = triggerIcon.scaledToWidth(tileW, Qt.TransformationMode.SmoothTransformation)
+
+		for entity in self.mapFile.entities:
+			entityX = entity.mapX - tileW/2+1 if entity.mapX > 0 else 0
+			entityY = entity.mapY - tileH/2+1 if entity.mapY > 0 else 0
+			item = self.mapScene.addPixmap(personIcon if entity.type == EntityType.Person else triggerIcon)
+			item.setPos(entityX, entityY)
+			item.setZValue(256)
 
 
 	def setLayerVisible(self, layer:int, visible:bool):
@@ -142,7 +161,7 @@ class MapView(QGraphicsView):
 				item.setBrush(cursorColor)
 				self.pointerGroup.addToGroup(item)
 
-		self.pointerGroup.setZValue(257)
+		self.pointerGroup.setZValue(258)
 
 
 	def setDrawSize(self, size:int):
@@ -286,7 +305,7 @@ class MapView(QGraphicsView):
 
 		self.gridGroup.setVisible(self.__gridVisible)
 		self.mapScene.addItem(self.gridGroup)
-		self.gridGroup.setZValue(256)
+		self.gridGroup.setZValue(257)
 
 
 	@Slot(int)
