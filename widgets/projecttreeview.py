@@ -2,8 +2,8 @@ import os
 from os import path
 import shutil
 
-from PySide6.QtCore import Qt, Signal, Slot, QModelIndex
-from PySide6.QtGui import QAction, QMouseEvent, QPixmap, QStandardItemModel, QStandardItem, QContextMenuEvent, QIcon, QGuiApplication
+from PySide6.QtCore import Qt, Signal, Slot, QModelIndex, QUrl
+from PySide6.QtGui import QAction, QPixmap, QStandardItemModel, QStandardItem, QContextMenuEvent, QIcon, QGuiApplication, QDesktopServices
 from PySide6.QtWidgets import QTreeView, QFileSystemModel, QMenu, QWidget, QStyle, QAbstractItemView, QMessageBox
 
 from qsiproject import QSIProject
@@ -13,7 +13,7 @@ class ProjectTreeView(QTreeView):
 	contextMenu: QMenu
 
 	openFileAction: QAction
-	showInExplorerAction: QAction
+	openFolderAction: QAction
 	copyPathAction: QAction
 	copyRelativePathAction: QAction
 	renameAction: QAction
@@ -32,7 +32,7 @@ class ProjectTreeView(QTreeView):
 		emptyProjectItem.setSelectable(False)
 		self.contextMenu = QMenu(self)
 		self.openFileAction = self.addContextMenuAction("Open File", QStyle.StandardPixmap.SP_DialogOpenButton)
-		self.showInExplorerAction = self.addContextMenuAction("Open containing folder", QStyle.StandardPixmap.SP_DirIcon)
+		self.openFolderAction = self.addContextMenuAction("Open Containing Folder", QStyle.StandardPixmap.SP_DirIcon)
 		self.copyPathAction = self.addContextMenuAction("Copy Path")
 		self.copyRelativePathAction = self.addContextMenuAction("Copy Relative Path")
 		self.contextMenu.addSeparator()
@@ -89,6 +89,9 @@ class ProjectTreeView(QTreeView):
 			case self.openFileAction:
 				if not isDir:
 					self.fileItemActivated.emit(filePath)
+			case self.openFolderAction:
+				parentDir = path.split(path.abspath(filePath))[0]
+				QDesktopServices.openUrl(QUrl.fromLocalFile(parentDir))
 			case self.copyPathAction:
 				QGuiApplication.clipboard().setText(filePath)
 			case self.copyRelativePathAction:
