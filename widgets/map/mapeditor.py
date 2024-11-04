@@ -221,20 +221,14 @@ class MapEditor(SphereEditor):
 	def onMapGraphicToggleTriggered(self, which:int, show:bool):
 		match which:
 			case 0:
-				print(f"Showing SP: {show}")
+				self.ui.mapView.spawnPointIconVisible = show
 			case EntityType.Person:
-				print(f"Showing person icons: {show}")
+				self.ui.mapView.personIconsVisible = show
 			case EntityType.Trigger:
-				print(f"Showing trigger icons: {show}")
+				self.ui.mapView.triggerIconsVisible = show
 
 	@Slot(QAction)
 	def setCurrentTool(self, tool:QAction|QToolButton):
-		if tool == self.toggleGridAction:
-			self.ui.mapView.gridVisible = self.toggleGridAction.isChecked()
-			return
-		elif tool in self.menuBar.notToolActions:
-			return
-
 		match tool:
 			case self.menuBar.pencil1|self.menuBar.pencil3|self.menuBar.pencil5|self.menuBar.pencilTool:
 				self.ui.mapView.setCurrentTool(MapTool.Pencil)
@@ -246,3 +240,5 @@ class MapEditor(SphereEditor):
 				self.ui.mapView.setCurrentTool(MapTool.Fill)
 			case self.menuBar.dropperTool:
 				self.ui.mapView.setCurrentTool(MapTool.Select)
+			case self.toggleGridAction:
+				self.ui.mapView.gridVisible = self.toggleGridAction.isChecked()

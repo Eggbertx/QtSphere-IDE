@@ -29,6 +29,41 @@ class MapView(QGraphicsView):
 	hoverTilePos: QPoint
 	hoverTilePosChanged: Signal = Signal(QPoint)
 
+	#map icons
+	spIcon:QGraphicsPixmapItem
+	personIcons:list[QGraphicsPixmapItem]
+	triggerIcons:list[QGraphicsPixmapItem]
+
+	@property
+	def spawnPointIconVisible(self):
+		return self.spIcon.isVisible()
+	
+	@spawnPointIconVisible.setter
+	def spawnPointIconVisible(self, v:bool):
+		self.spIcon.setVisible(v)
+
+	@property
+	def personIconsVisible(self):
+		if len(self.personIcons) == 0:
+			return False
+		return self.personIcons[0].isVisible()
+
+	@personIconsVisible.setter
+	def personIconsVisible(self, v:bool):
+		for p in range(len(self.personIcons)):
+			self.personIcons[p].setVisible(v)
+	
+	@property
+	def triggerIconsVisible(self):
+		if len(self.triggerIcons) == 0:
+			return False
+		return self.triggerIcons[0].isVisible()
+
+	@triggerIconsVisible.setter
+	def triggerIconsVisible(self, v:bool):
+		for t in range(len(self.triggerIcons)):
+			self.triggerIcons[t].setVisible(v)
+
 	@property
 	def gridVisible(self):
 		return self.__gridVisible
@@ -60,6 +95,9 @@ class MapView(QGraphicsView):
 		self.hoverTilePosChanged.connect(self.onHoverTilePosChanged)
 		self.setViewportUpdateMode(QGraphicsView.ViewportUpdateMode.FullViewportUpdate)
 
+		self.personIcons = []
+		self.triggerIcons = []
+
 
 	def attachMap(self, map:SphereMap):
 		tileW = map.tileset.tileWidth
@@ -89,10 +127,10 @@ class MapView(QGraphicsView):
 		if spawnPointPixmap.width() > tileW:
 			spawnPointPixmap = spawnPointPixmap.scaledToWidth(tileW, Qt.TransformationMode.SmoothTransformation)
 
-		spawnPointItem = self.mapScene.addPixmap(spawnPointPixmap)
+		self.spIcon = self.mapScene.addPixmap(spawnPointPixmap)
 		startX = self.mapFile.startX - tileW/2+1 if self.mapFile.startX > 0 else 0
 		startY = self.mapFile.startY - tileH/2+1 if self.mapFile.startY > 0 else 0
-		spawnPointItem.setPos(startX, startY)
+		self.spIcon.setPos(startX, startY)
 
 		personIcon = QPixmap(":/res/person.svg")
 		if personIcon.height() > tileH:
@@ -112,6 +150,10 @@ class MapView(QGraphicsView):
 			item = self.mapScene.addPixmap(personIcon if entity.type == EntityType.Person else triggerIcon)
 			item.setPos(entityX, entityY)
 			item.setZValue(256)
+			if entity.type == EntityType.Person:
+				self.personIcons.append(item)
+			else:
+				self.triggerIcons.append(item)
 
 
 	def setLayerVisible(self, layer:int, visible:bool):
