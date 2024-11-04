@@ -15,10 +15,9 @@ class MapEditor(SphereEditor):
 	ui: Ui_MapEditor
 	layerMenu:QMenu
 
-	# menubar tools
 	menuBar:DrawingToolbar
 	toggleGridAction:QAction
-	toggleSpritesetsAction:QAction
+
 	layerPropertiesDialog:LayerPropertiesDialog
 
 	@property
@@ -62,8 +61,33 @@ class MapEditor(SphereEditor):
 		self.menuBar.addSeparator()
 		self.toggleGridAction = self.menuBar.addCheckableAction(QIcon(":/res/togglegrid.png"), "Show/Hide grid", True)
 		self.ui.tilesetView.indexChanged.connect(self.ui.mapView.onTileIndexChanged)
-		self.toggleSpritesetsAction = self.menuBar.addCheckableAction(QIcon(":/res/person.svg"), "Show Spritesets", True)
+
+		mapGraphicsMenuButton = QToolButton()
+		mapGraphicsMenuButton.setIcon(QIcon(":/res/person.svg"))
+		mapGraphicsMenuButton.setToolTip("Map icons")
+		mapGraphicsMenuButton.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+		spAction = self.addButtonMenuItem(mapGraphicsMenuButton, QIcon(":/res/spawnpoint_icon.svg"),
+			"Show spawn point", True)
+		spAction.triggered.connect(lambda: self.onMapGraphicToggleTriggered(0, spAction.isChecked()))
+
+		personsAction = self.addButtonMenuItem(mapGraphicsMenuButton, QIcon(":/res/person.svg"),
+			"Show person entities", True)
+		personsAction.triggered.connect(lambda: self.onMapGraphicToggleTriggered(1, personsAction.isChecked()))
+
+		triggersAction = self.addButtonMenuItem(mapGraphicsMenuButton, QIcon(":/res/trigger.svg"),
+			"Show trigger entities", True)
+		triggersAction.triggered.connect(lambda: self.onMapGraphicToggleTriggered(2, triggersAction.isChecked()))
+
+		self.menuBar.addWidget(mapGraphicsMenuButton)
+		self.menuBar.notToolActions.append(mapGraphicsMenuButton)
+
 		self.menuBar.actionTriggered.connect(self.setCurrentTool)
+
+	def addButtonMenuItem(self, btn:QToolButton, icon:QIcon, text:str, checked:bool) -> QAction:
+		action = btn.addAction(icon, text)
+		action.setCheckable(True)
+		action.setChecked(checked)
+		return action
 
 
 	def setupContextMenus(self):
@@ -193,13 +217,22 @@ class MapEditor(SphereEditor):
 	def layerPropertiesRequested(self):
 		self.layerPropertiesDialog.show(self.ui.layersTable.currentRow(), self.map)
 
+	@Slot(int,bool)
+	def onMapGraphicToggleTriggered(self, which:int, show:bool):
+		match which:
+			case 0:
+				print(f"Showing SP: {show}")
+			case EntityType.Person:
+				print(f"Showing person icons: {show}")
+			case EntityType.Trigger:
+				print(f"Showing trigger icons: {show}")
 
 	@Slot(QAction)
 	def setCurrentTool(self, tool:QAction|QToolButton):
 		if tool == self.toggleGridAction:
 			self.ui.mapView.gridVisible = self.toggleGridAction.isChecked()
 			return
-		elif tool == self.toggleSpritesetsAction:
+		elif tool in self.menuBar.notToolActions:
 			return
 
 		match tool:

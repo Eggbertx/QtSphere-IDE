@@ -27,8 +27,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="32"
-     inkscape:cx="6.296875"
-     inkscape:cy="8.8125"
+     inkscape:cx="13.90625"
+     inkscape:cy="8.0625"
      inkscape:current-layer="layer1" />
   <defs
      id="defs1">
@@ -45,14 +45,14 @@
      id="layer1">
     <text
        xml:space="preserve"
-       style="font-size:14.1262px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.983881;stroke-dasharray:none;stroke-opacity:1"
-       x="7.8092947"
-       y="13.136037"
+       style="font-size:13.8446px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.964265;stroke-dasharray:none;stroke-opacity:1"
+       x="7.9723129"
+       y="13.148661"
        id="text2"><tspan
          sodipodi:role="line"
          id="tspan2"
-         x="7.8092952"
-         y="13.136037"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:14.1262px;font-family:Sans;-inkscape-font-specification:'Sans Bold';fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.983881;stroke-dasharray:none;stroke-opacity:1">ST</tspan></text>
+         x="7.9723134"
+         y="13.148661"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:13.8446px;font-family:Sans;-inkscape-font-specification:'Sans Bold';fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.964265;stroke-dasharray:none;stroke-opacity:1">SP</tspan></text>
   </g>
 </svg>
