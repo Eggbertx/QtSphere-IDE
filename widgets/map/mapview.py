@@ -3,7 +3,7 @@ from math import floor
 
 from PySide6.QtCore import Qt, QEvent, QPoint, QRect, Signal, Slot, QSize
 from PySide6.QtGui import QMouseEvent, QPixmap, QColor
-from PySide6.QtWidgets import QGraphicsItemGroup, QGraphicsScene, QGraphicsView, QWidget, QGraphicsPixmapItem, QGraphicsLineItem, QGraphicsRectItem
+from PySide6.QtWidgets import QGraphicsItemGroup, QGraphicsScene, QGraphicsView, QWidget, QGraphicsPixmapItem, QGraphicsLineItem, QGraphicsRectItem, QGraphicsTextItem
 
 
 from formats.spheremap import SphereMap
@@ -79,6 +79,20 @@ class MapView(QGraphicsView):
 		self.mapFile = map
 		self.setDrawSize(1)
 		self.__updateGrid()
+		self.__updateIcons(tileW, tileH)
+
+
+	def __updateIcons(self, tileW:int, tileH:int):
+		spawnPointPixmap = QPixmap(":/res/spawnpoint_icon.svg")
+		if spawnPointPixmap.height() > tileH:
+			spawnPointPixmap = spawnPointPixmap.scaledToHeight(tileH, Qt.TransformationMode.SmoothTransformation)
+		if spawnPointPixmap.width() > tileW:
+			spawnPointPixmap = spawnPointPixmap.scaledToWidth(tileW, Qt.TransformationMode.SmoothTransformation)
+
+		spawnPointItem = self.mapScene.addPixmap(spawnPointPixmap)
+		startX = (self.mapFile.startX - tileW/2+1) if self.mapFile.startX > 0 else 0
+		startY = (self.mapFile.startY - tileH/2+1) if self.mapFile.startY > 0 else 0
+		spawnPointItem.setPos(startX, startY)
 
 
 	def setLayerVisible(self, layer:int, visible:bool):

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="16"
+   height="16"
+   viewBox="0 0 16 16"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="trigger.svg"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="32"
+     inkscape:cx="8.921875"
+     inkscape:cy="9.15625"
+     inkscape:current-layer="text4" />
+  <defs
+     id="defs1">
+    <rect
+       x="0"
+       y="0"
+       width="120"
+       height="120"
+       id="rect1" />
+  </defs>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="text4">
+      <text
+         xml:space="preserve"
+         style="font-size:21.3258px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.773425;stroke-dasharray:none;stroke-opacity:1"
+         x="8.0106602"
+         y="15.613288"
+         id="text1"><tspan
+           sodipodi:role="line"
+           id="tspan1"
+           x="8.0106602"
+           y="15.613288"
+           style="font-size:21.3258px;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.773425;stroke-dasharray:none;stroke-opacity:1">T</tspan></text>
+    </g>
+  </g>
+</svg>

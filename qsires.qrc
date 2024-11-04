@@ -15,11 +15,12 @@
         <file>res/dropper.png</file>
         <file>res/rectangletool.png</file>
         <file>res/gears.png</file>
-        <file>res/map-person.png</file>
         <file>res/legacyconfig.png</file>
         <file>res/legacyengine.png</file>
         <file>res/togglegrid.png</file>
         <file>res/show_spritesets.png</file>
         <file>res/person.svg</file>
+        <file>res/trigger.svg</file>
+        <file>res/spawnpoint_icon.svg</file>
     </qresource>
 </RCC>
