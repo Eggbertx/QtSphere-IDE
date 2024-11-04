@@ -21,7 +21,6 @@ class MapView(QGraphicsView):
 	mapFile: SphereMap
 	drawSize:int
 	gridGroup: QGraphicsItemGroup
-	__gridVisible: bool
 	pointerGroup: QGraphicsItemGroup
 	drawing: bool
 	currentTile: int
@@ -66,11 +65,10 @@ class MapView(QGraphicsView):
 
 	@property
 	def gridVisible(self):
-		return self.__gridVisible
+		return self.gridGroup.isVisible()
 
 	@gridVisible.setter
 	def gridVisible(self, visible:bool):
-		self.__gridVisible = visible
 		self.gridGroup.setVisible(visible)
 
 
@@ -79,8 +77,7 @@ class MapView(QGraphicsView):
 		self.setMouseTracking(True)
 		self.pointerGroup = None
 		self.gridGroup = QGraphicsItemGroup()
-		self.__gridVisible = False
-		self.gridGroup.setVisible(False)
+		self.gridVisible = False
 		self.mapScene = QGraphicsScene(self)
 		self.setScene(self.mapScene)
 
@@ -118,6 +115,7 @@ class MapView(QGraphicsView):
 		self.setDrawSize(1)
 		self.__updateGrid()
 		self.__updateMapIcons(tileW, tileH)
+		self.gridVisible = False
 
 
 	def __updateMapIcons(self, tileW:int, tileH:int):
@@ -345,7 +343,6 @@ class MapView(QGraphicsView):
 			line.setPen(gridColor)
 			self.gridGroup.addToGroup(line)
 
-		self.gridGroup.setVisible(self.__gridVisible)
 		self.mapScene.addItem(self.gridGroup)
 		self.gridGroup.setZValue(257)
 
