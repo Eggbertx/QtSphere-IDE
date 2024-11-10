@@ -43,7 +43,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>153</width>
+         <width>170</width>
          <height>455</height>
         </rect>
        </property>
@@ -124,7 +124,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>569</width>
+          <width>552</width>
           <height>68</height>
          </rect>
         </property>
@@ -139,7 +139,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>569</width>
+          <width>552</width>
           <height>307</height>
          </rect>
         </property>
@@ -182,6 +182,12 @@
        </widget>
       </widget>
       <widget class="QScrollArea" name="palette">
+       <property name="minimumSize">
+        <size>
+         <width>162</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="baseSize">
         <size>
          <width>160</width>
@@ -191,15 +197,16 @@
        <property name="widgetResizable">
         <bool>true</bool>
        </property>
-       <widget class="QWidget" name="scrollAreaWidgetContents_4">
+       <widget class="PaletteWidget" name="paletteWidget">
         <property name="geometry">
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>569</width>
+          <width>552</width>
           <height>68</height>
          </rect>
         </property>
+        <layout class="QVBoxLayout" name="verticalLayout_2"/>
        </widget>
       </widget>
      </widget>
@@ -207,6 +214,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PaletteWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets.palettewidget</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
