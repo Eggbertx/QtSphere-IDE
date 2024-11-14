@@ -129,7 +129,7 @@ class MainWindow(QMainWindow):
 		self.ui.mainToolBar.insertWidget(self.ui.actionOpenFile, self.newButton)
 
 		self.loadedProject = None
-		self.launcher = SphereLauncher()
+		self.launcher = SphereLauncher(self)
 		self.newImageDialog = NewImageDialog(self)
 		self.newMapDialog = NewMapDialog(self)
 		self.modifiedFilesDialog = ModifiedFilesDialog(self)
@@ -200,6 +200,10 @@ class MainWindow(QMainWindow):
 
 		QShortcut(Qt.Modifier.CTRL | Qt.Key.Key_PageDown, self, self.onNextTabTriggered)
 		QShortcut(Qt.Modifier.CTRL | Qt.Key.Key_PageUp, self, self.onPrevTabTriggered)
+		QShortcut(Qt.Modifier.CTRL | Qt.Key.Key_Tab, self, self.onNextTabTriggered)
+		QShortcut(Qt.Modifier.CTRL | Qt.Modifier.SHIFT | Qt.Key.Key_Tab, self, self.onPrevTabTriggered)
+		QShortcut(Qt.Modifier.CTRL | Qt.Key.Key_F4, self, self.onCurrentTabCloseRequested)
+		QShortcut(Qt.Modifier.CTRL | Qt.Key.Key_W, self, self.onCurrentTabCloseRequested)
 
 
 	def _openCurrentProjectDir(self):
@@ -211,8 +215,11 @@ class MainWindow(QMainWindow):
 		if game is None or game.buildDir is None or game.buildDir == "":
 			QMessageBox.critical(self, "Error launching game", "A game does not appear to be loaded")
 			return
-		
-		self.launcher.launchGame(game)
+
+		try:		
+			self.launcher.launchGame(game)
+		except Exception as e:
+			QMessageBox.critical(self, "Error launching game", f"Unable to run game: {e}")
 
 
 	def newTextFile(self):
@@ -263,7 +270,9 @@ class MainWindow(QMainWindow):
 			editor.modificationChanged.connect(self.onCurrentFileModificationChanged)
 			self.openAndGoToNewEditorWidget(editor, filePath)
 		except Exception as e:
-			QMessageBox.critical(self, "Error", traceback.format_exc())
+			errorDialog = QMessageBox(QMessageBox.Icon.Critical, "Error", str(e))
+			errorDialog.setInformativeText(traceback.format_exc())
+			errorDialog.show()
 			raise
 
 
@@ -316,7 +325,9 @@ class MainWindow(QMainWindow):
 			elif activeWidget is not StartPage:
 				raise NotImplementedError(f"Saving has not been implemented yet for this editor ({type(activeWidget)})")
 		except Exception as e:
-			QMessageBox.critical(self, "Error", traceback.format_exc())
+			errorDialog = QMessageBox(QMessageBox.Icon.Critical, "Error", str(e))
+			errorDialog.setInformativeText(traceback.format_exc())
+			errorDialog.show()
 			raise
 
 
@@ -379,6 +390,7 @@ class MainWindow(QMainWindow):
 			self.modifiedFilesDialog.show()
 			event.ignore()
 		else:
+			self.launcher.stopSphereProcess()
 			super().closeEvent(event)
 
 
@@ -606,6 +618,9 @@ class MainWindow(QMainWindow):
 		else:
 			self.openFilePaths.append(fromPath)
 
+	@Slot()
+	def onCurrentTabCloseRequested(self):
+		self.ui.openFileTabs.tabCloseRequested.emit(self.ui.openFileTabs.currentIndex())
 
 	@Slot(int)
 	def onTabCloseRequested(self, index:int):
