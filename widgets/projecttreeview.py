@@ -6,6 +6,7 @@ from PySide6.QtCore import Qt, Signal, Slot, QModelIndex, QUrl
 from PySide6.QtGui import QAction, QPixmap, QStandardItemModel, QStandardItem, QContextMenuEvent, QIcon, QGuiApplication, QDesktopServices
 from PySide6.QtWidgets import QTreeView, QFileSystemModel, QMenu, QWidget, QStyle, QAbstractItemView, QMessageBox
 
+from dialogs.errordialog import ErrorDialog
 from qsiproject import QSIProject
 
 class ProjectTreeView(QTreeView):
@@ -73,7 +74,7 @@ class ProjectTreeView(QTreeView):
 				os.remove(filePath)
 			self.fsModel.remove(index)
 		except Exception as e:
-			QMessageBox.critical(self, "Error", f"Unable to delete {filePath}: {e}")
+			ErrorDialog.showError(self, f"Unable to delete {filePath}: {e}")
 
 	def contextMenuEvent(self, event: QContextMenuEvent):
 		if self.model() == self.emptyProjectModel:

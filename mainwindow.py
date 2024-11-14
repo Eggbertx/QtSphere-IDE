@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QComboBox
 
 from ui.ui_mainwindow import Ui_MainWindow
 
+from dialogs.errordialog import ErrorDialog
 from dialogs.modifiedfilesdialog import ModifiedFilesDialog
 from dialogs.newimagedialog import NewImageDialog
 from dialogs.newmapdialog import NewMapDialog
@@ -213,13 +214,13 @@ class MainWindow(QMainWindow):
 
 	def launchGame(self, game:QSIProject):
 		if game is None or game.buildDir is None or game.buildDir == "":
-			QMessageBox.critical(self, "Error launching game", "A game does not appear to be loaded")
+			ErrorDialog.showError(self, "A game does not appear to be loaded", "Error launching game")
 			return
 
 		try:		
 			self.launcher.launchGame(game)
 		except Exception as e:
-			QMessageBox.critical(self, "Error launching game", f"Unable to run game: {e}")
+			ErrorDialog.showError(self, f"Unable to run game: {e}", "Error launching game")
 
 
 	def newTextFile(self):
@@ -390,7 +391,7 @@ class MainWindow(QMainWindow):
 			self.modifiedFilesDialog.show()
 			event.ignore()
 		else:
-			self.launcher.stopSphereProcess()
+			self.launcher.process.kill()
 			super().closeEvent(event)
 
 
@@ -534,7 +535,7 @@ class MainWindow(QMainWindow):
 	def onFileSaveTriggered(self):
 		currentPath = self.openFilePaths[self.currentTabIndex]
 		if currentPath is None:
-			QMessageBox.critical(self, "Error", "Invalid tab path. This should not normally happen.")
+			ErrorDialog.showError(self, "Invalid tab path. This should not normally happen", "Error")
 			return
 
 
@@ -601,7 +602,7 @@ class MainWindow(QMainWindow):
 		if newProject.open(projectDir):
 			self.loadProject(newProject)
 		else:
-			QMessageBox.critical(self, "Error", "Unable to open project directory")
+			ErrorDialog.showError(self, "Unable to open project directory")
 
 
 	@Slot()

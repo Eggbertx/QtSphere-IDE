@@ -1,9 +1,10 @@
 import os
 import os.path as path
 
-from PySide6.QtCore import QProcess, QSettings, QObject, Slot
-from PySide6.QtWidgets import QMessageBox, QWidget, QErrorMessage, QSizePolicy
+from PySide6.QtCore import QProcess, QSettings, Slot
+from PySide6.QtWidgets import QWidget
 
+from dialogs.errordialog import ErrorDialog
 from qsiproject import QSIProject, ProjectType
 
 class SphereLauncher:
@@ -64,7 +65,8 @@ class SphereLauncher:
 			else:
 				self.process.setProgram(program)
 				self.process.setArguments(args)
-
+		print("Starting process: ", self.process.program())
+		print("Process Arguments: ", self.process.arguments())
 		self.process.start(self.process.program(), self.process.arguments())
 
 
@@ -91,14 +93,15 @@ class SphereLauncher:
 
 
 	def showErrorWithOutput(self, error:str, title="Unable to launch game"):
-		msgBox = QMessageBox(QMessageBox.Icon.Critical, title, error, QMessageBox.StandardButton.Ok, self.parent)
+		informativeText = \
+			f"Command: {self.process.program()}<br>" + \
+			f"Arguments: {self.process.arguments()}"
+
 		if self.output != "":
-			msgBox.setInformativeText(f"{self.sphereName} output:\n{self.output}")
-		msgBox.show()
+			informativeText += f"<br>{self.sphereName} output:<br>{self.output}"
+		
+		ErrorDialog.showError(self.parent, error + "<br>" + informativeText, title)
 
-
-	def stopSphereProcess(self):
-		self.process.kill()
 
 
 	@Slot(QProcess.ProcessError)
@@ -124,3 +127,5 @@ class SphereLauncher:
 	def onProcessFinished(self, exitCode: QProcess.ExitStatus|int):
 		if exitCode != 0 and exitCode != QProcess.ExitStatus.NormalExit:
 			self.showErrorWithOutput(f"{self.sphereName} process finished with exit code {exitCode}")
+		else:
+			print("Process exited normally")

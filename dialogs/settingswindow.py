@@ -6,7 +6,7 @@ from PySide6.QtGui import QColor, QGuiApplication
 from PySide6.QtWidgets import QDialog, QWidget, QDialogButtonBox, QListWidgetItem, QFileDialog, QMenu, QMessageBox, QStyleFactory
 
 from settings import Settings, Defaults
-
+from dialogs.errordialog import ErrorDialog
 from widgets.colorbutton import ColorButton
 
 from ui.ui_settingswindow import Ui_SettingsWindow
@@ -116,7 +116,7 @@ class SettingsWindow(QDialog):
 			case self.ui.gridColor_btn:
 				btn.setColor(Defaults.gridColor.value)
 			case _:
-				QMessageBox.critical(self, "Error", f"Unrecognized color button '{btn.objectName()}'")
+				ErrorDialog.showError(self, f"Unrecognized color button '{btn.objectName()}'")
 
 	@Slot()
 	def onOK(self):

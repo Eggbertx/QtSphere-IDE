@@ -8,6 +8,8 @@ from PySide6.QtGui import QIcon
 from PySide6.QtCore import QDir, QFileInfo
 from PySide6.QtWidgets import QMessageBox
 
+from dialogs.errordialog import ErrorDialog
+
 _file_filters = ("*.ssproj", "Cellscript.js", "Cellscript.mjs", "Cellscript.cjs", "game.sgm")
 
 class ProjectType(Enum):
@@ -55,7 +57,7 @@ class QSIProject:
 		self.projectDir = path
 		fileInfo = QFileInfo(path)
 		if not fileInfo.exists():
-			QMessageBox.critical(None, "Error!", "Project path %s does not exist" % path)
+			ErrorDialog.showError(None, "Project path %s does not exist" % path)
 			return False
 
 		if fileInfo.isDir():
@@ -194,7 +196,7 @@ class QSIProject:
 
 		if len(resolutionArr) != 2:
 			# expects format <width>x<height>, missing x or more than one x
-			QMessageBox.critical(None, "Error", f"Project {self.name} has an invalid resolution string: {resolution}")
+			ErrorDialog.showError(None, f"Project {self.name} has an invalid resolution string: {resolution}")
 			return False
 		
 		self.width = int(resolutionArr[0]) if resolutionArr[0].isdigit() else -1
@@ -202,7 +204,7 @@ class QSIProject:
 		
 		if self.width < 1 or self.height < 1:
 			# width or height are an invalid number
-			QMessageBox.critical(None, "Error", f"Project {self.name} has an invalid resolution string: {resolution}")
+			ErrorDialog.showError(None, f"Project {self.name} has an invalid resolution string: {resolution}")
 			return False
 
 		self.compiler = "Cell"
