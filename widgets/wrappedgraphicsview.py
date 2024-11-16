@@ -24,6 +24,7 @@ class WrappedGraphicsView(QGraphicsView):
 			self.__scaleMult = factor
 			self.arrangeItems(self.width(), self.height())
 
+
 	def __init__(self, parent: QWidget | None = None):
 		super().__init__(parent)
 		self.setHorizontalScrollBarPolicy(Qt .ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -35,6 +36,7 @@ class WrappedGraphicsView(QGraphicsView):
 		self.tSize = QSize(0,0)
 		self.__scaleMult = 1
 		self.pixmaps = []
+
 
 	def indexAt(self, pos:QPoint):
 		x = 0
@@ -49,21 +51,34 @@ class WrappedGraphicsView(QGraphicsView):
 			x += size.width()
 		return -1
 
+
 	def resizeEvent(self, event: QResizeEvent):
 		self.arrangeItems(event.size().width(), event.size().height())
 		event.accept()
 
-	def mouseReleaseEvent(self, event: QMouseEvent):
-		newIndex = self.indexAt(event.pos())
+
+	def applyClick(self, pos:QPoint):
+		newIndex = self.indexAt(pos)
 		if newIndex > -1:
 			if self.selectedIndex != newIndex:
 				self.indexChanged.emit(newIndex)
 			self.selectedIndex = newIndex
 			self.arrangeItems(self.width(), self.height())
 
+
+	def mouseReleaseEvent(self, event: QMouseEvent):
+		self.applyClick(event.pos())
+
+
+	def insertPixmapAtSelected(self, pixmap:QPixmap):
+		self.pixmaps.insert(self.selectedIndex, pixmap)
+		self.arrangeItems()
+
+
 	def addPixmap(self, pixmap:QPixmap):
 		self.pixmaps.append(pixmap)
 		self.arrangeItems()
+
 
 	def arrangeItems(self, width:int = -1, height:int = -1):
 		if len(self.pixmaps) == 0:

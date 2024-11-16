@@ -70,7 +70,7 @@
          <number>0</number>
         </property>
         <item>
-         <widget class="WrappedGraphicsView" name="tilesetView">
+         <widget class="TilesetView" name="tilesetView">
           <property name="alignment">
            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
           </property>
@@ -245,9 +245,9 @@
    <header>widgets/map/mapview.h</header>
   </customwidget>
   <customwidget>
-   <class>WrappedGraphicsView</class>
+   <class>TilesetView</class>
    <extends>QGraphicsView</extends>
-   <header>widgets/wrappedgraphicsview.h</header>
+   <header>widgets.map.tilesetview</header>
   </customwidget>
  </customwidgets>
  <resources/>

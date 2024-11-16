@@ -83,6 +83,7 @@ class MapEditor(SphereEditor):
 
 		self.menuBar.actionTriggered.connect(self.setCurrentTool)
 
+
 	def addButtonMenuItem(self, btn:QToolButton, icon:QIcon, text:str, checked:bool) -> QAction:
 		action = btn.addAction(icon, text)
 		action.setCheckable(True)
@@ -159,8 +160,7 @@ class MapEditor(SphereEditor):
 		for e in range(len(entities)):
 			self.attachEntity(entities[e])
 		
-		for tile in map.tileset.tiles:
-			self.ui.tilesetView.addPixmap(tile.image)
+		self.ui.tilesetView.attachTileset(map.tileset)
 
 
 	@Slot(bool)
@@ -197,9 +197,11 @@ class MapEditor(SphereEditor):
 	def moveCurrentLayerUp(self):
 		pass
 
+
 	@Slot()
 	def moveCurrentLayerDown(self):
 		pass
+
 
 	@Slot()
 	def deleteCurrentLayer(self):
@@ -217,6 +219,7 @@ class MapEditor(SphereEditor):
 	def layerPropertiesRequested(self):
 		self.layerPropertiesDialog.show(self.ui.layersTable.currentRow(), self.map)
 
+
 	@Slot(int,bool)
 	def onMapGraphicToggleTriggered(self, which:int, show:bool):
 		match which:
@@ -226,6 +229,7 @@ class MapEditor(SphereEditor):
 				self.ui.mapView.personIconsVisible = show
 			case EntityType.Trigger:
 				self.ui.mapView.triggerIconsVisible = show
+
 
 	@Slot(QAction)
 	def setCurrentTool(self, tool:QAction|QToolButton):

@@ -1,8 +1,8 @@
 from io import BufferedReader
 import struct
 
-from PySide6.QtCore import QLine
-from PySide6.QtGui import QImage
+from PySide6.QtCore import Qt, QLine
+from PySide6.QtGui import QImage, QColor
 
 from formats.spherefile import SphereFile, FormatException, readSphereString
 
@@ -19,6 +19,19 @@ class Tile:
 	blocked:int
 	obstructions:list
 	name:str
+
+
+	@staticmethod
+	def fromBytes(tileBytes:bytes, width, height):
+		return Tile(QImage(tileBytes, width, height, QImage.Format.Format_RGBA8888))
+
+
+	@staticmethod
+	def fromColor(color:QColor|Qt.GlobalColor|str, width, height):
+		img = QImage(width, height, QImage.Format.Format_RGBA8888)
+		img.fill(color)
+		return Tile(img)
+
 
 	def __init__(self, image:QImage = None):
 		self.image = image
@@ -45,6 +58,7 @@ class Tileset(SphereFile):
 		rts._parseFileData(reader)
 		return rts
 
+
 	def __init__(self, filePath:str = None):
 		super().__init__(filePath)
 		self.tileWidth = 0
@@ -53,7 +67,24 @@ class Tileset(SphereFile):
 		self.compression = False
 		self.hasObstructions = False
 		self.tiles = []
-	
+
+
+	def appendTileFromBytes(self, tileBytes:bytes=None):
+		tile = Tile.fromBytes(tileBytes, self.tileWidth, self.tileHeight)
+		self.tiles.append(tile)
+		return tile
+
+
+	def appendTileFromColor(self, color:QColor|Qt.GlobalColor|str = Qt.GlobalColor.black):
+		tile = Tile.fromColor(color, self.tileWidth, self.tileHeight)
+		self.tiles.append(tile)
+		return tile
+
+
+	def insertTileAtIndex(self, index:int, tile:Tile):
+		self.tiles.insert(index, tile)
+
+
 	def _parseFileData(self, file:BufferedReader):
 		if file.read(4) != b".rts":
 			raise FormatException(self.filePath, "invalid tileset file signature")
@@ -71,8 +102,7 @@ class Tileset(SphereFile):
 
 		numPixels = self.tileWidth * self.tileHeight
 		for t in range(numTiles):
-			tileBytes = file.read(numPixels * 4)
-			self.tiles.append(Tile(QImage(tileBytes, self.tileWidth, self.tileHeight, QImage.Format.Format_RGBA8888)))
+			self.appendTileFromBytes(file.read(numPixels * 4))
 
 		for t in range(numTiles):
 			(self.tiles[t].animated, self.tiles[t].nextTile, self.tiles[t].delay,
@@ -91,6 +121,7 @@ class Tileset(SphereFile):
 						self.tiles[t].obstructions.append(QLine(x1, y1, x2, y2))
 				case _:
 					raise FormatException(self.filePath, f"Invalid block value for tile ID {t}")
+
 
 	def _packBytes() -> bytes:
 		raise NotImplementedError("Tileset saving not implemented yet")
