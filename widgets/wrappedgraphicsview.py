@@ -80,6 +80,11 @@ class WrappedGraphicsView(QGraphicsView):
 		self.arrangeItems()
 
 
+	def removeSelectedPixmap(self):
+		self.pixmaps.pop(self.selectedIndex)
+		self.arrangeItems()
+
+
 	def arrangeItems(self, width:int = -1, height:int = -1):
 		if len(self.pixmaps) == 0:
 			return

@@ -85,6 +85,11 @@ class Tileset(SphereFile):
 		self.tiles.insert(index, tile)
 
 
+	def removeTileAtIndex(self, index:int):
+		if index > -1 and index < len(self.tiles):
+			self.tiles.pop(index)
+
+
 	def _parseFileData(self, file:BufferedReader):
 		if file.read(4) != b".rts":
 			raise FormatException(self.filePath, "invalid tileset file signature")
