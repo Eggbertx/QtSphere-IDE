@@ -9,8 +9,16 @@ class TilesetView(WrappedGraphicsView):
 	tileset: Tileset
 	contextMenu: QMenu
 
-	tileInserted:Signal = Signal(int)
-	tileRemoved:Signal = Signal(int)
+	tilesInserted:Signal = Signal(int,int) # args: selectedIndex, count
+	tilesAppended:Signal = Signal(int) # args: count
+	tilesRemoved:Signal = Signal(int,int) # args: selectedIndex, count
+
+	@property
+	def numTiles(self):
+		if self.tileset is None:
+			return 0
+		return len(self.tileset.tiles)
+
 	def __init__(self, parent: QWidget|None = None):
 		super().__init__(parent)
 		self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -52,7 +60,6 @@ class TilesetView(WrappedGraphicsView):
 		tile = Tile.fromColor(Qt.GlobalColor.black, self.tileset.tileWidth, self.tileset.tileHeight)
 		self.tileset.insertTileAtIndex(self.selectedIndex, tile)
 		self.insertPixmapAtSelected(QPixmap.fromImage(tile.image))
-		self.tileInserted.emit(self.selectedIndex)
 
 
 	def __appendTile(self):
@@ -61,11 +68,9 @@ class TilesetView(WrappedGraphicsView):
 
 
 	def __deleteTile(self):
-		if len(self.tileset) > 1:
-			curSelected = self.selectedIndex
+		if self.numTiles > 1:
 			self.tileset.removeTileAtIndex(self.selectedIndex)
 			self.removeSelectedPixmap()
-			self.tileRemoved.emit(curSelected)
 
 
 	@Slot(QPoint)
@@ -77,16 +82,21 @@ class TilesetView(WrappedGraphicsView):
 	@Slot()
 	def onInsertTileSelected(self):
 		self.__insertTile()
+		self.tilesInserted.emit(self.selectedIndex, 1)
+
 
 
 	@Slot()
 	def onAppendTileSelected(self):
 		self.__appendTile()
+		self.tilesAppended.emit(1)
 
 
 	@Slot()
 	def onDeleteTileSelected(self):
+		curSelected = self.selectedIndex
 		self.__deleteTile()
+		self.tilesRemoved.emit(1, self.selectedIndex)
 
 
 	@Slot()
@@ -95,6 +105,7 @@ class TilesetView(WrappedGraphicsView):
 		if accepted:
 			for i in range(selected):
 				self.__insertTile()
+			self.tilesInserted.emit(self.selectedIndex, selected)
 
 
 	@Slot()
@@ -103,7 +114,7 @@ class TilesetView(WrappedGraphicsView):
 		if accepted:
 			for i in range(selected):
 				self.__appendTile()
-
+			self.tilesAppended.connect(selected)
 
 	@Slot()
 	def onDeleteTilesSelected(self):
@@ -112,8 +123,14 @@ class TilesetView(WrappedGraphicsView):
 			maxDeletable = 1
 		selected, accepted = QInputDialog.getInt(self.parentWidget(), "Append Tiles", f"Number of tiles (1-{maxDeletable})", 1, 1, maxDeletable)
 		if accepted:
+			numDeleted = 0
+			currentIndex = self.selectedIndex
 			for i in range(selected):
-				self.__deleteTile()
+				if self.numTiles > 1:
+					self.__deleteTile()
+					numDeleted += 1
+			if numDeleted > 0:
+				self.tilesRemoved.emit(currentIndex, numDeleted)
 
 
 	@Slot(bool)

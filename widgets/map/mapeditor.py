@@ -47,6 +47,9 @@ class MapEditor(SphereEditor):
 		self.ui.entitiesTable.horizontalHeader().setSectionResizeMode(1,QHeaderView.ResizeMode.Stretch)
 		self.ui.mainSplitter.setStretchFactor(0,1)
 		self.ui.layersTable.cellClicked.connect(self.onLayerTableCellClicked)
+		self.ui.tilesetView.tilesInserted.connect(self.onTilesetTilesInserted)
+		self.ui.tilesetView.tilesAppended.connect(self.onTilesetTilesAppended)
+		self.ui.tilesetView.tilesRemoved.connect(self.onTilesetTilesRemoved)
 
 
 	def setupToolbar(self):
@@ -144,6 +147,10 @@ class MapEditor(SphereEditor):
 		self.ui.entitiesTable.setColumnWidth(2, propertiesButton.width())
 
 
+	def updateTilesetTitle(self):
+		self.ui.tilesetBox.setTitle("Tiles (%d)" % self.ui.tilesetView.numTiles)
+
+
 	def attachMap(self, map:SphereMap):
 		self.ui.mapView.attachMap(map)
 		self.ui.layersTable.clear()
@@ -161,6 +168,7 @@ class MapEditor(SphereEditor):
 			self.attachEntity(entities[e])
 		
 		self.ui.tilesetView.attachTileset(map.tileset)
+		self.updateTilesetTitle()
 
 
 	@Slot(bool)
@@ -246,3 +254,19 @@ class MapEditor(SphereEditor):
 				self.ui.mapView.setCurrentTool(MapTool.Select)
 			case self.toggleGridAction:
 				self.ui.mapView.gridVisible = self.toggleGridAction.isChecked()
+
+
+	@Slot(int,int)
+	def onTilesetTilesInserted(self, index:int, count:int):
+		self.updateTilesetTitle()
+
+
+	@Slot(int)
+	def onTilesetTilesAppended(self, count:int):
+		self.updateTilesetTitle()
+
+
+	@Slot(int,int)
+	def onTilesetTilesRemoved(self, index:int, count:int):
+		self.updateTilesetTitle()
+
