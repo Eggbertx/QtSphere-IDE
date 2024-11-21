@@ -41,8 +41,10 @@ class TilesetView(WrappedGraphicsView):
 		toggleTilesetObstructionsAction.setCheckable(True)
 
 		zoomMenu = self.contextMenu.addMenu("Zoom")
-		for z in range(4):
-			zoomMenu.addAction(f"{z+1}x", lambda: self.onTilesetZoomChanged(z+1))
+		zoomMenu.addAction(f"1x", lambda: self.onTilesetZoomChanged(1))
+		zoomMenu.addAction(f"2x", lambda: self.onTilesetZoomChanged(2))
+		zoomMenu.addAction(f"4x", lambda: self.onTilesetZoomChanged(4))
+		zoomMenu.addAction(f"8x", lambda: self.onTilesetZoomChanged(8))
 
 		self.contextMenu.addSeparator()
 		self.contextMenu.addAction("Properties", self.onPropertiesSelected)
@@ -145,7 +147,10 @@ class TilesetView(WrappedGraphicsView):
 
 	@Slot(int)
 	def onTilesetZoomChanged(self, newZoom:int):
-		print("Tileset zoom:", newZoom)
+		for t in range(self.numTiles):
+			self.pixmaps[t] = QPixmap.fromImage(
+				self.tileset.tiles[t].image).scaledToHeight(self.tileset.tileHeight*newZoom)
+		self.arrangeItems()
 
 
 	@Slot()
