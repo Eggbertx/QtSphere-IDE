@@ -108,16 +108,12 @@ class TilesetView(WrappedGraphicsView):
 
 	@Slot()
 	def onInsertTileSelected(self):
-		# self.insertTile()
 		self.tilesInserted.emit(self.selectedIndex, 1)
-		# if self.mapEditor is not None:
-		# 	self.mapEditor.undoStack.push(TilesetInsertTileCommand(self, self.numTiles, self.selectedIndex, 1))
-		# # self.undoStack.push(DirectionAppendFrameCommand(self, self.directionIndex))
 
 
 	@Slot()
 	def onAppendTileSelected(self):
-		self.appendTile()
+		self.tilesAppended.emit(1)
 
 
 	@Slot()
@@ -130,16 +126,13 @@ class TilesetView(WrappedGraphicsView):
 		selected, accepted = QInputDialog.getInt(self.parentWidget(), "Insert Tiles", "Number of tiles (1-255)", 1, 1, 255)
 		if accepted:
 			self.tilesInserted.emit(self.selectedIndex, selected)
-			# for i in range(selected):
-			# 	self.insertTile()
 
 
 	@Slot()
 	def onAppendTilesSelected(self):
 		selected, accepted = QInputDialog.getInt(self.parentWidget(), "Append Tiles", "Number of tiles (1-255)", 1, 1, 255)
 		if accepted:
-			for i in range(selected):
-				self.appendTile()
+			self.tilesAppended.emit(selected)
 
 
 	@Slot()

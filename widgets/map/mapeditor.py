@@ -2,7 +2,7 @@ from PySide6.QtCore import Slot
 from PySide6.QtGui import QPixmap, QIcon, QAction
 from PySide6.QtWidgets import QWidget, QLabel, QTableWidgetItem, QToolButton, QHeaderView, QMenu, QPushButton
 
-from commands.tilesetcommands import TilesetInsertTileCommand
+from commands.tilesetcommands import TilesetInsertTilesCommand, TilesetAppendTilesCommand
 from dialogs.layerpropertiesdialog import LayerPropertiesDialog
 from formats.spheremap import SphereMap, EntityType, MapLayer, MapEntity
 from widgets.sphereeditor import SphereEditor
@@ -261,12 +261,13 @@ class MapEditor(SphereEditor):
 	@Slot(int,int)
 	def onTilesetTilesInserted(self, index:int, count:int):
 		self.updateTilesetTitle()
-		self.undoStack.push(TilesetInsertTileCommand(self.ui.tilesetView, self.ui.tilesetView.numTiles, index, count))
+		self.undoStack.push(TilesetInsertTilesCommand(self.ui.tilesetView, self.ui.tilesetView.numTiles, index, count))
 
 
 	@Slot(int)
 	def onTilesetTilesAppended(self, count:int):
 		self.updateTilesetTitle()
+		self.undoStack.push(TilesetAppendTilesCommand(self.ui.tilesetView, self.ui.tilesetView.numTiles, count))
 
 
 	@Slot(int,int)
