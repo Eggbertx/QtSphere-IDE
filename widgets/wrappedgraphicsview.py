@@ -70,6 +70,11 @@ class WrappedGraphicsView(QGraphicsView):
 		self.applyClick(event.pos())
 
 
+	def insertPixmap(self, pixmap:QPixmap, index:int):
+		self.pixmaps.insert(index, pixmap)
+		self.arrangeItems()
+
+
 	def insertPixmapAtSelected(self, pixmap:QPixmap):
 		self.pixmaps.insert(self.selectedIndex, pixmap)
 		self.arrangeItems()

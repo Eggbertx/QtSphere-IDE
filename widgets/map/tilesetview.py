@@ -12,7 +12,7 @@ class TilesetView(WrappedGraphicsView):
 
 	tilesInserted:Signal = Signal(int,int) # args: selectedIndex, count
 	tilesAppended:Signal = Signal(int) # args: count
-	tilesRemoved:Signal = Signal(int,list) # args: selectedIndex, count
+	tilesRemoved:Signal = Signal(int,int) # args: selectedIndex, count
 
 	@property
 	def numTiles(self):
@@ -65,12 +65,18 @@ class TilesetView(WrappedGraphicsView):
 
 
 	def insertTiles(self, count:int, index = -1):
+		tiles = []
+		for i in range(count):
+			tiles.append(Tile.fromColor(Qt.GlobalColor.black, self.tileset.tileWidth, self.tileset.tileHeight))
+		self.importTiles(tiles)
+
+
+	def importTiles(self, tiles:list[Tile], index = -1):
 		if index == -1:
 			index = self.selectedIndex
-		for i in range(count):
-			tile = Tile.fromColor(Qt.GlobalColor.black, self.tileset.tileWidth, self.tileset.tileHeight)
+		for tile in tiles:
 			self.tileset.insertTileAtIndex(index, tile)
-			self.insertPixmapAtSelected(QPixmap.fromImage(tile.image))
+			self.insertPixmap(QPixmap.fromImage(tile.image), index)
 
 
 	def appendTile(self):
@@ -118,7 +124,7 @@ class TilesetView(WrappedGraphicsView):
 
 	@Slot()
 	def onDeleteTileSelected(self):
-		self.deleteTile()
+		self.tilesRemoved.emit(self.selectedIndex, 1)
 
 
 	@Slot()
@@ -142,7 +148,7 @@ class TilesetView(WrappedGraphicsView):
 			maxDeletable = 1
 		selected, accepted = QInputDialog.getInt(self.parentWidget(), "Append Tiles", f"Number of tiles (1-{maxDeletable})", 1, 1, maxDeletable)
 		if accepted and selected > 0:
-			self.deleteTiles(selected)
+			self.tilesRemoved.emit(self.selectedIndex, selected)
 
 
 	@Slot(bool)
