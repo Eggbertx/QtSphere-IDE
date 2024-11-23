@@ -164,10 +164,7 @@ class TilesetView(WrappedGraphicsView):
 
 	@Slot(int)
 	def onTilesetZoomChanged(self, newZoom:int):
-		for t in range(self.numTiles):
-			self.pixmaps[t] = QPixmap.fromImage(
-				self.tileset.tiles[t].image).scaledToHeight(self.tileset.tileHeight*newZoom)
-		self.arrangeItems()
+		self.setZoom(newZoom)
 
 
 	@Slot()

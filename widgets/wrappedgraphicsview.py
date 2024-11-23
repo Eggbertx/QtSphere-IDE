@@ -89,6 +89,11 @@ class WrappedGraphicsView(QGraphicsView):
 		self.removePixmap(self.selectedIndex)
 
 
+	def setZoom(self, zoom:int):
+		self.__scaleMult = zoom
+		self.arrangeItems()
+
+
 	def arrangeItems(self, width:int = -1, height:int = -1):
 		if len(self.pixmaps) == 0:
 			return
