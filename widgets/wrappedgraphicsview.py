@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, QSize, QPoint, QRect, Signal
-from PySide6.QtGui import QMouseEvent, QResizeEvent, QPixmap, QColor, QImage
+from PySide6.QtGui import QMouseEvent, QResizeEvent, QPixmap, QColor
 from PySide6.QtWidgets import QWidget, QGraphicsView, QGraphicsScene
 
 from settings import Settings
@@ -80,9 +80,13 @@ class WrappedGraphicsView(QGraphicsView):
 		self.arrangeItems()
 
 
-	def removeSelectedPixmap(self):
-		self.pixmaps.pop(self.selectedIndex)
+	def removePixmap(self, index:int):
+		self.pixmaps.pop(index)
 		self.arrangeItems()
+
+
+	def removeSelectedPixmap(self):
+		self.removePixmap(self.selectedIndex)
 
 
 	def arrangeItems(self, width:int = -1, height:int = -1):

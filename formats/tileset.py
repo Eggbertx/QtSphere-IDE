@@ -4,7 +4,7 @@ import struct
 from PySide6.QtCore import Qt, QLine
 from PySide6.QtGui import QImage, QColor
 
-from formats.spherefile import SphereFile, FormatException, readSphereString
+from formats.spherefile import SphereFile, FormatException
 
 class ObstructionType:
 	NoObstruction = 0
@@ -87,7 +87,7 @@ class Tileset(SphereFile):
 
 	def removeTileAtIndex(self, index:int):
 		if index > -1 and index < len(self.tiles):
-			self.tiles.pop(index)
+			return self.tiles.pop(index)
 
 
 	def _parseFileData(self, file:BufferedReader):

@@ -35,7 +35,7 @@ class DirectionAppendFrameCommand(QUndoCommand):
 
 
 	def mergeWith(self, other: QUndoCommand) -> bool:
-		if other.id() == CommandIDs.DirectionAdd and isinstance(other, DirectionAppendFrameCommand) and other.initialFrames == self.initialFrames and other.dirIndex == self.dirIndex:
+		if other.id() == CommandIDs.DirectionAdd.value and isinstance(other, DirectionAppendFrameCommand) and other.initialFrames == self.initialFrames and other.dirIndex == self.dirIndex:
 			self.setText("Add frame")
 			return True
 		return False
@@ -76,7 +76,7 @@ class DirectionRemoveLastFrameCommand(QUndoCommand):
 
 
 	def mergeWith(self, other: QUndoCommand) -> bool:
-		if other.id() == CommandIDs.DirectionRemove and isinstance(other, DirectionRemoveLastFrameCommand) and other.initialFrames == self.initialFrames and other.affectedFrame == self.affectedFrame:
+		if other.id() == CommandIDs.DirectionRemove.value and isinstance(other, DirectionRemoveLastFrameCommand) and other.initialFrames == self.initialFrames and other.affectedFrame == self.affectedFrame:
 			self.setText("Remove frame")
 			return True
 		return False
