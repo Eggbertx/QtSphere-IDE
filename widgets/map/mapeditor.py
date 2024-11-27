@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QWidget, QLabel, QTableWidgetItem, QToolButton, QH
 
 from commands.tilesetcommands import TilesetInsertTilesCommand, TilesetAppendTilesCommand, TilesetRemoveTilesCommand
 from dialogs.layerpropertiesdialog import LayerPropertiesDialog
+from dialogs.tileepropertiesdialog import TilePropertiesDialog
 from formats.spheremap import SphereMap, EntityType, MapLayer, MapEntity
 from widgets.sphereeditor import SphereEditor
 from widgets.map.mapview import MapTool
@@ -19,7 +20,8 @@ class MapEditor(SphereEditor):
 	menuBar:DrawingToolbar
 	toggleGridAction:QAction
 
-	layerPropertiesDialog:LayerPropertiesDialog
+	layerPropertiesDialog: LayerPropertiesDialog
+	tilePropertiesDialog: TilePropertiesDialog
 
 	@property
 	def map(self):
@@ -42,6 +44,7 @@ class MapEditor(SphereEditor):
 		self.setupContextMenus()
 		self.currentTool = MapTool.Pencil
 		self.layerPropertiesDialog = LayerPropertiesDialog(self)
+		self.tilePropertiesDialog = TilePropertiesDialog(self)
 		self.ui.layersTable.setColumnWidth(0,48)
 		self.ui.layersTable.setColumnWidth(2,24)
 		self.ui.layersTable.horizontalHeader().setSectionResizeMode(1,QHeaderView.ResizeMode.Stretch)
@@ -51,6 +54,7 @@ class MapEditor(SphereEditor):
 		self.ui.tilesetView.tilesInserted.connect(self.onTilesetTilesInserted)
 		self.ui.tilesetView.tilesAppended.connect(self.onTilesetTilesAppended)
 		self.ui.tilesetView.tilesRemoved.connect(self.onTilesetTilesRemoved)
+		self.ui.tilesetView.tilePropertiesRequested.connect(self.onTilesetTilePropertiesRequested)
 
 
 	def setupToolbar(self):
@@ -274,3 +278,8 @@ class MapEditor(SphereEditor):
 	def onTilesetTilesRemoved(self, index:int, count:int):
 		self.undoStack.push(TilesetRemoveTilesCommand(self.ui.tilesetView, index, count))
 		self.updateTilesetTitle()
+
+
+	@Slot(int)
+	def onTilesetTilePropertiesRequested(self, index:int):
+		self.tilePropertiesDialog.show(self.map.tileset.tiles[index])

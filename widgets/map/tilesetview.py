@@ -13,6 +13,7 @@ class TilesetView(WrappedGraphicsView):
 	tilesInserted:Signal = Signal(int,int) # args: selectedIndex, count
 	tilesAppended:Signal = Signal(int) # args: count
 	tilesRemoved:Signal = Signal(int,int) # args: selectedIndex, count
+	tilePropertiesRequested:Signal = Signal(int)
 
 	@property
 	def numTiles(self):
@@ -168,4 +169,4 @@ class TilesetView(WrappedGraphicsView):
 
 	@Slot()
 	def onPropertiesSelected(self):
-		print("Properties")
+		self.tilePropertiesRequested.emit(self.selectedIndex)

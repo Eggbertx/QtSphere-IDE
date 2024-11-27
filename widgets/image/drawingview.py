@@ -42,6 +42,13 @@ class DrawingView(QGraphicsView):
 
 	modificationChanged:Signal = Signal(bool)
 
+
+	@staticmethod
+	def openAndAttach(parent:QWidget, imagePath:str):
+		image = QImage(imagePath)
+		return DrawingView(parent, image)
+
+
 	def __init__(self, parent: QWidget|None = None, image: QImage|None = None):
 		super().__init__(parent)
 		self.drawingMode = DrawingMode.Pencil
@@ -49,24 +56,19 @@ class DrawingView(QGraphicsView):
 		self.pressedButtons = 0
 		self.setBackgroundBrush(QBrush(QPixmap(":/res/transparency-bg.png")))
 
-		if image is None:
-			self.image = QImage(320, 240, QImage.Format.Format_RGBA8888)
-			self.image.fill(Qt.GlobalColor.white)
-		else:
-			self.image = image
 		self.leftColor = QColor("black")
 		self.rightColor = QColor("white")
 		self.brushSize = 1
 		self.lastPos = QPoint(-1, -1)
 		self.scene = QGraphicsScene(self)
 		self.setScene(self.scene)
-		self.setFixedSize(self.image.size())
 		self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
-		self.imageItem = self.scene.addPixmap(QPixmap.fromImage(self.image))
 		self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
-		self.setSceneRect(0, 0, image.width(), image.height())
+		self.image = image
+		if image is not None:
+			self.attachImage(image)
 
 
 	def setModified(self, modified:bool):
@@ -80,6 +82,20 @@ class DrawingView(QGraphicsView):
 		return QPoint(
 			pos.x() + self.horizontalScrollBar().value(),
 			pos.y() + self.verticalScrollBar().value())
+
+
+	def attachImage(self, image:QImage):
+		if image is None:
+			self.image = QImage(320, 240, QImage.Format.Format_RGBA8888)
+			self.image.fill(Qt.GlobalColor.white)
+		else:
+			self.image = image
+		
+		self.scene.clear()
+		self.imageItem = self.scene.addPixmap(QPixmap.fromImage(self.image))
+		self.setFixedSize(self.image.size())
+		self.setSceneRect(0, 0, image.width(), image.height())
+			
 
 #region Event overloads
 	def mousePressEvent(self, event: QMouseEvent) -> None:
@@ -114,8 +130,3 @@ class DrawingView(QGraphicsView):
 		self.lastPos = scrolledPos
 
 #endregion
-
-	@staticmethod
-	def openAndAttach(parent:QWidget, imagePath:str):
-		image = QImage(imagePath)
-		return DrawingView(parent, image)

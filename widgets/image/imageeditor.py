@@ -15,7 +15,7 @@ class ImageEditor(SphereEditor):
 		img = QImage(filePath)
 		return ImageEditor(parent, img)
 
-	def __init__(self, parent: QWidget, image: QImage):
+	def __init__(self, parent: QWidget|None = None, image: QImage = None):
 		super().__init__(parent)
 		self.drawingView = DrawingView(self, image)
 		self.menuBar = DrawingToolbar(self)
@@ -27,3 +27,7 @@ class ImageEditor(SphereEditor):
 		self.viewLayout.addStretch(0)
 		self.setLayout(self.viewLayout)
 		self.viewLayout.setMenuBar(self.menuBar)
+
+
+	def attachImage(self, image:QImage):
+		self.drawingView.attachImage(image)

@@ -75,17 +75,26 @@
       </layout>
      </item>
      <item>
-      <spacer name="verticalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
+      <widget class="QTabWidget" name="tabWidget">
+       <property name="currentIndex">
+        <number>0</number>
        </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
+       <widget class="ImageEditor" name="image_tab">
+        <attribute name="title">
+         <string>Edit Image</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="obstructions_tab">
+        <attribute name="title">
+         <string>Obstructions</string>
+        </attribute>
+       </widget>
+       <widget class="QWidget" name="animPreview_tab">
+        <attribute name="title">
+         <string>Preview</string>
+        </attribute>
+       </widget>
+      </widget>
      </item>
     </layout>
    </item>
@@ -103,7 +112,7 @@
         <enum>Qt::Vertical</enum>
        </property>
        <property name="standardButtons">
-        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+        <set>QDialogButtonBox::Apply|QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
        </property>
       </widget>
      </item>
@@ -113,7 +122,7 @@
         <string>Next TIle</string>
        </property>
        <property name="icon">
-        <iconset theme="QIcon::ThemeIcon::GoNext"/>
+        <iconset theme="go-next"/>
        </property>
       </widget>
      </item>
@@ -123,7 +132,7 @@
         <string>Previous Tile</string>
        </property>
        <property name="icon">
-        <iconset theme="QIcon::ThemeIcon::GoPrevious"/>
+        <iconset theme="go-previous"/>
        </property>
       </widget>
      </item>
@@ -144,6 +153,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ImageEditor</class>
+   <extends>QWidget</extends>
+   <header>widgets.image.imageeditor</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
