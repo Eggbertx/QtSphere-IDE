@@ -1,8 +1,8 @@
 from enum import Enum, auto
 
-from PySide6.QtCore import Signal, Slot
-from PySide6.QtGui import QAction, QIcon
-from PySide6.QtWidgets import QMenu, QToolBar, QToolButton, QWidget
+from PySide6.QtCore import Qt, Signal, Slot
+from PySide6.QtGui import QAction, QIcon, QPixmap
+from PySide6.QtWidgets import QMenu, QToolBar, QToolButton, QWidget, QStyle
 
 class DrawingTool(Enum):
 	Pencil = auto()
@@ -10,6 +10,7 @@ class DrawingTool(Enum):
 	Rectangle = auto()
 	RectangleFilled = auto()
 	Fill = auto()
+	Dropper = auto()
 	Select = auto()
 
 class DrawingToolbar(QToolBar):
@@ -21,6 +22,9 @@ class DrawingToolbar(QToolBar):
 	lineTool:QAction
 	fillTool:QAction
 	dropperTool:QAction
+	zoomInAction:QAction
+	zoomOutAction:QAction
+	zoomOriginalAction:QAction
 	notToolActions: list[QAction]
 
 	pencilSizeChanged: Signal = Signal(int)
@@ -58,6 +62,9 @@ class DrawingToolbar(QToolBar):
 		self.dropperTool = self.addAction(QIcon(":/res/dropper.png"), "Select tile")
 		self.dropperTool.setCheckable(True)
 		self.notToolActions = []
+		self.zoomInAction = self.addAction(QIcon.fromTheme(QIcon.ThemeIcon.ZoomIn), "Zoom in")
+		self.zoomOutAction = self.addAction(QIcon.fromTheme(QIcon.ThemeIcon.ZoomOut), "Zoom out")
+		self.zoomOriginalAction = self.addAction(QIcon.fromTheme("zoom-original"), "Zoom original")
 		self.actionTriggered.connect(self.setCurrentTool)
 
 	def addCheckableAction(self, icon: QIcon, text:str, notATool:bool = False) -> QAction:
@@ -73,21 +80,26 @@ class DrawingToolbar(QToolBar):
 		if tool in self.notToolActions:
 			# clicked action is a checkable action but not a tool (ex: toggle grid)
 			return
-
-		self.pencilTool.setChecked(False)
-		self.lineTool.setChecked(False)
-		self.rectTool.setChecked(False)
-		self.fillTool.setChecked(False)
-		self.dropperTool.setChecked(False)
+		if tool.isCheckable():
+			self.pencilTool.setChecked(False)
+			self.lineTool.setChecked(False)
+			self.rectTool.setChecked(False)
+			self.fillTool.setChecked(False)
+			self.dropperTool.setChecked(False)
 
 		match tool:
 			case self.pencil1|self.pencil3|self.pencil5|self.pencilTool:
 				self.pencilTool.setChecked(True)
+				self.currentToolChanged.emit(DrawingTool.Pencil)
 			case self.lineTool:
 				self.lineTool.setChecked(True)
+				self.currentToolChanged.emit(DrawingTool.Line)
 			case self.rectTool:
 				self.rectTool.setChecked(True)
+				self.currentToolChanged.emit(DrawingTool.Rectangle)
 			case self.fillTool:
 				self.fillTool.setChecked(True)
+				self.currentToolChanged.emit(DrawingTool.Fill)
 			case self.dropperTool:
 				self.dropperTool.setChecked(True)
+				self.currentToolChanged.emit(DrawingTool.Dropper)
