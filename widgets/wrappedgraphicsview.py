@@ -46,16 +46,20 @@ class WrappedGraphicsView(QGraphicsView):
 
 
 	def indexAt(self, pos:QPoint):
-		x = 0
-		y = 0
-		for i in range(len(self.pixmaps)):
-			if x + self.tSize.width() > self.width():
-				x = 0
-				y += self.tSize.height()
-			if QRect(QPoint(x,y), self.tSize).contains(pos):
-				return i
-			x += self.tSize.width()
-		return -1
+		tilesPerRow = self.width() // self.tSize.width()
+		px = pos.x() // self.tSize.width()
+		py = pos.y() // self.tSize.height()
+		i = px + tilesPerRow * py
+		if i >= len(self.pixmaps):
+			return -1
+		return i
+
+
+	def indexToPosition(self, index:int):
+		# returns QPoint given an index (doesn't do bounds checking)
+		tw = self.tSize.width()
+		tilesPerRow = self.width() // self.tSize.width()
+		return QPoint((index % tilesPerRow) * tw, (index // tilesPerRow) * tw)
 
 
 	def resizeEvent(self, event: QResizeEvent):
@@ -101,22 +105,17 @@ class WrappedGraphicsView(QGraphicsView):
 
 
 	def resetPixmaps(self):
-		x = 0
-		y = 0
 		self.wScene.clear()
+		self.selectionRect = None
 		for p in range(len(self.pixmaps)):
 			pixmap = self.pixmaps[p]
 			item = self.wScene.addPixmap(QPixmap(pixmap))
 			item.setScale(self.__scaleMult)
-			if x + self.tSize.height() > self.width():
-				x = 0
-				y += self.tSize.height()
 
-			x += self.tSize.width()
 
 
 	def arrangeItems(self, width:int = -1, height:int = -1, resetPixmaps:bool = False):
-		if len(self.pixmaps) == 0:
+		if len(self.pixmaps) == 0 or self.width() < 1:
 			return
 
 		if resetPixmaps:
@@ -130,28 +129,19 @@ class WrappedGraphicsView(QGraphicsView):
 			settings.mapCursorColor = cursorColor
 		cursorColor.setAlpha(128)
 
-		x = 0
-		y = 0
 		if self.selectionRect is not None:
 			self.wScene.removeItem(self.selectionRect)
 		self.selectionRect = self.wScene.addRect(0, 0, self.pixmaps[0].width(), self.pixmaps[0].height())
-
-		for i in range(len(self.wScene.items())):
+		t = 0
+		for i in range(len(self.wScene.items())-1,-1,-1):
 			item = self.wScene.items()[i]
-			if x + self.tSize.height() > self.width():
-				x = 0
-				y += self.tSize.height()
-			item.setPos(x, y)
-			item.setScale(self.scaleFactor)
-			if not isinstance(item, QGraphicsRectItem):
-				x += self.tSize.width()
-			if self.selectedIndex == i:
-				if x + self.tSize.width() < self.width():
-					self.selectionRect.setPos(x, y)
-				else:
-					self.selectionRect.setPos(0, y + self.tSize.height())
-				self.selectionRect.setBrush(cursorColor)
-				self.selectionRect.setZValue(1)
 
-		self.setSceneRect(0, 0, x + self.tSize.width(), y + self.tSize.height())
-		print(self.sceneRect(), self.selectionRect.rect())
+			if isinstance(item, QGraphicsRectItem):
+				item.setPos(self.indexToPosition(self.selectedIndex))
+				item.setBrush(cursorColor)
+				item.setZValue(1)
+			else:
+				item.setPos(self.indexToPosition(t))
+				t += 1
+			item.setScale(self.scaleFactor)
+

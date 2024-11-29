@@ -82,6 +82,7 @@ class TilesetView(WrappedGraphicsView):
 		for tile in tiles:
 			self.tileset.insertTileAtIndex(index, tile)
 			self.insertPixmap(QPixmap.fromImage(tile.image), index)
+			index += 1
 
 
 	def appendTile(self):
