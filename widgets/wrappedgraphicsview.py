@@ -1,15 +1,15 @@
 from PySide6.QtCore import Qt, QSize, QPoint, QRect, Signal
 from PySide6.QtGui import QMouseEvent, QResizeEvent, QPixmap, QColor
-from PySide6.QtWidgets import QWidget, QGraphicsView, QGraphicsScene
+from PySide6.QtWidgets import QWidget, QGraphicsView, QGraphicsScene, QGraphicsRectItem
 
 from settings import Settings
 
 class WrappedGraphicsView(QGraphicsView):
 	selectedIndex:int
-	tSize:QSize
 	wScene:QGraphicsScene
 	__scaleMult:int
 	pixmaps:list[QPixmap]
+	selectionRect:QGraphicsRectItem
 	indexChanged:Signal = Signal(int)
 
 	@property
@@ -25,6 +25,13 @@ class WrappedGraphicsView(QGraphicsView):
 			self.arrangeItems(self.width(), self.height())
 
 
+	@property
+	def tSize(self) -> QSize:
+		if len(self.pixmaps) == 0:
+			return QSize(0,0)
+		return self.pixmaps[0].size() * self.scaleFactor
+
+
 	def __init__(self, parent: QWidget | None = None):
 		super().__init__(parent)
 		self.setHorizontalScrollBarPolicy(Qt .ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -33,22 +40,21 @@ class WrappedGraphicsView(QGraphicsView):
 		self.selectedIndex = 0
 		self.wScene = QGraphicsScene(self)
 		self.setScene(self.wScene)
-		self.tSize = QSize(0,0)
 		self.__scaleMult = 1
 		self.pixmaps = []
+		self.selectionRect = None
 
 
 	def indexAt(self, pos:QPoint):
 		x = 0
 		y = 0
 		for i in range(len(self.pixmaps)):
-			size = self.pixmaps[i].size()
-			if x + size.width() > self.width():
+			if x + self.tSize.width() > self.width():
 				x = 0
-				y += size.height()
-			if QRect(QPoint(x,y), size).contains(pos):
+				y += self.tSize.height()
+			if QRect(QPoint(x,y), self.tSize).contains(pos):
 				return i
-			x += size.width()
+			x += self.tSize.width()
 		return -1
 
 
@@ -72,17 +78,17 @@ class WrappedGraphicsView(QGraphicsView):
 
 	def insertPixmap(self, pixmap:QPixmap, index:int):
 		self.pixmaps.insert(index, pixmap)
-		self.arrangeItems()
+		self.arrangeItems(resetPixmaps=True)
 
 
 	def insertPixmapAtSelected(self, pixmap:QPixmap):
 		self.pixmaps.insert(self.selectedIndex, pixmap)
-		self.arrangeItems()
+		self.arrangeItems(resetPixmaps=True)
 
 
 	def addPixmap(self, pixmap:QPixmap):
 		self.pixmaps.append(pixmap)
-		self.arrangeItems()
+		self.arrangeItems(resetPixmaps=True)
 
 
 	def removePixmap(self, index:int):
@@ -94,31 +100,9 @@ class WrappedGraphicsView(QGraphicsView):
 		self.removePixmap(self.selectedIndex)
 
 
-	def setZoom(self, zoom:int):
-		self.__scaleMult = zoom
-		self.arrangeItems()
-
-
-	def arrangeItems(self, width:int = -1, height:int = -1):
-		if len(self.pixmaps) == 0:
-			return
-
-		settings = Settings()
-		cursorColor = QColor(settings.mapCursorColor)
-		if not cursorColor.isValid():
-			cursorColor = QColor(0,128,255,128)
-			settings.mapCursorColor = cursorColor
-
-		cursorColor.setAlpha(128)
+	def resetPixmaps(self):
 		x = 0
 		y = 0
-		rows = 0
-
-		if width == -1 and height == -1:
-			self.tSize = self.pixmaps[0].size()
-		else:
-			self.tSize = self.wScene.items()[0].boundingRect().size().toSize() 
-
 		self.wScene.clear()
 		for p in range(len(self.pixmaps)):
 			pixmap = self.pixmaps[p]
@@ -128,13 +112,46 @@ class WrappedGraphicsView(QGraphicsView):
 				x = 0
 				y += self.tSize.height()
 
-			item.setPos(x * self.scaleFactor, y * self.scaleFactor)
-			if self.selectedIndex == p:
-				selectionBox = self.wScene.addRect(x, y, self.tSize.width() - 1, self.tSize.height() - 1)
-				selectionBox.setBrush(cursorColor)
-				selectionBox.setZValue(1)
-			
-			self.setSceneRect(0, 0, x + self.tSize.width() * self.scaleFactor, y + self.tSize.height() * self.scaleFactor)
 			x += self.tSize.width()
+
+
+	def arrangeItems(self, width:int = -1, height:int = -1, resetPixmaps:bool = False):
+		if len(self.pixmaps) == 0:
+			return
+
+		if resetPixmaps:
+			self.resetPixmaps()
+
+		settings = Settings()
+		cursorColor = QColor(settings.mapCursorColor)
 		
-		return rows
+		if not cursorColor.isValid():
+			cursorColor = QColor(0,128,255,128)
+			settings.mapCursorColor = cursorColor
+		cursorColor.setAlpha(128)
+
+		x = 0
+		y = 0
+		if self.selectionRect is not None:
+			self.wScene.removeItem(self.selectionRect)
+		self.selectionRect = self.wScene.addRect(0, 0, self.pixmaps[0].width(), self.pixmaps[0].height())
+
+		for i in range(len(self.wScene.items())):
+			item = self.wScene.items()[i]
+			if x + self.tSize.height() > self.width():
+				x = 0
+				y += self.tSize.height()
+			item.setPos(x, y)
+			item.setScale(self.scaleFactor)
+			if not isinstance(item, QGraphicsRectItem):
+				x += self.tSize.width()
+			if self.selectedIndex == i:
+				if x + self.tSize.width() < self.width():
+					self.selectionRect.setPos(x, y)
+				else:
+					self.selectionRect.setPos(0, y + self.tSize.height())
+				self.selectionRect.setBrush(cursorColor)
+				self.selectionRect.setZValue(1)
+
+		self.setSceneRect(0, 0, x + self.tSize.width(), y + self.tSize.height())
+		print(self.sceneRect(), self.selectionRect.rect())

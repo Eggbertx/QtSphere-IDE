@@ -283,7 +283,6 @@ class MapView(QGraphicsView):
 		tileWidth = self.mapFile.tileset.tileWidth
 		tileHeight = self.mapFile.tileset.tileHeight
 		pRect = self.pointerRect(True)
-		print(self.currentTile, self.currentLayer)
 		for rY in range(pRect.y(), pRect.bottom() + 1, 1):
 			for rX in range(pRect.x(), pRect.right() + 1, 1):
 				sceneX = rX * tileWidth
@@ -350,6 +349,7 @@ class MapView(QGraphicsView):
 	@Slot(int)
 	def onTileIndexChanged(self, newIndex:int):
 		self.currentTile = newIndex
+
 
 	@Slot(QPoint)
 	def onHoverTilePosChanged(self, pos:QPoint):

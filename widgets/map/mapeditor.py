@@ -171,8 +171,7 @@ class MapEditor(SphereEditor):
 		
 		for e in range(len(entities)):
 			self.attachEntity(entities[e])
-		
-		self.ui.tilesetView.attachTileset(map.tileset)
+		self.ui.tilesetView.attachTileset(map.tileset, True)
 		self.ui.tilesetView.mapEditor = self
 		self.updateTilesetTitle()
 

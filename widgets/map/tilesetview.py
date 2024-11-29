@@ -55,9 +55,13 @@ class TilesetView(WrappedGraphicsView):
 		self.customContextMenuRequested.connect(self.onContextMenuRequested)
 
 
-	def attachTileset(self, tileset:Tileset):
+	def attachTileset(self, tileset:Tileset, clear:bool = False):
+		if clear:
+			self.pixmaps = []
+			self.wScene.clear()
 		for tile in tileset.tiles:
-			self.addPixmap(tile.image)
+			self.pixmaps.append(QPixmap.fromImage(tile.image))
+		self.arrangeItems(resetPixmaps=True)
 		self.tileset = tileset
 
 
@@ -87,7 +91,8 @@ class TilesetView(WrappedGraphicsView):
 	def appendTiles(self, count:int):
 		for i in range(count):
 			tile = self.tileset.appendTileFromColor(Qt.GlobalColor.black)
-			self.addPixmap(QPixmap.fromImage(tile.image))
+			self.pixmaps.append(QPixmap.fromImage(tile.image))
+		self.arrangeItems(resetPixmaps=True)
 
 
 	def deleteTile(self):
@@ -102,8 +107,9 @@ class TilesetView(WrappedGraphicsView):
 			if self.numTiles > 1:
 				tile = self.tileset.removeTileAtIndex(index)
 				if tile is not None:
-					self.removePixmap(index)
+					self.pixmaps.pop(index)
 					deleted.append(tile)
+		self.arrangeItems()
 		return deleted
 
 
@@ -164,7 +170,7 @@ class TilesetView(WrappedGraphicsView):
 
 	@Slot(int)
 	def onTilesetZoomChanged(self, newZoom:int):
-		self.setZoom(newZoom)
+		self.scaleFactor = newZoom
 
 
 	@Slot()
