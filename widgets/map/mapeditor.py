@@ -41,16 +41,13 @@ class MapEditor(SphereEditor):
 		self.ui = Ui_MapEditor()
 		self.ui.setupUi(self)
 		self.setupToolbar()
-		self.setupContextMenus()
 		self.currentTool = MapTool.Pencil
 		self.layerPropertiesDialog = LayerPropertiesDialog(self)
 		self.tilePropertiesDialog = TilePropertiesDialog(self)
-		self.ui.layersTable.setColumnWidth(0,48)
-		self.ui.layersTable.setColumnWidth(2,24)
-		self.ui.layersTable.horizontalHeader().setSectionResizeMode(1,QHeaderView.ResizeMode.Stretch)
-		self.ui.entitiesTable.horizontalHeader().setSectionResizeMode(1,QHeaderView.ResizeMode.Stretch)
+		self.ui.layersTable.mapView = self.ui.mapView
+		self.ui.layersTable.layerVisibilityToggleRequested.connect(self.onLayerVisibilityToggled)
+		self.ui.layersTable.deleteLayerRequested.connect(self.onDeleteLayerRequested)
 		self.ui.mainSplitter.setStretchFactor(0,1)
-		self.ui.layersTable.cellClicked.connect(self.onLayerTableCellClicked)
 		self.ui.tilesetView.tilesInserted.connect(self.onTilesetTilesInserted)
 		self.ui.tilesetView.tilesAppended.connect(self.onTilesetTilesAppended)
 		self.ui.tilesetView.tilesRemoved.connect(self.onTilesetTilesRemoved)
@@ -99,47 +96,6 @@ class MapEditor(SphereEditor):
 		return action
 
 
-	def setupContextMenus(self):
-		self.layerMenu = QMenu(self)
-		self.layerMenu.addAction("Insert layer", self.onInsertLayerTriggered)
-		self.layerMenu.addAction("Delete layer", self.deleteCurrentLayer)
-		self.layerMenu.addAction("Duplicate layer", self.duplicateCurrentLayer)
-		self.layerMenu.addSeparator()
-		self.layerMenu.addAction("Move layer up", self.moveCurrentLayerUp)
-		self.layerMenu.addAction("Move layer down", self.moveCurrentLayerDown)
-		self.layerMenu.addSeparator()
-		self.layerMenu.addAction("Toggle lock layer", self.onLockCurrentLayerTriggered)
-		self.layerMenu.addAction("Properties", self.layerPropertiesRequested)
-		self.ui.layersTable.customContextMenuRequested.connect(
-			lambda pos: self.layerMenu.exec(self.ui.layersTable.mapToGlobal(pos)))
-
-
-	def attachLayer(self, layer:MapLayer):
-		l = self.ui.layersTable.rowCount()
-		self.ui.layersTable.insertRow(l)
-
-		eyeButton = QPushButton("")
-		eyeButton.setIcon(QPixmap(":/res/eye.png" if layer.visible else ":/res/eye-closed.png"))
-		eyeButton.setFlat(True)
-		eyeButton.setToolTip("Toggle layer visibility")
-		eyeButton.clicked.connect(self.onToggleLayerVisibleButtonClicked)
-		self.ui.layersTable.setCellWidget(l,0,eyeButton)
-
-		self.ui.layersTable.setItem(l,1, QTableWidgetItem(layer.name))
-		self.ui.layersTable.cellClicked.emit(0, 1)
-		self.ui.layersTable.selectRow(0)
-
-		deleteButton = QPushButton(QIcon.fromTheme("list-remove"), "")
-		deleteButton.setFlat(True)
-		deleteButton.setToolTip("Delete layer")
-		deleteButton.clicked.connect(self.onDeleteLayerButtonClicked)
-		self.ui.layersTable.setCellWidget(l,2,deleteButton)
-
-
-	def getTableWidgetRow(self, btn:QWidget):
-		return self.ui.layersTable.rowAt(btn.pos().y())
-
-
 	def attachEntity(self, entity:MapEntity):
 		e = self.ui.entitiesTable.rowCount()
 		self.ui.entitiesTable.insertRow(e)
@@ -158,13 +114,7 @@ class MapEditor(SphereEditor):
 
 	def attachMap(self, map:SphereMap):
 		self.ui.mapView.attachMap(map)
-		self.ui.layersTable.clear()
-		for l in range(len(self.map.layers)):
-			layer = self.map.layers[len(self.map.layers) - l - 1] # layers are ordered bottom to top, get them in reverse order
-			self.attachLayer(layer)
-
-		self.ui.layersTable.cellClicked.emit(0, 1)
-		self.ui.layersTable.selectRow(0)
+		self.ui.layersTable.attachMap(self.map)
 
 		self.ui.entitiesTable.clear()
 		entities = list(filter(lambda e: e.type == 1, map.entities))
@@ -176,61 +126,39 @@ class MapEditor(SphereEditor):
 		self.updateTilesetTitle()
 
 
-	@Slot(bool)
-	def onToggleLayerVisibleButtonClicked(self):
-		row = self.getTableWidgetRow(self.sender())
-		btn:QPushButton = self.ui.layersTable.cellWidget(row, 0)
-		visible = self.ui.mapView.toggleLayerVisibility(self.ui.layersTable.rowCount() - row - 1)
-		btn.setIcon(QPixmap(":/res/eye.png" if visible else ":/res/eye-closed.png"))
+	@Slot(int)
+	def onLayerVisibilityToggled(self, layer:int):
+		self.ui.mapView.toggleLayerVisibility(layer)
 
 
-	@Slot(bool)
-	def onDeleteLayerButtonClicked(self):
-		row = self.getTableWidgetRow(self.sender())
-		self.ui.mapView.deleteLayer(self.ui.layersTable.rowCount() - row - 1)
-		self.ui.layersTable.removeRow(row)
-
-
-	@Slot(int,int)
-	def onLayerTableCellClicked(self, row:int, column:int):
-		self.ui.mapView.currentLayer = row
-
-
-	@Slot()
-	def onInsertLayerTriggered(self):
+	@Slot(int)
+	def onInsertLayerRequested(self, l:int):
 		pass
 
 
-	@Slot()
-	def duplicateCurrentLayer(self):
+	@Slot(int)
+	def onDeleteLayerRequested(self, layer:int):
+		self.ui.mapView.deleteLayer(layer)
+
+
+	@Slot(int)
+	def onDuplicateLayerRequested(self, l:int):
 		pass
 
 
-	@Slot()
-	def moveCurrentLayerUp(self):
+	@Slot(int)
+	def onMoveLayerUpRequested(self, l:int):
 		pass
 
 
-	@Slot()
-	def moveCurrentLayerDown(self):
+	@Slot(int)
+	def onMoveLayerDownRequested(self, l:int):
 		pass
 
 
-	@Slot()
-	def deleteCurrentLayer(self):
-		row = self.ui.layersTable.currentRow()
-		self.ui.mapView.deleteLayer(self.ui.layersTable.rowCount() - row - 1)
-		self.ui.layersTable.removeRow(row)
-
-
-	@Slot()
-	def onLockCurrentLayerTriggered(self):
+	@Slot(int)
+	def onToggleLockLayerRequested(self, l:int):
 		pass
-
-
-	@Slot()
-	def layerPropertiesRequested(self):
-		self.layerPropertiesDialog.show(self.ui.layersTable.currentRow(), self.map)
 
 
 	@Slot(int,bool)

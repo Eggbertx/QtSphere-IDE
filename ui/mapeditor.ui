@@ -103,10 +103,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QTableWidget" name="layersTable">
-           <property name="contextMenuPolicy">
-            <enum>Qt::CustomContextMenu</enum>
-           </property>
+          <widget class="LayersTable" name="layersTable">
            <property name="selectionMode">
             <enum>QAbstractItemView::SingleSelection</enum>
            </property>
@@ -122,21 +119,6 @@
            <attribute name="verticalHeaderVisible">
             <bool>false</bool>
            </attribute>
-           <column>
-            <property name="text">
-             <string>Show/Hide</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Layer name</string>
-            </property>
-           </column>
-           <column>
-            <property name="text">
-             <string>Delete</string>
-            </property>
-           </column>
           </widget>
          </item>
         </layout>
@@ -248,6 +230,11 @@
    <class>TilesetView</class>
    <extends>QGraphicsView</extends>
    <header>widgets.map.tilesetview</header>
+  </customwidget>
+  <customwidget>
+   <class>LayersTable</class>
+   <extends>QTableWidget</extends>
+   <header>widgets.map.layerstable</header>
   </customwidget>
  </customwidgets>
  <resources/>

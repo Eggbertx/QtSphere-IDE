@@ -154,6 +154,12 @@ class MapView(QGraphicsView):
 				self.triggerIcons.append(item)
 
 
+	def isLayerVisible(self, layer:int) -> bool:
+		if layer < 0 or layer >= len(self.mapFile.layers):
+			raise IndexError(f"Layer index {layer} does not exist")
+		return self.mapFile.layers[layer].visible
+
+
 	def setLayerVisible(self, layer:int, visible:bool):
 		if layer < 0 or layer >= len(self.mapFile.layers):
 			raise IndexError(f"Layer index {layer} does not exist")

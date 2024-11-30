@@ -55,8 +55,7 @@ class LayerPropertiesDialog(QDialog):
 
 
 	def show(self, layerIndex:int, map:SphereMap):
-		super().show()
-		layer = map.layers[len(map.layers)-1- layerIndex]
+		layer = map.layers[layerIndex]
 		self.ui.nameLineEdit.setText(layer.name)
 		self.ui.widthSpinBox.setValue(layer.width)
 		self.ui.heightSpinBox.setValue(layer.height)
@@ -68,4 +67,4 @@ class LayerPropertiesDialog(QDialog):
 			for mLayer in map.layers:
 				if not mLayer.hasParallax:
 					self.__setParallaxScrollControlVals(layer)
-					return
+		return super().show()
