@@ -3,6 +3,7 @@ from PySide6.QtGui import QPixmap, QIcon, QAction
 from PySide6.QtWidgets import QWidget, QLabel, QTableWidgetItem, QToolButton, QHeaderView, QMenu, QPushButton
 
 from commands.tilesetcommands import TilesetInsertTilesCommand, TilesetAppendTilesCommand, TilesetRemoveTilesCommand
+from commands.maplayercommands import LayerRenamedCommand
 from dialogs.layerpropertiesdialog import LayerPropertiesDialog
 from dialogs.tileepropertiesdialog import TilePropertiesDialog
 from formats.spheremap import SphereMap, EntityType, MapLayer, MapEntity
@@ -47,7 +48,9 @@ class MapEditor(SphereEditor):
 		self.ui.layersTable.mapView = self.ui.mapView
 		self.ui.layersTable.layerVisibilityToggleRequested.connect(self.onLayerVisibilityToggled)
 		self.ui.layersTable.deleteLayerRequested.connect(self.onDeleteLayerRequested)
+		self.ui.layersTable.layerPropertiesRequested.connect(self.onLayerPropertiesDialogRequested)
 		self.ui.mainSplitter.setStretchFactor(0,1)
+		self.ui.layersTable.layerRenamed.connect(self.onLayerRenamed)
 		self.ui.tilesetView.tilesInserted.connect(self.onTilesetTilesInserted)
 		self.ui.tilesetView.tilesAppended.connect(self.onTilesetTilesAppended)
 		self.ui.tilesetView.tilesRemoved.connect(self.onTilesetTilesRemoved)
@@ -189,6 +192,12 @@ class MapEditor(SphereEditor):
 				self.ui.mapView.gridVisible = self.toggleGridAction.isChecked()
 
 
+	@Slot(int,int,str)
+	def onLayerRenamed(self, row:int, col:int, newName:str):
+		self.undoStack.push(LayerRenamedCommand(self.map, self.ui.layersTable, row, col))
+	# self.layerRenamed.emit(row, col, self.item(row, col).text())
+
+
 	@Slot(int,int)
 	def onTilesetTilesInserted(self, index:int, count:int):
 		self.undoStack.push(TilesetInsertTilesCommand(self.ui.tilesetView, index, count))
@@ -205,6 +214,11 @@ class MapEditor(SphereEditor):
 	def onTilesetTilesRemoved(self, index:int, count:int):
 		self.undoStack.push(TilesetRemoveTilesCommand(self.ui.tilesetView, index, count))
 		self.updateTilesetTitle()
+
+
+	@Slot(int)
+	def onLayerPropertiesDialogRequested(self, index:int):
+		self.layerPropertiesDialog.show(index, self.map)
 
 
 	@Slot(int)

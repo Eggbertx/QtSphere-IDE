@@ -2,14 +2,12 @@ from PySide6.QtCore import Signal, Slot, Qt
 from PySide6.QtGui import QPixmap, QIcon
 from PySide6.QtWidgets import QHeaderView, QWidget, QTableWidget, QPushButton, QTableWidgetItem
 
-from dialogs.layerpropertiesdialog import LayerPropertiesDialog
 from formats.spheremap import MapLayer, SphereMap
 from widgets.map.mapview import MapView
 
 
 class LayersTable(QTableWidget):
 	mapView:MapView
-	layerPropertiesDialog: LayerPropertiesDialog
 
 	layerVisibilityToggleRequested:Signal = Signal(int)
 	insertLayerRequested:Signal = Signal(int)
@@ -19,11 +17,11 @@ class LayersTable(QTableWidget):
 	moveLayerDownRequested:Signal = Signal(int)
 	toggleLockLayerRequested:Signal = Signal(int)
 	layerPropertiesRequested:Signal = Signal(int)
+	layerRenamed:Signal = Signal(int,int,str)
 
 
 	def __init__(self, parent:QWidget|None = None):
 		super().__init__(1, 3, parent)
-		self.layerPropertiesDialog = LayerPropertiesDialog(self)
 		self.setColumnCount(3)
 		self.setRowCount(0)
 		self.horizontalHeader().setVisible(False)
@@ -48,7 +46,7 @@ class LayersTable(QTableWidget):
 		self.addAction("Move Layer Down", lambda: self.moveLayerDownRequested.emit(self.currentLayer()))
 		self.addAction("").setSeparator(True)
 		self.addAction("Toggle Lock Layer", lambda: self.toggleLockLayerRequested.emit(self.currentLayer()))
-		self.addAction("Properties", lambda: self.layerPropertiesDialog.show(self.currentLayer(), self.mapView.mapFile))
+		self.addAction("Properties", lambda: self.layerPropertiesRequested.emit(self.currentLayer()))
 
 
 	def rowToLayer(self, row:int) -> int:
@@ -68,6 +66,7 @@ class LayersTable(QTableWidget):
 
 		self.cellClicked.emit(0, 1)
 		self.selectRow(0)
+		self.cellChanged.connect(self.onCellChanged)
 
 
 	def insertLayer(self, layer:MapLayer, row:int):
@@ -112,6 +111,13 @@ class LayersTable(QTableWidget):
 		btn:QPushButton = self.cellWidget(row, 0)
 		visible = self.mapView.isLayerVisible(layer)
 		btn.setIcon(QPixmap(":/res/eye.png" if visible else ":/res/eye-closed.png"))
+
+
+	@Slot(int,int)
+	def onCellChanged(self, row:int, col:int):
+		if col != 1:
+			return
+		self.layerRenamed.emit(row, col, self.item(row, col).text())
 
 
 	@Slot(int)

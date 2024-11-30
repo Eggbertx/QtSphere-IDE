@@ -6,3 +6,4 @@ class CommandIDs(Enum):
 	InsertTiles = auto()
 	AppendTiles = auto()
 	RemoveTiles = auto()
+	RenameMapLayer = auto()
