@@ -68,7 +68,7 @@ class MapEditor(SphereEditor):
 		self.menuBar.pencilTool.clicked.connect(lambda: self.setCurrentTool(self.menuBar.pencilTool))
 		self.menuBar.addSeparator()
 		self.toggleGridAction = self.menuBar.addCheckableAction(QIcon(":/res/togglegrid.png"), "Show/Hide grid", True)
-		self.ui.tilesetView.indexChanged.connect(self.ui.mapView.onTileIndexChanged)
+		self.ui.tilesetView.indexChanged.connect(self.ui.mapView.onTilesetCurrentTileChanged)
 
 		mapGraphicsMenuButton = QToolButton()
 		mapGraphicsMenuButton.setIcon(QIcon(":/res/person.svg"))

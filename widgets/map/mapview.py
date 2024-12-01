@@ -72,6 +72,20 @@ class MapView(QGraphicsView):
 		self.gridGroup.setVisible(visible)
 
 
+	@property
+	def tileWidth(self):
+		if self.mapFile is None:
+			return 0
+		return self.mapFile.tileset.tileWidth
+
+
+	@property
+	def tileHeight(self):
+		if self.mapFile is None:
+			return 0
+		return self.mapFile.tileset.tileHeight
+
+
 	def __init__(self, parent: QWidget = None):
 		super().__init__(parent)
 		self.setMouseTracking(True)
@@ -187,7 +201,7 @@ class MapView(QGraphicsView):
 	def mapToWidgetPos(self, x:int, y:int):
 		if self.mapFile is None:
 			return QPoint(-1, -1)
-		return QPoint(x * self.mapFile.tileset.tileWidth, y * self.mapFile.tileset.tileHeight)
+		return QPoint(x * self.tileWidth, y * self.tileHeight)
 
 
 	def setCurrentTool(self, tool:MapTool):
@@ -196,8 +210,8 @@ class MapView(QGraphicsView):
 
 	def __updatePointer(self):
 		settings = Settings()
-		tw = self.mapFile.tileset.tileWidth
-		th = self.mapFile.tileset.tileHeight
+		tw = self.tileWidth
+		th = self.tileHeight
 		cursorColor = QColor(settings.mapCursorColor)
 		cursorColor.setAlpha(128)
 
@@ -219,25 +233,25 @@ class MapView(QGraphicsView):
 	def widgetToMapPos(self, x:int, y:int):
 		if self.mapFile is None:
 			return QPoint(-1, -1)
-		return QPoint(floor(x/self.mapFile.tileset.tileWidth), floor(y/self.mapFile.tileset.tileHeight))
+		scenePos = self.mapToScene(x, y)
+
+		p = QPoint(
+			int(scenePos.x()) // self.tileWidth,
+			int(scenePos.y()) // self.tileHeight
+		)
+		return p
 
 
 	def pointerRect(self, tiles:bool):
-		rX = self.pointerGroup.x()
-		rY = self.pointerGroup.y()
+		rPos = self.pointerGroup.scenePos().toPoint()
+		rSize = QSize(self.drawSize * self.tileWidth, self.drawSize * self.tileHeight)
 		if tiles:
-			tilePos = self.widgetToMapPos(
-				rX + self.horizontalScrollBar().value(),
-				rY + self.verticalScrollBar().value()
-			)
-			rX = tilePos.x()
-			rY = tilePos.y()
+			# return a rect with tile position and draw size
+			widgetPos = self.mapFromScene(rPos)
+			rPos = self.widgetToMapPos(widgetPos.x(), widgetPos.y())
+			rSize = QSize(self.drawSize, self.drawSize)
+		return QRect(rPos, rSize)
 
-		rSize = QSize(self.drawSize, self.drawSize)
-		if not tiles:
-			rSize.setWidth(rSize.width() * self.mapFile.tileset.tileWidth)
-			rSize.setHeight(rSize.height() * self.mapFile.tileset.tileWidth)
-		return QRect(QPoint(rX, rY), rSize)
 
 	def mouseMoveEvent(self, event: QMouseEvent):
 		if self.mapFile is None:
@@ -245,14 +259,11 @@ class MapView(QGraphicsView):
 			return
 
 		mapSize = self.mapFile.largestLayerSize()
-		tileW = self.mapFile.tileset.tileWidth
-		tileH = self.mapFile.tileset.tileHeight
+		tileW = self.tileWidth
+		tileH = self.tileHeight
 		mapRect = QRect(0, 0, mapSize.width() * tileW, mapSize.height() * tileH)
 		
-		tilePos = self.widgetToMapPos(
-			event.pos().x() + self.horizontalScrollBar().value() - 1,
-			event.pos().y() + self.verticalScrollBar().value() - 1
-		)
+		tilePos = self.widgetToMapPos(event.pos().x(), event.pos().y())
 		if tilePos != self.hoverTilePos:
 			self.hoverTilePos = tilePos
 			self.hoverTilePosChanged.emit(self.hoverTilePos)
@@ -286,18 +297,16 @@ class MapView(QGraphicsView):
 
 
 	def __drawTile(self):
-		tileWidth = self.mapFile.tileset.tileWidth
-		tileHeight = self.mapFile.tileset.tileHeight
 		pRect = self.pointerRect(True)
 		for rY in range(pRect.y(), pRect.bottom() + 1, 1):
 			for rX in range(pRect.x(), pRect.right() + 1, 1):
-				sceneX = rX * tileWidth
-				sceneY = rY * tileHeight
-				mouseItems = self.items(sceneX, sceneY)
+				widgetPos = self.mapFromScene(self.mapToWidgetPos(rX, rY))
+				mouseItems = self.items(widgetPos.x(), widgetPos.y())
 				for item in mouseItems:
 					if isinstance(item, QGraphicsPixmapItem) and item.zValue() == len(self.mapFile.layers)-self.currentLayer-1:
 						item.setPixmap(QPixmap.fromImage(self.mapFile.tileset.tiles[self.currentTile].image))
 						break
+
 
 
 	def __resetPointerGroup(self):
@@ -353,15 +362,15 @@ class MapView(QGraphicsView):
 
 
 	@Slot(int)
-	def onTileIndexChanged(self, newIndex:int):
+	def onTilesetCurrentTileChanged(self, newIndex:int):
 		self.currentTile = newIndex
 
 
 	@Slot(QPoint)
 	def onHoverTilePosChanged(self, pos:QPoint):
 		pointerUL = self.mapToWidgetPos(
-			pos.x() - floor(self.drawSize/2),
-			pos.y() - floor(self.drawSize/2)
+			pos.x() - self.drawSize // 2,
+			pos.y() - self.drawSize // 2
 		)
 		self.pointerGroup.setPos(pointerUL)
 		if pos.x() > -1 and pos.y() > -1:
