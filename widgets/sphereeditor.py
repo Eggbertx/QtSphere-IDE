@@ -1,6 +1,6 @@
 from enum import Enum
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import Qt, Signal, QPoint
 from PySide6.QtGui import QUndoStack, QAction
 from PySide6.QtWidgets import QWidget
 
@@ -25,6 +25,39 @@ class SphereEditor(QWidget):
 	@staticmethod
 	def openAndAttach(parent: QWidget, filePath:str):
 		pass
+
+
+	@staticmethod
+	def pixelsInLine(p0:QPoint, p1:QPoint) -> list[QPoint]:
+		"""
+		Uses Bresenhan's algorithm to calculate the pixels in a line between the two given points, and can be used
+		for images or maps (or anything with raster editing)
+		"""
+		points:list[QPoint] = []
+		(x0, y0) = (p0.x(), p0.y())
+		(x1, y1) = (p1.x(), p1.y())
+
+		dx = abs(x1 - x0)
+		dy = abs(y1 - y0)
+		sx = 1 if x0 < x1 else -1
+		sy = 1 if y0 < y1 else -1
+
+		err = dx - dy
+
+		while True:
+			points.append(QPoint(x0, y0))
+			if x0 == x1 and y0 == y1:
+				break
+
+			e2 = 2 * err
+			if e2 > -dy:
+				err -= dy
+				x0 += sx
+			if e2 < dx:
+				err += dx
+				y0 += sy
+		return points
+
 
 	def __init__(self, parent: QWidget | None = None):
 		super().__init__(parent)
