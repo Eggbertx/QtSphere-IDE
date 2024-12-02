@@ -21,6 +21,6 @@ class TilePropertiesDialog(QDialog):
 
 	def show(self, tile:Tile) -> None:
 		self.tile = tile
-		self.ui.image_tab.attachImage(self.tile.image)
+		self.ui.image_tab.attachImage(self.tile.image.copy(self.tile.image.rect()))
 		self.ui.tabWidget.setCurrentIndex(0)
 		return super().show()
