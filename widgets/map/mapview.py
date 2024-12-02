@@ -1,9 +1,10 @@
 from enum import Enum, auto
-from math import floor
 
 from PySide6.QtCore import Qt, QEvent, QPoint, QRect, Signal, Slot, QSize
-from PySide6.QtGui import QMouseEvent, QPixmap, QColor
-from PySide6.QtWidgets import QGraphicsItemGroup, QGraphicsScene, QGraphicsView, QWidget, QGraphicsPixmapItem, QGraphicsLineItem, QGraphicsRectItem, QGraphicsTextItem
+from PySide6.QtGui import QMouseEvent, QPixmap, QColor, QAction
+from PySide6.QtWidgets import (
+	QGraphicsItemGroup, QGraphicsScene, QGraphicsView, QWidget, QGraphicsPixmapItem, QGraphicsLineItem, QGraphicsRectItem, QMenu
+)
 
 
 from formats.spheremap import SphereMap, EntityType
@@ -28,10 +29,30 @@ class MapView(QGraphicsView):
 	hoverTilePos: QPoint
 	hoverTilePosChanged: Signal = Signal(QPoint)
 
-	#map icons
-	spIcon:QGraphicsPixmapItem
-	personIcons:list[QGraphicsPixmapItem]
-	triggerIcons:list[QGraphicsPixmapItem]
+	# Map icons
+	spIcon: QGraphicsPixmapItem
+	personIcons: list[QGraphicsPixmapItem]
+	triggerIcons: list[QGraphicsPixmapItem]
+
+
+	# Context menu
+	contextMenu: QMenu
+	selectTileAction: QAction
+	setEntryPointAction: QAction
+	newPersonAction: QAction
+	newTriggerAction: QAction
+	editEntityAction: QAction
+	deleteEntityAction: QAction
+	editZoneAction: QAction
+	
+	selectTileRequested:Signal = Signal(QPoint,int)
+	setEntryPointRequested:Signal = Signal(QPoint,int)
+	newPersonRequested:Signal = Signal(QPoint,int)
+	newTriggerRequested:Signal = Signal(QPoint,int)
+	editEntityRequested:Signal = Signal(QPoint,int)
+	deleteEntityRequested:Signal = Signal(QPoint,int)
+	editZoneRequested:Signal = Signal(QPoint,int)
+
 
 	@property
 	def spawnPointIconVisible(self):
@@ -40,6 +61,7 @@ class MapView(QGraphicsView):
 	@spawnPointIconVisible.setter
 	def spawnPointIconVisible(self, v:bool):
 		self.spIcon.setVisible(v)
+
 
 	@property
 	def personIconsVisible(self):
@@ -51,7 +73,8 @@ class MapView(QGraphicsView):
 	def personIconsVisible(self, v:bool):
 		for p in range(len(self.personIcons)):
 			self.personIcons[p].setVisible(v)
-	
+
+
 	@property
 	def triggerIconsVisible(self):
 		if len(self.triggerIcons) == 0:
@@ -62,6 +85,7 @@ class MapView(QGraphicsView):
 	def triggerIconsVisible(self, v:bool):
 		for t in range(len(self.triggerIcons)):
 			self.triggerIcons[t].setVisible(v)
+
 
 	@property
 	def gridVisible(self):
@@ -108,6 +132,24 @@ class MapView(QGraphicsView):
 
 		self.personIcons = []
 		self.triggerIcons = []
+		self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+
+		self.customContextMenuRequested.connect(self.onCustomContextMenuRequested)
+		self.setupContextMenu()
+
+
+	def setupContextMenu(self):
+		self.contextMenu = QMenu()
+		self.selectTileAction = self.contextMenu.addAction("Select Tile")
+		self.contextMenu.addSeparator()
+		self.setEntryPointAction = self.contextMenu.addAction("Set Entry Point")
+		entityMenu = self.contextMenu.addMenu("New Entity")
+		self.newPersonAction = entityMenu.addAction("Person")
+		self.newTriggerAction = entityMenu.addAction("Trigger")
+		self.editEntityAction = self.contextMenu.addAction("Edit Entity")
+		self.deleteEntityAction = self.contextMenu.addAction("Delete Entity")
+		self.editZoneAction = self.contextMenu.addAction("Edit Zone")
+
 
 
 	def attachMap(self, map:SphereMap):
@@ -359,6 +401,29 @@ class MapView(QGraphicsView):
 
 		self.mapScene.addItem(self.gridGroup)
 		self.gridGroup.setZValue(257)
+
+
+	@Slot(QPoint)
+	def onCustomContextMenuRequested(self, pos:QPoint):
+		if not self.sceneRect().contains(pos):
+			return
+
+		tilePos = self.widgetToMapPos(pos.x(), pos.y())
+		match self.contextMenu.exec(self.mapToGlobal(pos)):
+			case self.selectTileAction:
+				self.selectTileRequested.emit(tilePos, self.currentLayer)
+			case self.setEntryPointAction:
+				self.setEntryPointRequested.emit(tilePos, self.currentLayer)
+			case self.newPersonAction:
+				self.newPersonRequested.emit(tilePos, self.currentLayer)
+			case self.newTriggerAction:
+				self.newTriggerRequested.emit(tilePos, self.currentLayer)
+			case self.editEntityAction:
+				self.editEntityRequested.emit(tilePos, self.currentLayer)
+			case self.deleteEntityAction:
+				self.deleteEntityRequested.emit(tilePos, self.currentLayer)
+			case self.editZoneAction:
+				self.editZoneRequested.emit(tilePos, self.currentLayer)
 
 
 	@Slot(int)
