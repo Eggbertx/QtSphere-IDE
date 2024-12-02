@@ -240,11 +240,13 @@ class SphereMap(SphereFile):
 		self.startX = 0
 		self.startY = 0
 
+
 	def open(self):
 		super().open()
 		if self.tilesetFile != "":
 			with open(self.tilesetPath(), "rb") as file:
 				self.tileset = Tileset.fromReader(file, self.tilesetFile)
+
 
 	def _parseFileData(self, file: BufferedReader):
 		super()._parseFileData(file)
@@ -281,12 +283,15 @@ class SphereMap(SphereFile):
 		if self.tilesetFile == "":
 			self.tileset = Tileset.fromReader(file, "")
 
+
 	def tilesetPath(self):
 		mapDir = "." if self.filePath is None else path.dirname(self.filePath)
 		return path.normpath(path.join(mapDir, self.tilesetFile)).replace("\\", "/")
 
+
 	def _packBytes() -> bytes:
 		raise NotImplementedError("Map saving not implemented yet")
+
 
 	def largestLayerSize(self):
 		largestW = 0
@@ -297,3 +302,35 @@ class SphereMap(SphereFile):
 			if layer.height > largestH:
 				largestH = layer.height
 		return QSize(largestW, largestH)
+
+
+	def tileIndexAt(self, tileX:int, tileY:int, layer:int):
+		if layer < 0 or layer >= len(self.layers):
+			print(f"Invalid layer: {layer}")
+			return -1
+
+		if tileX < 0 or tileX >= self.layers[layer].width or tileY < 0 or tileY >= self.layers[layer].height:
+			print(f"Invalid position: {tileX},{tileY}")
+			return -1
+		tileIndex = tileX + self.layers[layer].width * tileY
+		return self.layers[layer].tiles[tileIndex]
+
+
+	def entitiesOnTile(self, tileX:int, tileY:int, layer:int) -> list[MapEntity]:
+		if layer < 0 or layer >= len(self.layers):
+			raise IndexError(f"Invalid layer index {layer}")
+
+		tw = self.tileset.tileWidth
+		th = self.tileset.tileHeight
+		mx = tileX * tw
+		my = tileY * th
+		entities = []
+		for entity in self.entities:
+			if entity.layer != layer:
+				continue
+
+			if mx <= entity.mapX and entity.mapX <= mx + tw and \
+				my <= entity.mapY and entity.mapY <= my + th:
+				entities.append(entity)
+
+		return entities

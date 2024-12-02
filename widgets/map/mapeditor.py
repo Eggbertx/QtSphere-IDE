@@ -1,4 +1,4 @@
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Slot, QPoint
 from PySide6.QtGui import QPixmap, QIcon, QAction
 from PySide6.QtWidgets import QWidget, QLabel, QTableWidgetItem, QToolButton, QHeaderView, QMenu, QPushButton
 
@@ -49,8 +49,10 @@ class MapEditor(SphereEditor):
 		self.ui.layersTable.layerVisibilityToggleRequested.connect(self.onLayerVisibilityToggled)
 		self.ui.layersTable.deleteLayerRequested.connect(self.onDeleteLayerRequested)
 		self.ui.layersTable.layerPropertiesRequested.connect(self.onLayerPropertiesDialogRequested)
-		self.ui.mainSplitter.setStretchFactor(0,1)
 		self.ui.layersTable.layerRenamed.connect(self.onLayerRenamed)
+		self.ui.mainSplitter.setStretchFactor(0,1)
+		self.ui.mapView.currentTileChanged.connect(self.onMapCurrentTileChanged)
+		self.ui.tilesetView.indexChanged.connect(self.onTilesetCurrentIndexChanged)
 		self.ui.tilesetView.tilesInserted.connect(self.onTilesetTilesInserted)
 		self.ui.tilesetView.tilesAppended.connect(self.onTilesetTilesAppended)
 		self.ui.tilesetView.tilesRemoved.connect(self.onTilesetTilesRemoved)
@@ -68,7 +70,7 @@ class MapEditor(SphereEditor):
 		self.menuBar.pencilTool.clicked.connect(lambda: self.setCurrentTool(self.menuBar.pencilTool))
 		self.menuBar.addSeparator()
 		self.toggleGridAction = self.menuBar.addCheckableAction(QIcon(":/res/togglegrid.png"), "Show/Hide grid", True)
-		self.ui.tilesetView.indexChanged.connect(self.ui.mapView.onTilesetCurrentTileChanged)
+
 
 		mapGraphicsMenuButton = QToolButton()
 		mapGraphicsMenuButton.setIcon(QIcon(":/res/person.svg"))
@@ -88,7 +90,6 @@ class MapEditor(SphereEditor):
 
 		self.menuBar.addWidget(mapGraphicsMenuButton)
 		self.menuBar.notToolActions.append(mapGraphicsMenuButton)
-
 		self.menuBar.actionTriggered.connect(self.setCurrentTool)
 
 
@@ -129,6 +130,35 @@ class MapEditor(SphereEditor):
 		self.updateTilesetTitle()
 
 
+	@Slot(int,bool)
+	def onMapGraphicToggleTriggered(self, which:int, show:bool):
+		match which:
+			case 0:
+				self.ui.mapView.spawnPointIconVisible = show
+			case EntityType.Person:
+				self.ui.mapView.personIconsVisible = show
+			case EntityType.Trigger:
+				self.ui.mapView.triggerIconsVisible = show
+
+
+	@Slot(QAction)
+	def setCurrentTool(self, tool:QAction|QToolButton):
+		match tool:
+			case self.menuBar.pencil1|self.menuBar.pencil3|self.menuBar.pencil5|self.menuBar.pencilTool:
+				self.ui.mapView.setCurrentTool(MapTool.Pencil)
+			case self.menuBar.lineTool:
+				self.ui.mapView.setCurrentTool(MapTool.Line)
+			case self.menuBar.rectTool:
+				self.ui.mapView.setCurrentTool(MapTool.Rectangle)
+			case self.menuBar.fillTool:
+				self.ui.mapView.setCurrentTool(MapTool.Fill)
+			case self.menuBar.dropperTool:
+				self.ui.mapView.setCurrentTool(MapTool.Select)
+			case self.toggleGridAction:
+				self.ui.mapView.gridVisible = self.toggleGridAction.isChecked()
+
+
+#region LayersTable slots
 	@Slot(int)
 	def onLayerVisibilityToggled(self, layer:int):
 		self.ui.mapView.toggleLayerVisibility(layer)
@@ -160,42 +190,30 @@ class MapEditor(SphereEditor):
 
 
 	@Slot(int)
-	def onToggleLockLayerRequested(self, l:int):
-		pass
-
-
-	@Slot(int,bool)
-	def onMapGraphicToggleTriggered(self, which:int, show:bool):
-		match which:
-			case 0:
-				self.ui.mapView.spawnPointIconVisible = show
-			case EntityType.Person:
-				self.ui.mapView.personIconsVisible = show
-			case EntityType.Trigger:
-				self.ui.mapView.triggerIconsVisible = show
-
-
-	@Slot(QAction)
-	def setCurrentTool(self, tool:QAction|QToolButton):
-		match tool:
-			case self.menuBar.pencil1|self.menuBar.pencil3|self.menuBar.pencil5|self.menuBar.pencilTool:
-				self.ui.mapView.setCurrentTool(MapTool.Pencil)
-			case self.menuBar.lineTool:
-				self.ui.mapView.setCurrentTool(MapTool.Line)
-			case self.menuBar.rectTool:
-				self.ui.mapView.setCurrentTool(MapTool.Rectangle)
-			case self.menuBar.fillTool:
-				self.ui.mapView.setCurrentTool(MapTool.Fill)
-			case self.menuBar.dropperTool:
-				self.ui.mapView.setCurrentTool(MapTool.Select)
-			case self.toggleGridAction:
-				self.ui.mapView.gridVisible = self.toggleGridAction.isChecked()
+	def onLayerPropertiesDialogRequested(self, index:int):
+		self.layerPropertiesDialog.show(index, self.map)
 
 
 	@Slot(int,int,str)
 	def onLayerRenamed(self, row:int, col:int, newName:str):
 		self.undoStack.push(LayerRenamedCommand(self.map, self.ui.layersTable, row, col))
 	# self.layerRenamed.emit(row, col, self.item(row, col).text())
+#endregion
+
+
+#region MapView slots
+	@Slot(int)
+	def onMapCurrentTileChanged(self, newIndex:int):
+		self.ui.tilesetView.selectedIndex = newIndex
+		self.ui.tilesetView.arrangeItems()
+
+#endregion
+
+
+#region TilesetView slots
+	@Slot(int)
+	def onTilesetCurrentIndexChanged(self, newIndex:int):
+		self.ui.mapView.currentTile = newIndex
 
 
 	@Slot(int,int)
@@ -217,10 +235,13 @@ class MapEditor(SphereEditor):
 
 
 	@Slot(int)
-	def onLayerPropertiesDialogRequested(self, index:int):
-		self.layerPropertiesDialog.show(index, self.map)
+	def onTilesetTilePropertiesRequested(self, index:int):
+		self.tilePropertiesDialog.show(self.map.tileset.tiles[index])
 
 
 	@Slot(int)
-	def onTilesetTilePropertiesRequested(self, index:int):
-		self.tilePropertiesDialog.show(self.map.tileset.tiles[index])
+	def onToggleLockLayerRequested(self, l:int):
+		pass
+#endregion
+
+

@@ -100,7 +100,7 @@ class LayersTable(QTableWidget):
 
 	@Slot(int,int)
 	def onCellClicked(self, row:int, column:int):
-		self.mapView.currentLayer = row
+		self.mapView.currentLayer = self.rowToLayer(row)
 
 
 	@Slot(bool)

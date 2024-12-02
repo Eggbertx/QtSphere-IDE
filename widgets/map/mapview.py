@@ -45,7 +45,7 @@ class MapView(QGraphicsView):
 	deleteEntityAction: QAction
 	editZoneAction: QAction
 	
-	selectTileRequested:Signal = Signal(QPoint,int)
+	currentTileChanged:Signal = Signal(int)
 	setEntryPointRequested:Signal = Signal(QPoint,int)
 	newPersonRequested:Signal = Signal(QPoint,int)
 	newTriggerRequested:Signal = Signal(QPoint,int)
@@ -345,10 +345,9 @@ class MapView(QGraphicsView):
 				widgetPos = self.mapFromScene(self.mapToWidgetPos(rX, rY))
 				mouseItems = self.items(widgetPos.x(), widgetPos.y())
 				for item in mouseItems:
-					if isinstance(item, QGraphicsPixmapItem) and item.zValue() == len(self.mapFile.layers)-self.currentLayer-1:
+					if isinstance(item, QGraphicsPixmapItem) and item.zValue() == self.currentLayer:
 						item.setPixmap(QPixmap.fromImage(self.mapFile.tileset.tiles[self.currentTile].image))
 						break
-
 
 
 	def __resetPointerGroup(self):
@@ -411,7 +410,8 @@ class MapView(QGraphicsView):
 		tilePos = self.widgetToMapPos(pos.x(), pos.y())
 		match self.contextMenu.exec(self.mapToGlobal(pos)):
 			case self.selectTileAction:
-				self.selectTileRequested.emit(tilePos, self.currentLayer)
+				self.currentTile = self.mapFile.tileIndexAt(tilePos.x(), tilePos.y(), self.currentLayer)
+				self.currentTileChanged.emit(self.currentTile)
 			case self.setEntryPointAction:
 				self.setEntryPointRequested.emit(tilePos, self.currentLayer)
 			case self.newPersonAction:
@@ -424,11 +424,6 @@ class MapView(QGraphicsView):
 				self.deleteEntityRequested.emit(tilePos, self.currentLayer)
 			case self.editZoneAction:
 				self.editZoneRequested.emit(tilePos, self.currentLayer)
-
-
-	@Slot(int)
-	def onTilesetCurrentTileChanged(self, newIndex:int):
-		self.currentTile = newIndex
 
 
 	@Slot(QPoint)
