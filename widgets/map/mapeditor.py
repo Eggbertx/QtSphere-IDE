@@ -194,10 +194,10 @@ class MapEditor(SphereEditor):
 		self.layerPropertiesDialog.show(index, self.map)
 
 
-	@Slot(int,int,str)
-	def onLayerRenamed(self, row:int, col:int, newName:str):
-		self.undoStack.push(LayerRenamedCommand(self.map, self.ui.layersTable, row, col))
-	# self.layerRenamed.emit(row, col, self.item(row, col).text())
+	@Slot(int,str)
+	def onLayerRenamed(self, layer:int, newName:str):
+		self.undoStack.push(LayerRenamedCommand(self.map, self.ui.layersTable, layer))
+
 #endregion
 
 

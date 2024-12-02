@@ -17,7 +17,7 @@ class LayersTable(QTableWidget):
 	moveLayerDownRequested:Signal = Signal(int)
 	toggleLockLayerRequested:Signal = Signal(int)
 	layerPropertiesRequested:Signal = Signal(int)
-	layerRenamed:Signal = Signal(int,int,str)
+	layerRenamed:Signal = Signal(int,str)
 
 
 	def __init__(self, parent:QWidget|None = None):
@@ -47,6 +47,10 @@ class LayersTable(QTableWidget):
 		self.addAction("").setSeparator(True)
 		self.addAction("Toggle Lock Layer", lambda: self.toggleLockLayerRequested.emit(self.currentLayer()))
 		self.addAction("Properties", lambda: self.layerPropertiesRequested.emit(self.currentLayer()))
+
+
+	def layerToRow(self, layer:int) -> int:
+		return self.rowCount() - layer - 1
 
 
 	def rowToLayer(self, row:int) -> int:
@@ -117,15 +121,14 @@ class LayersTable(QTableWidget):
 	def onCellChanged(self, row:int, col:int):
 		if col != 1:
 			return
-		self.layerRenamed.emit(row, col, self.item(row, col).text())
+		self.layerRenamed.emit(self.rowToLayer(row), self.item(self.rowToLayer(row), col).text())
 
 
 	@Slot(int)
 	def onDeleteLayerRequested(self, layer:int):
 		if self.rowCount() <= 1:
 			return
-		row = self.rowCount() - layer - 1
-		self.removeRow(row)
+		self.removeRow(self.layerToRow(layer))
 
 
 	@Slot(bool)

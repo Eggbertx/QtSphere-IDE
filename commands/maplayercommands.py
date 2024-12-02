@@ -7,19 +7,17 @@ from widgets.map.layerstable import LayersTable
 class LayerRenamedCommand(QUndoCommand):
 	map:SphereMap
 	table:LayersTable
-	row:int
-	col:int
+	layer:int
 	oldName:str
 	newName:str
 
-	def __init__(self, map:SphereMap, table:LayersTable, row:int, col:int):
+	def __init__(self, map:SphereMap, table:LayersTable, layer:int):
 		super().__init__()
 		self.map = map
 		self.table = table
-		self.row = row
-		self.col = col
-		self.oldName = map.layers[table.rowToLayer(row)].name
-		self.newName = table.item(row, col).text()
+		self.layer = layer
+		self.oldName = map.layers[layer].name
+		self.newName = table.item(table.layerToRow(layer), 1).text()
 
 
 	def id(self) -> int:
@@ -27,16 +25,16 @@ class LayerRenamedCommand(QUndoCommand):
 
 
 	def undo(self) -> None:
-		self.map.layers[self.table.rowToLayer(self.row)].name = self.oldName
+		self.map.layers[self.layer].name = self.oldName
 		state = self.table.blockSignals(True)
-		self.table.item(self.row, self.col).setText(self.oldName)
+		self.table.item(self.table.layerToRow(self.layer), 1).setText(self.oldName)
 		self.table.blockSignals(state)
 
 
 
 	def redo(self) -> None:
-		self.map.layers[self.table.rowToLayer(self.row)].name = self.newName
-		item = self.table.item(self.row, self.col)
+		self.map.layers[self.layer].name = self.newName
+		item = self.table.item(self.table.layerToRow(self.layer), 1)
 		if item.text() != self.newName:
 			state = self.table.blockSignals(True)
 			item.setText(self.newName)
@@ -47,10 +45,9 @@ class LayerRenamedCommand(QUndoCommand):
 		if other.id() == self.id() and \
 			isinstance(other, LayerRenamedCommand) and \
 			other.newName == self.oldName and \
-			other.row == self.row and \
-			other.col == self.col and \
+			other.layer == self.layer and \
 			self.newName != self.oldName and \
-			self.map.layers[self.table.rowToLayer(self.row)].name != other.newName:
+			self.map.layers[self.layer].name != other.newName:
 			self.setText("Rename tile")
 			return True
 		return False
