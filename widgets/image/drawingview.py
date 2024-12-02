@@ -66,9 +66,7 @@ class DrawingView(QGraphicsView):
 		self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
 
 		self.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
-		self.image = image
-		if image is not None:
-			self.attachImage(image)
+		self.attachImage(image)
 
 
 	def setModified(self, modified:bool):
@@ -86,16 +84,16 @@ class DrawingView(QGraphicsView):
 
 	def attachImage(self, image:QImage):
 		if image is None:
-			self.image = QImage(320, 240, QImage.Format.Format_RGBA8888)
+			self.image = QImage(1, 1, QImage.Format.Format_RGBA8888)
 			self.image.fill(Qt.GlobalColor.white)
 		else:
 			self.image = image
-		
+
 		self.scene.clear()
 		self.imageItem = self.scene.addPixmap(QPixmap.fromImage(self.image))
 		self.setFixedSize(self.image.size())
-		self.setSceneRect(0, 0, image.width(), image.height())
-			
+		self.setSceneRect(0, 0, self.image.width(), self.image.height())
+
 
 #region Event overloads
 	def mousePressEvent(self, event: QMouseEvent) -> None:
