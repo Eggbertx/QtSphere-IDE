@@ -5,6 +5,7 @@
         "ui/drawingwidget.ui",
         "ui/entityeditdialog.ui",
         "ui/fonteditor.ui",
+        "ui/imageeditor.ui",
         "ui/importoptionsdialog.ui",
         "ui/layerpropertiesdialog.ui",
         "ui/mainwindow.ui",

@@ -1,11 +1,15 @@
-from PySide6.QtGui import QAction, QImage
-from PySide6.QtWidgets import  QMenu, QToolBar, QWidget, QVBoxLayout
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QImage
+from PySide6.QtWidgets import  QMenu, QWidget, QVBoxLayout
+
+from ui.ui_imageeditor import Ui_ImageEditor
+
 from widgets.sphereeditor import SphereEditor
 from widgets.image.drawingview import DrawingView
 from widgets.image.drawingtoolbar import DrawingToolbar
 
 class ImageEditor(SphereEditor):
-	drawingView: DrawingView
+	ui: Ui_ImageEditor
 	menuBar: DrawingToolbar
 	pencilMenu: QMenu
 	viewLayout: QVBoxLayout
@@ -17,17 +21,14 @@ class ImageEditor(SphereEditor):
 
 	def __init__(self, parent: QWidget|None = None, image: QImage = None):
 		super().__init__(parent)
-		self.drawingView = DrawingView(self, image)
+		self.ui = Ui_ImageEditor()
+		self.ui.setupUi(self)
+		self.attachImage(image)
+
 		self.menuBar = DrawingToolbar(self)
-		self.viewLayout = QVBoxLayout()
-		self.viewLayout = QVBoxLayout(self)
-		self.viewLayout.setSpacing(0)
-		self.viewLayout.setContentsMargins(0, 0, 0, 0)
-		self.viewLayout.addWidget(self.drawingView)
-		self.viewLayout.addStretch(0)
-		self.setLayout(self.viewLayout)
-		self.viewLayout.setMenuBar(self.menuBar)
+		self.ui.scrollAreaLayout.setMenuBar(self.menuBar)
+		self.ui.scrollAreaLayout.setAlignment(Qt.AlignmentFlag.AlignLeft|Qt.AlignmentFlag.AlignTop)
 
 
 	def attachImage(self, image:QImage):
-		self.drawingView.attachImage(image)
+		self.ui.drawingView.attachImage(image)
