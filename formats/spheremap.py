@@ -304,7 +304,7 @@ class SphereMap(SphereFile):
 		return QSize(largestW, largestH)
 
 
-	def tileIndexAt(self, tileX:int, tileY:int, layer:int):
+	def getTileIndexAt(self, tileX:int, tileY:int, layer:int):
 		if layer < 0 or layer >= len(self.layers):
 			print(f"Invalid layer: {layer}")
 			return -1
@@ -314,6 +314,17 @@ class SphereMap(SphereFile):
 			return -1
 		tileIndex = tileX + self.layers[layer].width * tileY
 		return self.layers[layer].tiles[tileIndex]
+
+
+	def setTileIndexAt(self, tileX:int, tileY:int, layer:int, newIndex:int):
+		if layer < 0 or layer >= len(self.layers):
+			raise IndexError(f"Invalid layer index {layer}")
+
+		if tileX < 0 or tileX >= self.layers[layer].width or tileY < 0 or tileY >= self.layers[layer].height:
+			raise IndexError(f"Invalid position {tileX},{tileY}")
+
+		tileIndex = tileX + self.layers[layer].width * tileY
+		self.layers[layer].tiles[tileIndex] = newIndex
 
 
 	def entitiesOnTile(self, tileX:int, tileY:int, layer:int) -> list[MapEntity]:

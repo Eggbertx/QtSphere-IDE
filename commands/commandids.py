@@ -7,3 +7,4 @@ class CommandIDs(Enum):
 	AppendTiles = auto()
 	RemoveTiles = auto()
 	RenameMapLayer = auto()
+	PencilDrawMap = auto()

@@ -295,6 +295,31 @@ class MapView(QGraphicsView):
 		return QRect(rPos, rSize)
 
 
+	# returns the tile matching the pixmap at the pixel position, or -1 if no tile is found
+	def getTileIndexAt(self, x:int, y:int, layer:int):
+		if self.mapFile is None:
+			return -1
+		widgetPos = self.mapFromScene(self.mapToScene(x, y))
+		items = self.items(widgetPos.x(), widgetPos.y())
+		for item in items:
+			if isinstance(item, QGraphicsPixmapItem) and item.zValue() == layer and \
+				item.pixmap().toImage() == self.mapFile.tileset.tiles[self.currentTile].image:
+				return self.currentTile
+		return -1
+
+
+	def setTileIndexAt(self, x:int, y:int, layer:int, index:int):
+		if self.mapFile is None or self.mapFile.tileset.tiles:
+			return
+		widgetPos = self.mapFromScene(self.mapToScene(x, y))
+		items = self.items(widgetPos.x(), widgetPos.y())
+		for item in items:
+			if isinstance(item, QGraphicsPixmapItem) and item.zValue() == layer:
+				item.setPixmap(QPixmap.fromImage(self.mapFile.tileset.tiles[index].image))
+				self.mapFile.setTileIndexAt(x // self.tileWidth, y // self.tileHeight, layer, index)
+
+
+#region Overloaded events
 	def mouseMoveEvent(self, event: QMouseEvent):
 		if self.mapFile is None:
 			self.setStatusTip("Map not loaded")
@@ -336,6 +361,7 @@ class MapView(QGraphicsView):
 		self.pointerGroup.hide()
 		self.drawing = False
 		self.window().setStatus("")
+#endregion
 
 
 	def __drawTile(self):
@@ -410,7 +436,7 @@ class MapView(QGraphicsView):
 		tilePos = self.widgetToMapPos(pos.x(), pos.y())
 		match self.contextMenu.exec(self.mapToGlobal(pos)):
 			case self.selectTileAction:
-				self.currentTile = self.mapFile.tileIndexAt(tilePos.x(), tilePos.y(), self.currentLayer)
+				self.currentTile = self.mapFile.getTileIndexAt(tilePos.x(), tilePos.y(), self.currentLayer)
 				self.currentTileChanged.emit(self.currentTile)
 			case self.setEntryPointAction:
 				self.setEntryPointRequested.emit(tilePos, self.currentLayer)
