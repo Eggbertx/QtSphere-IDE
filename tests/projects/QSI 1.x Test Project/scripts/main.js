@@ -1,3 +1,3 @@
-function main() {
-	Abort("test");
+function game() {
+	MapEngine("layerdrawing.rmp",60);
 }
