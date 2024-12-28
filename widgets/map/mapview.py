@@ -3,7 +3,7 @@ from enum import Enum, auto
 from PySide6.QtCore import Qt, QEvent, QPoint, QRect, Signal, Slot, QSize
 from PySide6.QtGui import QMouseEvent, QPixmap, QColor, QAction
 from PySide6.QtWidgets import (
-	QGraphicsItemGroup, QGraphicsScene, QGraphicsView, QWidget, QGraphicsPixmapItem, QGraphicsLineItem, QGraphicsRectItem, QMenu
+	QGraphicsItemGroup, QGraphicsScene, QGraphicsView, QWidget, QGraphicsPixmapItem, QGraphicsItem, QGraphicsLineItem, QGraphicsRectItem, QMenu
 )
 
 
@@ -349,7 +349,7 @@ class MapView(QGraphicsView):
 	def mousePressEvent(self, event: QMouseEvent) -> None:
 		if event.button() == Qt.MouseButton.LeftButton:
 			self.drawing = True
-			self.__drawTile()
+			self.__drawTile(True)
 
 
 	def mouseReleaseEvent(self, event: QMouseEvent) -> None:
@@ -364,16 +364,20 @@ class MapView(QGraphicsView):
 #endregion
 
 
-	def __drawTile(self):
+	def __filterItems(self, item:QGraphicsItem):
+		return isinstance(item, QGraphicsPixmapItem) and item.zValue() == self.currentLayer
+
+
+	def __drawTile(self, temp:bool):
 		pRect = self.pointerRect(True)
-		for rY in range(pRect.y(), pRect.bottom() + 1, 1):
-			for rX in range(pRect.x(), pRect.right() + 1, 1):
-				widgetPos = self.mapFromScene(self.mapToWidgetPos(rX, rY))
-				mouseItems = self.items(widgetPos.x(), widgetPos.y())
-				for item in mouseItems:
-					if isinstance(item, QGraphicsPixmapItem) and item.zValue() == self.currentLayer:
-						item.setPixmap(QPixmap.fromImage(self.mapFile.tileset.tiles[self.currentTile].image))
-						break
+		pRectWidgetUL = self.mapFromScene(self.mapToWidgetPos(pRect.x(), pRect.y()))
+		pRectWidgetBR = self.mapFromScene(self.mapToWidgetPos(pRect.right(), pRect.bottom()))
+		pRectWidget = QRect(pRectWidgetUL, pRectWidgetBR)
+		affectedItems = self.items(pRectWidget)
+		filteredItems:list[QGraphicsPixmapItem] = list(filter(self.__filterItems, affectedItems))
+
+		for item in filteredItems:
+			item.setPixmap(QPixmap.fromImage(self.mapFile.tileset.tiles[self.currentTile].image))
 
 
 	def __resetPointerGroup(self):
@@ -462,6 +466,6 @@ class MapView(QGraphicsView):
 		if pos.x() > -1 and pos.y() > -1:
 			self.pointerGroup.show()
 			if self.drawing:
-				self.__drawTile()
+				self.__drawTile(True)
 		else:
 			self.pointerGroup.hide()
