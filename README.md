@@ -14,11 +14,11 @@ This project is still a work in progress.
 * Qt Creator (UI development)
 
 ## Building
-Building this in Qt Creator will make things more convenient, but if you want to run it from the command line, run `python -m venv env`.
+Building this in Qt Creator will make things more convenient, but if you want to run it from the command line, run `python -m venv .venv`.
 
-Then, if you are in Windows, run `.\env\Scripts\activate`.
+Then, if you are in Windows, run `.\.venv\Scripts\activate`.
 
-In macOS, Linux, or BSD, run `source env/bin/activate`.
+In macOS, Linux, or BSD, run `source .venv/bin/activate`.
 
 Then, run the following:
 ```
