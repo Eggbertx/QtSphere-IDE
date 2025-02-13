@@ -1,6 +1,8 @@
 from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtWidgets import QTextEdit, QWidget
 
+from widgets.sphereeditor import SphereEditorType
+
 class TextEdit(QTextEdit):
 	filePath:str
 	modificationChanged:Signal = Signal(bool)
@@ -13,6 +15,10 @@ class TextEdit(QTextEdit):
 			te.document().setModified(False)
 			te.filePath = filePath
 		return te
+
+	@property
+	def editorType(self):
+		return SphereEditorType.Text
 
 	def __init__(self, parent: QWidget = None):
 		super().__init__(parent)

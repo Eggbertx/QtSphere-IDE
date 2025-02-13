@@ -8,7 +8,7 @@ from commands.maplayercommands import LayerRenamedCommand
 from dialogs.layerpropertiesdialog import LayerPropertiesDialog
 from dialogs.tileepropertiesdialog import TilePropertiesDialog
 from formats.spheremap import SphereMap, EntityType, MapEntity
-from widgets.sphereeditor import SphereEditor
+from widgets.sphereeditor import SphereEditor, SphereEditorType
 from widgets.image.drawingtoolbar import DrawingToolbar
 
 from ui.ui_mapeditor import Ui_MapEditor
@@ -39,7 +39,7 @@ class MapEditor(SphereEditor):
 
 
 	def __init__(self, parent: QWidget | None = None):
-		super().__init__(parent)
+		super().__init__(parent, SphereEditorType.Map)
 		self.ui = Ui_MapEditor()
 		self.ui.setupUi(self)
 		self.setupToolbar()

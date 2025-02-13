@@ -4,7 +4,7 @@ from PySide6.QtWidgets import  QMenu, QWidget, QVBoxLayout
 
 from ui.ui_imageeditor import Ui_ImageEditor
 
-from widgets.sphereeditor import SphereEditor
+from widgets.sphereeditor import SphereEditor, SphereEditorType
 from widgets.image.drawingtoolbar import DrawingToolbar
 
 class ImageEditor(SphereEditor):
@@ -19,7 +19,7 @@ class ImageEditor(SphereEditor):
 		return ImageEditor(parent, img)
 
 	def __init__(self, parent: QWidget|None = None, image: QImage = None):
-		super().__init__(parent)
+		super().__init__(parent, SphereEditorType.Image)
 		self.ui = Ui_ImageEditor()
 		self.ui.setupUi(self)
 		self.attachImage(image)

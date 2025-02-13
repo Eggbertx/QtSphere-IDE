@@ -3,7 +3,7 @@ from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import QWidget, QGraphicsPixmapItem, QGraphicsScene
 
 from formats.spriteset import SphereSpriteset
-from ..sphereeditor import SphereEditor, SphereFile
+from ..sphereeditor import SphereEditor, SphereEditorType
 from .imagechooser import ImageChooser
 from .directionview import DirectionView
 
@@ -26,11 +26,10 @@ class SpritesetEditor(SphereEditor):
 		return editor
 
 	def __init__(self, parent: QWidget = None):
-		super().__init__(parent)
+		super().__init__(parent, SphereEditorType.Spriteset)
 		self.ui = Ui_SpritesetEditor()
 		self.ui.setupUi(self)
 		self.directionViews = []
-		self.editorType = SphereFile.Spriteset
 		self.loadedSpriteset = None
 		self.directionScene = QGraphicsScene(self.ui.animView)
 		self.ui.animView.setScene(self.directionScene)

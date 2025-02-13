@@ -10,7 +10,7 @@ from signal import signal, SIGINT, SIG_DFL
 from PySide6.QtCore import QCoreApplication, Qt, Slot, QUrl
 from PySide6.QtGui import QCloseEvent, QIcon, QDesktopServices, QImage, QShortcut
 from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QComboBox,
-	QFileDialog, QToolButton, QWidget, QDialog, QDialogButtonBox, QAbstractButton)
+	QFileDialog, QMenu, QToolButton, QWidget, QDialog, QDialogButtonBox, QAbstractButton)
 
 from ui.ui_mainwindow import Ui_MainWindow
 
@@ -23,15 +23,14 @@ from dialogs.settingswindow import SettingsWindow
 from formats.spheremap import SphereMap
 from qsiproject import QSIProject
 from spherelauncher import SphereLauncher
-from widgets.image.drawingview import DrawingView
 from widgets.image.imageeditor import ImageEditor
 from widgets.map.mapeditor import MapEditor
-from widgets.sphereeditor import SphereEditor
+from widgets.sphereeditor import SphereEditor, SphereEditorType
 from widgets.spriteset.spriteseteditor import SpritesetEditor
 from widgets.startpage import StartPage
 from widgets.textedit import TextEdit
 from settings import Settings
-
+from editor_menus import EditorMenuProvider
 
 _OPEN_DIALOG_FILTER = (
 	"All supported files (*.sgm *.txt *.js *.mjs *.cjs *.rmp *.rss *.rws)",
@@ -82,6 +81,8 @@ class MainWindow(QMainWindow):
 	newButton: QToolButton
 	openFilePaths: list[str] # each element should correspond to the respective tab index, with Start Page (and any other non-file tabs) being None
 	version: str
+	activeEditorMenu: QMenu
+	menuProvider: EditorMenuProvider
 
 	@property
 	def currentTabWidget(self):
@@ -100,12 +101,14 @@ class MainWindow(QMainWindow):
 
 		self.version = version
 		self.switchSidebarTab(SidebarTab.FileTree)
+		self.activeEditorMenu = None
 		self.verbose = verbose
 		self.settingsWindow = SettingsWindow(self)
 		self.ui.splitter.setStretchFactor(1, 4)
 		self.startPage = StartPage(self.ui.openFileTabs, printWarnings=self.verbose)
 		self.ui.openFileTabs.addTab(self.startPage, "Start Page")
 		self.openFilePaths = [None]
+		self.menuProvider = EditorMenuProvider(self)
 
 		self.engineSelector = QComboBox(self.ui.mainToolBar)
 		self.engineSelector.setMinimumWidth(120)
@@ -229,6 +232,21 @@ class MainWindow(QMainWindow):
 		self.openFilePaths.append(filePath)
 		t = self.ui.openFileTabs.addTab(editor, "<new file>" if filePath == "" else basename(filePath))
 		self.ui.openFileTabs.setCurrentIndex(t)
+
+
+	def setEditorMenu(self, editorType: SphereEditorType, editor:SphereEditor = None):
+		if self.activeEditorMenu is not None:
+			self.ui.menuBar.removeAction(self.activeEditorMenu.menuAction())
+		
+		beforeAction = self.ui.menuTools.menuAction()
+		match editorType:
+			case SphereEditorType.Map:
+				self.activeEditorMenu = self.menuProvider.createMapMenu(editor)
+				self.ui.menuBar.insertAction(beforeAction, self.activeEditorMenu.menuAction())
+			case SphereEditorType.Spriteset:
+				self.activeEditorMenu = self.menuProvider.createSpritesetMenu(editor)
+				self.ui.menuBar.insertAction(beforeAction, self.activeEditorMenu.menuAction())
+
 
 
 	def openFile(self, filePath:str):
@@ -513,6 +531,12 @@ class MainWindow(QMainWindow):
 			currentPath = self.openFilePaths[index]
 			self.ui.actionSave.setEnabled(currentPath is not None)
 			self.ui.actionSave_As.setEnabled(currentPath is not None)
+		
+		editor = self.ui.openFileTabs.currentWidget()
+		if hasattr(editor, "editorType"):
+			self.setEditorMenu(editor.editorType, editor)
+		else:
+			self.setEditorMenu(None)
 
 
 	@Slot()

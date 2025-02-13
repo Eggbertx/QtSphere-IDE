@@ -1,23 +1,24 @@
-from enum import Enum
+from enum import Enum, auto
 
 from PySide6.QtCore import Qt, Signal, QPoint
 from PySide6.QtGui import QUndoStack, QAction
 from PySide6.QtWidgets import QWidget
 
-class SphereFile(Enum):
-	Text = 0
-	Font = 1
-	Map = 2
-	Package = 3
-	Spriteset = 4
-	TilesetFile = 5
-	WindowStyle = 6
+class SphereEditorType(Enum):
+	Other = -1
+	Text = auto()
+	Font = auto()
+	Map = auto()
+	Package = auto()
+	Spriteset = auto()
+	TilesetFile = auto()
+	WindowStyle = auto()
+	Image = auto()
 
 class SphereEditor(QWidget):
 	undoStack: QUndoStack
 	undoAction: QAction
 	redoAction: QAction
-	editorType: SphereFile = SphereFile.Text
 	filePath:str
 	modificationChanged:Signal = Signal(bool)
 	__modified:bool
@@ -58,8 +59,12 @@ class SphereEditor(QWidget):
 				y0 += sy
 		return points
 
+	__editorType: SphereEditorType
+	@property
+	def editorType(self):
+		return self.__editorType
 
-	def __init__(self, parent: QWidget | None = None):
+	def __init__(self, parent: QWidget | None = None, editorType:SphereEditorType = SphereEditorType.Text):
 		super().__init__(parent)
 		self.filePath = ""
 		self.undoStack = QUndoStack(self)
@@ -68,6 +73,7 @@ class SphereEditor(QWidget):
 		self.redoAction = QAction("&Redo")
 		self.redoAction.setShortcut(Qt.Key.Key_Redo)
 		self.__modified = False
+		self.__editorType = editorType
 
 	def undo(self):
 		self.undoStack.undo()
