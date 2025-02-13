@@ -5,7 +5,6 @@ from PySide6.QtWidgets import  QMenu, QWidget, QVBoxLayout
 from ui.ui_imageeditor import Ui_ImageEditor
 
 from widgets.sphereeditor import SphereEditor
-from widgets.image.drawingview import DrawingView
 from widgets.image.drawingtoolbar import DrawingToolbar
 
 class ImageEditor(SphereEditor):

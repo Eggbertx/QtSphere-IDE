@@ -3,16 +3,11 @@ from PySide6.QtCore import Qt, QSize, Signal, QPoint, QRect
 from PySide6.QtWidgets import QGraphicsPixmapItem, QGraphicsScene, QGraphicsView, QWidget, QAbstractScrollArea
 from PySide6.QtGui import QBrush, QColor, QImage, QMouseEvent, QPainter, QPen, QPixmap
 
-
-class DrawingMode(Enum):
-	Pencil = auto()
-	Line = auto()
-	Rectangle = auto()
-	Fill = auto()
+from widgets.drawingenums import DrawingTool
 
 class DrawingView(QGraphicsView):
 	scene: QGraphicsScene
-	drawingMode: DrawingMode
+	drawingTool: DrawingTool
 	image: QImage
 	__modified: bool
 	pressedButtons: int
@@ -51,7 +46,7 @@ class DrawingView(QGraphicsView):
 
 	def __init__(self, parent: QWidget|None = None, image: QImage|None = None):
 		super().__init__(parent)
-		self.drawingMode = DrawingMode.Pencil
+		self.drawingTool = DrawingTool.Pencil
 		self.__modified = False
 		self.pressedButtons = 0
 		self.setBackgroundBrush(QBrush(QPixmap(":/res/transparency-bg.png")))

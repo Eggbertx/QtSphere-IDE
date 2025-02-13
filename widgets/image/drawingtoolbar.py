@@ -4,14 +4,7 @@ from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtGui import QAction, QIcon, QPixmap
 from PySide6.QtWidgets import QMenu, QToolBar, QToolButton, QWidget, QStyle
 
-class DrawingTool(Enum):
-	Pencil = auto()
-	Line = auto()
-	Rectangle = auto()
-	RectangleFilled = auto()
-	Fill = auto()
-	Dropper = auto()
-	Select = auto()
+from widgets.drawingenums import DrawingTool
 
 class DrawingToolbar(QToolBar):
 	pencilMenu:QMenu

@@ -1,6 +1,5 @@
 from PySide6.QtCore import QPoint
 from PySide6.QtGui import QUndoCommand
-from PySide6.QtWidgets import QGraphicsPixmapItem
 
 from commands.commandids import CommandIDs
 from widgets.map.mapview import MapView
@@ -12,6 +11,7 @@ class PencilDrawMapCommand(QUndoCommand):
 	layer:int
 	mapView: MapView
 	def __init__(self, affectedTiles:list[QPoint], newIndex:int, layer:int, mapView:MapView):
+		super().__init__()
 		self.oldTiles = []
 		self.affectedTiles = affectedTiles
 		self.newIndex = newIndex
@@ -49,6 +49,7 @@ class PencilDrawMapCommand(QUndoCommand):
 			self.oldTiles.append(tileIndex)
 			# Set the new tile index
 			self.mapView.setTileIndexAt(mapX, mapY, self.layer, self.newIndex)
+		self.mapView.removeTemporaryTiles()
 
 
 	def mergeWith(self, other):

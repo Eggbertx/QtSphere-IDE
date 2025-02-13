@@ -81,7 +81,7 @@ class MapLayer:
 	numSegments:int
 	reflective:bool
 	name:str
-	tiles:tuple[int]
+	tiles:list[int]
 	segments:list[ObstructionSegment]
 
 	@staticmethod
@@ -90,7 +90,7 @@ class MapLayer:
 		(layer.width, layer.height, layer.flags, layer.parallaxX, layer.parallaxY, layer.scrollingX,
 		layer.scrollingY, layer.numSegments, layer.reflective) = struct.unpack("<3H4fL?3x", reader.read(30))
 		layer.name = readSphereString(reader)
-		layer.tiles = struct.unpack(f"<{layer.width*layer.height}H", reader.read(layer.width*layer.height*2))
+		layer.tiles = list(struct.unpack(f"<{layer.width*layer.height}H", reader.read(layer.width*layer.height*2)))
 		layer.segments = []
 		for s in range(layer.numSegments):
 			segment = ObstructionSegment()

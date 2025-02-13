@@ -7,15 +7,12 @@ from PySide6.QtWidgets import (
 )
 
 
+from compare_images import images_equal
 from formats.spheremap import SphereMap, EntityType
 from settings import Settings, Defaults
 
-class MapTool(Enum):
-	Pencil = auto()
-	Line = auto()
-	Rectangle = auto()
-	Fill = auto()
-	Select = auto()
+from widgets.drawingenums import DrawingTool, DrawMode
+
 
 class MapView(QGraphicsView):
 	mapScene: QGraphicsScene
@@ -24,6 +21,8 @@ class MapView(QGraphicsView):
 	gridGroup: QGraphicsItemGroup
 	pointerGroup: QGraphicsItemGroup
 	drawing: bool
+	drawMode: DrawMode
+	drawingPoints: list[QPoint]
 	currentTile: int
 	currentLayer: int
 	hoverTilePos: QPoint
@@ -52,6 +51,7 @@ class MapView(QGraphicsView):
 	editEntityRequested:Signal = Signal(QPoint,int)
 	deleteEntityRequested:Signal = Signal(QPoint,int)
 	editZoneRequested:Signal = Signal(QPoint,int)
+	drawModeChanged:Signal = Signal(DrawMode)
 
 
 	@property
@@ -122,6 +122,8 @@ class MapView(QGraphicsView):
 		self.mapFile = None
 		self.drawSize = 3
 		self.drawing = False
+		self.drawMode = DrawMode.NotDrawing
+		self.drawingPoints = []
 		self.currentTile = 0
 		self.currentLayer = 0
 
@@ -246,7 +248,7 @@ class MapView(QGraphicsView):
 		return QPoint(x * self.tileWidth, y * self.tileHeight)
 
 
-	def setCurrentTool(self, tool:MapTool):
+	def setCurrentTool(self, tool:DrawingTool):
 		pass
 
 
@@ -296,27 +298,31 @@ class MapView(QGraphicsView):
 
 
 	# returns the tile matching the pixmap at the pixel position, or -1 if no tile is found
-	def getTileIndexAt(self, x:int, y:int, layer:int):
+	def getTileIndexAt(self, x:int, y:int, layer:int, tempTile:bool = False) -> int:
 		if self.mapFile is None:
 			return -1
-		widgetPos = self.mapFromScene(self.mapToScene(x, y))
-		items = self.items(widgetPos.x(), widgetPos.y())
+		items:list[QGraphicsPixmapItem] = list(filter(lambda i:
+			isinstance(i, QGraphicsPixmapItem) and i.zValue() == layer + (0.5 if tempTile else 0), self.items(x, y)
+		))
+		assert len(items) <= 1, f"More than one item found at {x}, {y}, layer {layer} (tempTile: {tempTile})"
 		for item in items:
-			if isinstance(item, QGraphicsPixmapItem) and item.zValue() == layer and \
-				item.pixmap().toImage() == self.mapFile.tileset.tiles[self.currentTile].image:
-				return self.currentTile
+			for t, tile in enumerate(self.mapFile.tileset.tiles):
+				if images_equal(item.pixmap(), tile.image):
+					return t
 		return -1
 
 
 	def setTileIndexAt(self, x:int, y:int, layer:int, index:int):
-		if self.mapFile is None or self.mapFile.tileset.tiles:
+		if self.mapFile is None or index < 0 or index >= len(self.mapFile.tileset.tiles):
 			return
 		widgetPos = self.mapFromScene(self.mapToScene(x, y))
-		items = self.items(widgetPos.x(), widgetPos.y())
+		items:list[QGraphicsPixmapItem] = list(filter(
+			lambda i: isinstance(i, QGraphicsPixmapItem) and i.zValue() == layer,
+			self.items(widgetPos.x(), widgetPos.y())
+		))
 		for item in items:
-			if isinstance(item, QGraphicsPixmapItem) and item.zValue() == layer:
-				item.setPixmap(QPixmap.fromImage(self.mapFile.tileset.tiles[index].image))
-				self.mapFile.setTileIndexAt(x // self.tileWidth, y // self.tileHeight, layer, index)
+			item.setPixmap(QPixmap.fromImage(self.mapFile.tileset.tiles[index].image))
+			self.mapFile.setTileIndexAt(x // self.tileWidth, y // self.tileHeight, layer, index)
 
 
 #region Overloaded events
@@ -349,17 +355,22 @@ class MapView(QGraphicsView):
 	def mousePressEvent(self, event: QMouseEvent) -> None:
 		if event.button() == Qt.MouseButton.LeftButton:
 			self.drawing = True
-			self.__drawTile(True)
+			self.drawMode = DrawMode.MouseDown
+			self.drawModeChanged.emit(self.drawMode)
+			self.__drawTemporaryTile()
 
 
 	def mouseReleaseEvent(self, event: QMouseEvent) -> None:
 		self.drawing = False
+		self.drawMode = DrawMode.MouseReleased
+		self.drawModeChanged.emit(self.drawMode)
+		self.drawingPoints = []
 
 
 	def leaveEvent(self, event: QEvent):
 		super().leaveEvent(event)
 		self.pointerGroup.hide()
-		self.drawing = False
+		self.drawing = False # drawing is changed, but the mouse is not released so drawMode is not changed
 		self.window().setStatus("")
 #endregion
 
@@ -368,16 +379,28 @@ class MapView(QGraphicsView):
 		return isinstance(item, QGraphicsPixmapItem) and item.zValue() == self.currentLayer
 
 
-	def __drawTile(self, temp:bool):
+	def __drawTemporaryTile(self):
 		pRect = self.pointerRect(True)
 		pRectWidgetUL = self.mapFromScene(self.mapToWidgetPos(pRect.x(), pRect.y()))
 		pRectWidgetBR = self.mapFromScene(self.mapToWidgetPos(pRect.right(), pRect.bottom()))
 		pRectWidget = QRect(pRectWidgetUL, pRectWidgetBR)
 		affectedItems = self.items(pRectWidget)
 		filteredItems:list[QGraphicsPixmapItem] = list(filter(self.__filterItems, affectedItems))
-
+		currentImage = self.mapFile.tileset.tiles[self.currentTile].image
 		for item in filteredItems:
-			item.setPixmap(QPixmap.fromImage(self.mapFile.tileset.tiles[self.currentTile].image))
+			itemPos = item.pos().toPoint()
+			if itemPos in self.drawingPoints:
+				continue
+			self.drawingPoints.append(self.widgetToMapPos(itemPos.x(), itemPos.y()))
+			tempItem = self.scene().addPixmap(QPixmap.fromImage(currentImage))
+			tempItem.setPos(item.x(), item.y())
+			tempItem.setZValue(self.currentLayer + 0.5)
+
+
+	def removeTemporaryTiles(self):
+		temporaryItems = list(filter(lambda i: isinstance(i, QGraphicsPixmapItem) and i.zValue() % 1 > 0, self.mapScene.items()))
+		for item in temporaryItems:
+			self.mapScene.removeItem(item)
 
 
 	def __resetPointerGroup(self):
@@ -465,7 +488,7 @@ class MapView(QGraphicsView):
 		self.pointerGroup.setPos(pointerUL)
 		if pos.x() > -1 and pos.y() > -1:
 			self.pointerGroup.show()
-			if self.drawing:
-				self.__drawTile(True)
+			if self.drawMode == DrawMode.MouseDown and self.drawing:
+				self.__drawTemporaryTile()
 		else:
 			self.pointerGroup.hide()

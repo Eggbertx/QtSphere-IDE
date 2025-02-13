@@ -1,18 +1,19 @@
 from PySide6.QtCore import Slot, QPoint
 from PySide6.QtGui import QPixmap, QIcon, QAction
-from PySide6.QtWidgets import QWidget, QLabel, QTableWidgetItem, QToolButton, QHeaderView, QMenu, QPushButton
+from PySide6.QtWidgets import QWidget, QLabel, QToolButton, QMenu, QPushButton
 
+from commands.mapviewcommands import PencilDrawMapCommand
 from commands.tilesetcommands import TilesetInsertTilesCommand, TilesetAppendTilesCommand, TilesetRemoveTilesCommand
 from commands.maplayercommands import LayerRenamedCommand
 from dialogs.layerpropertiesdialog import LayerPropertiesDialog
 from dialogs.tileepropertiesdialog import TilePropertiesDialog
-from formats.spheremap import SphereMap, EntityType, MapLayer, MapEntity
+from formats.spheremap import SphereMap, EntityType, MapEntity
 from widgets.sphereeditor import SphereEditor
-from widgets.map.mapview import MapTool
 from widgets.image.drawingtoolbar import DrawingToolbar
 
 from ui.ui_mapeditor import Ui_MapEditor
 
+from widgets.drawingenums import DrawingTool, DrawMode
 
 class MapEditor(SphereEditor):
 	ui: Ui_MapEditor
@@ -42,7 +43,7 @@ class MapEditor(SphereEditor):
 		self.ui = Ui_MapEditor()
 		self.ui.setupUi(self)
 		self.setupToolbar()
-		self.currentTool = MapTool.Pencil
+		self.currentTool = DrawingTool.Pencil
 		self.layerPropertiesDialog = LayerPropertiesDialog(self)
 		self.tilePropertiesDialog = TilePropertiesDialog(self)
 		self.ui.layersTable.mapView = self.ui.mapView
@@ -52,6 +53,7 @@ class MapEditor(SphereEditor):
 		self.ui.layersTable.layerRenamed.connect(self.onLayerRenamed)
 		self.ui.mainSplitter.setStretchFactor(0,1)
 		self.ui.mapView.currentTileChanged.connect(self.onMapCurrentTileChanged)
+		self.ui.mapView.drawModeChanged.connect(self.onDrawModeChanged)
 		self.ui.tilesetView.indexChanged.connect(self.onTilesetCurrentIndexChanged)
 		self.ui.tilesetView.tilesInserted.connect(self.onTilesetTilesInserted)
 		self.ui.tilesetView.tilesAppended.connect(self.onTilesetTilesAppended)
@@ -145,15 +147,15 @@ class MapEditor(SphereEditor):
 	def setCurrentTool(self, tool:QAction|QToolButton):
 		match tool:
 			case self.menuBar.pencil1|self.menuBar.pencil3|self.menuBar.pencil5|self.menuBar.pencilTool:
-				self.ui.mapView.setCurrentTool(MapTool.Pencil)
+				self.ui.mapView.setCurrentTool(DrawingTool.Pencil)
 			case self.menuBar.lineTool:
-				self.ui.mapView.setCurrentTool(MapTool.Line)
+				self.ui.mapView.setCurrentTool(DrawingTool.Line)
 			case self.menuBar.rectTool:
-				self.ui.mapView.setCurrentTool(MapTool.Rectangle)
+				self.ui.mapView.setCurrentTool(DrawingTool.Rectangle)
 			case self.menuBar.fillTool:
-				self.ui.mapView.setCurrentTool(MapTool.Fill)
+				self.ui.mapView.setCurrentTool(DrawingTool.Fill)
 			case self.menuBar.dropperTool:
-				self.ui.mapView.setCurrentTool(MapTool.Select)
+				self.ui.mapView.setCurrentTool(DrawingTool.Select)
 			case self.toggleGridAction:
 				self.ui.mapView.gridVisible = self.toggleGridAction.isChecked()
 
@@ -206,6 +208,12 @@ class MapEditor(SphereEditor):
 	def onMapCurrentTileChanged(self, newIndex:int):
 		self.ui.tilesetView.selectedIndex = newIndex
 		self.ui.tilesetView.arrangeItems()
+
+
+	@Slot(DrawMode)
+	def onDrawModeChanged(self, mode:DrawMode):
+		if mode == DrawMode.MouseReleased:
+			self.undoStack.push(PencilDrawMapCommand(self.ui.mapView.drawingPoints, self.ui.mapView.currentTile, self.ui.mapView.currentLayer, self.ui.mapView))
 
 #endregion
 
