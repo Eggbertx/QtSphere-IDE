@@ -5,10 +5,10 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Python Debugger: mainwindow.py",
+			"name": "Python Debugger: qtsphere-ide",
 			"type": "debugpy",
 			"request": "launch",
-			"program": "mainwindow.py",
+			"program": "qtsphere-ide.py",
 			"console": "integratedTerminal"
 		}
 	]
