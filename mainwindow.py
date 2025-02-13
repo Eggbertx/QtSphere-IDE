@@ -35,11 +35,11 @@ from widgets.textedit import TextEdit
 from settings import Settings
 
 
-_VERSION = "0.10"
+_VERSION = "0.11"
 _APPLICATION_NAME = "QtSphere IDE"
 _ORG_NAME = "Spherical"
 _ABOUT_STRING = f"""QtSphere IDE v{_VERSION}<br />
-Copyright 2024 by <a href=\"https://github.com/eggbertx\">Eggbertx</a><br /><br />
+Copyright 2025 by <a href=\"https://github.com/eggbertx\">Eggbertx</a><br /><br />
 See <a href=\"https://github.com/Eggbertx/QtSphere-IDE/blob/master/LICENSE.txt\">LICENSE.txt</a> for more information.
 """
 _OPEN_DIALOG_FILTER = (
