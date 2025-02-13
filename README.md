@@ -24,5 +24,5 @@ Then, run the following:
 ```
 pip install -r requirements.txt
 pyside6-project build
-python mainwindow.py
+python qtsphere-ide.py
 ```

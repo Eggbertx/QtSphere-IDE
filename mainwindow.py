@@ -1,5 +1,3 @@
-#!/usr/bin/python3
-
 from argparse import ArgumentParser
 import ctypes
 from enum import Enum
@@ -35,13 +33,6 @@ from widgets.textedit import TextEdit
 from settings import Settings
 
 
-_VERSION = "0.11"
-_APPLICATION_NAME = "QtSphere IDE"
-_ORG_NAME = "Spherical"
-_ABOUT_STRING = f"""QtSphere IDE v{_VERSION}<br />
-Copyright 2025 by <a href=\"https://github.com/eggbertx\">Eggbertx</a><br /><br />
-See <a href=\"https://github.com/Eggbertx/QtSphere-IDE/blob/master/LICENSE.txt\">LICENSE.txt</a> for more information.
-"""
 _OPEN_DIALOG_FILTER = (
 	"All supported files (*.sgm *.txt *.js *.mjs *.cjs *.rmp *.rss *.rws)",
 	"Sphere projects (*.sgm)",
@@ -90,6 +81,7 @@ class MainWindow(QMainWindow):
 	modifiedFilesDialog: ModifiedFilesDialog
 	newButton: QToolButton
 	openFilePaths: list[str] # each element should correspond to the respective tab index, with Start Page (and any other non-file tabs) being None
+	version: str
 
 	@property
 	def currentTabWidget(self):
@@ -100,12 +92,13 @@ class MainWindow(QMainWindow):
 		return self.ui.openFileTabs.currentIndex()
 
 
-	def __init__(self, parent=None, verbose=False):
+	def __init__(self, version:str, parent=None, verbose=False):
 		super().__init__(parent)
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		self.installEventFilter(self)
 
+		self.version = version
 		self.switchSidebarTab(SidebarTab.FileTree)
 		self.verbose = verbose
 		self.settingsWindow = SettingsWindow(self)
@@ -157,7 +150,10 @@ class MainWindow(QMainWindow):
 	def _connectActions(self):
 		self.ui.actionExit.triggered.connect(sys.exit)
 		self.ui.actionAbout_Qt.triggered.connect(lambda: QMessageBox.aboutQt(self, "About Qt"))
-		self.ui.actionAbout.triggered.connect(lambda: QMessageBox.about(self, "About QtSphere IDE", _ABOUT_STRING))
+		self.ui.actionAbout.triggered.connect(lambda: QMessageBox.about(self, "About QtSphere IDE", 
+			f"QtSphere IDE v{self.version}<br />" +
+			"Copyright 2025 by <a href=\"https://github.com/eggbertx\">Eggbertx</a><br /><br />" +
+			"See <a href=\"https://github.com/Eggbertx/QtSphere-IDE/blob/master/LICENSE.txt\">LICENSE.txt</a> for more information."))
 		self.ui.openFileTabs.tabCloseRequested.connect(self.onTabCloseRequested)
 		self.ui.openFileTabs.tabBar().tabMoved.connect(self.onTabMoved)
 		self.ui.actionConfigure_QtSphere_IDE.triggered.connect(self.onOpenSettingsWindowTriggered)
@@ -280,7 +276,7 @@ class MainWindow(QMainWindow):
 	def closeProject(self):
 		self.loadedProject = None
 		self.ui.treeView.updateProject(None)
-		self.setWindowTitle(f"QtSphere IDE {_VERSION}")
+		self.setWindowTitle(f"QtSphere IDE {self.version}")
 		self.ui.menuProject.setEnabled(False)
 		self.engineSelector.setEnabled(False)
 		self.ui.actionProject_Properties.setEnabled(False)
@@ -436,7 +432,7 @@ class MainWindow(QMainWindow):
 
 	def loadProject(self, project:QSIProject):
 		print("Loading project:", project.projectDir)
-		self.setWindowTitle(f"QtSphereIDE {_VERSION} - {project.name}")
+		self.setWindowTitle(f"QtSphereIDE {self.version} - {project.name}")
 		self.ui.menuProject.setEnabled(True)
 		self.engineSelector.setEnabled(True)
 		self.ui.actionProject_Properties.setEnabled(True)
@@ -682,28 +678,3 @@ class MainWindow(QMainWindow):
 		project = self.startPage.currentProject if selected is None else selected
 		QDesktopServices.openUrl(QUrl.fromLocalFile(project.projectDir))
 	#endregion
-
-
-if __name__ == "__main__":
-	parser = ArgumentParser()
-	parser.add_argument("--verbose", "-v",
-		action="store_true",
-		default=False,
-		help="If set, QtSphere IDE will print a warning when it finds a directory with no parseable game file (game.sgm, Cellscript.js, etc)")
-	
-	args = parser.parse_args()
-
-	QCoreApplication.setApplicationName(_APPLICATION_NAME)
-	QCoreApplication.setOrganizationName(_ORG_NAME)
-	QCoreApplication.setApplicationVersion(_VERSION)
-	app = QApplication(sys.argv)
-
-	window = MainWindow(verbose=args.verbose)
-	settings = Settings()
-	app.setStyle(settings.theme)
-	if settings.maximized:
-		window.showMaximized()
-	else:
-		window.show()
-	signal(SIGINT, SIG_DFL)
-	sys.exit(app.exec())
