@@ -20,15 +20,15 @@ if __name__ == "__main__":
 		action="store_true",
 		default=False,
 		help="If set, QtSphere IDE will print a warning when it finds a directory with no parseable game file (game.sgm, Cellscript.js, etc)")
-	
-	args = parser.parse_args()
+
+	args, otherArgs = parser.parse_known_args()
 
 	QCoreApplication.setApplicationName(__APPLICATION_NAME)
 	QCoreApplication.setOrganizationName(__ORG_NAME)
 	QCoreApplication.setApplicationVersion(__VERSION)
 	app = QApplication(sys.argv)
 
-	window = MainWindow(__VERSION, verbose=args.verbose)
+	window = MainWindow(__VERSION, openPath=None if len(otherArgs) == 0 else otherArgs[0], verbose=args.verbose)
 	settings = Settings()
 	app.setStyle(settings.theme)
 	if settings.maximized:

@@ -5,11 +5,25 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Python Debugger: qtsphere-ide",
+			"name": "Debug QtSphere IDE",
 			"type": "debugpy",
 			"request": "launch",
 			"program": "qtsphere-ide.py",
 			"console": "integratedTerminal"
+		},
+		{
+			"name": "Debug QtSphere IDE (1.x directory)",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "qtsphere-ide.py",
+			"args": ["tests/projects/QSI 1.x Test Project"],
+		},
+		{
+			"name": "Debug QtSphere IDE (Sphere Studio Project)",
+			"type": "debugpy",
+			"request": "launch",
+			"program": "qtsphere-ide.py",
+			"args": ["tests/projects/QSI neoSphere Test Project"],
 		}
 	]
 }

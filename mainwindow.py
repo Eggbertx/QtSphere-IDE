@@ -93,7 +93,7 @@ class MainWindow(QMainWindow):
 		return self.ui.openFileTabs.currentIndex()
 
 
-	def __init__(self, version:str, parent=None, verbose=False):
+	def __init__(self, version:str, openPath=None, parent=None, verbose=False):
 		super().__init__(parent)
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
@@ -134,6 +134,9 @@ class MainWindow(QMainWindow):
 		self.ui.treeView.updateProject(self.loadedProject)
 		self._setupSettings()
 		self._connectActions()
+		if openPath is not None:
+			self.openProjectFileOrDir(openPath)
+
 		if os.name == "nt":
 			# makes it so that our icon shows up correctly in the task bar instead of using pythonw.exe's icon
 			ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(f"spherical.QtSphereIDE{_VERSION}")
@@ -289,6 +292,33 @@ class MainWindow(QMainWindow):
 			errorDialog.setInformativeText(traceback.format_exc())
 			errorDialog.show()
 			raise
+
+
+
+	def openProjectFileOrDir(self, openPath:str):
+		ext = openPath[openPath.rindex("."):] if openPath.count(".") > 0 else ""
+		match ext:
+			case ".sgm":
+				project = QSIProject()
+				if project.open(openPath):
+					self.loadProject(project)
+				else:
+					ErrorDialog.showError(self, "Unable to open Sphere 1.x project file")
+			case ".ssproj":
+				project = QSIProject()
+				if project.open(openPath):
+					self.loadProject(project)
+				else:
+					ErrorDialog.showError(self, "Unable to open Sphere Studio project file")
+			case _:
+				if os.path.isdir(openPath):
+					project = QSIProject()
+					if project.open(openPath):
+						self.loadProject(project)
+					else:
+						ErrorDialog.showError(self, "Unable to open project directory")
+				else:
+					self.openFile(openPath)
 
 
 	def closeProject(self):
