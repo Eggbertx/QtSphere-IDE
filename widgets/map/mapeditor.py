@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QWidget, QLabel, QToolButton, QMenu, QPushButton
 
 from commands.mapviewcommands import PencilDrawMapCommand
 from commands.tilesetcommands import TilesetInsertTilesCommand, TilesetAppendTilesCommand, TilesetRemoveTilesCommand
-from commands.maplayercommands import LayerRenamedCommand
+from commands.maplayercommands import LayerRenamedCommand, LayerVisibilityToggleCommand
 from dialogs.layerpropertiesdialog import LayerPropertiesDialog
 from dialogs.tileepropertiesdialog import TilePropertiesDialog
 from formats.spheremap import SphereMap, EntityType, MapEntity
@@ -163,7 +163,7 @@ class MapEditor(SphereEditor):
 #region LayersTable slots
 	@Slot(int)
 	def onLayerVisibilityToggled(self, layer:int):
-		self.ui.mapView.toggleLayerVisibility(layer)
+		self.undoStack.push(LayerVisibilityToggleCommand(self.map, self.ui.mapView, self.ui.layersTable, layer, self.map.layers[layer].visible))
 
 
 	@Slot(int)

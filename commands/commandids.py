@@ -8,3 +8,4 @@ class CommandIDs(Enum):
 	RemoveTiles = auto()
 	RenameMapLayer = auto()
 	PencilDrawMap = auto()
+	ToggleMapLayerVisibility = auto()

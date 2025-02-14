@@ -102,6 +102,12 @@ class LayersTable(QTableWidget):
 		return self.rowAt(btn.pos().y())
 
 
+	def updateButtonPixmap(self, row:int):
+		btn:QPushButton = self.cellWidget(row, 0)
+		layer = self.rowToLayer(row)
+		btn.setIcon(QPixmap(":/res/eye.png" if self.mapView.isLayerVisible(layer) else ":/res/eye-closed.png"))
+
+
 	@Slot(int,int)
 	def onCellClicked(self, row:int, column:int):
 		self.mapView.currentLayer = self.rowToLayer(row)
@@ -112,9 +118,7 @@ class LayersTable(QTableWidget):
 		row = self.getWidgetRow(self.sender())
 		layer = self.rowToLayer(row)
 		self.layerVisibilityToggleRequested.emit(layer)
-		btn:QPushButton = self.cellWidget(row, 0)
-		visible = self.mapView.isLayerVisible(layer)
-		btn.setIcon(QPixmap(":/res/eye.png" if visible else ":/res/eye-closed.png"))
+		self.updateButtonPixmap(row)
 
 
 	@Slot(int,int)
