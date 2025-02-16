@@ -18,6 +18,7 @@
         "ui/soundplayer.ui",
         "ui/spriteseteditor.ui",
         "ui/startpage.ui",
-        "ui/tilepropertiesdialog.ui"
+        "ui/tilepropertiesdialog.ui",
+        "ui/mappropertiesdialog.ui"
     ]
 }

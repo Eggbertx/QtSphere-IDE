@@ -3,6 +3,7 @@ from typing import Self
 from PySide6.QtWidgets import QMenu, QWidget
 from PySide6.QtGui import QAction
 
+from dialogs.mappropertiesdialog import MapPropertiesDialog
 from widgets.map.mapeditor import MapEditor
 from widgets.spriteset.spriteseteditor import SpritesetEditor
 
@@ -15,7 +16,7 @@ class EditorMenuProvider:
 	def createMapMenu(self, editor:MapEditor):
 		mapMenu = QMenu(self.parent)
 		mapMenu.setTitle("Map")
-		mapMenu.addAction("Properties")
+		mapMenu.addAction("Properties", lambda: self.__showMapProperties(editor))
 		mapMenu.addSeparator()
 		mapTilesetMenu = mapMenu.addMenu("Tileset")
 		mapMenu.addAction("Resize All Layers")
@@ -29,6 +30,12 @@ class EditorMenuProvider:
 		mapTilesetMenu.addAction("Export")
 		mapTilesetMenu.addAction("Prune")
 		return mapMenu
+
+
+	def __showMapProperties(self, editor:MapEditor):
+		mapPropertiesDialog = MapPropertiesDialog(editor, editor.map)
+		mapPropertiesDialog.exec()
+
 
 	def createSpritesetMenu(self, editor:SpritesetEditor):
 		spritesetMenu = QMenu(self.parent)

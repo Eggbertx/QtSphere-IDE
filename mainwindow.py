@@ -12,6 +12,7 @@ from PySide6.QtGui import QCloseEvent, QIcon, QDesktopServices, QImage, QShortcu
 from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QComboBox,
 	QFileDialog, QMenu, QToolButton, QWidget, QDialog, QDialogButtonBox, QAbstractButton)
 
+from dialogs.mappropertiesdialog import MapPropertiesDialog
 from ui.ui_mainwindow import Ui_MainWindow
 
 from dialogs.errordialog import ErrorDialog
@@ -30,7 +31,7 @@ from widgets.spriteset.spriteseteditor import SpritesetEditor
 from widgets.startpage import StartPage
 from widgets.textedit import TextEdit
 from settings import Settings
-from editor_menus import EditorMenuProvider
+from widgets.editor_menus import EditorMenuProvider
 
 _OPEN_DIALOG_FILTER = (
 	"All supported files (*.sgm *.txt *.js *.mjs *.cjs *.rmp *.rss *.rws)",
