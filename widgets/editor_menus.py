@@ -21,6 +21,8 @@ class EditorMenuProvider:
 		mapTilesetMenu = mapMenu.addMenu("Tileset")
 		mapMenu.addAction("Resize All Layers")
 		mapMenu.addAction("Resize Current Layer")
+		mapMenu.addSeparator()
+		mapMenu.addAction("Export image")
 
 		mapTilesetMenu.addAction("Change Tile Size")
 		mapTilesetMenu.addAction("Rescale Tileset")

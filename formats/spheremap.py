@@ -206,13 +206,6 @@ class SphereMap(SphereFile):
 		return self.strings[MapString.TilesetFile]
 
 
-	@property
-	def musicFile(self):
-		if len(self.strings) < MapString.MusicFile:
-			return ""
-		return self.strings[MapString.MusicFile]
-
-
 	@staticmethod
 	def create(width:int, height:int, tileset:str = None):
 		rts = Tileset()
@@ -302,6 +295,12 @@ class SphereMap(SphereFile):
 
 	def _packBytes() -> bytes:
 		raise NotImplementedError("Map saving not implemented yet")
+
+
+	def getString(self, string:MapString):
+		if string < 0 or string >= len(self.strings):
+			return None
+		return self.strings[string]
 
 
 	def largestLayerSize(self):

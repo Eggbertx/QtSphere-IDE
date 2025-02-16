@@ -1,11 +1,9 @@
-from argparse import ArgumentParser
 import ctypes
-from enum import Enum
+from enum import Enum, auto
 import os
 from os.path import basename
 import sys
 import traceback
-from signal import signal, SIGINT, SIG_DFL
 
 from PySide6.QtCore import QCoreApplication, Qt, Slot, QUrl
 from PySide6.QtGui import QCloseEvent, QIcon, QDesktopServices, QImage, QShortcut
@@ -49,23 +47,23 @@ _OPEN_DIALOG_FILTER = (
 
 
 class FileType(Enum):
-	AllSupported = 0
-	Projects = 1
-	Script = 2
-	Text = 3
-	Image = 4
-	Audio = 5
-	SphereFont = 6
-	SphereMap = 7
-	Spriteset = 8
-	WindowStyle = 9
-	All = 10
+	AllSupported = auto()
+	Projects = auto()
+	Script = auto()
+	Text = auto()
+	Image = auto()
+	Audio = auto()
+	SphereFont = auto()
+	SphereMap = auto()
+	Spriteset = auto()
+	WindowStyle = auto()
+	All = auto()
 
 
 class SidebarTab(Enum):
-	FileTree = 0
-	TaskList = 1
-	SoundTest = 2
+	FileTree = auto()
+	TaskList = auto()
+	SoundTest = auto()
 
 
 class MainWindow(QMainWindow):
