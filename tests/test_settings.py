@@ -12,9 +12,9 @@ def __remove_ini_file():
 		os.unlink(__test_ini)
 
 def setup_module(module):
-	QCoreApplication.setApplicationName(mainwindow._APPLICATION_NAME)
-	QCoreApplication.setOrganizationName(mainwindow._ORG_NAME)
-	QCoreApplication.setApplicationVersion(mainwindow._VERSION)
+	QCoreApplication.setApplicationName("QtSphere IDE")
+	QCoreApplication.setOrganizationName("Spherical")
+	QCoreApplication.setApplicationVersion("0.10")
 
 def setup_function(function):
 	__remove_ini_file()

@@ -173,6 +173,8 @@ class MapZone:
 		(zone.x1,zone.y1,zone.x2,zone.y2,zone.layer,zone.reactivateInNumSteps) = struct.unpack("<6H4x", reader.read(16))
 		zone.script = readSphereString(reader)
 		return zone
+
+
 	def __init__(self, x1:int = 0, y1:int = 0, x2:int = 0, y2:int = 0, layer:int = 0, reactivateInNumSteps:int = 8, script:str = ""):
 		self.x1 = x1
 		self.y1 = y1
@@ -195,12 +197,20 @@ class SphereMap(SphereFile):
 	layers:list[MapLayer]
 	entities:list[MapEntity]
 	zones:list[MapZone]
+	repeating:bool
 
 	@property
 	def tilesetFile(self):
 		if len(self.strings) < MapString.TilesetFile:
 			raise FormatException(self.filePath, "Missing tileset string data")
 		return self.strings[MapString.TilesetFile]
+
+
+	@property
+	def musicFile(self):
+		if len(self.strings) < MapString.MusicFile:
+			return ""
+		return self.strings[MapString.MusicFile]
 
 
 	@staticmethod
@@ -239,6 +249,7 @@ class SphereMap(SphereFile):
 		self.tileset = None
 		self.startX = 0
 		self.startY = 0
+		self.repeating = False
 
 
 	def open(self):
@@ -255,7 +266,7 @@ class SphereMap(SphereFile):
 			raise FormatException(self.filePath, f"invalid file signature")
 		
 		(version, numLayers, numEntities, self.startX, self.startY,
-		self.startLayer, self.startDirection, numStrings, numZones) = struct.unpack("<HxBx3H2B2H235x", file.read(252))
+		self.startLayer, self.startDirection, numStrings, numZones, self.repeating) = struct.unpack("<HxBx3H2B2H?234x", file.read(252))
 		if version != 1:
 			raise FormatException(self.filePath, f"invalid map file version (must be 1, got {version})")
 
