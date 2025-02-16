@@ -139,7 +139,7 @@ class MainWindow(QMainWindow):
 
 		if os.name == "nt":
 			# makes it so that our icon shows up correctly in the task bar instead of using pythonw.exe's icon
-			ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(f"spherical.QtSphereIDE{_VERSION}")
+			ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(f"spherical.QtSphereIDE{self.version}")
 
 
 	def _setupSettings(self):
