@@ -9,6 +9,44 @@ from ui.ui_mappropertiesdialog import Ui_MapPropertiesDialog
 class MapPropertiesDialog(QDialog):
 	map:SphereMap
 	ui:Ui_MapPropertiesDialog
+
+	@property
+	def tileset(self):
+		return self.ui.tileset_txt.text()
+	
+	@property
+	def bgm(self):
+		return self.ui.bgm_txt.text()
+	
+	@property
+	def repeating(self):
+		return self.ui.repeat_chk.isChecked()
+	
+	@property
+	def entryScript(self):
+		return self.ui.enter_txt.toPlainText()
+	
+	@property
+	def exitScript(self):
+		return self.ui.leave_txt.toPlainText()
+	
+	@property
+	def northScript(self):
+		return self.ui.north_txt.toPlainText()
+	
+	@property
+	def eastScript(self):
+		return self.ui.east_txt.toPlainText()
+	
+	@property
+	def southScript(self):
+		return self.ui.south_txt.toPlainText()
+	
+	@property
+	def westScript(self):
+		return self.ui.west_txt.toPlainText
+
+
 	def __init__(self, parent = None, map:SphereMap = None):
 		super().__init__(parent)
 		self.ui = Ui_MapPropertiesDialog()

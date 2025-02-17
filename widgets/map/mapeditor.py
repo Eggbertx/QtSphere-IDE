@@ -1,19 +1,22 @@
-from PySide6.QtCore import Slot, QPoint
+from PySide6.QtCore import Slot, QPoint, Signal
 from PySide6.QtGui import QPixmap, QIcon, QAction
 from PySide6.QtWidgets import QWidget, QLabel, QToolButton, QMenu, QPushButton
 
+from commands.mappropertiescommands import MapPropertiesChangedCommand
 from commands.mapviewcommands import PencilDrawMapCommand
 from commands.tilesetcommands import TilesetInsertTilesCommand, TilesetAppendTilesCommand, TilesetRemoveTilesCommand
 from commands.maplayercommands import LayerRenamedCommand, LayerVisibilityToggleCommand
 from dialogs.layerpropertiesdialog import LayerPropertiesDialog
 from dialogs.tileepropertiesdialog import TilePropertiesDialog
 from formats.spheremap import SphereMap, EntityType, MapEntity
+from formats.tileset import Tileset
 from widgets.sphereeditor import SphereEditor, SphereEditorType
 from widgets.image.drawingtoolbar import DrawingToolbar
 
 from ui.ui_mapeditor import Ui_MapEditor
 
 from widgets.drawingenums import DrawingTool, DrawMode
+from dialogs.mappropertiesdialog import MapPropertiesDialog
 
 class MapEditor(SphereEditor):
 	ui: Ui_MapEditor
@@ -22,8 +25,9 @@ class MapEditor(SphereEditor):
 	menuBar:DrawingToolbar
 	toggleGridAction:QAction
 
-	layerPropertiesDialog: LayerPropertiesDialog
-	tilePropertiesDialog: TilePropertiesDialog
+	layerPropertiesDialog:LayerPropertiesDialog
+	tilePropertiesDialog:TilePropertiesDialog
+	mapPropertiesChanged:Signal = Signal(MapPropertiesDialog)
 
 	@property
 	def map(self):
@@ -59,6 +63,7 @@ class MapEditor(SphereEditor):
 		self.ui.tilesetView.tilesAppended.connect(self.onTilesetTilesAppended)
 		self.ui.tilesetView.tilesRemoved.connect(self.onTilesetTilesRemoved)
 		self.ui.tilesetView.tilePropertiesRequested.connect(self.onTilesetTilePropertiesRequested)
+		self.mapPropertiesChanged.connect(self.onMapPropertiesChanged)
 
 
 	def setupToolbar(self):
@@ -132,6 +137,13 @@ class MapEditor(SphereEditor):
 		self.updateTilesetTitle()
 
 
+	def attachTileset(self, tileset:Tileset):
+		self.ui.tilesetView.attachTileset(tileset, True)
+		self.ui.tilesetView.mapEditor = self
+		self.updateTilesetTitle()
+		self.ui.mapView.attachTileset(tileset)
+
+
 	@Slot(int,bool)
 	def onMapGraphicToggleTriggered(self, which:int, show:bool):
 		match which:
@@ -159,6 +171,11 @@ class MapEditor(SphereEditor):
 			case self.toggleGridAction:
 				self.ui.mapView.gridVisible = self.toggleGridAction.isChecked()
 
+
+	@Slot(MapPropertiesDialog)
+	def onMapPropertiesChanged(self, dialog:MapPropertiesDialog):
+		print(f"New tileset: {dialog.ui.tileset_txt.text()}")
+		self.undoStack.push(MapPropertiesChangedCommand(dialog, self.map, self))
 
 #region LayersTable slots
 	@Slot(int)

@@ -36,7 +36,8 @@ class EditorMenuProvider:
 
 	def __showMapProperties(self, editor:MapEditor):
 		mapPropertiesDialog = MapPropertiesDialog(editor, editor.map)
-		mapPropertiesDialog.exec()
+		if mapPropertiesDialog.exec() != 0:
+			editor.mapPropertiesChanged.emit(mapPropertiesDialog)
 
 
 	def createSpritesetMenu(self, editor:SpritesetEditor):

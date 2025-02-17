@@ -1,5 +1,6 @@
 from enum import Enum, auto
 
+import shiboken6
 from PySide6.QtCore import Qt, QEvent, QPoint, QRect, Signal, Slot, QSize
 from PySide6.QtGui import QMouseEvent, QPixmap, QColor, QAction
 from PySide6.QtWidgets import (
@@ -9,6 +10,7 @@ from PySide6.QtWidgets import (
 
 from compare_images import images_equal
 from formats.spheremap import SphereMap, EntityType
+from formats.tileset import Tileset
 from settings import Settings, Defaults
 
 from widgets.drawingenums import DrawingTool, DrawMode
@@ -155,25 +157,29 @@ class MapView(QGraphicsView):
 
 
 	def attachMap(self, map:SphereMap):
-		tileW = map.tileset.tileWidth
-		tileH = map.tileset.tileHeight
+		self.mapFile = map
+		self.attachTileset(map.tileset)
+		self.setDrawSize(1)
+		self.gridVisible = False
+
+
+	def attachTileset(self, tileset:Tileset):
 		self.mapScene.clear()
-		for l in range(len(map.layers)):
-			layer = map.layers[l]
+		for l in range(len(self.mapFile.layers)):
+			layer = self.mapFile.layers[l]
 			for t in range(len(layer.tiles)):
 				tile = layer.tiles[t]
-				tilePixmap = self.mapScene.addPixmap(QPixmap.fromImage(map.tileset.tiles[tile].image))
+				tilePixmap = self.mapScene.addPixmap(QPixmap.fromImage(tileset.tiles[tile].image))
 				tilePixmap.setShapeMode(QGraphicsPixmapItem.ShapeMode.BoundingRectShape)
 				x = t % layer.width
 				y = (t - x) / layer.width
-				tilePixmap.setPos(x * tileW,y * tileH)
+				tilePixmap.setPos(x * tileset.tileWidth, y * tileset.tileHeight)
 				tilePixmap.setZValue(l)
 				tilePixmap.setVisible(layer.visible)
-		self.mapFile = map
-		self.setDrawSize(1)
 		self.__updateGrid()
-		self.__updateMapIcons(tileW, tileH)
-		self.gridVisible = False
+		self.__updateMapIcons(tileset.tileWidth, tileset.tileHeight)
+		self.pointerGroup = None
+		self.__resetPointerGroup()
 
 
 	def __updateMapIcons(self, tileW:int, tileH:int):
@@ -287,6 +293,8 @@ class MapView(QGraphicsView):
 
 
 	def pointerRect(self, tiles:bool):
+		if self.pointerGroup is None or not shiboken6.isValid(self.pointerGroup):
+			self.__resetPointerGroup()
 		rPos = self.pointerGroup.scenePos().toPoint()
 		rSize = QSize(self.drawSize * self.tileWidth, self.drawSize * self.tileHeight)
 		if tiles:
@@ -369,7 +377,8 @@ class MapView(QGraphicsView):
 
 	def leaveEvent(self, event: QEvent):
 		super().leaveEvent(event)
-		self.pointerGroup.hide()
+		if self.pointerGroup is not None and shiboken6.isValid(self.pointerGroup):
+			self.pointerGroup.hide()
 		self.drawing = False # drawing is changed, but the mouse is not released so drawMode is not changed
 		self.window().setStatus("")
 #endregion
@@ -404,7 +413,7 @@ class MapView(QGraphicsView):
 
 
 	def __resetPointerGroup(self):
-		if self.pointerGroup is not None:
+		if self.pointerGroup is not None and shiboken6.isValid(self.pointerGroup):
 			items = self.pointerGroup.childItems()
 			for item in items:
 				self.mapScene.removeItem(item)
@@ -415,7 +424,7 @@ class MapView(QGraphicsView):
 
 
 	def __resetGridGroup(self):
-		if self.gridGroup is not None:
+		if self.gridGroup is not None and shiboken6.isValid(self.gridGroup):
 			if self.gridGroup.scene() is not None:
 				self.mapScene.destroyItemGroup(self.gridGroup)
 			del self.gridGroup
@@ -485,10 +494,13 @@ class MapView(QGraphicsView):
 			pos.x() - self.drawSize // 2,
 			pos.y() - self.drawSize // 2
 		)
-		self.pointerGroup.setPos(pointerUL)
-		if pos.x() > -1 and pos.y() > -1:
-			self.pointerGroup.show()
-			if self.drawMode == DrawMode.MouseDown and self.drawing:
-				self.__drawTemporaryTile()
-		else:
-			self.pointerGroup.hide()
+		try:
+			self.pointerGroup.setPos(pointerUL)
+			if pos.x() > -1 and pos.y() > -1:
+				self.pointerGroup.show()
+				if self.drawMode == DrawMode.MouseDown and self.drawing:
+					self.__drawTemporaryTile()
+			else:
+				self.pointerGroup.hide()
+		except:
+			pass

@@ -206,6 +206,13 @@ class SphereMap(SphereFile):
 		return self.strings[MapString.TilesetFile]
 
 
+	@tilesetFile.setter
+	def tilesetFile(self, value:str):
+		if len(self.strings) < MapString.TilesetFile:
+			self.strings.append("")
+		self.strings[MapString.TilesetFile] = value
+
+
 	@staticmethod
 	def create(width:int, height:int, tileset:str = None):
 		rts = Tileset()
@@ -301,6 +308,14 @@ class SphereMap(SphereFile):
 		if string < 0 or string >= len(self.strings):
 			return None
 		return self.strings[string]
+
+
+	def setString(self, string:MapString, value:str):
+		if string < 0:
+			raise IndexError(f"Invalid map string index {string}")
+		if string >= len(self.strings):
+			self.strings.extend([""] * (string - len(self.strings) + 1))
+		self.strings[string] = value
 
 
 	def largestLayerSize(self):

@@ -9,3 +9,4 @@ class CommandIDs(Enum):
 	RenameMapLayer = auto()
 	PencilDrawMap = auto()
 	ToggleMapLayerVisibility = auto()
+	MapPropertiesChanged = auto()
