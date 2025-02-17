@@ -180,6 +180,7 @@ class MapView(QGraphicsView):
 		self.__updateMapIcons(tileset.tileWidth, tileset.tileHeight)
 		self.pointerGroup = None
 		self.__resetPointerGroup()
+		self.__updatePointer()
 
 
 	def __updateMapIcons(self, tileW:int, tileH:int):
