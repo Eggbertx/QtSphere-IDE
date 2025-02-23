@@ -2,7 +2,7 @@ from PySide6.QtCore import Slot, Signal, QSize
 from PySide6.QtGui import QIcon, QAction
 from PySide6.QtWidgets import QWidget, QLabel, QToolButton, QMenu, QPushButton
 
-from commands.maplayerresizecommands import AllLayersResizedCommand
+from commands.maplayerresizecommands import ResizeAllMapLayersCommand, ResizeCurrentMapLayerCommand
 from commands.mappropertiescommands import MapPropertiesChangedCommand
 from commands.mapviewcommands import PencilDrawMapCommand
 from commands.tilesetcommands import TilesetInsertTilesCommand, TilesetAppendTilesCommand, TilesetRemoveTilesCommand
@@ -30,6 +30,7 @@ class MapEditor(SphereEditor):
 	tilePropertiesDialog:TilePropertiesDialog
 	mapPropertiesChanged:Signal = Signal(MapPropertiesDialog)
 	allLayersResized:Signal = Signal(QSize)
+	currentLayerResized:Signal = Signal(int,QSize)
 
 	@property
 	def map(self):
@@ -67,6 +68,7 @@ class MapEditor(SphereEditor):
 		self.ui.tilesetView.tilePropertiesRequested.connect(self.onTilesetTilePropertiesRequested)
 		self.mapPropertiesChanged.connect(self.onMapPropertiesChanged)
 		self.allLayersResized.connect(self.onAllLayersResized)
+		self.currentLayerResized.connect(self.onCurrentLayerResized)
 
 
 	def setupToolbar(self):
@@ -182,7 +184,13 @@ class MapEditor(SphereEditor):
 
 	@Slot(QSize)
 	def onAllLayersResized(self, newSize:QSize):
-		self.undoStack.push(AllLayersResizedCommand(self.ui.mapView, newSize))
+		self.undoStack.push(ResizeAllMapLayersCommand(self.ui.mapView, newSize))
+
+
+	@Slot(int,QSize)
+	def onCurrentLayerResized(self, layer:int, newSize:QSize):
+		self.undoStack.push(ResizeCurrentMapLayerCommand(self.ui.mapView, layer, newSize))
+
 
 #region LayersTable slots
 	@Slot(int)

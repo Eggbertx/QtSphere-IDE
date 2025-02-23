@@ -5,8 +5,7 @@ from commands.commandids import CommandIDs
 from formats.spheremap import SphereMap
 from widgets.map.mapview import MapView
 
-class AllLayersResizedCommand(QUndoCommand):
-	map:SphereMap
+class ResizeAllMapLayersCommand(QUndoCommand):
 	mapView:MapView
 	oldSizes:list[QSize]
 	newSizes:list[QSize]
@@ -39,6 +38,46 @@ class AllLayersResizedCommand(QUndoCommand):
 		
 
 	def mergeWith(self, other:QUndoCommand) -> bool:
-		return other.id() == self.id() and isinstance(other, AllLayersResizedCommand) \
+		return other.id() == self.id() and isinstance(other, ResizeAllMapLayersCommand) \
 			and other.map.filePath == self.map.filePath \
 			and other.newSizes == self.newSizes
+
+
+class ResizeCurrentMapLayerCommand(QUndoCommand):
+	mapView:MapView
+	layerIndex:int
+	oldSize:QSize
+	newSize:QSize
+
+	@property
+	def map(self) -> SphereMap:
+		return self.mapView.mapFile
+
+
+	def __init__(self, mapView:MapView, layerIndex:int, newSize:QSize):
+		super().__init__()
+		self.mapView = mapView
+		self.layerIndex = layerIndex
+		self.oldSize = QSize(self.map.layers[layerIndex].width, self.map.layers[layerIndex].height)
+		self.newSize = newSize
+
+
+	def id(self) -> int:
+		return CommandIDs.ResizeCurrentMapLayer.value
+
+
+	def undo(self):
+		self.map.layers[self.layerIndex].resize(self.oldSize.width(), self.oldSize.height())
+		self.mapView.attachTileset(self.map.tileset)
+
+
+	def redo(self):
+		self.map.layers[self.layerIndex].resize(self.newSize.width(), self.newSize.height())
+		self.mapView.attachTileset(self.map.tileset)
+
+
+	def mergeWith(self, other:QUndoCommand) -> bool:
+		return other.id() == self.id() and isinstance(other, ResizeCurrentMapLayerCommand) \
+			and other.map.filePath == self.map.filePath \
+			and other.layerIndex == self.layerIndex \
+			and other.newSize == self.newSize

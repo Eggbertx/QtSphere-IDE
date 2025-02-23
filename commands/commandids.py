@@ -11,3 +11,4 @@ class CommandIDs(Enum):
 	ToggleMapLayerVisibility = auto()
 	MapPropertiesChanged = auto()
 	ResizeAllMapLayers = auto()
+	ResizeCurrentMapLayer = auto()

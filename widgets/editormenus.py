@@ -14,10 +14,18 @@ class EditorMenuProvider:
 
 
 	def __showResizeAllLayersDialog(self, editor:MapEditor):
-		resizeDialog = ResizeDialog("Resize All Layers", QSize(editor.map.layers[0].width,editor.map.layers[0].height), editor)
+		resizeDialog = ResizeDialog("Resize All Layers", QSize(editor.map.layers[0].width, editor.map.layers[0].height), editor)
 		resizeDialog.suffix = " tiles"
 		if resizeDialog.exec() != 0:
 			editor.allLayersResized.emit(resizeDialog.sizeValue)
+
+
+	def __showResizeCurrentLayerDialog(self, editor:MapEditor):
+		currentLayer = editor.ui.layersTable.currentLayer()
+		resizeDialog = ResizeDialog("Resize Current Layer", QSize(editor.map.layers[currentLayer].width, editor.map.layers[currentLayer].height), editor)
+		resizeDialog.suffix = " tiles"
+		if resizeDialog.exec() != 0:
+			editor.currentLayerResized.emit(currentLayer, resizeDialog.sizeValue)
 
 
 	def createMapMenu(self, editor:MapEditor):
@@ -27,7 +35,7 @@ class EditorMenuProvider:
 		mapMenu.addSeparator()
 		mapTilesetMenu = mapMenu.addMenu("Tileset")
 		mapMenu.addAction("Resize All Layers", lambda: self.__showResizeAllLayersDialog(editor))
-		mapMenu.addAction("Resize Current Layer")
+		mapMenu.addAction("Resize Current Layer", lambda: self.__showResizeCurrentLayerDialog(editor))
 		mapMenu.addSeparator()
 		mapMenu.addAction("Export image")
 
