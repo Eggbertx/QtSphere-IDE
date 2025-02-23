@@ -112,6 +112,21 @@ class MapLayer:
 		self.tiles = []
 		self.segments = []
 
+
+	def resize(self, newWidth:int, newHeight:int):
+		if newWidth == self.width and newHeight == self.height:
+			return
+
+		newTiles = [0] * newWidth * newHeight
+		for y in range(min(self.height, newHeight)):
+			for x in range(min(self.width, newWidth)):
+				newTiles[x + y * newWidth] = self.tiles[x + y * self.width]
+
+		self.width = newWidth
+		self.height = newHeight
+		self.tiles = newTiles
+
+
 class MapEntity:
 	mapX:int
 	mapY:int
@@ -319,14 +334,7 @@ class SphereMap(SphereFile):
 
 
 	def largestLayerSize(self):
-		largestW = 0
-		largestH = 0
-		for layer in self.layers:
-			if layer.width > largestW:
-				largestW = layer.width
-			if layer.height > largestH:
-				largestH = layer.height
-		return QSize(largestW, largestH)
+		return QSize(max(self.layers, key=lambda l: l.width).width, max(self.layers, key=lambda l: l.height).height)
 
 
 	def getTileIndexAt(self, tileX:int, tileY:int, layer:int):

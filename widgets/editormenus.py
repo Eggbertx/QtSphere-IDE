@@ -1,9 +1,8 @@
-from typing import Self
-
+from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QMenu, QWidget
-from PySide6.QtGui import QAction
 
 from dialogs.mappropertiesdialog import MapPropertiesDialog
+from dialogs.resizedialog import ResizeDialog
 from widgets.map.mapeditor import MapEditor
 from widgets.spriteset.spriteseteditor import SpritesetEditor
 
@@ -13,13 +12,21 @@ class EditorMenuProvider:
 	def __init__(self, parent:QWidget = None):
 		self.parent = parent
 
+
+	def __showResizeAllLayersDialog(self, editor:MapEditor):
+		resizeDialog = ResizeDialog("Resize All Layers", QSize(editor.map.layers[0].width,editor.map.layers[0].height), editor)
+		resizeDialog.suffix = " tiles"
+		if resizeDialog.exec() != 0:
+			editor.allLayersResized.emit(resizeDialog.sizeValue)
+
+
 	def createMapMenu(self, editor:MapEditor):
 		mapMenu = QMenu(self.parent)
 		mapMenu.setTitle("Map")
 		mapMenu.addAction("Properties", lambda: self.__showMapProperties(editor))
 		mapMenu.addSeparator()
 		mapTilesetMenu = mapMenu.addMenu("Tileset")
-		mapMenu.addAction("Resize All Layers")
+		mapMenu.addAction("Resize All Layers", lambda: self.__showResizeAllLayersDialog(editor))
 		mapMenu.addAction("Resize Current Layer")
 		mapMenu.addSeparator()
 		mapMenu.addAction("Export image")

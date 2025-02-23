@@ -1,0 +1,44 @@
+from PySide6.QtCore import QSize
+from PySide6.QtGui import QUndoCommand
+
+from commands.commandids import CommandIDs
+from formats.spheremap import SphereMap
+from widgets.map.mapview import MapView
+
+class AllLayersResizedCommand(QUndoCommand):
+	map:SphereMap
+	mapView:MapView
+	oldSizes:list[QSize]
+	newSizes:list[QSize]
+
+	@property
+	def map(self) -> SphereMap:
+		return self.mapView.mapFile
+
+	def __init__(self, mapView:MapView, newSize:QSize):
+		super().__init__()
+		self.mapView = mapView
+		self.oldSizes = [QSize(layer.width, layer.height) for layer in self.map.layers]
+		self.newSizes = [newSize for _ in self.map.layers]
+
+
+	def id(self) -> int:
+		return CommandIDs.ResizeAllMapLayers.value
+
+
+	def undo(self):
+		for i in range(len(self.map.layers)):
+			self.map.layers[i].resize(self.oldSizes[i].width(), self.oldSizes[i].height())
+		self.mapView.attachTileset(self.map.tileset)
+
+
+	def redo(self):
+		for i in range(len(self.map.layers)):
+			self.map.layers[i].resize(self.newSizes[i].width(), self.newSizes[i].height())
+		self.mapView.attachTileset(self.map.tileset)
+		
+
+	def mergeWith(self, other:QUndoCommand) -> bool:
+		return other.id() == self.id() and isinstance(other, AllLayersResizedCommand) \
+			and other.map.filePath == self.map.filePath \
+			and other.newSizes == self.newSizes
