@@ -58,7 +58,7 @@ class WrappedGraphicsView(QGraphicsView):
 	def indexToPosition(self, index:int):
 		# returns QPoint given an index (doesn't do bounds checking)
 		tw = self.tSize.width()
-		tilesPerRow = self.width() // self.tSize.width()
+		tilesPerRow = max(self.width() // self.tSize.width(),1)
 		return QPoint((index % tilesPerRow) * tw, (index // tilesPerRow) * tw)
 
 
