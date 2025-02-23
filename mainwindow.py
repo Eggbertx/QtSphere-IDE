@@ -29,7 +29,7 @@ from widgets.spriteset.spriteseteditor import SpritesetEditor
 from widgets.startpage import StartPage
 from widgets.textedit import TextEdit
 from settings import Settings
-from widgets.editor_menus import EditorMenuProvider
+from widgets.editormenus import EditorMenuProvider
 
 _OPEN_DIALOG_FILTER = (
 	"All supported files (*.sgm *.txt *.js *.mjs *.cjs *.rmp *.rss *.rws)",
