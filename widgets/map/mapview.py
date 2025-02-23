@@ -155,7 +155,6 @@ class MapView(QGraphicsView):
 		self.editZoneAction = self.contextMenu.addAction("Edit Zone")
 
 
-
 	def attachMap(self, map:SphereMap):
 		self.mapFile = map
 		self.attachTileset(map.tileset)
@@ -176,6 +175,8 @@ class MapView(QGraphicsView):
 				tilePixmap.setPos(x * tileset.tileWidth, y * tileset.tileHeight)
 				tilePixmap.setZValue(l)
 				tilePixmap.setVisible(layer.visible)
+		largestLayer = self.mapFile.largestLayerSize()
+		self.setSceneRect(0, 0, largestLayer.width() * tileset.tileWidth, largestLayer.height() * tileset.tileHeight)
 		self.__updateGrid()
 		self.__updateMapIcons(tileset.tileWidth, tileset.tileHeight)
 		self.pointerGroup = None
@@ -427,9 +428,12 @@ class MapView(QGraphicsView):
 	def __resetGridGroup(self):
 		if self.gridGroup is not None and shiboken6.isValid(self.gridGroup):
 			if self.gridGroup.scene() is not None:
+				for item in self.gridGroup.childItems():
+					self.mapScene.removeItem(item)
 				self.mapScene.destroyItemGroup(self.gridGroup)
 			del self.gridGroup
 		self.gridGroup = QGraphicsItemGroup()
+		self.gridVisible = False
 
 
 	def __updateGrid(self):
@@ -445,19 +449,16 @@ class MapView(QGraphicsView):
 		mapWidth = int(mapSize.width())
 		mapHeight = int(mapSize.height())
 		
-		sceneWidth = self.mapScene.width()
-		sceneHeight = self.mapScene.height()
-
 		gridWidth = self.mapFile.tileset.tileWidth
 		gridHeight = self.mapFile.tileset.tileHeight
 
 		for y in range(gridHeight, mapHeight, gridHeight):
-			line = QGraphicsLineItem(0, y, sceneWidth-1, y)
+			line = QGraphicsLineItem(0, y, mapWidth-1, y)
 			line.setPen(gridColor)
 			self.gridGroup.addToGroup(line)
 		
 		for x in range(gridWidth, mapWidth, gridWidth):
-			line = QGraphicsLineItem(x, 0, x, sceneHeight-1)
+			line = QGraphicsLineItem(x, 0, x, mapHeight-1)
 			line.setPen(gridColor)
 			self.gridGroup.addToGroup(line)
 
