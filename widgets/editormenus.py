@@ -28,6 +28,19 @@ class EditorMenuProvider:
 			editor.currentLayerResized.emit(currentLayer, resizeDialog.sizeValue)
 
 
+	def __showChangeTileSizeDialog(self, editor:MapEditor):
+		resizeDialog = ResizeDialog("Change Tile Size", QSize(editor.map.tileset.tileWidth, editor.map.tileset.tileHeight), editor)
+		resizeDialog.suffix = " px"
+		if resizeDialog.exec() != 0:
+			editor.tileSizeChanged.emit(resizeDialog.sizeValue)
+
+
+	def __showRescaleTilesetDialog(self, editor:MapEditor):
+		resizeDialog = ResizeDialog("Rescale Tileset", QSize(editor.map.tileset.tileWidth, editor.map.tileset.tileHeight), editor)
+		resizeDialog.suffix = " px"
+		if resizeDialog.exec() != 0:
+			editor.tilesetRescaled.emit(resizeDialog.sizeValue)
+
 	def createMapMenu(self, editor:MapEditor):
 		mapMenu = QMenu(self.parent)
 		mapMenu.setTitle("Map")
@@ -39,8 +52,8 @@ class EditorMenuProvider:
 		mapMenu.addSeparator()
 		mapMenu.addAction("Export image")
 
-		mapTilesetMenu.addAction("Change Tile Size")
-		mapTilesetMenu.addAction("Rescale Tileset")
+		mapTilesetMenu.addAction("Change Tile Size", lambda: self.__showChangeTileSizeDialog(editor))
+		mapTilesetMenu.addAction("Rescale Tileset", lambda: self.__showRescaleTilesetDialog(editor))
 		mapTilesetMenu.addSeparator()
 		mapTilesetMenu.addAction("Change Tileset")
 		mapTilesetMenu.addAction("Import")

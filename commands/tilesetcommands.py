@@ -1,6 +1,8 @@
-from PySide6.QtGui import QUndoCommand
+from PySide6.QtCore import QSize, Qt, QPoint
+from PySide6.QtGui import QUndoCommand, QImage, QPainter
 
 from commands.commandids import CommandIDs
+from widgets.map.mapview import MapView
 from widgets.map.tilesetview import TilesetView, Tile
 
 class TilesetInsertTilesCommand(QUndoCommand):
@@ -104,3 +106,62 @@ class TilesetRemoveTilesCommand(QUndoCommand):
 				self.setText("Remove tile(s)")
 				return True
 		return False
+
+
+class TileSizeChangedCommand(QUndoCommand):
+	mapView: MapView
+	tilesetView: TilesetView
+	oldSize: QSize
+	newSize: QSize
+	oldTileImages: list[QImage]
+	isScaling: bool
+	def __init__(self, mapView:MapView, tilesetView:TilesetView, newSize:QSize, isScaling:bool):
+		super().__init__()
+		self.mapView = mapView
+		self.tilesetView = tilesetView
+		self.oldSize = QSize(tilesetView.tileset.tileWidth, tilesetView.tileset.tileHeight)
+		self.newSize = newSize
+		self.oldTileImages = [tile.image for tile in tilesetView.tileset.tiles]
+		self.isScaling = isScaling
+
+
+	def id(self):
+		return CommandIDs.ChangeTileSize.value
+
+
+	def undo(self):
+		for t in range(len(self.tilesetView.tileset.tiles)):
+			tile = self.tilesetView.tileset.tiles[t]
+			tile.image = self.oldTileImages[t]
+		self.tilesetView.tileset.tileWidth = self.oldSize.width()
+		self.tilesetView.tileset.tileHeight = self.oldSize.height()
+		self.mapView.attachTileset(self.tilesetView.tileset)
+		self.tilesetView.attachTileset(self.tilesetView.tileset, True)
+
+
+	def redo(self):
+		self.tilesetView.tileset.tileWidth = self.newSize.width()
+		self.tilesetView.tileset.tileHeight = self.newSize.height()
+		for t in range(len(self.tilesetView.tileset.tiles)):
+			if self.isScaling:
+				self.tilesetView.tileset.tiles[t].image = self.oldTileImages[t].scaled(self.newSize, Qt.AspectRatioMode.IgnoreAspectRatio)
+			else:
+				tmpImg = QImage(self.newSize, QImage.Format.Format_ARGB32)
+				tmpImgPainter = QPainter(tmpImg)
+				tmpImgPainter.drawImage(QPoint(0, 0), self.oldTileImages[t])
+				if self.newSize.width() > self.oldSize.width():
+					tmpImgPainter.fillRect(self.oldSize.width(), 0, self.newSize.width() - self.oldSize.width(), self.newSize.height(), Qt.GlobalColor.black)
+				if self.newSize.height() > self.oldSize.height():
+					tmpImgPainter.fillRect(0, self.oldSize.height(), self.newSize.width(), self.newSize.height() - self.oldSize.height(), Qt.GlobalColor.black)
+				tmpImgPainter.end()
+				self.tilesetView.tileset.tiles[t].image = tmpImg
+		self.mapView.attachTileset(self.tilesetView.tileset)
+		self.tilesetView.attachTileset(self.tilesetView.tileset, True)
+
+
+	def mergeWith(self, other: QUndoCommand) -> bool:
+		return other.id() == CommandIDs.ChangeTileSize.value and \
+			isinstance(other, TileSizeChangedCommand) and \
+			other.tilesetView == self.tilesetView and \
+			other.newSize == self.newSize and \
+			other.isScaling == self.isScaling

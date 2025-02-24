@@ -12,3 +12,5 @@ class CommandIDs(Enum):
 	MapPropertiesChanged = auto()
 	ResizeAllMapLayers = auto()
 	ResizeCurrentMapLayer = auto()
+	ChangeTileSize = auto()
+	RescaleTileset = auto()

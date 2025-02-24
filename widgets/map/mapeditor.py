@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QWidget, QLabel, QToolButton, QMenu, QPushButton
 from commands.maplayerresizecommands import ResizeAllMapLayersCommand, ResizeCurrentMapLayerCommand
 from commands.mappropertiescommands import MapPropertiesChangedCommand
 from commands.mapviewcommands import PencilDrawMapCommand
-from commands.tilesetcommands import TilesetInsertTilesCommand, TilesetAppendTilesCommand, TilesetRemoveTilesCommand
+from commands.tilesetcommands import TileSizeChangedCommand, TilesetInsertTilesCommand, TilesetAppendTilesCommand, TilesetRemoveTilesCommand
 from commands.maplayercommands import LayerRenamedCommand, LayerVisibilityToggleCommand
 from dialogs.layerpropertiesdialog import LayerPropertiesDialog
 from dialogs.tileepropertiesdialog import TilePropertiesDialog
@@ -31,6 +31,8 @@ class MapEditor(SphereEditor):
 	mapPropertiesChanged:Signal = Signal(MapPropertiesDialog)
 	allLayersResized:Signal = Signal(QSize)
 	currentLayerResized:Signal = Signal(int,QSize)
+	tileSizeChanged:Signal = Signal(QSize)
+	tilesetRescaled:Signal = Signal(QSize)
 
 	@property
 	def map(self):
@@ -69,6 +71,8 @@ class MapEditor(SphereEditor):
 		self.mapPropertiesChanged.connect(self.onMapPropertiesChanged)
 		self.allLayersResized.connect(self.onAllLayersResized)
 		self.currentLayerResized.connect(self.onCurrentLayerResized)
+		self.tileSizeChanged.connect(self.onTileSizeChanged)
+		self.tilesetRescaled.connect(self.onTilesetRescaled)
 
 
 	def setupToolbar(self):
@@ -190,6 +194,16 @@ class MapEditor(SphereEditor):
 	@Slot(int,QSize)
 	def onCurrentLayerResized(self, layer:int, newSize:QSize):
 		self.undoStack.push(ResizeCurrentMapLayerCommand(self.ui.mapView, layer, newSize))
+
+
+	@Slot(QSize)
+	def onTileSizeChanged(self, newSize:QSize):
+		self.undoStack.push(TileSizeChangedCommand(self.ui.mapView, self.ui.tilesetView, newSize, False))
+
+
+	@Slot(QSize)
+	def onTilesetRescaled(self, newSize:QSize):
+		self.undoStack.push(TileSizeChangedCommand(self.ui.mapView, self.ui.tilesetView, newSize, True))
 
 
 #region LayersTable slots
