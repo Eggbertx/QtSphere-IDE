@@ -1,8 +1,10 @@
+from os import path
 from PySide6.QtCore import QSize
-from PySide6.QtWidgets import QMenu, QWidget
+from PySide6.QtWidgets import QMenu, QWidget, QFileDialog, QMessageBox
 
 from dialogs.mappropertiesdialog import MapPropertiesDialog
 from dialogs.resizedialog import ResizeDialog
+from formats.tileset import Tileset
 from widgets.map.mapeditor import MapEditor
 from widgets.spriteset.spriteseteditor import SpritesetEditor
 
@@ -41,6 +43,21 @@ class EditorMenuProvider:
 		if resizeDialog.exec() != 0:
 			editor.tilesetRescaled.emit(resizeDialog.sizeValue)
 
+
+	def __showReplaceTilesetDialog(self, editor:MapEditor):
+		fileDialog = QFileDialog(self.parent, "Replace Tileset", path.dirname(editor.map.filePath), "Sphere Tileset (*.rts);;All Files (*)")
+		fileDialog.setAcceptMode(QFileDialog.AcceptMode.AcceptOpen)
+		fileDialog.setFileMode(QFileDialog.FileMode.ExistingFile)
+		if fileDialog.exec() != 0:
+			replacementRts = Tileset(fileDialog.selectedFiles()[0])
+			replacementRts.open()
+			if len(replacementRts.tiles) < len(editor.map.tileset.tiles):
+				QMessageBox.critical(self.parent, "Unable To Replace Tileset",
+					"The replacement tileset has fewer tiles than the current tileset.", QMessageBox.StandardButton.Ok)
+				return
+			editor.tilesetReplaced.emit(replacementRts)
+
+
 	def createMapMenu(self, editor:MapEditor):
 		mapMenu = QMenu(self.parent)
 		mapMenu.setTitle("Map")
@@ -55,7 +72,7 @@ class EditorMenuProvider:
 		mapTilesetMenu.addAction("Change Tile Size", lambda: self.__showChangeTileSizeDialog(editor))
 		mapTilesetMenu.addAction("Rescale Tileset", lambda: self.__showRescaleTilesetDialog(editor))
 		mapTilesetMenu.addSeparator()
-		mapTilesetMenu.addAction("Change Tileset")
+		mapTilesetMenu.addAction("Replace Tileset", lambda: self.__showReplaceTilesetDialog(editor))
 		mapTilesetMenu.addAction("Import")
 		mapTilesetMenu.addAction("Export")
 		mapTilesetMenu.addAction("Prune")

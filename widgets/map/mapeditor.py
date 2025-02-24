@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QWidget, QLabel, QToolButton, QMenu, QPushButton
 from commands.maplayerresizecommands import ResizeAllMapLayersCommand, ResizeCurrentMapLayerCommand
 from commands.mappropertiescommands import MapPropertiesChangedCommand
 from commands.mapviewcommands import PencilDrawMapCommand
-from commands.tilesetcommands import TileSizeChangedCommand, TilesetInsertTilesCommand, TilesetAppendTilesCommand, TilesetRemoveTilesCommand
+from commands.tilesetcommands import TileSizeChangedCommand, TilesetInsertTilesCommand, TilesetAppendTilesCommand, TilesetRemoveTilesCommand, TilesetReplacedCommand
 from commands.maplayercommands import LayerRenamedCommand, LayerVisibilityToggleCommand
 from dialogs.layerpropertiesdialog import LayerPropertiesDialog
 from dialogs.tileepropertiesdialog import TilePropertiesDialog
@@ -33,6 +33,7 @@ class MapEditor(SphereEditor):
 	currentLayerResized:Signal = Signal(int,QSize)
 	tileSizeChanged:Signal = Signal(QSize)
 	tilesetRescaled:Signal = Signal(QSize)
+	tilesetReplaced:Signal = Signal(Tileset)
 
 	@property
 	def map(self):
@@ -73,6 +74,7 @@ class MapEditor(SphereEditor):
 		self.currentLayerResized.connect(self.onCurrentLayerResized)
 		self.tileSizeChanged.connect(self.onTileSizeChanged)
 		self.tilesetRescaled.connect(self.onTilesetRescaled)
+		self.tilesetReplaced.connect(self.onTilesetReplaced)
 
 
 	def setupToolbar(self):
@@ -205,6 +207,10 @@ class MapEditor(SphereEditor):
 	def onTilesetRescaled(self, newSize:QSize):
 		self.undoStack.push(TileSizeChangedCommand(self.ui.mapView, self.ui.tilesetView, newSize, True))
 
+
+	@Slot(Tileset)
+	def onTilesetReplaced(self, tileset:Tileset):
+		self.undoStack.push(TilesetReplacedCommand(self.ui.mapView, self.ui.tilesetView, tileset))
 
 #region LayersTable slots
 	@Slot(int)

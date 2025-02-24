@@ -2,6 +2,7 @@ from PySide6.QtCore import QSize, Qt, QPoint
 from PySide6.QtGui import QUndoCommand, QImage, QPainter
 
 from commands.commandids import CommandIDs
+from formats.tileset import Tileset
 from widgets.map.mapview import MapView
 from widgets.map.tilesetview import TilesetView, Tile
 
@@ -165,3 +166,37 @@ class TileSizeChangedCommand(QUndoCommand):
 			other.tilesetView == self.tilesetView and \
 			other.newSize == self.newSize and \
 			other.isScaling == self.isScaling
+
+
+class TilesetReplacedCommand(QUndoCommand):
+	mapView: MapView
+	tilesetView: TilesetView
+	oldTileset: Tileset
+	newTileset: Tileset
+	def __init__(self, mapView:MapView, tilesetView:TilesetView, newTileset:Tileset):
+		super().__init__()
+		self.mapView = mapView
+		self.tilesetView = tilesetView
+		self.oldTileset = tilesetView.tileset
+		self.newTileset = newTileset
+
+
+	def id(self):
+		return CommandIDs.ReplaceTileset.value
+
+
+	def undo(self):
+		self.tilesetView.attachTileset(self.oldTileset, True)
+		self.mapView.attachTileset(self.oldTileset)
+
+
+	def redo(self):
+		self.tilesetView.attachTileset(self.newTileset, True)
+		self.mapView.attachTileset(self.newTileset)
+
+
+	def mergeWith(self, other: QUndoCommand) -> bool:
+		return other.id() == CommandIDs.ReplaceTileset.value and \
+			isinstance(other, TilesetReplacedCommand) and \
+			other.tilesetView == self.tilesetView and \
+			other.newTileset == self.newTileset
