@@ -236,6 +236,10 @@ class MainWindow(QMainWindow):
 		self.ui.openFileTabs.setCurrentIndex(t)
 
 
+	def updateZoomMenu(self, editorType:SphereEditorType):
+		self.ui.menuZoom.setEnabled(editorType is not None and editorType in (SphereEditorType.Map, SphereEditorType.Spriteset, SphereEditorType.Image))
+
+
 	def setEditorMenu(self, editorType: SphereEditorType, editor:SphereEditor = None):
 		if self.activeEditorMenu is not None:
 			self.ui.menuBar.removeAction(self.activeEditorMenu.menuAction())
@@ -561,11 +565,13 @@ class MainWindow(QMainWindow):
 			self.ui.actionSave.setEnabled(currentPath is not None)
 			self.ui.actionSave_As.setEnabled(currentPath is not None)
 		
-		editor = self.ui.openFileTabs.currentWidget()
+		editor:SphereEditor = self.ui.openFileTabs.currentWidget()
 		if hasattr(editor, "editorType"):
 			self.setEditorMenu(editor.editorType, editor)
+			self.updateZoomMenu(editor.editorType)
 		else:
 			self.setEditorMenu(None)
+			self.updateZoomMenu(SphereEditorType.Other)
 
 
 	@Slot()

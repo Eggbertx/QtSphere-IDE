@@ -420,13 +420,14 @@
      <property name="title">
       <string>Zoom</string>
      </property>
-     <addaction name="action1x"/>
-     <addaction name="action2x"/>
-     <addaction name="action4x"/>
-     <addaction name="action8x"/>
+     <addaction name="actionZoom1x"/>
+     <addaction name="actionZoom2x"/>
+     <addaction name="actionZoom4x"/>
+     <addaction name="actionZoom8x"/>
      <addaction name="separator"/>
      <addaction name="actionZoom_In"/>
      <addaction name="actionZoom_Out"/>
+     <addaction name="actionResetZoom"/>
     </widget>
     <addaction name="actionStart_Page"/>
     <addaction name="actionProject_Explorer"/>
@@ -813,19 +814,28 @@
     <string>Project Task List</string>
    </property>
   </action>
-  <action name="action1x">
+  <action name="actionZoom1x">
    <property name="text">
     <string>1x</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
   </action>
-  <action name="action2x">
+  <action name="actionZoom2x">
    <property name="text">
     <string>2x</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
+   </property>
   </action>
-  <action name="action4x">
+  <action name="actionZoom4x">
    <property name="text">
     <string>4x</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+4</string>
    </property>
   </action>
   <action name="actionProject_Explorer">
@@ -838,9 +848,12 @@
     <string>Spherical community</string>
    </property>
   </action>
-  <action name="action8x">
+  <action name="actionZoom8x">
    <property name="text">
     <string>8x</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+8</string>
    </property>
   </action>
   <action name="actionSystem_font_to_Sphere_font">
@@ -856,6 +869,17 @@
   <action name="newImage">
    <property name="text">
     <string>Image</string>
+   </property>
+  </action>
+  <action name="actionResetZoom">
+   <property name="icon">
+    <iconset theme="zoom-original"/>
+   </property>
+   <property name="text">
+    <string>Reset Zoom</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
    </property>
   </action>
  </widget>
