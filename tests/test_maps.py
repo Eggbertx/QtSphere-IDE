@@ -1860,9 +1860,12 @@ def test_parse_rmp(tileset:str):
 		assert layer.reflective == expectedLayer["reflective"]
 		
 		assert len(layer.tiles) == layer.width * layer.height
-		assert layer.tiles == expectedLayer["tiles"]
-
-		for s in range(len(layer.segments)):
+		# compare layer.tiles with expectedLayer["tiles"]
+		for t in range(len(layer.tiles)):
+			assert layer.tiles[t] == expectedLayer["tiles"][t], f"Tile {t} mismatch: {layer.tiles[t]} != {expectedLayer['tiles'][t]}"
+		
+		assert len(layer.segments) == layer.numSegments
+		for s in range(layer.numSegments):
 			assert layer.segments[s].x1 == expectedLayer["segments"][s].x1
 			assert layer.segments[s].y1 == expectedLayer["segments"][s].y1
 			assert layer.segments[s].x2 == expectedLayer["segments"][s].x2

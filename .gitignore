@@ -87,3 +87,6 @@ CMakeLists.txt.user*
 
 # Python env
 .venv
+
+# Pytest coverage
+.coverage
