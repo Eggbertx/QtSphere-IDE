@@ -7,8 +7,6 @@ from PySide6.QtWidgets import (
 	QGraphicsItemGroup, QGraphicsScene, QGraphicsView, QWidget, QGraphicsPixmapItem, QGraphicsItem, QGraphicsLineItem, QGraphicsRectItem, QMenu
 )
 
-
-from compare_images import images_equal
 from formats.spheremap import SphereMap, EntityType
 from formats.tileset import Tileset
 from settings import Settings, Defaults
@@ -169,6 +167,7 @@ class MapView(QGraphicsView):
 			for t in range(len(layer.tiles)):
 				tile = layer.tiles[t]
 				tilePixmap = self.mapScene.addPixmap(QPixmap.fromImage(tileset.tiles[tile].image))
+				tilePixmap.setData(0, tileset.tiles[tile].uuid)
 				tilePixmap.setShapeMode(QGraphicsPixmapItem.ShapeMode.BoundingRectShape)
 				x = t % layer.width
 				y = (t - x) / layer.width
@@ -311,13 +310,17 @@ class MapView(QGraphicsView):
 	def getTileIndexAt(self, x:int, y:int, layer:int, tempTile:bool = False) -> int:
 		if self.mapFile is None:
 			return -1
+
 		items:list[QGraphicsPixmapItem] = list(filter(lambda i:
 			isinstance(i, QGraphicsPixmapItem) and i.zValue() == layer + (0.5 if tempTile else 0), self.items(x, y)
-		))
+		)) # type: ignore
 		assert len(items) <= 1, f"More than one item found at {x}, {y}, layer {layer} (tempTile: {tempTile})"
+
 		for item in items:
 			for t, tile in enumerate(self.mapFile.tileset.tiles):
-				if images_equal(item.pixmap(), tile.image):
+				itemUuid = item.data(0)
+				tileUuid = tile.uuid
+				if itemUuid == tileUuid:
 					return t
 		return -1
 
@@ -398,6 +401,7 @@ class MapView(QGraphicsView):
 		affectedItems = self.items(pRectWidget)
 		filteredItems:list[QGraphicsPixmapItem] = list(filter(self.__filterItems, affectedItems))
 		currentImage = self.mapFile.tileset.tiles[self.currentTile].image
+		currentUuid = self.mapFile.tileset.tiles[self.currentTile].uuid
 		for item in filteredItems:
 			itemPos = item.pos().toPoint()
 			if itemPos in self.drawingPoints:
@@ -406,6 +410,7 @@ class MapView(QGraphicsView):
 			tempItem = self.scene().addPixmap(QPixmap.fromImage(currentImage))
 			tempItem.setPos(item.x(), item.y())
 			tempItem.setZValue(self.currentLayer + 0.5)
+			tempItem.setData(0, currentUuid)
 
 
 	def removeTemporaryTiles(self):

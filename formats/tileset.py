@@ -1,7 +1,7 @@
 from io import BufferedReader
 import struct
 
-from PySide6.QtCore import Qt, QLine
+from PySide6.QtCore import Qt, QLine, QUuid
 from PySide6.QtGui import QImage, QColor
 
 from formats.spherefile import SphereFile, FormatException
@@ -19,6 +19,7 @@ class Tile:
 	blocked:int
 	obstructions:list
 	name:str
+	uuid:str # not saved to or loaded from the file, just used for QGraphicsPixmapItem matching to get around compression
 
 
 	@staticmethod
@@ -41,6 +42,7 @@ class Tile:
 		self.blocked = False
 		self.obstructions = []
 		self.name = ""
+		self.uuid = QUuid.createUuid().toString()
 
 
 class Tileset(SphereFile):

@@ -41,7 +41,7 @@ class PencilDrawMapCommand(QUndoCommand):
 			mapX = tilePos.x() * self.mapView.tileWidth
 			mapY = tilePos.y() * self.mapView.tileHeight
 			# Get the tile index at the specified position
-			tileIndex = self.mapView.getTileIndexAt(mapX, mapY, self.layer)
+			tileIndex = self.mapView.getTileIndexAt(mapX, mapY, self.layer, True)
 			# If the tile index is not valid, skip (this should not normally happen)
 			if tileIndex == -1 or tileIndex >= len(self.mapView.mapFile.tileset.tiles):
 				continue
