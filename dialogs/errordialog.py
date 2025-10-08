@@ -1,3 +1,5 @@
+ # type: ignore
+
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QErrorMessage, QWidget, QLabel, QStyle, QTextEdit
 
@@ -7,21 +9,21 @@ class ErrorDialog(QErrorMessage):
 	def showErrorWithType(parent:QWidget, error:str|Exception, type:str, title:str="Error"):
 		msgBox = ErrorDialog(parent)
 		msgBox.setWindowTitle(title)
-		msgBox.showMessage(error, type)
+		msgBox.showMessage(str(error), type)
 
 
 	@staticmethod
 	def showError(parent:QWidget, error:str|Exception, title:str="Error"):
 		msgBox = ErrorDialog(parent, True)
 		msgBox.setWindowTitle(title)
-		msgBox.showMessage(error)
+		msgBox.showMessage(str(error))
 
 
 	def __init__(self, parent: QWidget, withType=False):
 		super().__init__(parent)
 		
 		children = self.children()
-
+		children[1].setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
 		children[2].setVisible(withType)
 
 		# Modify the dialog's icon label, since it defaults to SP_MessageBoxInformation
