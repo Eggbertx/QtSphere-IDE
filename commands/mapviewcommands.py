@@ -27,27 +27,21 @@ class PencilDrawMapCommand(QUndoCommand):
 		for i, tilePos in enumerate(self.affectedTiles):
 			mapX = tilePos.x() * self.mapView.tileWidth
 			mapY = tilePos.y() * self.mapView.tileHeight
-			# Get the tile index at the specified position
 			tileIndex = self.mapView.getTileIndexAt(mapX, mapY, self.layer)
-			# If the tile index is not valid, skip (this should not normally happen)
 			if tileIndex == -1 or tileIndex >= len(self.mapView.mapFile.tileset.tiles):
 				continue
-			# Set the old tile index
 			self.mapView.setTileIndexAt(mapX, mapY, self.layer, self.oldTiles[i])
+		self.mapView.removeTemporaryTiles()
 
 
 	def redo(self):
 		for tilePos in self.affectedTiles:
 			mapX = tilePos.x() * self.mapView.tileWidth
 			mapY = tilePos.y() * self.mapView.tileHeight
-			# Get the tile index at the specified position
-			tileIndex = self.mapView.getTileIndexAt(mapX, mapY, self.layer, True)
-			# If the tile index is not valid, skip (this should not normally happen)
+			tileIndex = self.mapView.getTileIndexAt(mapX, mapY, self.layer)
 			if tileIndex == -1 or tileIndex >= len(self.mapView.mapFile.tileset.tiles):
 				continue
-			# Save the old tile index
 			self.oldTiles.append(tileIndex)
-			# Set the new tile index
 			self.mapView.setTileIndexAt(mapX, mapY, self.layer, self.newIndex)
 		self.mapView.removeTemporaryTiles()
 
