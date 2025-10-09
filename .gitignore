@@ -84,6 +84,7 @@ CMakeLists.txt.user*
 
 # Sphere stuff
 *.usr
+dist/
 
 # Python env
 .venv
