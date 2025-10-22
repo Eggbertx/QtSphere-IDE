@@ -1,7 +1,6 @@
 import os
 
 from PySide6.QtCore import QCoreApplication, QSettings, QRect
-import mainwindow
 
 from settings import Settings
 

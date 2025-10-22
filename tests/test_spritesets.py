@@ -1,7 +1,6 @@
 import io
 
-import formats
-import formats.spriteset
+from formats.spriteset import SphereSpriteset
 
 _sphere_testspriteset_bytes = bytes((
 	0x2e, 0x72, 0x73, 0x73, 0x03, 0x00, 0x04, 0x00, 0x10, 0x00, 0x18, 0x00,
@@ -541,8 +540,8 @@ _sphere_testspriteset_bytes = bytes((
 
 def test_parse_rss():
 	f = io.BytesIO(_sphere_testspriteset_bytes)
-	
-	spriteset = formats.spriteset.SphereSpriteset()
+
+	spriteset = SphereSpriteset()
 	spriteset.filePath = "test.rss"
 	spriteset._parseFileData(f)
 	assert spriteset.version == 3
