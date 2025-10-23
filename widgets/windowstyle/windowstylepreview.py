@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt, QPoint, QRect
+from PySide6.QtCore import Qt, QPoint, QRect, Signal
 from PySide6.QtGui import QPainter, QMouseEvent
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QPixmap, QImage
@@ -11,6 +11,7 @@ class WindowStylePreview(QWidget):
 	__showGrid: bool
 	activeBitmap: WindowStyleBitmap
 	__scale: int
+	activeBitmapChanged = Signal(int)
 
 	@property
 	def ulBitmap(self):
@@ -221,4 +222,5 @@ class WindowStylePreview(QWidget):
 				self.activeBitmap = r
 				if currentActive != self.activeBitmap:
 					self.update()
+					self.activeBitmapChanged.emit(self.activeBitmap)
 				return
