@@ -1,4 +1,5 @@
-from PySide6.QtWidgets import QWidget
+from PySide6.QtGui import QAction, QIcon
+from PySide6.QtWidgets import QWidget, QToolBar, QMenu, QToolButton
 
 from ui.ui_windowstyleeditor import Ui_WindowStyleEditor
 
@@ -8,6 +9,7 @@ from widgets.sphereeditor import SphereEditor
 
 class WindowStyleEditor(SphereEditor):
 	ui: Ui_WindowStyleEditor
+	toolBar : QToolBar
 
 	@property
 	def preview(self):
@@ -25,16 +27,37 @@ class WindowStyleEditor(SphereEditor):
 		super().__init__(parent, SphereEditorType.WindowStyle)
 		self.ui = Ui_WindowStyleEditor()
 		self.ui.setupUi(self)
+		self.toolBar = QToolBar()
 		self.setupToolbar()
 
 	def setupToolbar(self):
-		pass
+		gridAction = QAction(QIcon(":/res/togglegrid.png"), "Toggle Grid", self)
+		gridAction.setCheckable(True)
+		gridAction.setChecked(True)
+		gridAction.toggled.connect(self.preview.setGridVisible)
+		self.toolBar.addAction(gridAction)
+
+		propertiesAction = QAction(QIcon.fromTheme("document-properties"), "Window Style Properties", self)
+		self.toolBar.addAction(propertiesAction)
+
+		self.toolBar.addSeparator()
+
+		zoomMenuButton = QToolButton(self)
+		zoomMenuButton.setText("Zoom")
+		zoomMenuButton.setIcon(QIcon.fromTheme("zoom-in"))
+		zoomMenuButton.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+
+		zoomMenu = QMenu("Set Zoom", self)
+		zoomMenu.setIcon(QIcon.fromTheme("zoom-in"))
+		zoomMenu.addAction("1x")
+		zoomMenu.addAction("2x")
+		zoomMenu.addAction("4x")
+		zoomMenuButton.setMenu(zoomMenu)
+
+		self.toolBar.addWidget(zoomMenuButton)
+
+		self.ui.verticalLayout.setMenuBar(self.toolBar)
 
 	def attachWindowStyle(self, rws: SphereWindowStyle):
 		self.setWindowTitle(f"Window Style Editor - {rws.filePath}")
 		self.preview.attachWindowStyle(rws)
-		# for i in range(9):
-		# 	self.preview.setBitmap(i, rws.bitmaps[i], 
-		# 		i == WindowStyleBitmap.Background and rws.backgroundMode in (
-		# 			BackgroundMode.Stretched, BackgroundMode.StretchedWithGradient))
-		# self.preview.setBitmap(WindowStyleBitmap.UpperLeft, rws.bitmaps[WindowStyleBitmap.UpperLeft])

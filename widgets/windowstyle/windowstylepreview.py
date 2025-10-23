@@ -1,5 +1,5 @@
-from PySide6.QtCore import Qt, QPoint
-from PySide6.QtGui import QPainter
+from PySide6.QtCore import Qt, QPoint, QRect
+from PySide6.QtGui import QPainter, QMouseEvent
 from PySide6.QtWidgets import QWidget
 from PySide6.QtGui import QPixmap, QImage
 
@@ -8,6 +8,8 @@ from formats.windowstyle import SphereWindowStyle, WindowStyleBitmap, Background
 
 class WindowStylePreview(QWidget):
 	windowStyle: SphereWindowStyle
+	__showGrid: bool
+	activeBitmap: WindowStyleBitmap
 
 	@property
 	def ulBitmap(self):
@@ -68,6 +70,12 @@ class WindowStylePreview(QWidget):
 		super().__init__(parent)
 		self.windowStyle = None
 		self.alphaBG = QPixmap(":/res/transparency-bg.png")
+		self.__showGrid = True
+		self.activeBitmap = WindowStyleBitmap.UpperLeft
+
+	def setGridVisible(self, visible: bool):
+		self.__showGrid = visible
+		self.update()
 
 
 	def attachWindowStyle(self, rws: SphereWindowStyle):
@@ -91,6 +99,28 @@ class WindowStylePreview(QWidget):
 		minWidthMiddle = min(top.width(), bg.width(), bottom.width())
 		minWidthRight = min(ur.width(), right.width(), lr.width())
 		self.setMinimumWidth(minWidthLeft + minWidthMiddle + minWidthRight)
+
+
+	def getColorForBitmap(self, bitmap: WindowStyleBitmap):
+		if bitmap == self.activeBitmap:
+			return Qt.GlobalColor.green
+		else:
+			return Qt.GlobalColor.magenta
+
+	def gridRects(self):
+		w = self.rect().width()
+		h = self.rect().height()
+		return (
+			QRect(0, 0, self.ulBitmap.width(), self.ulBitmap.height()),
+			QRect(self.ulBitmap.width(), 0, w - self.ulBitmap.width() - self.urBitmap.width(), self.topBitmap.height()),
+			QRect(w - self.urBitmap.width(), 0, self.urBitmap.width(), self.urBitmap.height()),
+			QRect(0, self.ulBitmap.height(), self.leftBitmap.width(), h - self.ulBitmap.height() - self.llBitmap.height()),
+			QRect(self.leftBitmap.width(), self.topBitmap.height(), w - self.leftBitmap.width() - self.rightBitmap.width(), h - self.topBitmap.height() - self.bottomBitmap.height()),
+			QRect(w - self.rightBitmap.width(), self.urBitmap.height(), self.rightBitmap.width(), h - self.urBitmap.height() - self.lrBitmap.height()),
+			QRect(0, h - self.llBitmap.height(), self.llBitmap.width(), self.llBitmap.height()),
+			QRect(self.llBitmap.width(), h - self.bottomBitmap.height(), w - self.llBitmap.width() - self.lrBitmap.width(), self.bottomBitmap.height()),
+			QRect(w - self.lrBitmap.width(), h - self.lrBitmap.height(), self.lrBitmap.width(), self.lrBitmap.height())
+		)
 
 	def paintEvent(self, event):
 		painter = QPainter(self)
@@ -131,4 +161,35 @@ class WindowStylePreview(QWidget):
 				for y in range(bgY, bgY + bgH, self.bgBitmap.height()):
 					painter.drawImage(QPoint(x, y), self.bgBitmap)
 
+		# grid
+		if not self.__showGrid:
+			painter.end()
+			return
+
+		gridRects = self.gridRects()
+
+		for r in range(len(gridRects)):
+			if r != self.activeBitmap:
+				painter.setPen(self.getColorForBitmap(r))
+				painter.drawRect(gridRects[r])
+
+		# make sure active grid is on top
+		painter.setPen(self.getColorForBitmap(self.activeBitmap))
+		painter.drawRect(gridRects[self.activeBitmap])
+
 		painter.end()
+
+	def mousePressEvent(self, event: QMouseEvent):
+		if event.button() != Qt.MouseButton.LeftButton:
+			return
+		
+		currentActive = self.activeBitmap
+		x = event.position().x()
+		y = event.position().y()
+		gridRects = self.gridRects()
+		for r in range(len(gridRects)):
+			if gridRects[r].contains(QPoint(x, y)):
+				self.activeBitmap = r
+				if currentActive != self.activeBitmap:
+					self.update()
+				return
