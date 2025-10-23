@@ -253,6 +253,9 @@ class MainWindow(QMainWindow):
 			case SphereEditorType.Spriteset:
 				self.activeEditorMenu = self.menuProvider.createSpritesetMenu(editor)
 				self.ui.menuBar.insertAction(beforeAction, self.activeEditorMenu.menuAction())
+			case SphereEditorType.WindowStyle:
+				self.activeEditorMenu = self.menuProvider.createWindowStyleMenu(editor)
+				self.ui.menuBar.insertAction(beforeAction, self.activeEditorMenu.menuAction())
 
 
 

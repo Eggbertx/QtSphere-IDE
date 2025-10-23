@@ -7,6 +7,7 @@ from dialogs.resizedialog import ResizeDialog
 from formats.tileset import Tileset
 from widgets.map.mapeditor import MapEditor
 from widgets.spriteset.spriteseteditor import SpritesetEditor
+from widgets.windowstyle.windowstyleeditor import WindowStyleEditor
 
 class EditorMenuProvider:
 	parent: QWidget
@@ -102,3 +103,9 @@ class EditorMenuProvider:
 		spritesetMenu.addAction("Export Frame as Image")
 		spritesetMenu.addAction("Export Spriteset as Image")
 		return spritesetMenu
+
+	def createWindowStyleMenu(self, editor:WindowStyleEditor):
+		windoStyleMenu = QMenu(self.parent)
+		windoStyleMenu.setTitle("Window Style")
+		windoStyleMenu.addAction("Properties")
+		return windoStyleMenu
