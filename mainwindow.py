@@ -30,6 +30,7 @@ from widgets.startpage import StartPage
 from widgets.textedit import TextEdit
 from settings import Settings
 from widgets.editormenus import EditorMenuProvider
+from widgets.windowstyle.windowstyleeditor import WindowStyleEditor
 
 _OPEN_DIALOG_FILTER = (
 	"All supported files (*.sgm *.txt *.js *.mjs *.cjs *.rmp *.rss *.rws)",
@@ -274,6 +275,8 @@ class MainWindow(QMainWindow):
 					rmp = SphereMap.create(self.newMapDialog.tilesW, self.newMapDialog.tilesH, self.newMapDialog.tilesetPath)
 					editor = MapEditor(self.ui.openFileTabs)
 					editor.attachMap(rmp)
+				case ".rws":
+					editor = WindowStyleEditor.openAndAttach(self.ui.openFileTabs, filePath)
 				case ".txt"|".js"|".cjs"|".mjs"|".ts"|".md"|".sgm":
 					editor = TextEdit.openAndAttach(self.ui.openFileTabs, filePath)
 				case ".bmp"|".gif"|".jpeg"|".jpg"|".png":

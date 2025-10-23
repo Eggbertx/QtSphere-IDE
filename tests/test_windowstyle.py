@@ -2,7 +2,7 @@ from os import path
 import pytest
 from PySide6.QtGui import QColor, QImage, QTransform
 
-from formats.windowstyle import SphereWindowStyle, BackgroundMode, WindowstyleBitmap
+from formats.windowstyle import SphereWindowStyle, BackgroundMode, WindowStyleBitmap
 
 palette = (
 	QColor(0, 0, 0, 0), # transparent
@@ -49,28 +49,28 @@ ul_pixels = (
 images = [QImage(32, 32, QImage.Format.Format_RGBA8888) for _ in range(9)]
 for y in range(32):
 	for x in range(32):
-		images[WindowstyleBitmap.UpperLeft].setPixelColor(x, y, palette[ul_pixels[y * 32 + x]])
-		images[WindowstyleBitmap.UpperRight].setPixelColor(31 - x, y, palette[ul_pixels[y * 32 + x]])
-		images[WindowstyleBitmap.LowerLeft].setPixelColor(x, 31 - y, palette[ul_pixels[y * 32 + x]])
-		images[WindowstyleBitmap.LowerRight].setPixelColor(31 - x, 31 - y, palette[ul_pixels[y * 32 + x]])
+		images[WindowStyleBitmap.UpperLeft].setPixelColor(x, y, palette[ul_pixels[y * 32 + x]])
+		images[WindowStyleBitmap.UpperRight].setPixelColor(31 - x, y, palette[ul_pixels[y * 32 + x]])
+		images[WindowStyleBitmap.LowerLeft].setPixelColor(x, 31 - y, palette[ul_pixels[y * 32 + x]])
+		images[WindowStyleBitmap.LowerRight].setPixelColor(31 - x, 31 - y, palette[ul_pixels[y * 32 + x]])
 
-images[WindowstyleBitmap.Top].fill(palette[2])
-images[WindowstyleBitmap.Bottom].fill(palette[2])
-images[WindowstyleBitmap.Left].fill(palette[2])
-images[WindowstyleBitmap.Right].fill(palette[2])
-images[WindowstyleBitmap.Background].fill(palette[2])
-images[WindowstyleBitmap.Background] = images[WindowstyleBitmap.Background].scaled(16, 16)
+images[WindowStyleBitmap.Top].fill(palette[2])
+images[WindowStyleBitmap.Bottom].fill(palette[2])
+images[WindowStyleBitmap.Left].fill(palette[2])
+images[WindowStyleBitmap.Right].fill(palette[2])
+images[WindowStyleBitmap.Background].fill(palette[2])
+images[WindowStyleBitmap.Background] = images[WindowStyleBitmap.Background].scaled(16, 16)
 for i in range(32):
-	images[WindowstyleBitmap.Top].setPixelColor(i, 0, palette[1])
-	images[WindowstyleBitmap.Top].setPixelColor(i, 31, palette[3])
-	images[WindowstyleBitmap.Bottom].setPixelColor(i, 31, palette[1])
-	images[WindowstyleBitmap.Bottom].setPixelColor(i, 0, palette[3])
-	images[WindowstyleBitmap.Left].setPixelColor(0, 31-i, palette[1])
-	images[WindowstyleBitmap.Left].setPixelColor(31, 31-i, palette[3])
-	images[WindowstyleBitmap.Right].setPixelColor(31, i, palette[1])
-	images[WindowstyleBitmap.Right].setPixelColor(0, i, palette[3])
-	images[WindowstyleBitmap.Background].setPixelColor(i // 2, i //2, palette[3])
-	images[WindowstyleBitmap.Background].setPixelColor(i // 2, 15 - i //2, palette[3])
+	images[WindowStyleBitmap.Top].setPixelColor(i, 0, palette[1])
+	images[WindowStyleBitmap.Top].setPixelColor(i, 31, palette[3])
+	images[WindowStyleBitmap.Bottom].setPixelColor(i, 31, palette[1])
+	images[WindowStyleBitmap.Bottom].setPixelColor(i, 0, palette[3])
+	images[WindowStyleBitmap.Left].setPixelColor(0, 31-i, palette[1])
+	images[WindowStyleBitmap.Left].setPixelColor(31, 31-i, palette[3])
+	images[WindowStyleBitmap.Right].setPixelColor(31, i, palette[1])
+	images[WindowStyleBitmap.Right].setPixelColor(0, i, palette[3])
+	images[WindowStyleBitmap.Background].setPixelColor(i // 2, i //2, palette[3])
+	images[WindowStyleBitmap.Background].setPixelColor(i // 2, 15 - i //2, palette[3])
 
 gradient_corner_colors = (
 	QColor(255, 0, 0),
@@ -150,7 +150,7 @@ def test_parse_rws(rws_case):
 	for i in range(len(rws.bitmaps)):
 		img = rws.bitmaps[i]
 		assert not img.isNull()
-		expected_size = 16 if i == WindowstyleBitmap.Background else 32
+		expected_size = 16 if i == WindowStyleBitmap.Background else 32
 		assert img.width() == expected_size
 		assert img.height() == expected_size
 		assert img == images[i], f"Bitmap {i} does not match expected image"

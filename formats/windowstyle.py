@@ -23,7 +23,7 @@ class EdgeOffset:
 	Right = 2
 	Bottom = 3
 
-class WindowstyleBitmap:
+class WindowStyleBitmap:
 	UpperLeft = 0
 	Top = 1
 	UpperRight = 2
