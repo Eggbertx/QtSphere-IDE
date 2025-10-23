@@ -49,9 +49,9 @@ class WindowStyleEditor(SphereEditor):
 
 		zoomMenu = QMenu("Set Zoom", self)
 		zoomMenu.setIcon(QIcon.fromTheme("zoom-in"))
-		zoomMenu.addAction("1x")
-		zoomMenu.addAction("2x")
-		zoomMenu.addAction("4x")
+		zoomMenu.addAction("1x").triggered.connect(lambda: self.preview.setScale(1))
+		zoomMenu.addAction("2x").triggered.connect(lambda: self.preview.setScale(2))
+		zoomMenu.addAction("4x").triggered.connect(lambda: self.preview.setScale(4))
 		zoomMenuButton.setMenu(zoomMenu)
 
 		self.toolBar.addWidget(zoomMenuButton)

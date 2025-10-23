@@ -10,6 +10,7 @@ class WindowStylePreview(QWidget):
 	windowStyle: SphereWindowStyle
 	__showGrid: bool
 	activeBitmap: WindowStyleBitmap
+	__scale: int
 
 	@property
 	def ulBitmap(self):
@@ -72,33 +73,33 @@ class WindowStylePreview(QWidget):
 		self.alphaBG = QPixmap(":/res/transparency-bg.png")
 		self.__showGrid = True
 		self.activeBitmap = WindowStyleBitmap.UpperLeft
+		self.__scale = 2
 
 	def setGridVisible(self, visible: bool):
 		self.__showGrid = visible
 		self.update()
 
+	def setScale(self, scale: int):
+		self.__scale = scale
+		self.setMinimumSize()
+		self.update()
+
+	def setMinimumSize(self):
+		s = self.__scale
+		minWidthLeft = min(self.ulBitmap.width()*s, self.leftBitmap.width()*s, self.llBitmap.width()*s)
+		minWidthMiddle = min(self.topBitmap.width()*s, self.bgBitmap.width()*s, self.bottomBitmap.width()*s)
+		minWidthRight = min(self.urBitmap.width()*s, self.rightBitmap.width()*s, self.lrBitmap.width()*s)
+		self.setMinimumWidth(minWidthLeft + minWidthMiddle + minWidthRight)
+
+		minHeightTop = min(self.ulBitmap.height()*s, self.topBitmap.height()*s, self.urBitmap.height()*s)
+		minHeightMiddle = min(self.leftBitmap.height()*s, self.bgBitmap.height()*s, self.rightBitmap.height()*s)
+		minHeightBottom = min(self.llBitmap.height()*s, self.bottomBitmap.height()*s, self.lrBitmap.height()*s)
+		self.setMinimumHeight(minHeightTop + minHeightMiddle + minHeightBottom)
 
 	def attachWindowStyle(self, rws: SphereWindowStyle):
 		self.windowStyle = rws
-		ul = rws.bitmaps[WindowStyleBitmap.UpperLeft]
-		top = rws.bitmaps[WindowStyleBitmap.Top]
-		ur = rws.bitmaps[WindowStyleBitmap.UpperRight]
-		left = rws.bitmaps[WindowStyleBitmap.Left]
-		bg = rws.bitmaps[WindowStyleBitmap.Background]
-		right = rws.bitmaps[WindowStyleBitmap.Right]
-		ll = rws.bitmaps[WindowStyleBitmap.LowerLeft]
-		bottom = rws.bitmaps[WindowStyleBitmap.Bottom]
-		lr = rws.bitmaps[WindowStyleBitmap.LowerRight]
-
-		minHeightTop = min(ul.height(), top.height(), ur.height())
-		minHeightMiddle = min(left.height(), bg.height(), right.height())
-		minHeightBottom = min(ll.height(), bottom.height(), lr.height())
-		self.setMinimumHeight(minHeightTop + minHeightMiddle + minHeightBottom)
-
-		minWidthLeft = min(ul.width(), left.width(), ll.width())
-		minWidthMiddle = min(top.width(), bg.width(), bottom.width())
-		minWidthRight = min(ur.width(), right.width(), lr.width())
-		self.setMinimumWidth(minWidthLeft + minWidthMiddle + minWidthRight)
+		self.setMinimumSize()
+		self.update()
 
 
 	def getColorForBitmap(self, bitmap: WindowStyleBitmap):
@@ -110,16 +111,35 @@ class WindowStylePreview(QWidget):
 	def gridRects(self):
 		w = self.rect().width()
 		h = self.rect().height()
+		s = self.__scale
+		ulsw = self.ulBitmap.width()*s
+		ulsh = self.ulBitmap.height()*s
+		tsw = self.topBitmap.width()*s
+		tsh = self.topBitmap.height()*s
+		ursw = self.urBitmap.width()*s
+		ursh = self.urBitmap.height()*s
+		lsw = self.leftBitmap.width()*s
+		lsh = self.leftBitmap.height()*s
+		bgsw = self.bgBitmap.width()*s
+		bgsh = self.bgBitmap.height()*s
+		rsw = self.rightBitmap.width()*s
+		rsh = self.rightBitmap.height()*s
+		llsw = self.llBitmap.width()*s
+		llsh = self.llBitmap.height()*s
+		bsw = self.bottomBitmap.width()*s
+		bsh = self.bottomBitmap.height()*s
+		lrsw = self.lrBitmap.width()*s
+		lrsh = self.lrBitmap.height()*s
 		return (
-			QRect(0, 0, self.ulBitmap.width(), self.ulBitmap.height()),
-			QRect(self.ulBitmap.width(), 0, w - self.ulBitmap.width() - self.urBitmap.width(), self.topBitmap.height()),
-			QRect(w - self.urBitmap.width(), 0, self.urBitmap.width(), self.urBitmap.height()),
-			QRect(0, self.ulBitmap.height(), self.leftBitmap.width(), h - self.ulBitmap.height() - self.llBitmap.height()),
-			QRect(self.leftBitmap.width(), self.topBitmap.height(), w - self.leftBitmap.width() - self.rightBitmap.width(), h - self.topBitmap.height() - self.bottomBitmap.height()),
-			QRect(w - self.rightBitmap.width(), self.urBitmap.height(), self.rightBitmap.width(), h - self.urBitmap.height() - self.lrBitmap.height()),
-			QRect(0, h - self.llBitmap.height(), self.llBitmap.width(), self.llBitmap.height()),
-			QRect(self.llBitmap.width(), h - self.bottomBitmap.height(), w - self.llBitmap.width() - self.lrBitmap.width(), self.bottomBitmap.height()),
-			QRect(w - self.lrBitmap.width(), h - self.lrBitmap.height(), self.lrBitmap.width(), self.lrBitmap.height())
+			QRect(0, 0, ulsw, ulsh),
+			QRect(ulsw, 0, w - ulsw - ursw, tsh),
+			QRect(w - ursw, 0, ursw, ursh),
+			QRect(0, ulsh, lsw, h - ulsh - llsh),
+			QRect(lsw, tsh, w - lsw - rsw, h - tsh - bsh),
+			QRect(w - rsw, ursh, rsw, h - ursh - lrsh),
+			QRect(0, h - llsh, llsw, llsh),
+			QRect(llsw, h - bsh, w - llsw - lrsw, bsh),
+			QRect(w - lrsw, h - lrsh, lrsw, lrsh)
 		)
 
 	def paintEvent(self, event):
@@ -127,47 +147,56 @@ class WindowStylePreview(QWidget):
 
 		w = self.rect().width()
 		h = self.rect().height()
-
-		for x in range(0, w, self.topBitmap.width()):
-			painter.drawImage(x, 0, self.topBitmap)
-		for x in range(0, w, self.bottomBitmap.width()):
-			painter.drawImage(x, h - self.bottomBitmap.height(), self.bottomBitmap)
-		for y in range(0, h, self.leftBitmap.height()):
-			painter.drawImage(0, y, self.leftBitmap)
-		for y in range(0, h, self.rightBitmap.height()):
-			painter.drawImage(w - self.rightBitmap.width(), y, self.rightBitmap)
-
-		painter.eraseRect(0, 0, self.ulBitmap.width(), self.ulBitmap.height())
-		painter.eraseRect(w-self.urBitmap.width(), 0, self.urBitmap.width(), self.urBitmap.height())
-		painter.eraseRect(0, h - self.llBitmap.height(), self.llBitmap.width(), self.llBitmap.height())
-		painter.eraseRect(w - self.lrBitmap.width(), h - self.lrBitmap.height(), self.lrBitmap.width(), self.lrBitmap.height())
-
-		# corners
-		painter.drawImage(0, 0, self.ulBitmap)
-		painter.drawImage(w - self.urBitmap.width(), 0, self.urBitmap)
-		painter.drawImage(0, h - self.llBitmap.height(), self.llBitmap)
-		painter.drawImage(w - self.lrBitmap.width(), h - self.lrBitmap.height(), self.lrBitmap)
+		s = self.__scale
 
 		# background
-		bgX = self.leftBitmap.width()
-		bgY = self.topBitmap.height()
-		bgW = w - self.leftBitmap.width() - self.rightBitmap.width()
-		bgH = h - self.topBitmap.height() - self.bottomBitmap.height()
+		bgX = self.leftBitmap.width()*s
+		bgY = self.topBitmap.height()*s
+		bgW = w - self.leftBitmap.width()*s - self.rightBitmap.width()*s
+		bgH = h - self.topBitmap.height()*s - self.bottomBitmap.height()*s
 		if self.windowStyle.backgroundMode in (BackgroundMode.Stretched, BackgroundMode.StretchedWithGradient):
 			scaledBG = self.bgBitmap.scaled(bgW, bgH, Qt.IgnoreAspectRatio, Qt.TransformationMode.FastTransformation)
 			painter.drawImage(QPoint(bgX, bgY), scaledBG)
 		else:
-			for x in range(bgX, bgX + bgW, self.bgBitmap.width()):
-				for y in range(bgY, bgY + bgH, self.bgBitmap.height()):
-					painter.drawImage(QPoint(x, y), self.bgBitmap)
+			# tiled background
+			for x in range(bgX, bgX + bgW, self.bgBitmap.width()*s):
+				for y in range(bgY, bgY + bgH, self.bgBitmap.height()*s):
+					painter.drawImage(QPoint(x, y), self.bgBitmap.scaled(self.bgBitmap.width()*s, self.bgBitmap.height()*s))
 
-		# grid
+		sw = self.topBitmap.width()*s
+		sh = self.topBitmap.height()*s
+		for x in range(0, w, sw):
+			painter.drawImage(x, 0, self.topBitmap.scaled(sw, sh))
+
+		sw = self.bottomBitmap.width()*s
+		sh = self.bottomBitmap.height()*s
+		for x in range(0, w, sw):
+			painter.drawImage(x, h - sh, self.bottomBitmap.scaled(sw, sh))
+		sw = self.leftBitmap.width()*s
+		sh = self.leftBitmap.height()*s
+		for y in range(0, h, sw):
+			painter.drawImage(0, y, self.leftBitmap.scaled(sw, sh))
+		sw = self.rightBitmap.width()*s
+		sh = self.rightBitmap.height()*s
+		for y in range(0, h, sh):
+			painter.drawImage(w - sw, y, self.rightBitmap.scaled(sw, sh))
+
+		painter.eraseRect(0, 0, self.ulBitmap.width()*s, self.ulBitmap.height()*s)
+		painter.eraseRect(w-self.urBitmap.width()*s, 0, self.urBitmap.width()*s, self.urBitmap.height()*s)
+		painter.eraseRect(0, h - self.llBitmap.height()*s, self.llBitmap.width()*s, self.llBitmap.height()*s)
+		painter.eraseRect(w - self.lrBitmap.width(), h - self.lrBitmap.height()*s, self.lrBitmap.width()*s, self.lrBitmap.height()*s)
+
+		# corners
+		painter.drawImage(0, 0, self.ulBitmap.scaled(self.ulBitmap.width()*s, self.ulBitmap.height()*s))
+		painter.drawImage(w - self.urBitmap.width()*s, 0, self.urBitmap.scaled(self.urBitmap.width()*s, self.urBitmap.height()*s))
+		painter.drawImage(0, h - self.llBitmap.height()*s, self.llBitmap.scaled(self.llBitmap.width()*s, self.llBitmap.height()*s))
+		painter.drawImage(w - self.lrBitmap.width()*s, h - self.lrBitmap.height()*s, self.lrBitmap.scaled(self.lrBitmap.width()*s, self.lrBitmap.height()*s))
+
 		if not self.__showGrid:
 			painter.end()
 			return
 
 		gridRects = self.gridRects()
-
 		for r in range(len(gridRects)):
 			if r != self.activeBitmap:
 				painter.setPen(self.getColorForBitmap(r))
