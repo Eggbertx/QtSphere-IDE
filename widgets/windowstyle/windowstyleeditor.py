@@ -2,7 +2,7 @@ from PySide6.QtWidgets import QWidget
 
 from ui.ui_windowstyleeditor import Ui_WindowStyleEditor
 
-from formats.windowstyle import SphereWindowStyle, WindowStyleBitmap
+from formats.windowstyle import SphereWindowStyle, WindowStyleBitmap, BackgroundMode
 from widgets.sphereeditor import SphereEditorType
 from widgets.sphereeditor import SphereEditor
 
@@ -32,6 +32,9 @@ class WindowStyleEditor(SphereEditor):
 
 	def attachWindowStyle(self, rws: SphereWindowStyle):
 		self.setWindowTitle(f"Window Style Editor - {rws.filePath}")
-		for i in range(9):
-			self.preview.setBitmap(i, rws.bitmaps[i])
+		self.preview.attachWindowStyle(rws)
+		# for i in range(9):
+		# 	self.preview.setBitmap(i, rws.bitmaps[i], 
+		# 		i == WindowStyleBitmap.Background and rws.backgroundMode in (
+		# 			BackgroundMode.Stretched, BackgroundMode.StretchedWithGradient))
 		# self.preview.setBitmap(WindowStyleBitmap.UpperLeft, rws.bitmaps[WindowStyleBitmap.UpperLeft])
