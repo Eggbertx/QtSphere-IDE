@@ -51,9 +51,12 @@ class WindowStyleEditor(SphereEditor):
 
 		zoomMenu = QMenu("Set Zoom", self)
 		zoomMenu.setIcon(QIcon.fromTheme("zoom-in"))
-		zoomMenu.addAction("1x").triggered.connect(lambda: self.preview.setScale(1))
-		zoomMenu.addAction("2x").triggered.connect(lambda: self.preview.setScale(2))
-		zoomMenu.addAction("4x").triggered.connect(lambda: self.preview.setScale(4))
+		zoomMenu.addAction("1x").setCheckable(True)
+		zoom2 = zoomMenu.addAction("2x")
+		zoom2.setCheckable(True)
+		zoom2.setChecked(True)
+		zoomMenu.addAction("4x").setCheckable(True)
+		zoomMenu.triggered.connect(self.zoomMenuTriggered)
 		zoomMenuButton.setMenu(zoomMenu)
 
 		self.toolBar.addWidget(zoomMenuButton)
@@ -69,3 +72,17 @@ class WindowStyleEditor(SphereEditor):
 	def windowStyleActiveBitmapChanged(self, index: int):
 		bitmap = self.preview.windowStyle.bitmaps[index]
 		self.ui.bitmapEditor.attachImage(bitmap)
+
+	@Slot(QAction)
+	def zoomMenuTriggered(self, action:QAction):
+		menu:QMenu = action.parent()
+		for item in menu.actions():
+			item.setChecked(False)
+		match action.text():
+			case "1x":
+				self.preview.setScale(1)
+			case "2x":
+				self.preview.setScale(2)
+			case "4x":
+				self.preview.setScale(4)
+		action.setChecked(True)
