@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QMenu, QWidget, QFileDialog, QMessageBox
 
 from dialogs.mappropertiesdialog import MapPropertiesDialog
 from dialogs.resizedialog import ResizeDialog
+from dialogs.windowstylepropertiesdialog import WindowStylePropertiesDialog
 from formats.tileset import Tileset
 from widgets.map.mapeditor import MapEditor
 from widgets.spriteset.spriteseteditor import SpritesetEditor
@@ -104,8 +105,13 @@ class EditorMenuProvider:
 		spritesetMenu.addAction("Export Spriteset as Image")
 		return spritesetMenu
 
+	def __showWindowStylePropertiesDialog(self, editor:WindowStyleEditor):
+		dialog = WindowStylePropertiesDialog(editor, editor.windowStyle)
+		if dialog.exec() != 0:
+			editor.windowStylePropertiesChanged.emit(dialog)
+
 	def createWindowStyleMenu(self, editor:WindowStyleEditor):
 		windoStyleMenu = QMenu(self.parent)
 		windoStyleMenu.setTitle("Window Style")
-		windoStyleMenu.addAction("Properties")
+		windoStyleMenu.addAction("Properties", lambda: self.__showWindowStylePropertiesDialog(editor))
 		return windoStyleMenu

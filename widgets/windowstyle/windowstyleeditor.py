@@ -1,9 +1,9 @@
-from PySide6.QtCore import Slot
+from PySide6.QtCore import Slot, Signal
 from PySide6.QtGui import QAction, QIcon
 from PySide6.QtWidgets import QWidget, QToolBar, QMenu, QToolButton
 
 from ui.ui_windowstyleeditor import Ui_WindowStyleEditor
-
+from dialogs.windowstylepropertiesdialog import WindowStylePropertiesDialog
 from formats.windowstyle import SphereWindowStyle, WindowStyleBitmap, BackgroundMode
 from widgets.sphereeditor import SphereEditorType
 from widgets.sphereeditor import SphereEditor
@@ -11,6 +11,8 @@ from widgets.sphereeditor import SphereEditor
 class WindowStyleEditor(SphereEditor):
 	ui: Ui_WindowStyleEditor
 	toolBar : QToolBar
+	windowStyle: SphereWindowStyle
+	windowStylePropertiesChanged = Signal(WindowStylePropertiesDialog)
 
 	@property
 	def preview(self):
@@ -31,6 +33,7 @@ class WindowStyleEditor(SphereEditor):
 		self.toolBar = QToolBar()
 		self.setupToolbar()
 		self.ui.windowStylePreview.activeBitmapChanged.connect(self.windowStyleActiveBitmapChanged)
+		self.windowStyle = None
 
 	def setupToolbar(self):
 		gridAction = QAction(QIcon(":/res/togglegrid.png"), "Toggle Grid", self)
@@ -65,7 +68,8 @@ class WindowStyleEditor(SphereEditor):
 
 	def attachWindowStyle(self, rws: SphereWindowStyle):
 		self.setWindowTitle(f"Window Style Editor - {rws.filePath}")
-		self.preview.attachWindowStyle(rws)
+		self.windowStyle = rws
+		self.preview.attachWindowStyle(self.windowStyle)
 		self.windowStyleActiveBitmapChanged(WindowStyleBitmap.UpperLeft)
 
 	@Slot(int)
