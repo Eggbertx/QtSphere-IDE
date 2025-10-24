@@ -1,3 +1,4 @@
+from math import pow
 from enum import Enum
 import os
 
@@ -71,7 +72,9 @@ class SettingsWindow(QDialog):
 		settings.neosphereDir = self.ui.neosphereDir_txt.text()
 		settings.legacySphereDir = self.ui.legacySphereDir_txt.text()
 		settings.unrecognizedFileEditor = "text" if self.ui.unrecognizedFileEditor_combo.currentIndex() == 1 else "external"
-		settings.defaultEngine = "legacy" if self.ui.defaultEngine_combo.currentIndex() == 1 else "neosphere"
+		settings.defaultEngine = "legacy" if self.ui.defaultEngine_combo.currentIndex() == 1 else "neoSphere"
+		settings.defaultZoom = pow(2, self.ui.defaultZoom_combo.currentIndex())
+		
 
 		del settings.projectDirs
 		numDirs = self.ui.projectDirsList.count()

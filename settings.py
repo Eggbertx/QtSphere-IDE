@@ -4,156 +4,160 @@ from PySide6.QtCore import QSettings, QRect
 from PySide6.QtGui import QColor
 
 class Defaults(Enum):
+	geometry = QRect()
 	gridColor = QColor.fromString("#FF00FF")
+	legacySphereDir = ""
 	mapCursorColor = QColor.fromString("#0080ff")
-	defaultEngine = "neosphere"
-	unrecognizedFileEditor = "text"
 	maximized = True
+	neoSphereDir = ""
+	projectDirs = []
+	unrecognizedFileEditor = "text"
+	defaultEngine = "neoSphere"
 	wineDir = "/usr/bin"
 	theme = "Fusion"
-
-class Keys:
-	geometry = "geometry"
-	gridColor = "gridColor"
-	legacySphereDir = "legacySphereDir"
-	mapCursorColor = "mapCursorColor"
-	maximized = "maximized"
-	neosphereDir = "neosphereDir"
-	projectDirs = "projectDirs"
-	unrecognizedFileEditor = "unrecognizedFileEditor"
-	defaultEngine = "defaultEngine"
-	wineDir = "wineDir"
-	theme = "theme"
+	defaultZoom = 2
 
 
 class Settings(QSettings):
 	@property
 	def geometry(self) -> QRect:
-		return self.value(Keys.geometry)
+		return self.value(Defaults.geometry.name)
 	
 	@geometry.setter
 	def geometry(self, geom:QRect):
-		self.setValue(Keys.geometry, geom)
+		self.setValue(Defaults.geometry.name, geom)
 	
 	@geometry.deleter
 	def geometry(self):
-		self.remove(Keys.geometry)
+		self.remove(Defaults.geometry.name)
 
 	@property
 	def gridColor(self) -> QColor:
-		return self.value(Keys.gridColor)
+		return self.value(Defaults.gridColor.name)
 	
 	@gridColor.setter
 	def gridColor(self, col):
-		self.setValue(Keys.gridColor, col)
+		self.setValue(Defaults.gridColor.name, col)
 
 	@gridColor.deleter
 	def gridColor(self):
-		self.remove(Keys.gridColor)
+		self.remove(Defaults.gridColor.name)
 
 	@property
 	def legacySphereDir(self) -> str:
-		return self.value(Keys.legacySphereDir)
+		return self.value(Defaults.legacySphereDir.name)
 
 	@legacySphereDir.setter
 	def legacySphereDir(self, val:str):
-		self.setValue(Keys.legacySphereDir, val)
+		self.setValue(Defaults.legacySphereDir.name, val)
 
 	@property
 	def mapCursorColor(self) -> QColor|str:
-		return self.value(Keys.mapCursorColor, Defaults.mapCursorColor.value)
+		return self.value(Defaults.mapCursorColor.name, Defaults.mapCursorColor.value)
 
 	@mapCursorColor.setter
 	def mapCursorColor(self, col:QColor|str):
-		self.setValue(Keys.mapCursorColor, col)
+		self.setValue(Defaults.mapCursorColor.name, col)
 	
 	@mapCursorColor.deleter
 	def mapCursorColor(self):
-		self.remove(Keys.mapCursorColor)
+		self.remove(Defaults.mapCursorColor.name)
 
 	@property
 	def maximized(self) -> bool:
-		return self.value(Keys.maximized, Defaults.maximized.value)
+		return self.value(Defaults.maximized.name, Defaults.maximized.value)
 
 	@maximized.setter
 	def maximized(self, m:bool):
-		self.setValue(Keys.maximized, m)
+		self.setValue(Defaults.maximized.name, m)
 	
 	@maximized.deleter
 	def maximized(self):
-		self.remove(Keys.maximized)
+		self.remove(Defaults.maximized.name)
 
 	@property
 	def neosphereDir(self) -> str:
-		return self.value(Keys.neosphereDir)
+		return self.value(Defaults.neoSphereDir.name)
 
 	@neosphereDir.setter
 	def neosphereDir(self, dir:str):
-		self.setValue(Keys.neosphereDir, dir)
+		self.setValue(Defaults.neoSphereDir.name, dir)
 	
 	@neosphereDir.deleter
 	def neosphereDir(self):
-		self.remove(Keys.neosphereDir)
+		self.remove(Defaults.neoSphereDir.name)
 
 	@property
 	def projectDirs(self) -> list[str]:
-		return self.getArray(Keys.projectDirs, "directory")
+		return self.getArray(Defaults.projectDirs.name, "directory")
 
 	@projectDirs.setter
 	def projectDirs(self, dirs:list[str]):
-		self.setArray(Keys.projectDirs, "directory", dirs)
+		self.setArray(Defaults.projectDirs.name, "directory", dirs)
 
 	@projectDirs.deleter
 	def projectDirs(self):
-		self.remove(Keys.projectDirs)
+		self.remove(Defaults.projectDirs.name)
 
 	@property
 	def unrecognizedFileEditor(self) -> str:
-		return self.value(Keys.unrecognizedFileEditor)
+		return self.value(Defaults.unrecognizedFileEditor.name, Defaults.unrecognizedFileEditor.value)
 
 	@unrecognizedFileEditor.setter
 	def unrecognizedFileEditor(self, editor:str):
-		self.setValue(Keys.unrecognizedFileEditor, editor)
+		self.setValue(Defaults.unrecognizedFileEditor.name, editor)
 
 	@unrecognizedFileEditor.deleter
 	def unrecognizedFileEditor(self):
-		self.remove(Keys.unrecognizedFileEditor)
+		self.remove(Defaults.unrecognizedFileEditor.name)
 
 	@property
 	def defaultEngine(self):
-		return self.value(Keys.defaultEngine)
+		return self.value(Defaults.defaultEngine.name)
 
 	@defaultEngine.setter
 	def defaultEngine(self, which:str):
-		self.setValue(Keys.defaultEngine, which)
+		self.setValue(Defaults.defaultEngine.name, which)
 
 	@defaultEngine.deleter
 	def defaultEngine(self):
-		self.remove(Keys.defaultEngine)
+		self.remove(Defaults.defaultEngine.name)
 
 	@property
 	def wineDir(self) -> str:
-		return self.value(Keys.wineDir)
+		return self.value(Defaults.wineDir.name)
 	
 	@wineDir.setter
 	def wineDir(self, dir:str):
-		self.setValue(Keys.wineDir, dir)
+		self.setValue(Defaults.wineDir.name, dir)
 
 	@wineDir.deleter
 	def wineDir(self):
-		self.remove(Keys.wineDir)
+		self.remove(Defaults.wineDir.name)
 
 	@property
 	def theme(self) -> str:
-		return self.value(Keys.theme, Defaults.theme.value)
+		return self.value(Defaults.theme.name, Defaults.theme.value)
 
 	@theme.setter
 	def theme(self, newTheme:str):
-		self.setValue(Keys.theme, newTheme)
+		self.setValue(Defaults.theme.name, newTheme)
 
 	@theme.deleter
 	def theme(self):
-		self.remove(Keys.theme)
+		self.remove(Defaults.theme)
+
+	@property
+	def defaultZoom(self) -> int:
+		return self.value(Defaults.defaultZoom.name, Defaults.defaultZoom.value)
+
+	@defaultZoom.setter
+	def defaultZoom(self, z:int):
+		self.setValue(Defaults.defaultZoom.name, z)
+
+	@defaultZoom.deleter
+	def defaultZoom(self):
+		self.remove(Defaults.defaultZoom.name)
 
 	def __init__(self, filename:str = None) -> None:
 		if filename is None:
@@ -167,7 +171,7 @@ class Settings(QSettings):
 			default = Defaults[key].value
 		return super().value(key, default)
 	
-	def getArray(self, arrayKey:str|Keys, indexKey:str):
+	def getArray(self, arrayKey:str|Defaults, indexKey:str):
 		num = self.beginReadArray(arrayKey)
 		arr = []
 		for i in range(num):

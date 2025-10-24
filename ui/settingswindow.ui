@@ -48,91 +48,12 @@
        <string>UI</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout">
-       <item row="1" column="0">
-        <widget class="QLabel" name="theme_lbl">
-         <property name="text">
-          <string>Theme</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="unrecognizedFileEditor_lbl">
-         <property name="text">
-          <string>Unrecognized file editor</string>
-         </property>
-        </widget>
-       </item>
        <item row="4" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Colors</string>
          </property>
         </widget>
-       </item>
-       <item row="5" column="0">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="3" column="1">
-        <widget class="QComboBox" name="unrecognizedFileEditor_combo">
-         <item>
-          <property name="text">
-           <string>External editor</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Internal text editor</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="defaultEngine_combo">
-         <property name="toolTip">
-          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If the legacy engine is chosen on a non-Windows OS and WINE is available, it will be used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-         </property>
-         <property name="currentText">
-          <string>neoSphere</string>
-         </property>
-         <item>
-          <property name="text">
-           <string>neoSphere</string>
-          </property>
-          <property name="icon">
-           <iconset resource="../qsires.qrc">
-            <normaloff>:/res/neosphere.png</normaloff>:/res/neosphere.png</iconset>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>Sphere 1.x (legacy)</string>
-          </property>
-          <property name="icon">
-           <iconset resource="../qsires.qrc">
-            <normaloff>:/res/legacyengine.png</normaloff>:/res/legacyengine.png</iconset>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="defaultEngine_lbl">
-         <property name="text">
-          <string>Default Sphere engine</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QComboBox" name="theme_combo"/>
        </item>
        <item row="4" column="1">
         <layout class="QGridLayout" name="colorsLayout">
@@ -195,6 +116,119 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item row="6" column="0">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="defaultEngine_lbl">
+         <property name="text">
+          <string>Default Sphere engine</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="theme_lbl">
+         <property name="text">
+          <string>Theme</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QComboBox" name="theme_combo"/>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="defaultEngine_combo">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If the legacy engine is chosen on a non-Windows OS and WINE is available, it will be used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="currentText">
+          <string>neoSphere</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>neoSphere</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../qsires.qrc">
+            <normaloff>:/res/neosphere.png</normaloff>:/res/neosphere.png</iconset>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Sphere 1.x (legacy)</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../qsires.qrc">
+            <normaloff>:/res/legacyengine.png</normaloff>:/res/legacyengine.png</iconset>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="unrecognizedFileEditor_lbl">
+         <property name="text">
+          <string>Unrecognized file editor</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QComboBox" name="unrecognizedFileEditor_combo">
+         <item>
+          <property name="text">
+           <string>External editor</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>Internal text editor</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="ddefaultZoom_lbl">
+         <property name="text">
+          <string>Default zoom</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QComboBox" name="defaultZoom_combo">
+         <property name="currentIndex">
+          <number>1</number>
+         </property>
+         <item>
+          <property name="text">
+           <string>1x</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>2x</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>4x</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>8x</string>
+          </property>
+         </item>
+        </widget>
        </item>
       </layout>
      </widget>
