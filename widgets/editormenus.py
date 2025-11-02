@@ -1,6 +1,9 @@
+from math import pow
 from os import path
+
 from PySide6.QtCore import QSize
 from PySide6.QtWidgets import QMenu, QWidget, QFileDialog, QMessageBox
+from PySide6.QtGui import QAction
 
 from dialogs.mappropertiesdialog import MapPropertiesDialog
 from dialogs.resizedialog import ResizeDialog
@@ -15,6 +18,13 @@ class EditorMenuProvider:
 
 	def __init__(self, parent:QWidget = None):
 		self.parent = parent
+
+
+	def setCheckedAction(self, menu: QMenu, a:QAction):
+		items = menu.actions()
+		for item in items:
+			item.setCheckable(True)
+			item.setChecked(item == a)
 
 
 	def __showResizeAllLayersDialog(self, editor:MapEditor):
@@ -105,13 +115,37 @@ class EditorMenuProvider:
 		spritesetMenu.addAction("Export Spriteset as Image")
 		return spritesetMenu
 
+
 	def __showWindowStylePropertiesDialog(self, editor:WindowStyleEditor):
 		dialog = WindowStylePropertiesDialog(editor, editor.windowStyle)
 		if dialog.exec() != 0:
 			editor.windowStylePropertiesChanged.emit(dialog)
 
+
 	def createWindowStyleMenu(self, editor:WindowStyleEditor):
-		windoStyleMenu = QMenu(self.parent)
-		windoStyleMenu.setTitle("Window Style")
-		windoStyleMenu.addAction("Properties", lambda: self.__showWindowStylePropertiesDialog(editor))
-		return windoStyleMenu
+		windowStyleMenu = QMenu(self.parent)
+		windowStyleMenu.setTitle("Window Style")
+		editMenu = windowStyleMenu.addMenu("Edit")
+		
+		bitmaps = ("Upper Left", "Top", "Upper Right", "Right", "Lower Right", "Bottom", "Lower Left", "Left", "Background")
+		for b in range(len(bitmaps)):
+			action = editMenu.addAction(bitmaps[b])
+			action.setCheckable(True)
+			action.setData(b)
+		editMenu.actions()[0].setChecked(True)
+		editMenu.triggered.connect(editor.windowStyleActiveBitmapChanged)
+		editMenu.triggered.connect(lambda a: editor.preview.setActiveBitmap(action.data()))
+
+		zoomMenu = windowStyleMenu.addMenu("Zoom")
+		for i in range(3):
+			zoomMenu.addAction(f"{int(pow(2, i))}x").setCheckable(True)
+		zoomMenu.actions()[1].setChecked(True)
+		zoomMenu.triggered.connect(editor.zoomMenuTriggered)
+
+		sizeMenu = windowStyleMenu.addMenu("Change Size")
+		sizeMenu.addAction("Change Dimensions")
+		sizeMenu.addAction("Rescale Current Bitmap")
+
+		windowStyleMenu.addSeparator()
+		windowStyleMenu.addAction("Properties", lambda: self.__showWindowStylePropertiesDialog(editor))
+		return windowStyleMenu

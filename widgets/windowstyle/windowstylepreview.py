@@ -209,6 +209,13 @@ class WindowStylePreview(QWidget):
 
 		painter.end()
 
+	def setActiveBitmap(self, b: int):
+		currentActive = self.activeBitmap
+		self.activeBitmap = b
+		if currentActive != self.activeBitmap:
+			self.update()
+			self.activeBitmapChanged.emit(self.activeBitmap)
+
 	def mousePressEvent(self, event: QMouseEvent):
 		if event.button() != Qt.MouseButton.LeftButton:
 			return
@@ -219,8 +226,5 @@ class WindowStylePreview(QWidget):
 		gridRects = self.gridRects()
 		for r in range(len(gridRects)):
 			if gridRects[r].contains(QPoint(x, y)):
-				self.activeBitmap = r
-				if currentActive != self.activeBitmap:
-					self.update()
-					self.activeBitmapChanged.emit(self.activeBitmap)
+				self.setActiveBitmap(r)
 				return
