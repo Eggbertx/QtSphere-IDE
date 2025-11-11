@@ -131,10 +131,9 @@ class EditorMenuProvider:
 		for b in range(len(bitmaps)):
 			action = editMenu.addAction(bitmaps[b])
 			action.setCheckable(True)
+			action.triggered.connect(lambda: editor.preview.setActiveBitmap(b))
 			action.setData(b)
 		editMenu.actions()[0].setChecked(True)
-		editMenu.triggered.connect(editor.windowStyleActiveBitmapChanged)
-		editMenu.triggered.connect(lambda a: editor.preview.setActiveBitmap(action.data()))
 
 		zoomMenu = windowStyleMenu.addMenu("Zoom")
 		for i in range(3):

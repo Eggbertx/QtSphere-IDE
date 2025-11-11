@@ -3,6 +3,7 @@ const windowStretchBG = LoadWindowStyle("window_stretch-bg.rws");
 const windowGradientBG = LoadWindowStyle("window_gradient-bg.rws");
 const windowGradientTiledBG = LoadWindowStyle("window_gradient-tiled-bg.rws");
 const windowGradientStretchBG = LoadWindowStyle("window_gradient-stretch-bg.rws");
+const windowOddSizes = LoadWindowStyle("odd-sizes-test.rws");
 const font = LoadFont("dailybuild.rfn");
 
 
@@ -22,6 +23,8 @@ function render() {
 	windowGradientTiledBG.drawWindow(x, y, w, h);
 	x += w + 64;
 	windowGradientStretchBG.drawWindow(x, y, w*1.4, h);
+	x += w*1.4 + 64+16;
+	windowOddSizes.drawWindow(x, y, w, h);
 }
 
 function game() {

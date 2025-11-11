@@ -5,7 +5,7 @@ const windowStretchBG = LoadWindowStyle("@/windowstyles/window_stretch-bg.rws");
 const windowGradientBG = LoadWindowStyle("@/windowstyles/window_gradient-bg.rws");
 const windowGradientTiledBG = LoadWindowStyle("@/windowstyles/window_gradient-tiled-bg.rws");
 const windowGradientStretchBG = LoadWindowStyle("@/windowstyles/window_gradient-stretch-bg.rws");
-// const font = LoadFont("@/fonts/dailybuild.rfn");
+const windowOddSizes = LoadWindowStyle("@/windowstyles/odd-sizes-test.rws");
 const font = new Font("@/fonts/dailybuild.rfn");
 
 export default class Game extends Task {
@@ -41,5 +41,7 @@ export default class Game extends Task {
 		windowGradientTiledBG.drawWindow(x, y, w, h);
 		x += w + 64;
 		windowGradientStretchBG.drawWindow(x, y, w*1.4, h);
+		x += w*1.4 + 64 + 16;
+		windowOddSizes.drawWindow(x, y, w, h);
 	}
 }
