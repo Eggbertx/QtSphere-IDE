@@ -86,9 +86,22 @@ class DrawingView(QGraphicsView):
 
 		self.scene.clear()
 		self.imageItem = self.scene.addPixmap(QPixmap.fromImage(self.image))
+		self.__updateSize()
+
+	def zoomIn(self):
+		self.image = self.image.scaled(self.image.width() * 2, self.image.height() * 2, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.FastTransformation)
+		self.imageItem.setPixmap(QPixmap.fromImage(self.image))
+		self.__updateSize()
+
+	def zoomOut(self):
+		self.image = self.image.scaled(self.image.width() // 2, self.image.height() // 2, Qt.AspectRatioMode.IgnoreAspectRatio, Qt.TransformationMode.FastTransformation)
+		self.imageItem.setPixmap(QPixmap.fromImage(self.image))
+		self.__updateSize()
+
+	def __updateSize(self):
 		self.setFixedSize(self.image.size())
 		self.setSceneRect(0, 0, self.image.width(), self.image.height())
-
+		self.viewport().update()
 
 #region Event overloads
 	def mousePressEvent(self, event: QMouseEvent) -> None:
