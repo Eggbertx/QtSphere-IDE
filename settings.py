@@ -31,7 +31,7 @@ class Settings(QSettings):
 
 	@property
 	def gridColor(self) -> QColor:
-		return self.value("gridColor")
+		return self.value("gridColor", Defaults.gridColor)
 	
 	@gridColor.setter
 	def gridColor(self, col):

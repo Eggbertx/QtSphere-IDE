@@ -446,7 +446,7 @@ class MapView(QGraphicsView):
 		settings = Settings()
 		gridColor = settings.gridColor
 		if not gridColor.isValid():
-			gridColor = Defaults.gridColor.value
+			gridColor = Defaults.gridColor
 			settings.gridColor = gridColor
 		gridColor.setAlpha(128)
 
