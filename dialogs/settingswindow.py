@@ -33,17 +33,17 @@ class SettingsWindow(QDialog):
 		self.ui.neosphereDir_btn.clicked.connect(self.onNeoSphereDirButtonClicked)
 		self.ui.legacySphereDir_btn.clicked.connect(self.onLegacySphereDirButtonClicked)
 		
-		self._addColorMenu(self.ui.gridColor_btn)
-		self._addColorMenu(self.ui.mapCursorCol_btn)
-		self._removeWineIfWindows()
-		self._addThemeItems()
+		self.__addColorMenu(self.ui.gridColor_btn)
+		self.__addColorMenu(self.ui.mapCursorCol_btn)
+		self.__removeWineIfWindows()
+		self.__addThemeItems()
 		self.loadSettings()
 		
 
-	def _addColorMenu(self, btn:ColorButton):
+	def __addColorMenu(self, btn:ColorButton):
 		menu = QMenu(btn)
 		menu.addAction("Copy color to clipboard").triggered.connect(lambda: QGuiApplication.clipboard().setText(btn.color.name()))
-		menu.addAction("Reset color").triggered.connect(lambda: self._resetColorPressed(btn))
+		menu.addAction("Reset color").triggered.connect(lambda: self.__resetColorPressed(btn))
 		btn.customContextMenuRequested.connect(lambda pt: menu.exec(btn.mapToGlobal(pt)))
 	
 	def loadSettings(self):
@@ -61,9 +61,9 @@ class SettingsWindow(QDialog):
 		searchPaths = settings.projectDirs
 		for sPath in searchPaths:
 			if sPath != "":
-				self._addProjectDirItem(sPath)
+				self.__addProjectDirItem(sPath)
 
-	def _saveSettings(self):
+	def __saveSettings(self):
 		settings = Settings()
 		settings.mapCursorColor = self.ui.mapCursorCol_btn.color
 		settings.gridColor = self.ui.gridColor_btn.color
@@ -87,19 +87,19 @@ class SettingsWindow(QDialog):
 		settings.theme = self.ui.theme_combo.currentText()
 		self.settingsSaved.emit()
 
-	def _addThemeItems(self):
+	def __addThemeItems(self):
 		keys:list[str] = QStyleFactory.keys()
 		settings = Settings()
 		self.ui.theme_combo.addItems(keys)
 		index = keys.index(settings.theme)
 		self.ui.theme_combo.setCurrentIndex(index)
 
-	def _addProjectDirItem(self, text:str):
+	def __addProjectDirItem(self, text:str):
 		item = QListWidgetItem(text, self.ui.projectDirsList)
 		item.setFlags(item.flags()|Qt.ItemFlag.ItemIsEditable)
 		self.ui.projectDirsList.addItem(item)
 
-	def _removeWineIfWindows(self):
+	def __removeWineIfWindows(self):
 		if os.name == "nt":
 			# running in Windows, no need for WINE stuff
 			settings = Settings()
@@ -112,27 +112,27 @@ class SettingsWindow(QDialog):
 			self.ui.wineDir_txt.deleteLater()
 			self.ui.wineDir_layout.deleteLater()
 
-	def _resetColorPressed(self, btn:ColorButton):
+	def __resetColorPressed(self, btn:ColorButton):
 		match btn:
 			case self.ui.mapCursorCol_btn:
-				btn.setColor(Defaults.mapCursorColor.value)
+				btn.setColor(Defaults.mapCursorColor)
 			case self.ui.gridColor_btn:
-				btn.setColor(Defaults.gridColor.value)
+				btn.setColor(Defaults.gridColor)
 			case _:
 				ErrorDialog.showError(self, f"Unrecognized color button '{btn.objectName()}'")
 
 	@Slot()
 	def onOK(self):
-		self._saveSettings()
+		self.__saveSettings()
 		self.accept()
 
 	@Slot()	
 	def onApply(self):
-		self._saveSettings()
+		self.__saveSettings()
 
 	@Slot()
 	def onAddDirButtonClicked(self):
-		self._addProjectDirItem("")
+		self.__addProjectDirItem("")
 		self.ui.projectDirsList.setCurrentRow(self.ui.projectDirsList.count()-1)
 
 	@Slot()

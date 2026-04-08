@@ -1,9 +1,7 @@
-from enum import Enum
-
 from PySide6.QtCore import QSettings, QRect
 from PySide6.QtGui import QColor
 
-class Defaults(Enum):
+class Defaults:
 	geometry = QRect()
 	gridColor = QColor.fromString("#FF00FF")
 	legacySphereDir = ""
@@ -21,127 +19,127 @@ class Defaults(Enum):
 class Settings(QSettings):
 	@property
 	def geometry(self) -> QRect:
-		return self.value(Defaults.geometry.name)
+		return self.value("geometry")
 	
 	@geometry.setter
 	def geometry(self, geom:QRect):
-		self.setValue(Defaults.geometry.name, geom)
+		self.setValue("geometry", geom)
 	
 	@geometry.deleter
 	def geometry(self):
-		self.remove(Defaults.geometry.name)
+		self.remove("geometry")
 
 	@property
 	def gridColor(self) -> QColor:
-		return self.value(Defaults.gridColor.name)
+		return self.value("gridColor")
 	
 	@gridColor.setter
 	def gridColor(self, col):
-		self.setValue(Defaults.gridColor.name, col)
+		self.setValue("gridColor", col)
 
 	@gridColor.deleter
 	def gridColor(self):
-		self.remove(Defaults.gridColor.name)
+		self.remove("gridColor")
 
 	@property
 	def legacySphereDir(self) -> str:
-		return self.value(Defaults.legacySphereDir.name)
+		return self.value("legacySphereDir")
 
 	@legacySphereDir.setter
 	def legacySphereDir(self, val:str):
-		self.setValue(Defaults.legacySphereDir.name, val)
+		self.setValue("legacySphereDir", val)
 
 	@property
 	def mapCursorColor(self) -> QColor|str:
-		return self.value(Defaults.mapCursorColor.name, Defaults.mapCursorColor.value)
+		return self.value("mapCursorColor", Defaults.mapCursorColor)
 
 	@mapCursorColor.setter
 	def mapCursorColor(self, col:QColor|str):
-		self.setValue(Defaults.mapCursorColor.name, col)
+		self.setValue("mapCursorColor", col)
 	
 	@mapCursorColor.deleter
 	def mapCursorColor(self):
-		self.remove(Defaults.mapCursorColor.name)
+		self.remove("mapCursorColor")
 
 	@property
 	def maximized(self) -> bool:
-		return self.value(Defaults.maximized.name, Defaults.maximized.value)
+		return self.value("maximized", Defaults.maximized)
 
 	@maximized.setter
 	def maximized(self, m:bool):
-		self.setValue(Defaults.maximized.name, m)
+		self.setValue("maximized", m)
 	
 	@maximized.deleter
 	def maximized(self):
-		self.remove(Defaults.maximized.name)
+		self.remove("maximized")
 
 	@property
 	def neosphereDir(self) -> str:
-		return self.value(Defaults.neoSphereDir.name)
+		return self.value("neoSphereDir")
 
 	@neosphereDir.setter
 	def neosphereDir(self, dir:str):
-		self.setValue(Defaults.neoSphereDir.name, dir)
+		self.setValue("neoSphereDir", dir)
 	
 	@neosphereDir.deleter
 	def neosphereDir(self):
-		self.remove(Defaults.neoSphereDir.name)
+		self.remove("neoSphereDir")
 
 	@property
 	def projectDirs(self) -> list[str]:
-		return self.getArray(Defaults.projectDirs.name, "directory")
+		return self.getArray("projectDirs", "directory")
 
 	@projectDirs.setter
 	def projectDirs(self, dirs:list[str]):
-		self.setArray(Defaults.projectDirs.name, "directory", dirs)
+		self.setArray("projectDirs", "directory", dirs)
 
 	@projectDirs.deleter
 	def projectDirs(self):
-		self.remove(Defaults.projectDirs.name)
+		self.remove("projectDirs")
 
 	@property
 	def unrecognizedFileEditor(self) -> str:
-		return self.value(Defaults.unrecognizedFileEditor.name, Defaults.unrecognizedFileEditor.value)
+		return self.value("unrecognizedFileEditor", Defaults.unrecognizedFileEditor)
 
 	@unrecognizedFileEditor.setter
 	def unrecognizedFileEditor(self, editor:str):
-		self.setValue(Defaults.unrecognizedFileEditor.name, editor)
+		self.setValue("unrecognizedFileEditor", editor)
 
 	@unrecognizedFileEditor.deleter
 	def unrecognizedFileEditor(self):
-		self.remove(Defaults.unrecognizedFileEditor.name)
+		self.remove("unrecognizedFileEditor")
 
 	@property
 	def defaultEngine(self):
-		return self.value(Defaults.defaultEngine.name)
+		return self.value("defaultEngine")
 
 	@defaultEngine.setter
 	def defaultEngine(self, which:str):
-		self.setValue(Defaults.defaultEngine.name, which)
+		self.setValue("defaultEngine", which)
 
 	@defaultEngine.deleter
 	def defaultEngine(self):
-		self.remove(Defaults.defaultEngine.name)
+		self.remove("defaultEngine")
 
 	@property
 	def wineDir(self) -> str:
-		return self.value(Defaults.wineDir.name)
+		return self.value("wineDir")
 	
 	@wineDir.setter
 	def wineDir(self, dir:str):
-		self.setValue(Defaults.wineDir.name, dir)
+		self.setValue("wineDir", dir)
 
 	@wineDir.deleter
 	def wineDir(self):
-		self.remove(Defaults.wineDir.name)
+		self.remove("wineDir")
 
 	@property
 	def theme(self) -> str:
-		return self.value(Defaults.theme.name, Defaults.theme.value)
+		return self.value("theme", Defaults.theme)
 
 	@theme.setter
 	def theme(self, newTheme:str):
-		self.setValue(Defaults.theme.name, newTheme)
+		self.setValue("theme", newTheme)
 
 	@theme.deleter
 	def theme(self):
@@ -149,15 +147,15 @@ class Settings(QSettings):
 
 	@property
 	def defaultZoom(self) -> int:
-		return self.value(Defaults.defaultZoom.name, Defaults.defaultZoom.value)
+		return self.value("defaultZoom", Defaults.defaultZoom)
 
 	@defaultZoom.setter
 	def defaultZoom(self, z:int):
-		self.setValue(Defaults.defaultZoom.name, z)
+		self.setValue("defaultZoom", z)
 
 	@defaultZoom.deleter
 	def defaultZoom(self):
-		self.remove(Defaults.defaultZoom.name)
+		self.remove("defaultZoom")
 
 	def __init__(self, filename:str = None) -> None:
 		if filename is None:
@@ -168,7 +166,7 @@ class Settings(QSettings):
 	def value(self, key:str, default = None):
 		if default is None and hasattr(Defaults, key):
 			# no default value passed to function, a constant default exists
-			default = Defaults[key].value
+			default = getattr(Defaults, key)
 		return super().value(key, default)
 	
 	def getArray(self, arrayKey:str|Defaults, indexKey:str):
