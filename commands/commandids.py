@@ -15,3 +15,4 @@ class CommandIDs(Enum):
 	ChangeTileSize = auto()
 	RescaleTileset = auto()
 	ReplaceTileset = auto()
+	WindowStylePropertiesChanged = auto()

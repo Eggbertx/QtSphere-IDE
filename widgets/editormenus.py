@@ -132,12 +132,15 @@ class EditorMenuProvider:
 			action = editMenu.addAction(bitmaps[b])
 			action.setCheckable(True)
 			action.triggered.connect(lambda: editor.preview.setActiveBitmap(b))
+			action.triggered.connect(lambda: self.setCheckedAction(editMenu, editMenu.actions()[b]))
 			action.setData(b)
 		editMenu.actions()[0].setChecked(True)
 
 		zoomMenu = windowStyleMenu.addMenu("Zoom")
 		for i in range(3):
-			zoomMenu.addAction(f"{int(pow(2, i))}x").setCheckable(True)
+			action = zoomMenu.addAction(f"{int(pow(2, i))}x")
+			action.setCheckable(True)
+			
 		zoomMenu.actions()[1].setChecked(True)
 		zoomMenu.triggered.connect(editor.zoomMenuTriggered)
 

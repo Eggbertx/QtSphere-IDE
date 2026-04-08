@@ -2,6 +2,7 @@ from PySide6.QtCore import Slot, Signal
 from PySide6.QtGui import QAction, QIcon
 from PySide6.QtWidgets import QWidget, QToolBar, QMenu, QToolButton
 
+from commands.windowstylepropertiescommands import WindowStylePropertiesChangedCommand
 from ui.ui_windowstyleeditor import Ui_WindowStyleEditor
 from dialogs.windowstylepropertiesdialog import WindowStylePropertiesDialog
 from formats.windowstyle import SphereWindowStyle, WindowStyleBitmap, BackgroundMode
@@ -34,6 +35,8 @@ class WindowStyleEditor(SphereEditor):
 		self.setupToolbar()
 		self.ui.windowStylePreview.activeBitmapChanged.connect(self.windowStyleActiveBitmapChanged)
 		self.windowStyle = None
+		self.windowStylePropertiesChanged.connect(self.onWindowStylePropertiesChanged)
+
 
 	def setupToolbar(self):
 		gridAction = QAction(QIcon(":/res/togglegrid.png"), "Toggle Grid", self)
@@ -43,8 +46,8 @@ class WindowStyleEditor(SphereEditor):
 		self.toolBar.addAction(gridAction)
 
 		propertiesAction = QAction(QIcon.fromTheme("document-properties"), "Window Style Properties", self)
+		propertiesAction.triggered.connect(self.windowstylePropertiesDialogTriggered)
 		self.toolBar.addAction(propertiesAction)
-
 		self.toolBar.addSeparator()
 
 		zoomMenuButton = QToolButton(self)
@@ -54,11 +57,11 @@ class WindowStyleEditor(SphereEditor):
 
 		zoomMenu = QMenu("Set Zoom", self)
 		zoomMenu.setIcon(QIcon.fromTheme("zoom-in"))
-		zoomMenu.addAction("1x").setCheckable(True)
-		zoom2 = zoomMenu.addAction("2x")
-		zoom2.setCheckable(True)
-		zoom2.setChecked(True)
-		zoomMenu.addAction("4x").setCheckable(True)
+		for i in range(3):
+			action = zoomMenu.addAction(f"{int(pow(2, i))}x")
+			action.setCheckable(True)
+			if i == 1:
+				action.setChecked(True)
 		zoomMenu.triggered.connect(self.zoomMenuTriggered)
 		zoomMenuButton.setMenu(zoomMenu)
 
@@ -66,16 +69,19 @@ class WindowStyleEditor(SphereEditor):
 
 		self.ui.verticalLayout.setMenuBar(self.toolBar)
 
+
 	def attachWindowStyle(self, rws: SphereWindowStyle):
 		self.setWindowTitle(f"Window Style Editor - {rws.filePath}")
 		self.windowStyle = rws
 		self.preview.attachWindowStyle(self.windowStyle)
 		self.windowStyleActiveBitmapChanged(WindowStyleBitmap.UpperLeft)
 
+
 	@Slot(int)
 	def windowStyleActiveBitmapChanged(self, index: int):
 		bitmap = self.preview.windowStyle.bitmaps[index]
 		self.ui.bitmapEditor.attachImage(bitmap)
+
 
 	@Slot(QAction)
 	def zoomMenuTriggered(self, action:QAction):
@@ -90,3 +96,15 @@ class WindowStyleEditor(SphereEditor):
 			case "4x":
 				self.preview.setScale(4)
 		action.setChecked(True)
+
+
+	@Slot(QAction)
+	def windowstylePropertiesDialogTriggered(self, action:QAction):
+		dialog = WindowStylePropertiesDialog(self, self.windowStyle)
+		if dialog.exec() != 0:
+			self.windowStylePropertiesChanged.emit(dialog)
+
+
+	@Slot(WindowStylePropertiesDialog)
+	def onWindowStylePropertiesChanged(self, dialog:WindowStylePropertiesDialog):
+		self.undoStack.push(WindowStylePropertiesChangedCommand(dialog, self.windowStyle, self))
