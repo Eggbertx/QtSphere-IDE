@@ -56,6 +56,7 @@ class SettingsWindow(QDialog):
 		self.ui.legacySphereDir_txt.setText(settings.legacySphereDir or "")
 		self.ui.unrecognizedFileEditor_combo.setCurrentIndex(0 if settings.unrecognizedFileEditor == "external" else 1)
 		self.ui.defaultEngine_combo.setCurrentIndex(1 if settings.defaultEngine == "legacy" else 0)
+		self.ui.connectConsole_chk.setChecked(settings.connectConsole)
 
 		self.ui.projectDirsList.clear()
 		searchPaths = settings.projectDirs
@@ -74,6 +75,7 @@ class SettingsWindow(QDialog):
 		settings.unrecognizedFileEditor = "text" if self.ui.unrecognizedFileEditor_combo.currentIndex() == 1 else "external"
 		settings.defaultEngine = "legacy" if self.ui.defaultEngine_combo.currentIndex() == 1 else "neoSphere"
 		settings.defaultZoom = pow(2, self.ui.defaultZoom_combo.currentIndex())
+		settings.connectConsole = self.ui.connectConsole_chk.isChecked()
 		
 
 		del settings.projectDirs

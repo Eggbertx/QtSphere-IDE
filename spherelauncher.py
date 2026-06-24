@@ -1,58 +1,63 @@
 import os
 import os.path as path
+import sys
 
-from PySide6.QtCore import QProcess, QSettings, Slot
+from PySide6.QtCore import QProcess, Slot
 from PySide6.QtWidgets import QWidget
 
 from dialogs.errordialog import ErrorDialog
-from qsiproject import QSIProject, ProjectType
+from qsiproject import QSIProject
+from settings import Settings
 
 class SphereLauncher:
-	settings: QSettings
+	settings: Settings
 	process:QProcess
 	output:str
 	parent:QWidget
 	sphereName:str
+	manuallyStopped:bool
 
 	@property
 	def winePath(self):
-		return path.join(self.settings.value("wineDir", ""), "wine")
+		return path.join(self.settings.wineDir, "wine")
 
 	@property
 	def neospherePath(self):
-		return path.join(self.settings.value("neosphereDir", ""), "neosphere")
+		return path.join(self.settings.neosphereDir, "neosphere")
 
 	@property
 	def ssjPath(self):
-		return path.join(self.settings.value("neosphereDir", ""), "ssj")
+		return path.join(self.settings.neosphereDir, "ssj")
 
 	@property
 	def cellPath(self):
-		return path.join(self.settings.value("neosphereDir", ""), "cell")
+		return path.join(self.settings.neosphereDir, "cell")
 
 	@property
 	def legacySphereEnginePath(self):
-		return path.join(self.settings.value("legacySphereDir", ""), "engine.exe")
+		return path.join(self.settings.legacySphereDir, "engine.exe")
 
 	@property
 	def legacySphereConfigPath(self):
-		return path.join(self.settings.value("legacySphereDir", ""), "config.exe")
+		return path.join(self.settings.legacySphereDir, "config.exe")
 
 
 	def __init__(self, parent:QWidget = None) -> None:
 		self.parent = parent
 		self.output = ""
-		self.settings = QSettings()
+		self.settings = Settings()
 		self.process = QProcess(parent)
 		self.process.readyReadStandardOutput.connect(self.onProcessStdout)
 		self.process.readyReadStandardError.connect(self.onProcessStderr)
-		self.process.errorOccurred.connect(lambda e: self.showErrorWithOutput(f"An error occured with the Sphere process: {e}"))
+		self.process.errorOccurred.connect(self.onProcessErrorOccured)
 		self.process.finished.connect(self.onProcessFinished)
 		self.sphereName = "Sphere"
+		self.manuallyStopped = False
 
 
 	def _runSphereProgram(self, isLegacy:bool, program:str, args:list[str], workingDir:str = os.curdir):
-		if isLegacy and self.settings.value("legacySphereDir", "") == "":
+		self.manuallyStopped = False
+		if isLegacy and self.settings.legacySphereDir == "":
 			raise Exception("Legacy Sphere directory not set")
 		self.process.setWorkingDirectory(workingDir)
 		if os.name == "nt":
@@ -72,7 +77,7 @@ class SphereLauncher:
 
 	def runLegacyConfig(self):
 		self.sphereName = "Sphere 1.x config"
-		self._runSphereProgram(True, self.legacySphereConfigPath, [], self.settings.value("legacySphereDir"))
+		self._runSphereProgram(True, self.legacySphereConfigPath, [], self.settings.legacySphereDir)
 
 
 	def runLegacyEngine(self, gameDir:str):
@@ -86,10 +91,20 @@ class SphereLauncher:
 
 
 	def launchGame(self, project:QSIProject):
-		if self.settings.value("defaultEngine", "neosphere") == "neosphere":
+		if self.settings.defaultEngine == "neosphere":
 			self.runNeosphere(project.buildDir)
 		else:
 			self.runLegacyEngine(project.buildDir)
+
+
+	def isRunning(self):
+		return self.process.state() != QProcess.ProcessState.NotRunning
+
+
+	def stopGame(self):
+		if self.isRunning():
+			self.manuallyStopped = True
+			self.process.terminate()
 
 
 	def showErrorWithOutput(self, error:str, title="Unable to launch game"):
@@ -103,29 +118,33 @@ class SphereLauncher:
 		ErrorDialog.showError(self.parent, error + "<br>" + informativeText, title)
 
 
-
 	@Slot(QProcess.ProcessError)
 	def onProcessErrorOccured(self, error:QProcess.ProcessError):
-		self.showErrorWithOutput(f"An error occured while running {self.sphereName}: {error}", "Error")
+		if not self.manuallyStopped:
+			self.showErrorWithOutput(f"An error occured while running {self.sphereName}: {error}", "Error")
 
 
 	@Slot()
 	def onProcessStdout(self):
 		data = self.process.readAllStandardOutput().data().decode()
-		# print("stdout: ", data)
+		if self.settings.connectConsole:
+			print(data, end="", flush=True)
 		self.output += data
 
 
 	@Slot()
 	def onProcessStderr(self):
 		data = self.process.readAllStandardError().data().decode()
-		# print("stderr: ", data)
+		if self.settings.connectConsole:
+			print(data, end="", flush=True, file=sys.stderr)
 		self.output += data
 
 
 	@Slot(QProcess.ExitStatus)
 	def onProcessFinished(self, exitCode: QProcess.ExitStatus|int):
-		if exitCode != 0 and exitCode != QProcess.ExitStatus.NormalExit:
+		if exitCode != 0 and not self.manuallyStopped and exitCode != QProcess.ExitStatus.NormalExit:
 			self.showErrorWithOutput(f"{self.sphereName} process finished with exit code {exitCode}")
+		elif self.manuallyStopped:
+			print("Process was manually terminated")
 		else:
 			print("Process exited normally")

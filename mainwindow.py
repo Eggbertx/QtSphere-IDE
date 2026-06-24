@@ -5,7 +5,7 @@ from os.path import basename
 import sys
 import traceback
 
-from PySide6.QtCore import QCoreApplication, Qt, Slot, QUrl
+from PySide6.QtCore import QProcess, Qt, Slot, QUrl
 from PySide6.QtGui import QCloseEvent, QIcon, QDesktopServices, QImage, QShortcut
 from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QComboBox,
 	QFileDialog, QMenu, QToolButton, QWidget, QDialog, QDialogButtonBox, QAbstractButton)
@@ -167,6 +167,7 @@ class MainWindow(QMainWindow):
 		self.startPage.projectLoaded.connect(lambda proj: self.loadProject(proj))
 		self.startPage.loadProjectAction.triggered.connect(self.onStartPageProjectSelected)
 		self.startPage.startGameAction.triggered.connect(self.onStartGameTriggered)
+		self.launcher.process.stateChanged.connect(self.onProcessStateChanged)
 		self.startPage.openProjectDirAction.triggered.connect(self.onOpenSelectedProjectDir)
 		self.engineSelector.currentIndexChanged.connect(self.onEngineChanged)
 		self.ui.actionClose.triggered.connect(self.closeProject)
@@ -219,7 +220,7 @@ class MainWindow(QMainWindow):
 			ErrorDialog.showError(self, "A game does not appear to be loaded", "Error launching game")
 			return
 
-		try:		
+		try:
 			self.launcher.launchGame(game)
 		except Exception as e:
 			ErrorDialog.showError(self, f"Unable to run game: {e}", "Error launching game")
@@ -538,7 +539,10 @@ class MainWindow(QMainWindow):
 
 	@Slot()
 	def onGameLaunched(self):
-		self.launchGame(self.loadedProject)
+		if self.launcher.isRunning():
+			self.launcher.stopGame()
+		else:
+			self.launchGame(self.loadedProject)
 
 
 	@Slot(bool)
@@ -726,6 +730,13 @@ class MainWindow(QMainWindow):
 		if game is None:
 			return
 		self.launchGame(game)
+
+
+	@Slot(QProcess.ProcessState)
+	def onProcessStateChanged(self, state: QProcess.ProcessState):
+		self.ui.toolbarPlayGame.setIcon(QIcon.fromTheme("media-playback-stop" if state == QProcess.ProcessState.Running else "media-playback-start"))
+		self.ui.toolbarPlayGame.setText("Stop Game" if state == QProcess.ProcessState.Running else "Play Game")
+		self.ui.toolbarPlayGame.setToolTip("Stop Game" if state == QProcess.ProcessState.Running else "Play Game")
 
 
 	@Slot()

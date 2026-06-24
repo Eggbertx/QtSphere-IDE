@@ -14,6 +14,7 @@ class Defaults:
 	wineDir = "/usr/bin"
 	theme = "Fusion"
 	defaultZoom = 2
+	connectConsole = True
 
 
 class Settings(QSettings):
@@ -143,7 +144,7 @@ class Settings(QSettings):
 
 	@theme.deleter
 	def theme(self):
-		self.remove(Defaults.theme)
+		self.remove("theme")
 
 	@property
 	def defaultZoom(self) -> int:
@@ -157,6 +158,18 @@ class Settings(QSettings):
 	def defaultZoom(self):
 		self.remove("defaultZoom")
 
+	@property
+	def connectConsole(self) -> bool:
+		return self.__getBool("connectConsole", Defaults.connectConsole)
+	
+	@connectConsole.setter
+	def connectConsole(self, val:bool):
+		self.setValue("connectConsole", val)
+
+	@connectConsole.deleter
+	def connectConsole(self):
+		self.remove("connectConsole")
+
 	def __init__(self, filename:str = None) -> None:
 		if filename is None:
 			super().__init__()
@@ -169,6 +182,12 @@ class Settings(QSettings):
 			default = getattr(Defaults, key)
 		return super().value(key, default)
 	
+	def __getBool(self, key:str, default:bool|None = None) -> bool:
+		v = self.value(key, default)
+		if isinstance(v, str):
+			return v.lower() == "true"
+		return v
+
 	def getArray(self, arrayKey:str|Defaults, indexKey:str):
 		num = self.beginReadArray(arrayKey)
 		arr = []
