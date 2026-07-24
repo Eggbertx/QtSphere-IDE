@@ -297,6 +297,7 @@ class MainWindow(QMainWindow):
 						editor = TextEdit.openAndAttach(self.ui.openFileTabs, filePath)
 			editor.modificationChanged.connect(self.onCurrentFileModificationChanged)
 			self.openAndGoToNewEditorWidget(editor, filePath)
+			self.addRecentFile(filePath)
 		except Exception as e:
 			errorDialog = QMessageBox(QMessageBox.Icon.Critical, "Error", str(e))
 			errorDialog.setInformativeText(traceback.format_exc())
@@ -349,6 +350,7 @@ class MainWindow(QMainWindow):
 			settings.recentProjects.insert(0, project.projectDir)
 		recentProjects.insert(0, project.projectDir)
 		settings.recentProjects = recentProjects[:10]
+		self.updateRecentMenu()
 
 
 	def addRecentFile(self, filePath:str):
@@ -359,19 +361,43 @@ class MainWindow(QMainWindow):
 			settings.recentFiles.insert(0, filePath)
 		recentFiles.insert(0, filePath)
 		settings.recentFiles = recentFiles[:10]
+		self.updateRecentMenu()
+
+
+	def clearRecentFilesAndProjects(self):
+		settings = Settings()
+		settings.recentFiles = []
+		settings.recentProjects = []
+		self.updateRecentMenu()
 
 
 	def updateRecentMenu(self):
 		settings = Settings()
-		self.ui.menuRecent_Files.clear()
-		for f in settings.recentFiles:
-			action = self.ui.menuRecent_Files.addAction(f)
-			action.triggered.connect(lambda checked, path=f: self.openFile(path))
+		self.ui.menuOpenRecent.clear()
+		noRecent = len(settings.recentFiles) == 0 and len(settings.recentProjects) == 0
+		clearAction = self.ui.menuOpenRecent.addAction("No recent files" if noRecent else "Clear recent files and projects", self.clearRecentFilesAndProjects)
+		if noRecent:
+			clearAction.setEnabled(False)
+			return
 
-		self.ui.menuRecent_Projects.clear()
-		for p in settings.recentProjects:
-			action = self.ui.menuRecent_Projects.addAction(p)
-			action.triggered.connect(lambda checked, path=p: self.openProjectFileOrDir(path))
+		self.ui.menuOpenRecent.addSeparator()
+		if len(settings.recentProjects) > 0:
+			for p in settings.recentProjects:
+				action = self.ui.menuOpenRecent.addAction(p)
+				action.triggered.connect(lambda checked, path=p: self.openProjectFileOrDir(path))
+		else:
+			action = self.ui.menuOpenRecent.addAction("No recent projects")
+			action.setEnabled(False)
+
+		self.ui.menuOpenRecent.addSeparator()
+		if len(settings.recentFiles) > 0:
+			for f in settings.recentFiles:
+				action = self.ui.menuOpenRecent.addAction(f)
+				action.triggered.connect(lambda checked, path=f: self.openFile(path))
+		else:
+			action = self.ui.menuOpenRecent.addAction("No recent files")
+			action.setEnabled(False)
+
 
 
 	def switchSidebarTab(self, tab:SidebarTab):
@@ -532,6 +558,7 @@ class MainWindow(QMainWindow):
 		self.projectPropertiesDialog.project = self.loadedProject
 		self.ui.treeView.updateProject(project)
 		self.switchSidebarTab(SidebarTab.FileTree)
+		self.addRecentProject(project)
 
 
 	#region Slots
