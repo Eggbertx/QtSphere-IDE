@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QMessageBox, QComboBox
 from dialogs.mappropertiesdialog import MapPropertiesDialog
 from ui.ui_mainwindow import Ui_MainWindow
 
+from dialogs.aboutdialog import AboutDialog
 from dialogs.errordialog import ErrorDialog
 from dialogs.modifiedfilesdialog import ModifiedFilesDialog
 from dialogs.newimagedialog import NewImageDialog
@@ -72,6 +73,7 @@ class MainWindow(QMainWindow):
 	engineSelector: QComboBox
 	settingsWindow: SettingsWindow
 	loadedProject: QSIProject
+	aboutDialog: AboutDialog
 	newImageDialog: NewImageDialog
 	newMapDialog: NewMapDialog
 	launcher: SphereLauncher
@@ -136,6 +138,7 @@ class MainWindow(QMainWindow):
 		self._connectActions()
 		if openPath is not None:
 			self.openProjectFileOrDir(openPath)
+		self.aboutDialog = AboutDialog(self.version, self)
 
 		if os.name == "nt":
 			# makes it so that our icon shows up correctly in the task bar instead of using pythonw.exe's icon
@@ -155,14 +158,11 @@ class MainWindow(QMainWindow):
 
 	def _connectActions(self):
 		self.ui.actionExit.triggered.connect(sys.exit)
-		self.ui.actionAbout_Qt.triggered.connect(lambda: QMessageBox.aboutQt(self, "About Qt"))
-		self.ui.actionAbout.triggered.connect(lambda: QMessageBox.about(self, "About QtSphere IDE", 
-			f"QtSphere IDE v{self.version}<br />" +
-			"Copyright 2025 by <a href=\"https://github.com/eggbertx\">Eggbertx</a><br /><br />" +
-			"See <a href=\"https://github.com/Eggbertx/QtSphere-IDE/blob/master/LICENSE.txt\">LICENSE.txt</a> for more information."))
+		self.ui.actionAboutQt.triggered.connect(lambda: QMessageBox.aboutQt(self, "About Qt"))
+		self.ui.actionAbout.triggered.connect(lambda: self.aboutDialog.exec())
 		self.ui.openFileTabs.tabCloseRequested.connect(self.onTabCloseRequested)
 		self.ui.openFileTabs.tabBar().tabMoved.connect(self.onTabMoved)
-		self.ui.actionConfigure_QtSphere_IDE.triggered.connect(self.onOpenSettingsWindowTriggered)
+		self.ui.actionConfigureQtSphereIDE.triggered.connect(self.onOpenSettingsWindowTriggered)
 		self.settingsWindow.settingsSaved.connect(self.onSettingsSaved)
 		self.startPage.projectLoaded.connect(lambda proj: self.loadProject(proj))
 		self.startPage.loadProjectAction.triggered.connect(self.onStartPageProjectSelected)
@@ -172,13 +172,13 @@ class MainWindow(QMainWindow):
 		self.engineSelector.currentIndexChanged.connect(self.onEngineChanged)
 		self.ui.actionClose.triggered.connect(self.closeProject)
 		self.ui.actionRefresh.triggered.connect(lambda: self.ui.treeView.updateProject(self.loadedProject))
-		self.ui.actionProject_Explorer.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.FileTree))
-		self.ui.actionProject_Task_List.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.TaskList))
-		self.ui.actionSound_Test.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.SoundTest))
-		self.ui.actionSpherical_community.triggered.connect(lambda: QDesktopServices.openUrl("https://spheredev.org/"))
+		self.ui.actionProjectExplorer.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.FileTree))
+		self.ui.actionProjectTaskList.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.TaskList))
+		self.ui.actionSoundTest.triggered.connect(lambda: self.switchSidebarTab(SidebarTab.SoundTest))
+		self.ui.actionSphericalCommunity.triggered.connect(lambda: QDesktopServices.openUrl("https://spheredev.org/"))
 		self.ui.actionQSIGithub.triggered.connect(lambda: QDesktopServices.openUrl("https://github.com/Eggbertx/QtSphere-IDE"))
 		self.ui.actionNSGithub.triggered.connect(lambda: QDesktopServices.openUrl("https://github.com/spheredev/neoSphere"))
-		self.ui.actionOpen_Game_Directory.triggered.connect(self._openCurrentProjectDir)
+		self.ui.actionOpenGameDirectory.triggered.connect(self._openCurrentProjectDir)
 		self.ui.treeView.fileItemActivated.connect(self.openFile)
 		self.ui.actionOpenFile.triggered.connect(self.onOpenFileTriggered)
 		self.ui.actionOpenProject.triggered.connect(self.onOpenProjectTriggered)
@@ -188,7 +188,7 @@ class MainWindow(QMainWindow):
 		self.ui.actionCut.triggered.connect(self.onCutTriggered)
 		self.ui.actionCopy.triggered.connect(self.onCopyTriggered)
 		self.ui.actionPaste.triggered.connect(self.onPasteTriggered)
-		self.ui.actionSelect_All.triggered.connect(self.onSelectAllTriggered)
+		self.ui.actionSelectAll.triggered.connect(self.onSelectAllTriggered)
 		self.ui.actionLegacyConfig.triggered.connect(self.launcher.runLegacyConfig)
 		self.ui.toolbarPlayGame.triggered.connect(self.onGameLaunched)
 		self.ui.newProject.triggered.connect(self.projectPropertiesDialog.show)
@@ -196,9 +196,9 @@ class MainWindow(QMainWindow):
 		self.newImageDialog.accepted.connect(self.onNewImageAccepted)
 		self.ui.newMap.triggered.connect(self.newMapDialog.show)
 		self.newMapDialog.accepted.connect(self.onNewMapAccepted)
-		self.ui.actionProject_Properties.triggered.connect(self.projectPropertiesDialog.show)
+		self.ui.actionProjectProperties.triggered.connect(self.projectPropertiesDialog.show)
 		self.ui.actionSave.triggered.connect(lambda: self.saveCurrentTab(False))
-		self.ui.actionSave_As.triggered.connect(lambda: self.saveCurrentTab(True))
+		self.ui.actionSaveAs.triggered.connect(lambda: self.saveCurrentTab(True))
 		self.ui.newPlainTextFile.triggered.connect(self.newTextFile)
 		self.modifiedFilesDialog.buttonBox.clicked.connect(self.onModifiedFileDialogButtonClicked)
 
@@ -304,7 +304,6 @@ class MainWindow(QMainWindow):
 			raise
 
 
-
 	def openProjectFileOrDir(self, openPath:str):
 		ext = openPath[openPath.rindex("."):] if openPath.count(".") > 0 else ""
 		match ext:
@@ -337,9 +336,42 @@ class MainWindow(QMainWindow):
 		self.setWindowTitle(f"QtSphere IDE {self.version}")
 		self.ui.menuProject.setEnabled(False)
 		self.engineSelector.setEnabled(False)
-		self.ui.actionProject_Properties.setEnabled(False)
+		self.ui.actionProjectProperties.setEnabled(False)
 		self.ui.toolbarPlayGame.setEnabled(False)
 		self.newMapDialog.projectPath = None
+
+
+	def addRecentProject(self, project:QSIProject):
+		settings = Settings()
+		recentProjects = settings.recentProjects
+		if project.projectDir in recentProjects:
+			recentProjects.remove(project.projectDir)
+			settings.recentProjects.insert(0, project.projectDir)
+		recentProjects.insert(0, project.projectDir)
+		settings.recentProjects = recentProjects[:10]
+
+
+	def addRecentFile(self, filePath:str):
+		settings = Settings()
+		recentFiles = settings.recentFiles
+		if filePath in recentFiles:
+			recentFiles.remove(filePath)
+			settings.recentFiles.insert(0, filePath)
+		recentFiles.insert(0, filePath)
+		settings.recentFiles = recentFiles[:10]
+
+
+	def updateRecentMenu(self):
+		settings = Settings()
+		self.ui.menuRecent_Files.clear()
+		for f in settings.recentFiles:
+			action = self.ui.menuRecent_Files.addAction(f)
+			action.triggered.connect(lambda checked, path=f: self.openFile(path))
+
+		self.ui.menuRecent_Projects.clear()
+		for p in settings.recentProjects:
+			action = self.ui.menuRecent_Projects.addAction(p)
+			action.triggered.connect(lambda checked, path=p: self.openProjectFileOrDir(path))
 
 
 	def switchSidebarTab(self, tab:SidebarTab):
@@ -493,7 +525,7 @@ class MainWindow(QMainWindow):
 		self.setWindowTitle(f"QtSphereIDE {self.version} - {project.name}")
 		self.ui.menuProject.setEnabled(True)
 		self.engineSelector.setEnabled(True)
-		self.ui.actionProject_Properties.setEnabled(True)
+		self.ui.actionProjectProperties.setEnabled(True)
 		self.loadedProject = project
 		self.ui.toolbarPlayGame.setEnabled(True)
 		self.newMapDialog.projectPath = project.projectDir
@@ -568,12 +600,12 @@ class MainWindow(QMainWindow):
 		self.ui.actionCut.setEnabled(hasClipboard)
 		self.ui.actionCopy.setEnabled(hasClipboard)
 		self.ui.actionPaste.setEnabled(hasClipboard)
-		self.ui.actionSelect_All.setEnabled(self.currentTabHasSelectAll())
+		self.ui.actionSelectAll.setEnabled(self.currentTabHasSelectAll())
 		index = self.currentTabIndex
 		if index < len(self.openFilePaths):
 			currentPath = self.openFilePaths[index]
 			self.ui.actionSave.setEnabled(currentPath is not None)
-			self.ui.actionSave_As.setEnabled(currentPath is not None)
+			self.ui.actionSaveAs.setEnabled(currentPath is not None)
 		
 		editor:SphereEditor = self.ui.openFileTabs.currentWidget()
 		if hasattr(editor, "editorType"):

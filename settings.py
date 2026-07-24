@@ -15,6 +15,8 @@ class Defaults:
 	theme = "Fusion"
 	defaultZoom = 2
 	connectConsole = True
+	recentProjects = []
+	recentFiles = []
 
 
 class Settings(QSettings):
@@ -169,6 +171,30 @@ class Settings(QSettings):
 	@connectConsole.deleter
 	def connectConsole(self):
 		self.remove("connectConsole")
+
+	@property
+	def recentProjects(self) -> list[str]:
+		return self.getArray("recentProjects", "path")
+
+	@recentProjects.setter
+	def recentProjects(self, paths:list[str]):
+		self.setArray("recentProjects", "path", paths)
+
+	@recentProjects.deleter
+	def recentProjects(self):
+		self.remove("recentProjects")
+
+	@property
+	def recentFiles(self) -> list[str]:
+		return self.getArray("recentFiles", "path")
+
+	@recentFiles.setter
+	def recentFiles(self, paths:list[str]):
+		self.setArray("recentFiles", "path", paths)
+
+	@recentFiles.deleter
+	def recentFiles(self):
+		self.remove("recentFiles")
 
 	def __init__(self, filename:str = None) -> None:
 		if filename is None:

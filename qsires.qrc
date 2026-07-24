@@ -22,5 +22,6 @@
         <file>res/person.svg</file>
         <file>res/trigger.svg</file>
         <file>res/spawnpoint_icon.svg</file>
+        <file>LICENSE.txt</file>
     </qresource>
 </RCC>

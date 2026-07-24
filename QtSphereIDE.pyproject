@@ -22,6 +22,7 @@
         "ui/mappropertiesdialog.ui",
         "ui/resizedialog.ui",
         "ui/windowstyleeditor.ui",
-        "ui/windowstylepropertiesdialog.ui"
+        "ui/windowstylepropertiesdialog.ui",
+        "ui/aboutdialog.ui"
     ]
 }
